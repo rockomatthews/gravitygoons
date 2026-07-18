@@ -1,5 +1,5 @@
 {
-  "name": "impact-club-site",
+  "name": "gravity-goons-site",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.110.7",
+    "@types/three": "^0.185.1",
     "next": "16.2.10",
     "react": "19.2.7",
     "react-dom": "19.2.7",
+    "three": "^0.185.1",
     "viem": "2.55.2"
   },
   "devDependencies": {
@@ -24,4 +26,3 @@
     "typescript": "5.9.3"
   }
 }
-

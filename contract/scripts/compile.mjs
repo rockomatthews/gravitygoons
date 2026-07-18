@@ -4,7 +4,7 @@ import solc from "solc";
 
 const root = path.resolve(import.meta.dirname, "..");
 const sources = {};
-for (const file of ["ImpactClub.sol", "ImpactProgressRegistry.sol"]) {
+for (const file of ["GravityGoons.sol", "GravityGoonsProgressRegistry.sol"]) {
   sources[`src/${file}`] = { content: fs.readFileSync(path.join(root, "src", file), "utf8") };
 }
 
@@ -30,6 +30,7 @@ for (const error of output.errors ?? []) {
   console[error.severity === "error" ? "error" : "warn"](error.formattedMessage);
 }
 if ((output.errors ?? []).some((error) => error.severity === "error")) process.exit(1);
+fs.rmSync(path.join(root, "artifacts"), { recursive: true, force: true });
 fs.mkdirSync(path.join(root, "artifacts"), { recursive: true });
 for (const [source, contracts] of Object.entries(output.contracts)) {
   if (!source.startsWith("src/")) continue;
@@ -43,4 +44,4 @@ for (const [source, contracts] of Object.entries(output.contracts)) {
     }, null, 2));
   }
 }
-console.log("Compiled Impact Club contracts.");
+console.log("Compiled Gravity Goons contracts.");

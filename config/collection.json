@@ -1,6 +1,6 @@
 {
-  "name": "Impact Club",
-  "symbol": "IMPACT",
+  "name": "Gravity Goons",
+  "symbol": "GOONS",
   "description": "1,000 selectable action-sports characters built for future progression.",
   "seed": 260718,
   "supply": 1000,
@@ -11,7 +11,7 @@
   "royalty_bps": 500,
   "image_base_uri": "ipfs://REPLACE_IMAGE_CID/",
   "genesis_metadata_base_uri": "ipfs://REPLACE_GENESIS_CID/",
-  "dynamic_metadata_base_url": "https://REPLACE_OWNED_DOMAIN/api/nft/v1/",
+  "dynamic_metadata_base_url": "https://gravitygoons.com/api/nft/v1/",
   "progress_registry_address": "0x0000000000000000000000000000000000000000",
   "schema_version": 1,
   "render": {

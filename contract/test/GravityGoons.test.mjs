@@ -5,11 +5,11 @@ import ganache from "ganache";
 import { BrowserProvider, ContractFactory, Wallet, parseEther } from "ethers";
 
 const root = path.resolve(import.meta.dirname, "..");
-const impactArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "ImpactClub.json")));
-const registryArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "ImpactProgressRegistry.json")));
+const impactArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "GravityGoons.json")));
+const registryArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "GravityGoonsProgressRegistry.json")));
 const disciplineWords = JSON.parse(fs.readFileSync(path.join(root, "config", "discipline-words.json")));
 
-describe("Impact Club launch contracts", function () {
+describe("Gravity Goons launch contracts", function () {
   let ganacheProvider;
   let provider;
   let owner;
@@ -97,7 +97,7 @@ describe("Impact Club launch contracts", function () {
       deadline: BigInt(block.timestamp + 3600),
     };
     const domain = {
-      name: "Impact Club Progress",
+      name: "Gravity Goons Progress",
       version: "1",
       chainId: network.chainId,
       verifyingContract: await registry.getAddress(),
@@ -136,7 +136,7 @@ describe("Impact Club launch contracts", function () {
     const actual = Number(await collection.disciplineOf(9));
     const block = await provider.getBlock("latest");
     const network = await provider.getNetwork();
-    const domain = { name: "Impact Club Progress", version: "1", chainId: network.chainId, verifyingContract: await registry.getAddress() };
+    const domain = { name: "Gravity Goons Progress", version: "1", chainId: network.chainId, verifyingContract: await registry.getAddress() };
     const types = { ProgressClaim: [
       { name: "tokenId", type: "uint256" }, { name: "xp", type: "uint64" },
       { name: "level", type: "uint32" }, { name: "trickBitmap", type: "uint64" },

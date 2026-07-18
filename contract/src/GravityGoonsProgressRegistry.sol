@@ -7,15 +7,15 @@ import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-interface IImpactClubProgressTarget {
+interface IGravityGoonsProgressTarget {
     function ownerOf(uint256 tokenId) external view returns (address);
     function disciplineOf(uint256 tokenId) external view returns (uint8);
     function notifyMetadataUpdate(uint256 tokenId) external;
 }
 
-/// @title Impact Progress Registry
-/// @notice Settles signed, monotonic progression that follows an Impact Club token.
-contract ImpactProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
+/// @title Gravity Goons Progress Registry
+/// @notice Settles signed, monotonic progression that follows a Gravity Goons token.
+contract GravityGoonsProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
     uint256 public constant SIGNER_DELAY = 2 days;
     bytes32 public constant PROGRESS_TYPEHASH = keccak256(
         "ProgressClaim(uint256 tokenId,uint64 xp,uint32 level,uint64 trickBitmap,uint64 achievementBitmap,uint16 catalogVersion,uint8 discipline,uint32 nonce,uint64 deadline)"
@@ -42,7 +42,7 @@ contract ImpactProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
         uint64 deadline;
     }
 
-    IImpactClubProgressTarget public collection;
+    IGravityGoonsProgressTarget public collection;
     address public gameSigner;
     address public pendingGameSigner;
     uint64 public signerActivationTime;
@@ -72,7 +72,7 @@ contract ImpactProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
     );
 
     constructor(address initialOwner, address initialGameSigner)
-        EIP712("Impact Club Progress", "1")
+        EIP712("Gravity Goons Progress", "1")
         Ownable(initialOwner)
     {
         if (initialGameSigner == address(0)) revert InvalidAddress();
@@ -82,7 +82,7 @@ contract ImpactProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
     function setCollectionOnce(address collectionAddress) external onlyOwner {
         if (address(collection) != address(0)) revert CollectionAlreadySet();
         if (collectionAddress == address(0)) revert InvalidAddress();
-        collection = IImpactClubProgressTarget(collectionAddress);
+        collection = IGravityGoonsProgressTarget(collectionAddress);
         emit CollectionSet(collectionAddress);
     }
 
@@ -154,4 +154,3 @@ contract ImpactProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
         emit GameSignerActivated(gameSigner);
     }
 }
-

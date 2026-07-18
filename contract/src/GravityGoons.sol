@@ -7,9 +7,9 @@ import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-/// @title Impact Club
+/// @title Gravity Goons
 /// @notice Immediate-reveal, exact-token ERC-721 for selectable action-sports characters.
-contract ImpactClub is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
+contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
     uint256 public constant MAX_SUPPLY = 1_000;
     uint256 public constant PUBLIC_ALLOCATION = 950;
     uint256 public constant CREATOR_ALLOCATION = 50;
@@ -48,7 +48,7 @@ contract ImpactClub is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         address registry,
         string memory metadataBaseURL,
         uint256[12] memory disciplineWords
-    ) ERC721("Impact Club", "IMPACT") Ownable(initialOwner) {
+    ) ERC721("Gravity Goons", "GOONS") Ownable(initialOwner) {
         if (bytes(metadataBaseURL).length == 0) revert EmptyMetadataURL();
         progressRegistry = registry;
         _metadataBaseURL = metadataBaseURL;
@@ -149,4 +149,3 @@ contract ImpactClub is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         return string(output);
     }
 }
-

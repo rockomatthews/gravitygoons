@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministically assigns all 1,000 Impact Club characters and metadata."""
+"""Deterministically assigns all 1,000 Gravity Goons characters and metadata."""
 
 from __future__ import annotations
 
@@ -137,7 +137,7 @@ def build_assignments(config: dict) -> list[dict]:
 
             item = {
                 "token_id": token_id,
-                "name": f"Impact Club #{token_id:04d}",
+                "name": f"Gravity Goons #{token_id:04d}",
                 "cast": cast,
                 "species": species,
                 "archetype": archetype,
@@ -215,7 +215,7 @@ def metadata_for(item: dict, config: dict) -> dict:
         "name": item["name"],
         "description": config["description"],
         "image": f"{config['image_base_uri']}{token_id:04d}.png",
-        "external_url": f"https://REPLACE_OWNED_DOMAIN/character/{token_id:04d}",
+        "external_url": f"https://gravitygoons.com/character/{token_id:04d}",
         "attributes": attributes,
         "properties": {
             "discipline": item["discipline"],

@@ -5,8 +5,6 @@ import { createWalletClient, custom } from "viem";
 import { base } from "viem/chains";
 import { collectionAbi, collectionAddress, ZERO_ADDRESS } from "@/lib/contracts";
 
-declare global { interface Window { ethereum?: { request(args: { method: string; params?: unknown[] }): Promise<unknown> } } }
-
 export function OwnerControls() {
   const [reserveIds, setReserveIds] = useState("1,2,3");
   const [recipient, setRecipient] = useState("");
@@ -31,4 +29,3 @@ export function OwnerControls() {
     </div>
   );
 }
-

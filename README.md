@@ -1,6 +1,8 @@
-# Impact Club
+# Gravity Goons
 
 Immediate-reveal, exact-token action-sports NFTs with game-ready progression foundations.
+
+Production website: `https://gravitygoons.com`
 
 ## Current milestone
 
@@ -30,7 +32,7 @@ Still gated:
 - Full-body sport-readable concept: `art/concepts/snow-leopard-full-body-v2.png`
 - Procedural Blender scene/render builder: `art/blender/render_base_character.py`
 - Approval notes: `reports/approval-gate-1.md`
-- Twelve-character roster: `art/approval/impact-club-roster-12-v1.png`
+- Twelve-character roster: `art/approval/gravity-goons-roster-12-v1.png`
 - Roster mapping: `reports/approval-gate-2-roster.md`
 - Fictional label catalog: `traits/parody-brands.json`
 
@@ -39,7 +41,7 @@ The current Blender 5.1.2 Homebrew executable crashes inside its Metal device in
 ## Generate and validate the collection data
 
 ```bash
-cd /Users/rob/Documents/Codex/impact-club
+cd /Users/rob/Documents/Codex/gravity-goons
 python3 -m pip install -r requirements.txt
 python3 generate.py
 ```
@@ -107,6 +109,22 @@ npm run build
 ```
 
 The metadata route is `/api/nft/v1/[tokenId]`. It reads onchain progress first, may use Supabase as a cache fallback, emits OpenSea-compatible attributes, and uses short CDN caching with ETags.
+
+The storefront includes an interactive Three.js gravity field, futuristic 3D presentation, a Base wallet connection button, automatic Base network switching, live availability polling for all 1,000 IDs, sold-token disabling, exact-token checkout for up to five Goons, transaction confirmation, and automatic post-mint refresh.
+
+### Vercel configuration
+
+Import this repository as a new Vercel project and set **Root Directory** to `site`. Attach `gravitygoons.com` after buying it through Vercel. Configure these production environment variables before the controlled mint:
+
+- `NEXT_PUBLIC_BASE_RPC_URL`
+- `NEXT_PUBLIC_COLLECTION_ADDRESS`
+- `NEXT_PUBLIC_PROGRESS_REGISTRY_ADDRESS`
+- `NEXT_PUBLIC_IMAGE_BASE_URI`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY` (server only)
+- `DEMO_PROGRESS_ENABLED=false`
+
+Never place the game signer, relayer key, deployer key, or Supabase service-role key in a `NEXT_PUBLIC_` variable.
 
 ## Mainnet launch gates
 

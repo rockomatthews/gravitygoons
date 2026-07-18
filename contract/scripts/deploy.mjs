@@ -26,14 +26,14 @@ function artifact(name) {
   return JSON.parse(fs.readFileSync(path.join(root, "artifacts", `${name}.json`), "utf8"));
 }
 
-const registryArtifact = artifact("ImpactProgressRegistry");
-const collectionArtifact = artifact("ImpactClub");
+const registryArtifact = artifact("GravityGoonsProgressRegistry");
+const collectionArtifact = artifact("GravityGoons");
 const words = JSON.parse(fs.readFileSync(path.join(root, "config", "discipline-words.json"), "utf8"));
 
 console.log(`Deploying from ${deployer.address} on chain ${network.chainId}...`);
 const registry = await new ContractFactory(registryArtifact.abi, registryArtifact.bytecode, deployer).deploy(deployer.address, gameSigner);
 await registry.waitForDeployment();
-console.log(`ImpactProgressRegistry: ${await registry.getAddress()}`);
+console.log(`GravityGoonsProgressRegistry: ${await registry.getAddress()}`);
 
 const collection = await new ContractFactory(collectionArtifact.abi, collectionArtifact.bytecode, deployer).deploy(
   owner,
@@ -42,7 +42,7 @@ const collection = await new ContractFactory(collectionArtifact.abi, collectionA
   words,
 );
 await collection.waitForDeployment();
-console.log(`ImpactClub: ${await collection.getAddress()}`);
+console.log(`GravityGoons: ${await collection.getAddress()}`);
 
 const link = await registry.setCollectionOnce(await collection.getAddress());
 await link.wait();

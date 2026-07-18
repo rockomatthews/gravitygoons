@@ -1,8 +1,8 @@
 {
-  "name": "Impact Club #0810",
+  "name": "Gravity Goons #0810",
   "description": "1,000 selectable action-sports characters built for future progression.",
   "image": "ipfs://REPLACE_IMAGE_CID/0810.png",
-  "external_url": "https://REPLACE_OWNED_DOMAIN/character/0810",
+  "external_url": "https://gravitygoons.com/character/0810",
   "attributes": [
     {
       "trait_type": "Cast",

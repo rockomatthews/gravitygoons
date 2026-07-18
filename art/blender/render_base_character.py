@@ -1,4 +1,4 @@
-"""Procedural Impact Club base snow-leopard approval render.
+"""Procedural Gravity Goons base snow-leopard approval render.
 
 Run:
   blender --background --python art/blender/render_base_character.py -- \
@@ -111,8 +111,8 @@ def build_character(clay=False):
     fur = mat("Snow fur", (0.55, 0.55, 0.52, 1), 0.82)
     muzzle = mat("Warm muzzle", (0.70, 0.67, 0.60, 1), 0.86)
     inner_ear = mat("Inner ear", (0.23, 0.16, 0.17, 1), 0.9)
-    teal = mat("Impact teal", (0.0, 0.62, 0.63, 1), 0.48)
-    coral = mat("Impact coral", (1.0, 0.16, 0.08, 1), 0.55)
+    teal = mat("Gravity teal", (0.0, 0.62, 0.63, 1), 0.48)
+    coral = mat("Gravity coral", (1.0, 0.16, 0.08, 1), 0.55)
     eye_white = mat("Eye white", (0.92, 0.88, 0.76, 1), 0.5)
     eye_teal = mat("Iris", (0.0, 0.68, 0.67, 1), 0.28, 0.1)
     clay_mat = mat("Clay", (0.48, 0.46, 0.42, 1), 0.9)

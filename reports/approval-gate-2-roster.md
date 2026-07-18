@@ -1,6 +1,6 @@
 # Approval Gate 2 — Twelve-Character Roster
 
-Visual sheet: `art/approval/impact-club-roster-12-v1.png`
+Visual sheet: `art/approval/gravity-goons-roster-12-v1.png`
 
 This roster tests the new full-body character-select direction across every discipline, all eight animal species, human representation, varied apparel silhouettes, and all twelve fictional labels.
 
@@ -20,4 +20,3 @@ This roster tests the new full-body character-select direction across every disc
 | 12 | Human | Snowboarding | QUEAZY | Snowboard and bindings |
 
 The sheet is visual direction, not the final deterministic render set. Text and original symbols will be authored as controlled Blender assets so spelling and logo geometry do not depend on image generation.
-

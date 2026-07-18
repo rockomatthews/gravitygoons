@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const claim = { tokenId: BigInt(input.tokenId), xp: BigInt(input.xp), level: input.level, trickBitmap: BigInt(input.trickBitmap), achievementBitmap: BigInt(input.achievementBitmap ?? "0"), catalogVersion: input.catalogVersion, discipline: input.discipline, nonce: input.nonce, deadline };
   const account = privateKeyToAccount(privateKey);
   const signature = await account.signTypedData({
-    domain: { name: "Impact Club Progress", version: "1", chainId: 8453, verifyingContract: registry },
+    domain: { name: "Gravity Goons Progress", version: "1", chainId: 8453, verifyingContract: registry },
     types: { ProgressClaim: [
       { name: "tokenId", type: "uint256" }, { name: "xp", type: "uint64" }, { name: "level", type: "uint32" },
       { name: "trickBitmap", type: "uint64" }, { name: "achievementBitmap", type: "uint64" },
@@ -24,4 +24,3 @@ export async function POST(request: Request) {
   });
   return Response.json({ claim: { ...claim, tokenId: claim.tokenId.toString(), xp: claim.xp.toString(), trickBitmap: claim.trickBitmap.toString(), achievementBitmap: claim.achievementBitmap.toString(), deadline: claim.deadline.toString() }, signature });
 }
-
