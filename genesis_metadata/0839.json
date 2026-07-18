@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Angular"
+      "value": "Round"
     },
     {
       "trait_type": "Complexion",
-      "value": "Tan"
+      "value": "Rose"
     },
     {
       "trait_type": "Discipline",
@@ -30,15 +30,15 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "Buzz"
     },
     {
       "trait_type": "Headwear",
@@ -46,11 +46,35 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Freeride Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -79,13 +103,13 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

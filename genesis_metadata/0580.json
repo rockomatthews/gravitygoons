@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Fox"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Boardshorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Beach Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Sand / Aqua"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -79,19 +103,19 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

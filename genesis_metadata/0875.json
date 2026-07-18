@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Long"
     },
     {
       "trait_type": "Complexion",
-      "value": "Olive"
+      "value": "Rose"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "Waves"
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "CARHEART"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -67,13 +91,13 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

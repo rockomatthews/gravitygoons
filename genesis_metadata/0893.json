@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Ram"
+      "value": "Snow Leopard"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
+    },
+    {
       "trait_type": "Apparel",
       "value": "Zip Jersey"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Loose Skate Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Chunky Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Style"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Snow Leopard"
+      "value": "Fox"
     },
     {
       "trait_type": "Archetype",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Handlebar Lean"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -73,19 +97,19 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 5,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 7,
+      "value": 5,
       "max_value": 10
     },
     {

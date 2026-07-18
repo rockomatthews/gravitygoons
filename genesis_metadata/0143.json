@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Raccoon"
+      "value": "Fox"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "QUEAZY"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Zip Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cargo Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Chunky Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Push-Off"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Style"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {

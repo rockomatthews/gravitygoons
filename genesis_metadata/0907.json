@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Snow Leopard"
+      "value": "Ram"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Copper"
+      "value": "Natural"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pole Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -79,19 +103,19 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {

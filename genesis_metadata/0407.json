@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Boar"
+      "value": "Ram"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "QUEAZY"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Armored Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bars Turned"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {

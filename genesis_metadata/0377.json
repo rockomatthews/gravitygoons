@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Ram"
+      "value": "Boar"
     },
     {
       "trait_type": "Archetype",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "OFF-BEIGE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -73,25 +97,25 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Control",
       "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Control",
+      "value": 7,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

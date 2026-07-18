@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Boar"
+      "value": "Hyena"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Copper"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "PROCRASTIGONIA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Freeride Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Drop-In Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Sky / Orange"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

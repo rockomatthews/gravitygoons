@@ -14,7 +14,7 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Long"
+      "value": "Heart"
     },
     {
       "trait_type": "Complexion",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
@@ -38,27 +38,51 @@
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Bald"
+      "value": "High Fade"
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
       "value": "None"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Short-Sleeve Wetsuit"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Boardshorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Beach Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,19 +91,19 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {

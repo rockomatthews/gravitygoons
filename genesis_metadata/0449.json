@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Round"
     },
     {
       "trait_type": "Complexion",
-      "value": "Fair"
+      "value": "Olive"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "High Fade"
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
-    },
-    {
-      "trait_type": "Apparel",
-      "value": "Crew Jersey"
-    },
-    {
-      "trait_type": "Accessory",
       "value": "None"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "BURNTON"
+    },
+    {
+      "trait_type": "Apparel",
+      "value": "Tank Top"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Loose Skate Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Low-Top Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Style"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Bandage"
+    },
+    {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -73,13 +97,13 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {

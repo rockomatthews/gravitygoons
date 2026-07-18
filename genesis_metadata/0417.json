@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Snow Leopard"
+      "value": "Fox"
     },
     {
       "trait_type": "Archetype",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,11 +46,35 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "OFF-BEIGE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Snow Bib"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Soft Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Binding Check"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",
@@ -67,31 +91,31 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Air",
-      "value": 8,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Control",
       "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
-      "trait_type": "Style",
+      "trait_type": "Air",
       "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
-      "trait_type": "Toughness",
+      "trait_type": "Control",
+      "value": 8,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Style",
       "value": 4,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Toughness",
+      "value": 5,
       "max_value": 10
     },
     {

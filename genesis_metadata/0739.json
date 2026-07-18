@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Copper"
+      "value": "Natural"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
     },
     {
       "trait_type": "Apparel",
       "value": "Shell Jacket"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Soft Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Carry"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Sky / Orange"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,13 +109,13 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

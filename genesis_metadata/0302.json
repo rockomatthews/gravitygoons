@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Natural"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "POOMA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Motocross Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,19 +91,19 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {

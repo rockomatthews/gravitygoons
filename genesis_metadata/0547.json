@@ -14,7 +14,7 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Square"
+      "value": "Long"
     },
     {
       "trait_type": "Complexion",
@@ -30,31 +30,55 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "High Fade"
+      "value": "Waves"
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "PROCRASTIGONIA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -79,13 +103,13 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

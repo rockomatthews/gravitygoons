@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Boar"
+      "value": "Shark"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Midnight"
+      "value": "Ash"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Wetsuit Bottom"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Barefoot"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Beach Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

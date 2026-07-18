@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Shark"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -73,13 +97,13 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {

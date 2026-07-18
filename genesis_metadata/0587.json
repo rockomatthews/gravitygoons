@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Gorilla"
+      "value": "Snow Leopard"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Shell Jacket"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Baggy Snow Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Stiff Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Carry"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",

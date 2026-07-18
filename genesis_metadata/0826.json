@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Raccoon"
+      "value": "Gorilla"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Midnight"
+      "value": "Ash"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "BURNTON"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Ventilated Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Enduro Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bars Turned"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {

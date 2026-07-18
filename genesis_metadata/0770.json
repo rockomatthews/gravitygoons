@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Round"
+      "value": "Long"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rose"
+      "value": "Light"
     },
     {
       "trait_type": "Discipline",
@@ -30,27 +30,51 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Curls"
+      "value": "Bald"
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Loose Skate Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Chunky Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Tail Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Style"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 4,
       "max_value": 10
     },
     {
@@ -85,13 +109,13 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

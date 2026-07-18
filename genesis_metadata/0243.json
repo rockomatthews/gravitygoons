@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Rich"
+      "value": "Olive"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pole Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Purple / Gold"
     },
     {
       "trait_type": "Rarity",

@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Copper"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "QUEAZY"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Tank Top"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Wetsuit Bottom"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Beach Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {

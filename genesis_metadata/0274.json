@@ -30,15 +30,15 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Curls"
+      "value": "Bald"
     },
     {
       "trait_type": "Headwear",
@@ -49,16 +49,40 @@
       "value": "Mirrored Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "POOMA"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cargo Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Chunky Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Tail Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Style"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",

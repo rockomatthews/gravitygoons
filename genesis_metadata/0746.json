@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Gorilla"
+      "value": "Hyena"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Natural"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "MIKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Freeride Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Drop-In Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Shark"
+      "value": "Ram"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
       "value": "Smoke Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "CARHEART"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Ski Bib"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -85,13 +109,13 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

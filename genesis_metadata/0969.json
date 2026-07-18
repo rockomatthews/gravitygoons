@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
       "value": "Smoke Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -73,25 +97,25 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

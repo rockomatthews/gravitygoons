@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Natural"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "OFF-BEIGE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Shell Jacket"
+      "value": "Zip Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cuffed Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Chunky Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Push-Off"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -73,19 +97,19 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {

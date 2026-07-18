@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Hyena"
+      "value": "Shark"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Midnight"
+      "value": "Natural"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
     },
     {
       "trait_type": "Apparel",
-      "value": "Shell Jacket"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Motocross Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Gate Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Sky / Orange"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {

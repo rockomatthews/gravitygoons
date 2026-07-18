@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Boar"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Natural"
     },
     {
       "trait_type": "Discipline",
@@ -26,11 +26,11 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "BURNTON"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Handlebar Lean"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Purple / Gold"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Hyena"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
       "value": "Sport Shades"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cuffed Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Low-Top Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Style"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,13 +91,13 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -85,13 +109,13 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

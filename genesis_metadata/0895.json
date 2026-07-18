@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Gorilla"
+      "value": "Ram"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Air",
       "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Air",
+      "value": 8,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Control",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {

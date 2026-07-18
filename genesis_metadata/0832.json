@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -34,7 +34,7 @@
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "None"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Control",
       "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Control",
+      "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

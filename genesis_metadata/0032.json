@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "POOMA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Shell Jacket"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Flat-Pedal Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

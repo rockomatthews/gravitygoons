@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Round"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rose"
+      "value": "Tan"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Curls"
+      "value": "Braids"
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "QUEAZY"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Drop-In Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",
@@ -73,13 +97,13 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {

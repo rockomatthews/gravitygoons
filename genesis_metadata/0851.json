@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Freeride Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pole Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -73,13 +97,13 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {

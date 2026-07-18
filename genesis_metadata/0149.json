@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Square"
+      "value": "Heart"
     },
     {
       "trait_type": "Complexion",
-      "value": "Light"
+      "value": "Warm Brown"
     },
     {
       "trait_type": "Discipline",
@@ -30,27 +30,51 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Buzz"
+      "value": "Curls"
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Ventilated Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bars Turned"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

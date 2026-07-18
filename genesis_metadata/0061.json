@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
       "value": "Mirrored Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Shell Jacket"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Volley Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pop-Up Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
@@ -67,31 +91,31 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Style",
       "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
-      "trait_type": "Toughness",
+      "trait_type": "Style",
       "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Toughness",
+      "value": 5,
       "max_value": 10
     },
     {

@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Square"
     },
     {
       "trait_type": "Complexion",
-      "value": "Light"
+      "value": "Rich"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "Braids"
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "POOMA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Tank Top"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Wetsuit Bottom"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pop-Up Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -67,31 +91,31 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {

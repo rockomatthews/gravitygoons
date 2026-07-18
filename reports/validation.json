@@ -22,5 +22,28 @@
     "Skiing": 166,
     "Snowboarding": 167
   },
-  "stat_rule": "Each token totals 30; every stat is between 4 and 8."
+  "parody_brands": {
+    "NORTH FAKE": 98,
+    "POOMA": 84,
+    "MIKE": 85,
+    "VOLCANO": 105,
+    "PROCRASTIGONIA": 75,
+    "AVOIDAS": 79,
+    "CARHEART": 88,
+    "VANISH": 66,
+    "QUEAZY": 80,
+    "OFF-BEIGE": 84,
+    "BURNTON": 84,
+    "FAUX RACING": 72
+  },
+  "sport_equipment": {
+    "Surfboard": 167,
+    "Motocross Bike": 166,
+    "BMX Bike": 167,
+    "Skateboard": 167,
+    "Twin-Tip Skis and Poles": 166,
+    "Snowboard with Bindings": 167
+  },
+  "stat_rule": "Each token totals 30; every stat is between 4 and 8.",
+  "sport_compatibility": "Every pose, top, bottom, footwear item, and equipment prop matches its discipline."
 }

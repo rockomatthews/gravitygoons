@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Copper"
+      "value": "Midnight"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "QUEAZY"
     },
     {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Wetsuit Bottom"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Barefoot"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pop-Up Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {

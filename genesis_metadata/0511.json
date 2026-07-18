@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Hyena"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Amber"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Flat-Pedal Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Purple / Gold"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {

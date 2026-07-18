@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Fair"
+      "value": "Deep"
     },
     {
       "trait_type": "Discipline",
@@ -26,39 +26,63 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "High Fade"
+      "value": "Shag"
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "MIKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Zip Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cuffed Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Tail Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -67,19 +91,19 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Air",
       "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Air",
+      "value": 7,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 6,
       "max_value": 10
     },
     {

@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Midnight"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "PROCRASTIGONIA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Armored Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Enduro Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Motocross Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Gate Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {

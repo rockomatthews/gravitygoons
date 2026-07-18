@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Fox"
+      "value": "Boar"
     },
     {
       "trait_type": "Archetype",
@@ -34,7 +34,7 @@
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "MIKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cuffed Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -67,31 +91,31 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Air",
       "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
-      "trait_type": "Control",
-      "value": 7,
+      "trait_type": "Air",
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
-      "trait_type": "Style",
+      "trait_type": "Control",
       "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Style",
+      "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

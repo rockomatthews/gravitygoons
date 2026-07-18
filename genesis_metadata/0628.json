@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Shark"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
-    },
-    {
-      "trait_type": "Apparel",
-      "value": "Shell Jacket"
-    },
-    {
-      "trait_type": "Accessory",
       "value": "None"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "CARHEART"
+    },
+    {
+      "trait_type": "Apparel",
+      "value": "Armored Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Enduro Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Motocross Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Bandage"
+    },
+    {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -73,25 +97,25 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Control",
       "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Control",
+      "value": 5,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {

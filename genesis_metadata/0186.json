@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Ram"
+      "value": "Fox"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -34,7 +34,7 @@
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
     },
     {
       "trait_type": "Apparel",
       "value": "Race Jersey"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Flat-Pedal Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pedal Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Purple / Gold"
     },
     {
       "trait_type": "Rarity",

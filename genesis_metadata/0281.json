@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Gorilla"
+      "value": "Snow Leopard"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Freeride Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pole Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Sky / Orange"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",

@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Gorilla"
+      "value": "Raccoon"
     },
     {
       "trait_type": "Archetype",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -49,16 +49,40 @@
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Tank Top"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Handlebar Lean"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Purple / Gold"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Air",
       "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Air",
+      "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Control",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

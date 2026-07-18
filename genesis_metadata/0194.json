@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Fox"
+      "value": "Ram"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Midnight"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "BURNTON"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Flat-Pedal Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Handlebar Lean"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -73,13 +97,13 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

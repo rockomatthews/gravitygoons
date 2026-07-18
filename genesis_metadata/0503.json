@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Angular"
+      "value": "Round"
     },
     {
       "trait_type": "Complexion",
-      "value": "Warm Brown"
+      "value": "Olive"
     },
     {
       "trait_type": "Discipline",
@@ -26,31 +26,55 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Buzz"
+      "value": "Bald"
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "NORTH FAKE"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Shell Jacket"
+      "value": "Ventilated Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Enduro Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Motocross Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Gate Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {

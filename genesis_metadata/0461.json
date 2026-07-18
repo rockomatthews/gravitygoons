@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -26,11 +26,11 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
     },
     {
       "trait_type": "Apparel",
       "value": "Shell Jacket"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Ski Bib"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Drop-In Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -79,19 +103,19 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {

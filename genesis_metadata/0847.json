@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Square"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rose"
+      "value": "Fair"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Buzz"
+      "value": "Bun"
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Freeride Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

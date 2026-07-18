@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Snow Leopard"
+      "value": "Gorilla"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,15 +46,39 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cargo Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Low-Top Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Push-Off"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "None"
     },
     {
       "trait_type": "Background",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -79,13 +103,13 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {

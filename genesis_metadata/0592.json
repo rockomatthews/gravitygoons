@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Angular"
     },
     {
       "trait_type": "Complexion",
-      "value": "Olive"
+      "value": "Light"
     },
     {
       "trait_type": "Discipline",
@@ -26,31 +26,55 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Buzz"
+      "value": "Bun"
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "MIKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Drop-In Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -73,19 +97,19 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

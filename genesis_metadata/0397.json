@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Boar"
+      "value": "Snow Leopard"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -26,15 +26,15 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "CARHEART"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Ski Bib"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Freestyle Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Drop-In Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",

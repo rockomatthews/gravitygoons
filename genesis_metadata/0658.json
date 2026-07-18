@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Round"
+      "value": "Square"
     },
     {
       "trait_type": "Complexion",
-      "value": "Fair"
+      "value": "Rich"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Curls"
+      "value": "Bald"
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Smoke Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cargo Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Handlebar Lean"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -67,19 +91,19 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

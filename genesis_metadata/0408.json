@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Hyena"
+      "value": "Fox"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Copper"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
       "value": "Clear Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Ventilated Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",
@@ -79,19 +103,19 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Style",
       "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Style",
+      "value": 4,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Toughness",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {

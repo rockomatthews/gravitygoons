@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Light"
+      "value": "Fair"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
@@ -38,27 +38,51 @@
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Bun"
+      "value": "High Fade"
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "MIKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Enduro Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bars Turned"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Toughness"
     },
     {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -79,19 +103,19 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {

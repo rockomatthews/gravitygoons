@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Hyena"
+      "value": "Gorilla"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Ash"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,15 +42,39 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "PROCRASTIGONIA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Short-Sleeve Wetsuit"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Wetsuit Bottom"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Beach Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {

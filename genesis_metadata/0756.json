@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Ram"
+      "value": "Boar"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Golden"
+      "value": "Arctic"
     },
     {
       "trait_type": "Discipline",
@@ -30,11 +30,11 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Five-Panel Cap"
     },
     {
       "trait_type": "Eyewear",
       "value": "Mirrored Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "OFF-BEIGE"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Snow Bib"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Stiff Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Carry"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -67,13 +91,13 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
@@ -85,13 +109,13 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

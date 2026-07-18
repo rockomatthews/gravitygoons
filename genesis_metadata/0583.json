@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Long"
     },
     {
       "trait_type": "Complexion",
-      "value": "Tan"
+      "value": "Deep"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Side Eye"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "Braids"
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "CARHEART"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Short-Sleeve Wetsuit"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Volley Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Beach Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Purple / Gold"
     },
     {
       "trait_type": "Rarity",
@@ -67,31 +91,31 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 6,
       "max_value": 10
     },
     {

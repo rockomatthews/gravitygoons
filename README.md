@@ -4,7 +4,7 @@ Immediate-reveal, exact-token action-sports NFTs with game-ready progression fou
 
 ## Current milestone
 
-The repository implements the launch architecture and **Approval Gate 1**. It does not claim that 1,000 final 3D renders exist yet: the requested approval gates deliberately stop mass rendering until the base character is approved.
+The repository implements the launch architecture, revised full-body **Approval Gate 1**, and a twelve-character **Gate 2 visual roster**. It does not claim that 1,000 final 3D renders exist yet: mass rendering remains gated on the collection look and trait catalog.
 
 Ready now:
 
@@ -27,8 +27,12 @@ Still gated:
 
 - Final-look concept: `art/concepts/snow-leopard-base-concept.png`
 - Turnaround concept: `art/concepts/snow-leopard-turnaround.png`
+- Full-body sport-readable concept: `art/concepts/snow-leopard-full-body-v2.png`
 - Procedural Blender scene/render builder: `art/blender/render_base_character.py`
 - Approval notes: `reports/approval-gate-1.md`
+- Twelve-character roster: `art/approval/impact-club-roster-12-v1.png`
+- Roster mapping: `reports/approval-gate-2-roster.md`
+- Fictional label catalog: `traits/parody-brands.json`
 
 The current Blender 5.1.2 Homebrew executable crashes inside its Metal device initialization on this Apple M5 machine before Python executes. The script is present and reproducible; use a working Blender 5.1.2 install or render it on CI/another Mac after the character is approved.
 
@@ -49,7 +53,7 @@ blender --background --python art/blender/render_base_character.py -- \
   --output-dir art/approval --resolution 2048 --save-blend
 ```
 
-The script uses Eevee Next and creates front, three-quarter, profile, and clay renders plus an editable `.blend` file.
+The script uses Eevee Next and creates full-body front, three-quarter, profile, and clay renders with branded apparel and visible skateboard equipment, plus an editable `.blend` file.
 
 ## Contracts
 
@@ -114,4 +118,3 @@ Do not deploy the collection contract until all of these are final:
 4. Dynamic API deployed and tested against the final IPFS CIDs.
 5. Owner/royalty wallet, deployer, game signer, and relayer security model finalized.
 6. Contracts independently reviewed, deployed, verified, and tested with one controlled mint while the public sale is closed.
-

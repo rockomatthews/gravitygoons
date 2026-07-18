@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Fox"
+      "value": "Hyena"
     },
     {
       "trait_type": "Archetype",
@@ -34,7 +34,7 @@
     },
     {
       "trait_type": "Eyes",
-      "value": "Teal"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "POOMA"
     },
     {
       "trait_type": "Apparel",
       "value": "Race Jersey"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Cargo Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pedal Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {

@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Raccoon"
+      "value": "Gorilla"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Natural"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -26,11 +26,11 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Cocky Grin"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
     },
     {
       "trait_type": "Apparel",
-      "value": "Zip Jersey"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Boardshorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Under Arm"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Neck Gaiter"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Ice / Navy"
     },
     {
       "trait_type": "Rarity",
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

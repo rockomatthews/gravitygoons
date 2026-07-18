@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Square"
+      "value": "Long"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rose"
+      "value": "Rich"
     },
     {
       "trait_type": "Discipline",
@@ -26,11 +26,11 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
@@ -38,27 +38,51 @@
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "High Fade"
+      "value": "Bun"
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
     },
     {
       "trait_type": "Apparel",
       "value": "Race Jersey"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Cargo Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Flat-Pedal Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pedal Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "Neck Gaiter"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -79,13 +103,13 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {

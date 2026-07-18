@@ -15,7 +15,7 @@ export default function Home() {
         <div className="hero-copy">
           <p className="eyebrow">SIX SPORTS · ONE CLUB · 1,000 ORIGINALS</p>
           <h1>Pick your athlete.<br/><i>Build their legacy.</i></h1>
-          <p className="lede">Every character is visible from day one. Choose the exact rider you want, then carry their stats, tricks, and history into the future game.</p>
+          <p className="lede">Every full-body athlete, sport prop, parody label, and starting stat is visible from day one. Choose the exact rider you want, then carry their tricks and history into the future game.</p>
           <div className="hero-actions"><a className="button primary" href="#collection">Choose yours</a><span>0.003 ETH · BASE</span></div>
         </div>
         <div className="hero-visual">

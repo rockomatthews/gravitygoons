@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Round"
+      "value": "Angular"
     },
     {
       "trait_type": "Complexion",
-      "value": "Warm Brown"
+      "value": "Rich"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Side Eye"
+      "value": "Easy Smile"
     },
     {
       "trait_type": "Eyes",
@@ -38,27 +38,51 @@
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "High Fade"
+      "value": "Bun"
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "QUEAZY"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Wetsuit Bottom"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Barefoot"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Under Arm"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -67,25 +91,25 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {

@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Heart"
+      "value": "Long"
     },
     {
       "trait_type": "Complexion",
-      "value": "Fair"
+      "value": "Tan"
     },
     {
       "trait_type": "Discipline",
@@ -30,35 +30,59 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Braids"
+      "value": "Shag"
     },
     {
       "trait_type": "Headwear",
-      "value": "Full-Face Helmet"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
       "value": "Smoke Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Padded Vest"
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Motocross Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bars Turned"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -67,13 +91,13 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -85,13 +109,13 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {

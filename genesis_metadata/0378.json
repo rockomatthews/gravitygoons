@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Square"
+      "value": "Round"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rose"
+      "value": "Fair"
     },
     {
       "trait_type": "Discipline",
@@ -26,31 +26,55 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "High Fade"
+      "value": "Bun"
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "FAUX RACING"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Baggy Snow Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Soft Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Binding Check"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
@@ -58,7 +82,7 @@
     },
     {
       "trait_type": "Background",
-      "value": "Acid Lime / Black"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -73,19 +97,19 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {

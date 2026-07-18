@@ -86,6 +86,20 @@ def add_curve(name: str, points, bevel_depth: float, material):
     return obj
 
 
+def add_text(name: str, body: str, location, scale: float, material):
+    bpy.ops.object.text_add(location=location, rotation=(math.radians(90), 0, 0))
+    obj = bpy.context.object
+    obj.name = name
+    obj.data.body = body
+    obj.data.align_x = "CENTER"
+    obj.data.align_y = "CENTER"
+    obj.data.extrude = 0.025
+    obj.data.bevel_depth = 0.008
+    obj.scale = (scale, scale, scale)
+    obj.data.materials.append(material)
+    return obj
+
+
 def look_at(obj, target=(0, 0, 2.3)):
     direction = Vector(target) - obj.location
     obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
@@ -105,7 +119,7 @@ def build_character(clay=False):
     if clay:
         charcoal = outline = fur = muzzle = inner_ear = teal = coral = eye_white = eye_teal = clay_mat
 
-    # Shoulders and jersey establish the collection-wide bust silhouette.
+    # Shoulders and tank establish the collection-wide athletic silhouette.
     add_uv("Shoulders", (0, 0.2, 0.1), (2.35, 0.82, 1.15), charcoal)
     add_uv("Neck", (0, 0.04, 1.05), (0.77, 0.62, 0.92), fur)
     add_uv("Head", (0, 0.0, 2.65), (1.38, 0.92, 1.42), fur)
@@ -150,18 +164,53 @@ def build_character(clay=False):
     for index, (x, y, z, size) in enumerate(spots):
         add_uv(f"Rosette {index}", (x, y, z), (size * 1.5, 0.035, size), outline, segments=24, rings=12)
 
-    # Jersey seam language and zipper.
+    # Tank seam language and the fictional MIKE label use an original impact mark.
     add_curve("Jersey seam L", [(-1.75, -0.60, 0.42), (-0.95, -0.72, 0.82), (-0.52, -0.72, 1.24)], 0.035, teal)
     add_curve("Jersey seam R", [(1.75, -0.60, 0.42), (0.95, -0.72, 0.82), (0.52, -0.72, 1.24)], 0.035, teal)
     add_cube("Zipper", (0, -0.72, 0.70), (0.045, 0.035, 0.52), muzzle, bevel=0.03)
+    add_text("MIKE label", "MIKE", (0, -0.90, 0.42), 0.34, teal)
+    add_curve("Original M mark L", [(-0.38, -0.94, 0.05), (-0.12, -0.98, -0.28), (0, -0.98, 0.02)], 0.055, teal)
+    add_curve("Original M mark R", [(0, -0.98, 0.02), (0.12, -0.98, -0.28), (0.38, -0.94, 0.05)], 0.055, teal)
+
+    # Full-body skateboarder anatomy. Capsule-like forms keep the production rig modular.
+    add_uv("Upper arm L", (-1.62, -0.04, -0.55), (0.48, 0.46, 0.90), fur)
+    add_uv("Upper arm R", (1.62, -0.04, -0.55), (0.48, 0.46, 0.90), fur)
+    add_uv("Forearm L", (-1.88, -0.22, -1.35), (0.40, 0.38, 0.78), fur)
+    add_uv("Forearm R", (1.78, -0.28, -1.28), (0.40, 0.38, 0.78), fur)
+    add_uv("Wrist guard L", (-1.98, -0.40, -1.85), (0.46, 0.40, 0.28), charcoal)
+    add_uv("Wrist guard R", (1.88, -0.43, -1.78), (0.46, 0.40, 0.28), charcoal)
+    add_uv("Hand L", (-2.02, -0.43, -2.18), (0.40, 0.34, 0.42), fur)
+    add_uv("Hand R", (1.88, -0.45, -2.10), (0.40, 0.34, 0.42), fur)
+
+    add_cube("Coral skate shorts", (0, -0.02, -1.62), (1.34, 0.62, 0.68), coral, bevel=0.28)
+    add_uv("Thigh L", (-0.70, 0.0, -2.45), (0.62, 0.58, 0.94), fur)
+    add_uv("Thigh R", (0.72, 0.02, -2.47), (0.62, 0.58, 0.94), fur)
+    add_uv("Teal knee pad L", (-0.72, -0.53, -3.06), (0.54, 0.22, 0.43), teal)
+    add_uv("Knee guard R", (0.72, -0.48, -3.06), (0.48, 0.20, 0.38), charcoal)
+    add_uv("Shin L", (-0.72, 0.0, -3.65), (0.48, 0.46, 0.82), fur)
+    add_uv("Shin R", (0.72, 0.0, -3.68), (0.48, 0.46, 0.82), fur)
+    add_cube("Skate shoe L", (-0.82, -0.34, -4.32), (0.68, 0.82, 0.28), charcoal, bevel=0.20)
+    add_cube("Skate shoe R", (0.82, -0.34, -4.32), (0.68, 0.82, 0.28), charcoal, bevel=0.20)
+    add_curve("Shoe stripe L", [(-1.25, -1.10, -4.29), (-0.82, -1.18, -4.24), (-0.40, -1.10, -4.29)], 0.045, teal)
+    add_curve("Shoe stripe R", [(0.40, -1.10, -4.29), (0.82, -1.18, -4.24), (1.25, -1.10, -4.29)], 0.045, teal)
+
+    # Upright skateboard makes the discipline unmistakable at marketplace thumbnail size.
+    add_cube("Skateboard deck", (-2.72, 0.0, -2.78), (0.36, 0.12, 1.72), charcoal, rotation=(0, math.radians(-7), 0), bevel=0.28)
+    add_curve("Board impact graphic", [(-2.92, -0.16, -3.22), (-2.60, -0.18, -2.76), (-2.90, -0.16, -2.28)], 0.075, coral)
+    for z in (-3.80, -1.76):
+        add_cube(f"Truck {z}", (-2.72, -0.28, z), (0.46, 0.16, 0.08), muzzle, bevel=0.05)
+        add_uv(f"Wheel L {z}", (-3.16, -0.31, z), (0.18, 0.12, 0.18), teal)
+        add_uv(f"Wheel R {z}", (-2.28, -0.31, z), (0.18, 0.12, 0.18), teal)
+
+    add_curve("Snow leopard tail", [(1.05, 0.28, -1.70), (2.05, 0.38, -2.55), (2.48, 0.10, -3.60), (1.90, -0.10, -4.12)], 0.30, fur)
 
     return {"teal": teal, "coral": coral}
 
 
 def add_background(materials):
     # Two slightly angled panels create the signature teal/coral split.
-    add_cube("Teal backdrop", (-3.0, 1.8, 2.0), (3.1, 0.10, 3.2), materials["teal"], rotation=(math.radians(90), 0, math.radians(-10)), bevel=0.0)
-    add_cube("Coral backdrop", (3.0, 1.9, 2.0), (3.1, 0.10, 3.2), materials["coral"], rotation=(math.radians(90), 0, math.radians(-10)), bevel=0.0)
+    add_cube("Teal backdrop", (-4.2, 2.2, -0.2), (4.3, 0.10, 5.8), materials["teal"], rotation=(math.radians(90), 0, math.radians(-7)), bevel=0.0)
+    add_cube("Coral backdrop", (4.2, 2.3, -0.2), (4.3, 0.10, 5.8), materials["coral"], rotation=(math.radians(90), 0, math.radians(-7)), bevel=0.0)
 
 
 def configure_scene(resolution: int):
@@ -203,11 +252,11 @@ def render_view(output: Path, yaw: float, clay: bool, resolution: int):
     configure_scene(resolution)
     materials = build_character(clay=clay)
     add_background(materials)
-    bpy.ops.object.camera_add(location=(0, -10.5, 2.50))
+    bpy.ops.object.camera_add(location=(0, -16.0, -0.20))
     camera = bpy.context.object
     camera.data.type = "ORTHO"
-    camera.data.ortho_scale = 5.6
-    look_at(camera, (0, 0, 2.18))
+    camera.data.ortho_scale = 10.2
+    look_at(camera, (0, 0, -0.20))
     bpy.context.scene.camera = camera
     # Rotate the entire character collection while preserving the camera rig.
     for obj in list(bpy.context.scene.objects):
@@ -235,4 +284,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

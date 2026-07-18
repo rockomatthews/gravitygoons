@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Round"
+      "value": "Heart"
     },
     {
       "trait_type": "Complexion",
-      "value": "Warm Brown"
+      "value": "Deep"
     },
     {
       "trait_type": "Discipline",
@@ -26,39 +26,63 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Amber"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Waves"
+      "value": "Curls"
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Beanie"
     },
     {
       "trait_type": "Eyewear",
-      "value": "None"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "CARHEART"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cargo Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Chunky Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Push-Off"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Purple / Gold"
+      "value": "Cobalt / Pink"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {

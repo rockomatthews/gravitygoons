@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Ram"
+      "value": "Hyena"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Arctic"
+      "value": "Natural"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Easy Smile"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Bare Head"
+      "value": "Full-Face Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
     },
     {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Armored Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Armored Race Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Sand / Aqua"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -73,25 +97,25 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 5,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Control",
-      "value": 6,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Style",
       "value": 4,
       "max_value": 10
     },
     {
       "display_type": "number",
-      "trait_type": "Toughness",
+      "trait_type": "Control",
       "value": 7,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Style",
+      "value": 5,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Toughness",
+      "value": 6,
       "max_value": 10
     },
     {

@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Raccoon"
+      "value": "Hyena"
     },
     {
       "trait_type": "Archetype",
@@ -26,11 +26,11 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Goofy"
+      "value": "Regular"
     },
     {
       "trait_type": "Expression",
-      "value": "Raised Brow"
+      "value": "Locked In"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Beanie"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Clear Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "VANISH"
     },
     {
       "trait_type": "Apparel",
       "value": "Zip Jersey"
     },
     {
+      "trait_type": "Bottom",
+      "value": "Cargo Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top Skate Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Skateboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Tail Plant"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Control"
+    },
+    {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Radio Earpiece"
     },
     {
       "trait_type": "Background",
-      "value": "Red / Cream"
+      "value": "Sky / Orange"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 7,
+      "value": 5,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {

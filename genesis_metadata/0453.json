@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Angular"
+      "value": "Square"
     },
     {
       "trait_type": "Complexion",
-      "value": "Tan"
+      "value": "Rich"
     },
     {
       "trait_type": "Discipline",
@@ -30,15 +30,15 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Cocky Grin"
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "Waves"
     },
     {
       "trait_type": "Headwear",
@@ -49,16 +49,40 @@
       "value": "Mirrored Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "AVOIDAS"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Cargo Shorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "High-Top BMX Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Pedal Ready"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Sand / Aqua"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 4,
+      "value": 5,
       "max_value": 10
     },
     {

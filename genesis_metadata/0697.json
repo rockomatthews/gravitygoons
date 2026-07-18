@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Angular"
+      "value": "Square"
     },
     {
       "trait_type": "Complexion",
-      "value": "Olive"
+      "value": "Fair"
     },
     {
       "trait_type": "Discipline",
@@ -34,11 +34,11 @@
     },
     {
       "trait_type": "Eyes",
-      "value": "Hazel"
+      "value": "Teal"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Bun"
+      "value": "Waves"
     },
     {
       "trait_type": "Headwear",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Sport Shades"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "OFF-BEIGE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Rash Guard"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Boardshorts"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Reef Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Surfboard"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Board Under Arm"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Radio Earpiece"
+      "value": "None"
     },
     {
       "trait_type": "Background",
-      "value": "Sand / Aqua"
+      "value": "Teal / Coral"
     },
     {
       "trait_type": "Rarity",
@@ -67,19 +91,19 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 6,
-      "max_value": 10
-    },
-    {
-      "display_type": "number",
-      "trait_type": "Air",
       "value": 5,
       "max_value": 10
     },
     {
       "display_type": "number",
+      "trait_type": "Air",
+      "value": 7,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
       "trait_type": "Control",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {

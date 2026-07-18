@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Long"
+      "value": "Heart"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rich"
+      "value": "Tan"
     },
     {
       "trait_type": "Discipline",
@@ -26,39 +26,63 @@
     },
     {
       "trait_type": "Stance",
-      "value": "Regular"
+      "value": "Goofy"
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Gray"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Shag"
+      "value": "Bun"
     },
     {
       "trait_type": "Headwear",
-      "value": "Half-Shell Helmet"
+      "value": "Bare Head"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Clear Goggles"
+      "value": "None"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "MIKE"
     },
     {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Tech Hoodie"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Baggy Snow Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Stiff Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Binding Check"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Gold Stud"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Sky / Orange"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -73,7 +97,7 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 7,
       "max_value": 10
     },
     {

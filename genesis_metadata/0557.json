@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Square"
+      "value": "Round"
     },
     {
       "trait_type": "Complexion",
-      "value": "Rose"
+      "value": "Olive"
     },
     {
       "trait_type": "Discipline",
@@ -30,15 +30,15 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
-      "value": "Brown"
+      "value": "Ice Blue"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Bun"
+      "value": "High Fade"
     },
     {
       "trait_type": "Headwear",
@@ -46,19 +46,43 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Mirrored Goggles"
+      "value": "Smoke Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "POOMA"
     },
     {
       "trait_type": "Apparel",
-      "value": "Tech Hoodie"
+      "value": "Armored Jersey"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Enduro Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Enduro Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Motocross Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bars Turned"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "Ear Tape"
+      "value": "Gold Stud"
     },
     {
       "trait_type": "Background",
-      "value": "Teal / Coral"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",
@@ -67,7 +91,7 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -79,7 +103,7 @@
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 7,
+      "value": 6,
       "max_value": 10
     },
     {
@@ -91,7 +115,7 @@
     {
       "display_type": "number",
       "trait_type": "Toughness",
-      "value": 5,
+      "value": 7,
       "max_value": 10
     },
     {

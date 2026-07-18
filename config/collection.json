@@ -55,6 +55,24 @@
     "Long",
     "Square",
     "Heart"
-  ]
+  ],
+  "parody_brands": [
+    "MIKE",
+    "AVOIDAS",
+    "POOMA",
+    "VANISH",
+    "NORTH FAKE",
+    "OFF-BEIGE",
+    "CARHEART",
+    "PROCRASTIGONIA",
+    "BURNTON",
+    "VOLCANO",
+    "FAUX RACING",
+    "QUEAZY"
+  ],
+  "presentation": {
+    "framing": "Full-body three-quarter character-select pose",
+    "sport_readability": "Discipline equipment must be visible at thumbnail size",
+    "brand_policy": "Fictional name and original symbol only; never reproduce a trademark"
+  }
 }
-

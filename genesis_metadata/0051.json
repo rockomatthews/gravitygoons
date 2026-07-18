@@ -14,11 +14,11 @@
     },
     {
       "trait_type": "Archetype",
-      "value": "Square"
+      "value": "Heart"
     },
     {
       "trait_type": "Complexion",
-      "value": "Deep"
+      "value": "Warm Brown"
     },
     {
       "trait_type": "Discipline",
@@ -30,15 +30,15 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
-      "value": "Ice Blue"
+      "value": "Hazel"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Braids"
+      "value": "Bald"
     },
     {
       "trait_type": "Headwear",
@@ -46,15 +46,39 @@
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
+      "value": "Mirrored Goggles"
+    },
+    {
+      "trait_type": "Parody Brand",
+      "value": "BURNTON"
     },
     {
       "trait_type": "Apparel",
-      "value": "Crew Jersey"
+      "value": "Shell Jacket"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Snow Bib"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Stiff Snowboard Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Snowboard with Bindings"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Binding Check"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Air"
     },
     {
       "trait_type": "Accessory",
-      "value": "Bandage"
+      "value": "Ear Tape"
     },
     {
       "trait_type": "Background",
@@ -73,13 +97,13 @@
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 7,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Control",
-      "value": 6,
+      "value": 5,
       "max_value": 10
     },
     {

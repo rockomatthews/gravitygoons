@@ -36,7 +36,10 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
     { trait_type: "Cast", value: token.cast }, { trait_type: "Species", value: token.species },
     { trait_type: "Discipline", value: token.discipline }, { trait_type: "Stance", value: token.stance },
     { trait_type: "Expression", value: token.expression }, { trait_type: "Headwear", value: token.headwear },
-    { trait_type: "Eyewear", value: token.eyewear }, { trait_type: "Apparel", value: token.apparel },
+    { trait_type: "Eyewear", value: token.eyewear }, { trait_type: "Parody Brand", value: token.parody_brand },
+    { trait_type: "Apparel", value: token.apparel }, { trait_type: "Bottom", value: token.bottom },
+    { trait_type: "Footwear", value: token.footwear }, { trait_type: "Sport Equipment", value: token.sport_equipment },
+    { trait_type: "Pose", value: token.pose }, { trait_type: "Play Style", value: token.play_style },
     { trait_type: "Accessory", value: token.accessory }, { trait_type: "Background", value: token.background },
     { trait_type: "Rarity", value: token.rarity },
     ...Object.entries(token.stats).map(([trait_type, value]) => ({ display_type: "number", trait_type, value, max_value: 10 })),
@@ -57,4 +60,3 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
   const etag = `"${createHash("sha256").update(body).digest("hex")}"`;
   return new Response(body, { headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", "cache-control": "public, max-age=15, s-maxage=30, stale-while-revalidate=300", etag } });
 }
-

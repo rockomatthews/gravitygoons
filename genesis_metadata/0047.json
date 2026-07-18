@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Light"
+      "value": "Rich"
     },
     {
       "trait_type": "Discipline",
@@ -30,15 +30,15 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Locked In"
+      "value": "Game Face"
     },
     {
       "trait_type": "Eyes",
-      "value": "Gray"
+      "value": "Brown"
     },
     {
       "trait_type": "Hair / Fur",
-      "value": "Bald"
+      "value": "Curls"
     },
     {
       "trait_type": "Headwear",
@@ -49,16 +49,40 @@
       "value": "Smoke Goggles"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "VOLCANO"
+    },
+    {
       "trait_type": "Apparel",
-      "value": "Race Jersey"
+      "value": "Oversized Tee"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Slim Chinos"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Flat-Pedal Shoes"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "BMX Bike"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Bike Beside"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
     },
     {
       "trait_type": "Accessory",
-      "value": "None"
+      "value": "Bandage"
     },
     {
       "trait_type": "Background",
-      "value": "Ice / Navy"
+      "value": "Acid Lime / Black"
     },
     {
       "trait_type": "Rarity",
@@ -67,13 +91,13 @@
     {
       "display_type": "number",
       "trait_type": "Speed",
-      "value": 5,
+      "value": 8,
       "max_value": 10
     },
     {
       "display_type": "number",
       "trait_type": "Air",
-      "value": 8,
+      "value": 7,
       "max_value": 10
     },
     {
@@ -85,7 +109,7 @@
     {
       "display_type": "number",
       "trait_type": "Style",
-      "value": 6,
+      "value": 4,
       "max_value": 10
     },
     {

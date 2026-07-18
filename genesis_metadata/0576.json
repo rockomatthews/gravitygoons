@@ -10,7 +10,7 @@
     },
     {
       "trait_type": "Species",
-      "value": "Gorilla"
+      "value": "Fox"
     },
     {
       "trait_type": "Archetype",
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "Complexion",
-      "value": "Midnight"
+      "value": "Golden"
     },
     {
       "trait_type": "Discipline",
@@ -30,7 +30,7 @@
     },
     {
       "trait_type": "Expression",
-      "value": "Game Face"
+      "value": "Raised Brow"
     },
     {
       "trait_type": "Eyes",
@@ -42,23 +42,47 @@
     },
     {
       "trait_type": "Headwear",
-      "value": "Five-Panel Cap"
+      "value": "Half-Shell Helmet"
     },
     {
       "trait_type": "Eyewear",
-      "value": "Sport Shades"
-    },
-    {
-      "trait_type": "Apparel",
-      "value": "Race Jersey"
-    },
-    {
-      "trait_type": "Accessory",
       "value": "None"
     },
     {
+      "trait_type": "Parody Brand",
+      "value": "PROCRASTIGONIA"
+    },
+    {
+      "trait_type": "Apparel",
+      "value": "Puffer Vest"
+    },
+    {
+      "trait_type": "Bottom",
+      "value": "Shell Pants"
+    },
+    {
+      "trait_type": "Footwear",
+      "value": "Alpine Ski Boots"
+    },
+    {
+      "trait_type": "Sport Equipment",
+      "value": "Twin-Tip Skis and Poles"
+    },
+    {
+      "trait_type": "Pose",
+      "value": "Skis Shouldered"
+    },
+    {
+      "trait_type": "Play Style",
+      "value": "Speed"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Bandage"
+    },
+    {
       "trait_type": "Background",
-      "value": "Cobalt / Pink"
+      "value": "Red / Cream"
     },
     {
       "trait_type": "Rarity",

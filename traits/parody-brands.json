@@ -1,0 +1,18 @@
+{
+  "policy": "Every label uses a fictional name, original symbol, and original typography. Broad category humor and color cues are allowed; protected marks and signature trade dress are not.",
+  "brands": [
+    {"name":"MIKE","category":"skate and training","symbol":"angular M impact bolt","palette":"teal / black / white","never_copy":"swoosh marks"},
+    {"name":"AVOIDAS","category":"technical sport","symbol":"three separated escape arrows","palette":"black / cream / acid lime","never_copy":"parallel stripe layouts"},
+    {"name":"POOMA","category":"street performance","symbol":"paw-shaped meteor","palette":"red / sand / black","never_copy":"leaping cat silhouettes"},
+    {"name":"VANISH","category":"skate shoes","symbol":"disappearing checker trail","palette":"black / white / coral","never_copy":"side stripe or signature wordmark shapes"},
+    {"name":"NORTH FAKE","category":"outdoor shells","symbol":"cracked inverted compass","palette":"navy / ice / orange","never_copy":"half-dome graphics"},
+    {"name":"OFF-BEIGE","category":"high-fashion streetwear","symbol":"offset blank label blocks","palette":"beige / black / fluorescent green","never_copy":"crossed arrow graphics"},
+    {"name":"CARHEART","category":"workwear","symbol":"hard-hat heart","palette":"brown / gold / teal","never_copy":"signature C patches"},
+    {"name":"PROCRASTIGONIA","category":"outdoor lifestyle","symbol":"sleeping mountain with clock hand","palette":"purple / rust / cream","never_copy":"existing mountain silhouettes"},
+    {"name":"BURNTON","category":"snow equipment","symbol":"scorched binding-shaped B","palette":"charcoal / ember / ice","never_copy":"existing snowboard wordmarks"},
+    {"name":"VOLCANO","category":"board sports","symbol":"erupting V-shaped stone","palette":"black / lava / gray","never_copy":"existing diamond marks"},
+    {"name":"FAUX RACING","category":"moto and BMX","symbol":"two crossed tails forming an F","palette":"orange / black / white","never_copy":"fox-head silhouettes"},
+    {"name":"QUEAZY","category":"experimental footwear","symbol":"warped spiral Q","palette":"bone / slime / charcoal","never_copy":"existing footwear silhouettes or stripe systems"}
+  ]
+}
+

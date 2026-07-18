@@ -16,7 +16,6 @@ EXPRESSIONS = ["Cocky Grin", "Locked In", "Side Eye", "Game Face", "Easy Smile",
 EYES = ["Teal", "Amber", "Ice Blue", "Hazel", "Brown", "Gray"]
 HEADWEAR = ["Half-Shell Helmet", "Full-Face Helmet", "Beanie", "Five-Panel Cap", "Bare Head"]
 EYEWEAR = ["None", "Clear Goggles", "Smoke Goggles", "Mirrored Goggles", "Sport Shades"]
-APPAREL = ["Zip Jersey", "Tech Hoodie", "Race Jersey", "Shell Jacket", "Crew Jersey", "Padded Vest"]
 ACCESSORIES = ["None", "Ear Tape", "Gold Stud", "Radio Earpiece", "Bandage", "Neck Gaiter"]
 BACKGROUNDS = [
     "Teal / Coral", "Acid Lime / Black", "Sky / Orange", "Purple / Gold",
@@ -25,6 +24,51 @@ BACKGROUNDS = [
 FUR_PALETTES = ["Natural", "Ash", "Midnight", "Copper", "Arctic", "Golden"]
 SKIN_TONES = ["Deep", "Rich", "Warm Brown", "Olive", "Tan", "Light", "Fair", "Rose"]
 HAIR = ["Buzz", "Curls", "Braids", "Shag", "High Fade", "Waves", "Bun", "Bald"]
+
+SPORT_TRAITS = {
+    "Skateboarding": {
+        "equipment": "Skateboard",
+        "poses": ["Board Beside", "Tail Plant", "Push-Off"],
+        "tops": ["Tank Top", "Oversized Tee", "Zip Jersey", "Tech Hoodie"],
+        "bottoms": ["Loose Skate Shorts", "Cargo Pants", "Cuffed Chinos"],
+        "footwear": ["High-Top Skate Shoes", "Low-Top Skate Shoes", "Chunky Skate Shoes"],
+    },
+    "Snowboarding": {
+        "equipment": "Snowboard with Bindings",
+        "poses": ["Board Carry", "Binding Check", "Slope Ready"],
+        "tops": ["Shell Jacket", "Puffer Vest", "Tech Hoodie"],
+        "bottoms": ["Snow Bib", "Shell Pants", "Baggy Snow Pants"],
+        "footwear": ["Soft Snowboard Boots", "Stiff Snowboard Boots"],
+    },
+    "Surfing": {
+        "equipment": "Surfboard",
+        "poses": ["Board Under Arm", "Beach Plant", "Pop-Up Ready"],
+        "tops": ["Tank Top", "Rash Guard", "Short-Sleeve Wetsuit"],
+        "bottoms": ["Boardshorts", "Wetsuit Bottom", "Volley Shorts"],
+        "footwear": ["Barefoot", "Reef Boots"],
+    },
+    "BMX": {
+        "equipment": "BMX Bike",
+        "poses": ["Handlebar Lean", "Bike Beside", "Pedal Ready"],
+        "tops": ["Tank Top", "Race Jersey", "Oversized Tee"],
+        "bottoms": ["Race Pants", "Cargo Shorts", "Slim Chinos"],
+        "footwear": ["Flat-Pedal Shoes", "High-Top BMX Shoes"],
+    },
+    "Motocross": {
+        "equipment": "Motocross Bike",
+        "poses": ["Bike Beside", "Bars Turned", "Gate Ready"],
+        "tops": ["Race Jersey", "Armored Jersey", "Ventilated Jersey"],
+        "bottoms": ["Armored Race Pants", "Enduro Pants"],
+        "footwear": ["Motocross Boots", "Enduro Boots"],
+    },
+    "Skiing": {
+        "equipment": "Twin-Tip Skis and Poles",
+        "poses": ["Skis Shouldered", "Pole Plant", "Drop-In Ready"],
+        "tops": ["Shell Jacket", "Puffer Vest", "Tech Hoodie"],
+        "bottoms": ["Ski Bib", "Shell Pants", "Freeride Pants"],
+        "footwear": ["Alpine Ski Boots", "Freestyle Ski Boots"],
+    },
+}
 
 STAT_BASES = {
     "Skateboarding": [5, 6, 7, 8, 4],
@@ -105,7 +149,12 @@ def build_assignments(config: dict) -> list[dict]:
                 "hair": hair,
                 "headwear": rng.choice(HEADWEAR),
                 "eyewear": rng.choice(EYEWEAR),
-                "apparel": rng.choice(APPAREL),
+                "parody_brand": rng.choice(config["parody_brands"]),
+                "apparel": rng.choice(SPORT_TRAITS[discipline]["tops"]),
+                "bottom": rng.choice(SPORT_TRAITS[discipline]["bottoms"]),
+                "footwear": rng.choice(SPORT_TRAITS[discipline]["footwear"]),
+                "sport_equipment": SPORT_TRAITS[discipline]["equipment"],
+                "pose": rng.choice(SPORT_TRAITS[discipline]["poses"]),
                 "accessory": rng.choice(ACCESSORIES),
                 "background": rng.choice(BACKGROUNDS),
                 "rarity": rarities[token_id - 1],
@@ -116,6 +165,7 @@ def build_assignments(config: dict) -> list[dict]:
                 "catalog_version": 1,
                 "schema_version": config["schema_version"],
             }
+            item["play_style"] = max(item["stats"], key=item["stats"].get)
             signature = assignment_signature(item)
             if signature not in signatures:
                 signatures.add(signature)
@@ -140,7 +190,13 @@ def metadata_for(item: dict, config: dict) -> dict:
         {"trait_type": "Hair / Fur", "value": item["hair"]},
         {"trait_type": "Headwear", "value": item["headwear"]},
         {"trait_type": "Eyewear", "value": item["eyewear"]},
+        {"trait_type": "Parody Brand", "value": item["parody_brand"]},
         {"trait_type": "Apparel", "value": item["apparel"]},
+        {"trait_type": "Bottom", "value": item["bottom"]},
+        {"trait_type": "Footwear", "value": item["footwear"]},
+        {"trait_type": "Sport Equipment", "value": item["sport_equipment"]},
+        {"trait_type": "Pose", "value": item["pose"]},
+        {"trait_type": "Play Style", "value": item["play_style"]},
         {"trait_type": "Accessory", "value": item["accessory"]},
         {"trait_type": "Background", "value": item["background"]},
         {"trait_type": "Rarity", "value": item["rarity"]},
@@ -174,6 +230,8 @@ def validate(assignments: list[dict], config: dict) -> dict:
     rarity = Counter(item["rarity"] for item in assignments)
     cast = Counter(item["cast"] for item in assignments)
     discipline = Counter(item["discipline"] for item in assignments)
+    brands = Counter(item["parody_brand"] for item in assignments)
+    equipment = Counter(item["sport_equipment"] for item in assignments)
     signatures = {assignment_signature(item) for item in assignments}
     errors: list[str] = []
     if len(assignments) != config["supply"]:
@@ -184,10 +242,19 @@ def validate(assignments: list[dict], config: dict) -> dict:
         errors.append("Cast quotas do not match")
     if len(signatures) != config["supply"]:
         errors.append("Duplicate assignment signatures")
+    if set(brands) != set(config["parody_brands"]):
+        errors.append("Not every parody brand appears in the collection")
     for item in assignments:
         values = list(item["stats"].values())
         if sum(values) != 30 or min(values) < 4 or max(values) > 8:
             errors.append(f"Invalid stats for {item['token_id']}")
+        sport = SPORT_TRAITS[item["discipline"]]
+        if item["sport_equipment"] != sport["equipment"]:
+            errors.append(f"Wrong equipment for {item['token_id']}")
+        if item["apparel"] not in sport["tops"] or item["bottom"] not in sport["bottoms"]:
+            errors.append(f"Incompatible apparel for {item['token_id']}")
+        if item["footwear"] not in sport["footwear"] or item["pose"] not in sport["poses"]:
+            errors.append(f"Incompatible pose or footwear for {item['token_id']}")
     return {
         "valid": not errors,
         "errors": errors,
@@ -196,7 +263,10 @@ def validate(assignments: list[dict], config: dict) -> dict:
         "rarity": dict(rarity),
         "cast": dict(cast),
         "disciplines": dict(discipline),
+        "parody_brands": dict(brands),
+        "sport_equipment": dict(equipment),
         "stat_rule": "Each token totals 30; every stat is between 4 and 8.",
+        "sport_compatibility": "Every pose, top, bottom, footwear item, and equipment prop matches its discipline.",
     }
 
 
