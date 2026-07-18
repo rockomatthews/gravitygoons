@@ -1,0 +1,9 @@
+{
+  "Skateboarding": ["Ollie", "Kickflip", "Heelflip", "Boardslide", "50-50 Grind", "Manual", "360 Flip", "Hardflip"],
+  "Snowboarding": ["Ollie", "Indy Grab", "Method", "Boardslide", "Frontside 360", "Backside 540", "Cork 720", "Double Backflip"],
+  "Surfing": ["Bottom Turn", "Cutback", "Floater", "Snap", "Tube Ride", "Air Reverse", "Alley-Oop", "Full Rotation"],
+  "BMX": ["Bunny Hop", "Manual", "Barspin", "Tailwhip", "Tabletop", "360", "Backflip", "Flair"],
+  "Motocross": ["Seat Grab", "Can-Can", "Nac-Nac", "Superman", "Whip", "Tsunami", "Backflip", "Double Backflip"],
+  "Skiing": ["Safety Grab", "Mute Grab", "Rail Slide", "360", "Cork 540", "Misty 720", "Switch 900", "Double Cork 1080"]
+}
+

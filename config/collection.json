@@ -1,0 +1,60 @@
+{
+  "name": "Impact Club",
+  "symbol": "IMPACT",
+  "description": "1,000 selectable action-sports characters built for future progression.",
+  "seed": 260718,
+  "supply": 1000,
+  "public_supply": 950,
+  "creator_reserve": 50,
+  "mint_price_eth": "0.003",
+  "max_per_wallet": 5,
+  "royalty_bps": 500,
+  "image_base_uri": "ipfs://REPLACE_IMAGE_CID/",
+  "genesis_metadata_base_uri": "ipfs://REPLACE_GENESIS_CID/",
+  "dynamic_metadata_base_url": "https://REPLACE_OWNED_DOMAIN/api/nft/v1/",
+  "progress_registry_address": "0x0000000000000000000000000000000000000000",
+  "schema_version": 1,
+  "render": {
+    "master_size": 2048,
+    "marketplace_size": 1024,
+    "engine": "BLENDER_EEVEE_NEXT",
+    "blender_version": "5.1.2"
+  },
+  "rarity_quotas": {
+    "Common": 550,
+    "Uncommon": 270,
+    "Rare": 120,
+    "Epic": 50,
+    "Legendary": 10
+  },
+  "cast_quotas": {
+    "Animal": 750,
+    "Human": 250
+  },
+  "disciplines": [
+    "Skateboarding",
+    "Snowboarding",
+    "Surfing",
+    "BMX",
+    "Motocross",
+    "Skiing"
+  ],
+  "animal_species": [
+    "Snow Leopard",
+    "Hyena",
+    "Ram",
+    "Boar",
+    "Shark",
+    "Gorilla",
+    "Fox",
+    "Raccoon"
+  ],
+  "human_archetypes": [
+    "Angular",
+    "Round",
+    "Long",
+    "Square",
+    "Heart"
+  ]
+}
+

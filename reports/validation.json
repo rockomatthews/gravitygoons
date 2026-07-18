@@ -1,0 +1,26 @@
+{
+  "valid": true,
+  "errors": [],
+  "supply": 1000,
+  "unique_signatures": 1000,
+  "rarity": {
+    "Common": 550,
+    "Uncommon": 270,
+    "Legendary": 10,
+    "Rare": 120,
+    "Epic": 50
+  },
+  "cast": {
+    "Animal": 750,
+    "Human": 250
+  },
+  "disciplines": {
+    "Surfing": 167,
+    "Motocross": 166,
+    "BMX": 167,
+    "Skateboarding": 167,
+    "Skiing": 166,
+    "Snowboarding": 167
+  },
+  "stat_rule": "Each token totals 30; every stat is between 4 and 8."
+}

@@ -1,0 +1,124 @@
+{
+  "name": "Impact Club #0276",
+  "description": "1,000 selectable action-sports characters built for future progression.",
+  "image": "ipfs://REPLACE_IMAGE_CID/0276.png",
+  "external_url": "https://REPLACE_OWNED_DOMAIN/character/0276",
+  "attributes": [
+    {
+      "trait_type": "Cast",
+      "value": "Animal"
+    },
+    {
+      "trait_type": "Species",
+      "value": "Ram"
+    },
+    {
+      "trait_type": "Archetype",
+      "value": "Anthropomorphic"
+    },
+    {
+      "trait_type": "Complexion",
+      "value": "Golden"
+    },
+    {
+      "trait_type": "Discipline",
+      "value": "Snowboarding"
+    },
+    {
+      "trait_type": "Stance",
+      "value": "Goofy"
+    },
+    {
+      "trait_type": "Expression",
+      "value": "Raised Brow"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Brown"
+    },
+    {
+      "trait_type": "Hair / Fur",
+      "value": "Species Fur"
+    },
+    {
+      "trait_type": "Headwear",
+      "value": "Half-Shell Helmet"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "None"
+    },
+    {
+      "trait_type": "Apparel",
+      "value": "Race Jersey"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "None"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cobalt / Pink"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Speed",
+      "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Air",
+      "value": 7,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Control",
+      "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Style",
+      "value": 6,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Toughness",
+      "value": 5,
+      "max_value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Level",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "XP",
+      "value": 0
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Tricks Learned",
+      "value": 0,
+      "max_value": 64
+    },
+    {
+      "trait_type": "Progress Schema",
+      "value": "v1"
+    }
+  ],
+  "properties": {
+    "discipline": "Snowboarding",
+    "progress_registry": "0x0000000000000000000000000000000000000000",
+    "schema_version": 1,
+    "genesis_metadata": "ipfs://REPLACE_GENESIS_CID/0276.json"
+  }
+}
