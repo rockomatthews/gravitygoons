@@ -36,6 +36,8 @@ def main():
         errors.append(f"Missing sculpt/material detail system: {rig.get('visual_detail_system')}")
     if rig and rig.get("silhouette_system") != "body-build-silhouette-v3":
         errors.append(f"Missing body-build silhouette system: {rig.get('silhouette_system')}")
+    if rig and rig.get("face_expression_system") != "species-expression-sculpt-v3":
+        errors.append(f"Missing species expression sculpt system: {rig.get('face_expression_system')}")
     attached = [obj for obj in bpy.data.objects if rig and obj.parent == rig]
     if len(attached) < 20:
         errors.append(f"Only {len(attached)} modules are attached to the rig")
@@ -116,6 +118,7 @@ def main():
         "visual_detail_system": rig.get("visual_detail_system") if rig else None,
         "body_build": rig.get("body_build") if rig else None,
         "silhouette_system": rig.get("silhouette_system") if rig else None,
+        "face_expression_system": rig.get("face_expression_system") if rig else None,
         "contact_solver": rig.get("equipment_contact_solver") if rig else None,
     }
     Path(options.report).write_text(json.dumps(report, indent=2) + "\n")

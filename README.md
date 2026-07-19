@@ -23,7 +23,7 @@ Ready now:
 - Next.js gallery, token detail pages, owner controls, dynamic metadata API, and demo EIP-712 signer;
 - Supabase progression migration, RLS, public read policies, and starter trick catalog;
 - deterministic Blender 4.5.1 LTS collection renderer with a locked 22-bone rig, shared weightable torso/limb topology, visible modular traits, and automated coverage selection;
-- four explicit body-build silhouettes and five authored human face profiles, all carried into genesis metadata and saved rig-ready scenes.
+- four explicit body-build silhouettes, five authored human head profiles, eight species-specific facial constructions, and six geometric expression systems, all carried into genesis metadata and saved rig-ready scenes.
 
 Still gated:
 

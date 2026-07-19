@@ -399,6 +399,16 @@ def face(token, mats):
                 f"Muzzle Pad {side}", (side * 0.29, -1.06, muzzle_z - 0.02),
                 (0.36, 0.15, 0.25), light, segments=24, rings=12,
             )
+            add_uv(
+                f"Cheek Plane {side}", (side * 0.70, -0.58, 2.48),
+                (0.36, 0.18, 0.42 if species in {"Snow Leopard", "Raccoon"} else 0.34),
+                body, segments=24, rings=12,
+            )
+            add_curve(
+                f"Temple Slash {side}",
+                [(side * 0.30, -0.90, 3.06), (side * 0.62, -0.84, 3.18), (side * 0.84, -0.72, 3.08)],
+                0.028, ink,
+            )
         nose_y = -1.36 if species in {"Hyena", "Fox"} else -1.20
         nose_scale = (0.22, 0.12, 0.15) if species == "Fox" else (0.28, 0.13, 0.17)
         add_uv("Animal Nose", (0, nose_y, muzzle_z + 0.08), nose_scale, ink, segments=20, rings=10)
@@ -408,6 +418,7 @@ def face(token, mats):
             for side in (-1, 1):
                 add_uv(f"Cheek ruff {side}", (side * 0.92, -0.32, 2.38), (0.38, 0.28, 0.52), light, segments=24, rings=12)
     elif species == "Ram":
+        add_uv("Ram forehead plate", (0, -0.60, 2.98), (0.72, 0.28, 0.54), light, segments=24, rings=12)
         add_uv("Ram muzzle", (0, -0.82, 2.30), (0.62, 0.38, 0.43), light)
         add_uv("Ram nose pad", (0, -1.14, 2.27), (0.34, 0.13, 0.22), ink, segments=24, rings=12)
         for side in (-1, 1):
@@ -415,16 +426,23 @@ def face(token, mats):
             add_torus(f"Horn outer {side}", (side * 0.94, 0.0, 2.86), 0.54, 0.15, mats["white"], rotation=(math.pi / 2, 0.2 * side, 0))
             add_torus(f"Horn inner {side}", (side * 0.94, -0.02, 2.86), 0.31, 0.095, mats["accent"], rotation=(math.pi / 2, 0.2 * side, 0))
             add_cone(f"Ram ear {side}", (side * 1.05, -0.02, 3.12), (0.34, 0.18, 0.26), body, rotation=(0, side * 0.70, 0), vertices=4)
+            add_uv(f"Ram cheek wool {side}", (side * 0.78, -0.38, 2.30), (0.38, 0.26, 0.46), light, segments=24, rings=12)
     elif species == "Boar":
+        for side in (-1, 1):
+            add_uv(f"Boar jowl {side}", (side * 0.68, -0.50, 2.24), (0.42, 0.28, 0.48), body, segments=24, rings=12)
+            add_cube(f"Boar brow plate {side}", (side * 0.48, -0.76, 2.98), (0.38, 0.10, 0.10), ink, rotation=(0, 0, -0.16 * side), bevel=0.10)
         add_uv("Boar snout", (0, -0.93, 2.28), (0.70, 0.42, 0.40), light)
         add_uv("Snout pad", (0, -1.28, 2.30), (0.48, 0.14, 0.26), ink)
         for side in (-1, 1):
             add_uv(f"Boar nostril {side}", (side * 0.20, -1.42, 2.32), (0.075, 0.025, 0.070), mats["metal"], segments=16, rings=8)
         add_cone("Tusk L", (-0.47, -1.16, 2.10), (0.13, 0.10, 0.34), mats["white"], rotation=(0.4, 0, -0.25), vertices=20)
         add_cone("Tusk R", (0.47, -1.16, 2.10), (0.13, 0.10, 0.34), mats["white"], rotation=(0.4, 0, 0.25), vertices=20)
+        for index, x in enumerate((-0.48, -0.24, 0, 0.24, 0.48)):
+            add_cone(f"Boar crest bristle {index}", (x, 0.16, 3.54 - abs(x) * 0.18), (0.10, 0.08, 0.24), ink, vertices=5)
     elif species == "Shark":
         add_cone("Dorsal fin", (0, 0.25, 3.66), (0.42, 0.20, 0.64), body, vertices=3)
         add_uv("Shark nose", (0, -0.92, 2.54), (0.82, 0.44, 0.50), light)
+        add_uv("Shark lower jaw", (0, -0.72, 2.02), (0.72, 0.34, 0.38), mats["white"], segments=24, rings=12)
         for side in (-1, 1):
             for index in range(3):
                 add_curve(f"Gill {side} {index}", [(side * (0.72 + index * 0.05), -0.73, 2.18 - index * 0.10), (side * (0.90 + index * 0.04), -0.60, 2.10 - index * 0.10)], 0.025, ink)
@@ -438,31 +456,84 @@ def face(token, mats):
         for side in (-1, 1):
             add_uv(f"Gorilla ear {side}", (side * 1.16, -0.02, 2.72), (0.28, 0.16, 0.34), body, segments=24, rings=12)
             add_uv(f"Gorilla nostril {side}", (side * 0.16, -1.29, 2.42), (0.055, 0.020, 0.040), mats["metal"], segments=12, rings=6)
+            add_uv(f"Gorilla cheek mass {side}", (side * 0.72, -0.44, 2.30), (0.46, 0.30, 0.52), body, segments=24, rings=12)
 
     if species == "Human":
+        for side in (-1, 1):
+            add_uv(f"Human ear {side}", (side * 1.02, -0.02, 2.66), (0.18, 0.10, 0.26), body, segments=20, rings=10)
+            add_uv(f"Human cheekbone {side}", (side * 0.53, -0.60, 2.42), (0.28, 0.16, 0.22), body, segments=20, rings=10)
         add_cube("Human nose bridge", (0, -0.82, 2.62), (0.11, 0.07, 0.23), body, bevel=0.10)
         add_uv("Human nose", (0, -0.96, 2.43), (0.15, 0.12, 0.16), body, segments=24, rings=12)
         for side in (-1, 1):
             add_uv(f"Human nostril {side}", (side * 0.052, -1.073, 2.40), (0.025, 0.014, 0.018), ink, segments=12, rings=6)
 
-    eye_z = 2.76
+    expression = token["expression"]
+    eye_profile = {
+        "Human": (0.40, 2.76, 0.32, 0.20),
+        "Snow Leopard": (0.43, 2.78, 0.34, 0.20),
+        "Hyena": (0.44, 2.82, 0.33, 0.19),
+        "Fox": (0.40, 2.84, 0.32, 0.18),
+        "Raccoon": (0.43, 2.78, 0.34, 0.19),
+        "Ram": (0.46, 2.78, 0.33, 0.19),
+        "Boar": (0.47, 2.79, 0.34, 0.18),
+        "Shark": (0.46, 2.76, 0.35, 0.18),
+        "Gorilla": (0.48, 2.78, 0.35, 0.18),
+    }[species]
+    eye_x, eye_z, eye_width, eye_height = eye_profile
+    gaze_shift = 0.11 if expression == "Side Eye" else 0.0
     for side in (-1, 1):
-        x = side * 0.43
-        add_uv(f"Eye {side}", (x, -0.80, eye_z), (0.34, 0.13, 0.20), mats["white"])
-        add_uv(f"Iris {side}", (x - side * 0.02, -0.91, eye_z), (0.11, 0.055, 0.12), mats["eye"])
-        add_uv(f"Pupil {side}", (x - side * 0.02, -0.958, eye_z), (0.045, 0.022, 0.064), ink, segments=16, rings=8)
-        add_uv(f"Eye catchlight {side}", (x - side * 0.045, -0.978, eye_z + 0.035), (0.018, 0.010, 0.020), mats["white"], segments=12, rings=6)
-        add_curve(f"Upper Lid {side}", [(x - 0.27, -0.925, eye_z + 0.08), (x, -0.965, eye_z + 0.17), (x + 0.27, -0.925, eye_z + 0.08)], 0.025, ink)
-        brow_angle = -0.18 * side if token["expression"] in {"Cocky Grin", "Game Face", "Locked In"} else 0.06 * side
-        if token["expression"] == "Raised Brow" and side == 1: brow_angle += 0.30
-        add_cube(f"Brow {side}", (x, -0.92, 3.03), (0.35, 0.06, 0.07), ink, rotation=(0, 0, brow_angle), bevel=0.07)
+        x = side * eye_x
+        height_factor = 1.0
+        if expression in {"Locked In", "Game Face"}:
+            height_factor = 0.72
+        elif expression == "Cocky Grin" and side == 1:
+            height_factor = 0.62
+        elif expression == "Raised Brow" and side == 1:
+            height_factor = 1.14
+        eye_z_side = eye_z + (0.04 if expression == "Raised Brow" and side == 1 else 0.0)
+        pupil_x = x + gaze_shift - side * 0.015
+        add_uv(f"Eye {side}", (x, -0.80, eye_z_side), (eye_width, 0.13, eye_height * height_factor), mats["white"])
+        add_uv(f"Iris {side}", (pupil_x, -0.91, eye_z_side), (0.11, 0.055, 0.12 * height_factor), mats["eye"])
+        add_uv(f"Pupil {side}", (pupil_x, -0.958, eye_z_side), (0.045, 0.022, 0.064 * height_factor), ink, segments=16, rings=8)
+        add_uv(f"Eye catchlight {side}", (pupil_x - 0.025, -0.978, eye_z_side + 0.035), (0.018, 0.010, 0.020), mats["white"], segments=12, rings=6)
+        lid_lift = 0.10 * height_factor
+        add_curve(f"Upper Lid {side}", [(x - eye_width * 0.82, -0.925, eye_z_side + 0.02), (x, -0.965, eye_z_side + lid_lift), (x + eye_width * 0.82, -0.925, eye_z_side + 0.02)], 0.030, ink)
+        add_curve(f"Lower Lid {side}", [(x - eye_width * 0.72, -0.918, eye_z_side - 0.04), (x, -0.942, eye_z_side - eye_height * height_factor * 0.62), (x + eye_width * 0.72, -0.918, eye_z_side - 0.04)], 0.018, ink)
+        brow_angle = -0.22 * side if expression in {"Cocky Grin", "Game Face", "Locked In"} else 0.05 * side
+        brow_z = 3.04
+        if expression == "Raised Brow" and side == 1:
+            brow_angle += 0.28
+            brow_z += 0.20
+        elif expression == "Side Eye" and side == -1:
+            brow_z += 0.08
+        add_cube(f"Brow {side}", (x, -0.92, brow_z), (0.35, 0.06, 0.075), ink, rotation=(0, 0, brow_angle), bevel=0.07)
 
-    if token["expression"] in {"Cocky Grin", "Easy Smile"}:
-        add_curve("Smile", [(-0.42, -1.04, 2.12), (0, -1.12, 2.00), (0.48, -1.02, 2.15)], 0.035, ink)
-        add_cone("Grin Fang", (0.31, -1.12, 2.08), (0.065, 0.035, 0.12), mats["white"], rotation=(math.pi, 0, 0), vertices=12)
+    mouth_z = {
+        "Human": 2.12, "Snow Leopard": 2.08, "Hyena": 2.04, "Fox": 2.06,
+        "Raccoon": 2.08, "Ram": 2.02, "Boar": 2.00, "Shark": 2.10, "Gorilla": 1.98,
+    }[species]
+    if expression == "Cocky Grin":
+        add_uv("Mouth Cavity", (0.05, -1.10, mouth_z), (0.50, 0.075, 0.22), ink, segments=32, rings=16)
+        add_cube("Grin Teeth", (0.08, -1.17, mouth_z + 0.075), (0.34, 0.035, 0.075), mats["white"], rotation=(0, 0, -0.10), bevel=0.04)
+        add_cone("Grin Fang", (0.34, -1.21, mouth_z + 0.015), (0.065, 0.035, 0.13), mats["white"], rotation=(math.pi, 0, 0), vertices=12)
+        add_curve("Cocky Lip", [(-0.43, -1.17, mouth_z + 0.05), (0.05, -1.20, mouth_z + 0.14), (0.52, -1.14, mouth_z + 0.18)], 0.030, mats["body_light"])
+    elif expression == "Easy Smile":
+        add_uv("Mouth Cavity", (0, -1.09, mouth_z), (0.43, 0.065, 0.17), ink, segments=32, rings=16)
+        add_cube("Smile Teeth", (0, -1.155, mouth_z + 0.075), (0.30, 0.025, 0.055), mats["white"], bevel=0.035)
+        add_uv("Smile Tongue", (0, -1.16, mouth_z - 0.065), (0.22, 0.025, 0.045), mats["accent"], segments=20, rings=10)
+        add_curve("Smile Lip", [(-0.42, -1.15, mouth_z + 0.04), (0, -1.18, mouth_z + 0.13), (0.42, -1.15, mouth_z + 0.04)], 0.026, mats["body_light"])
+    elif expression == "Game Face":
+        add_uv("Mouth Cavity", (0, -1.09, mouth_z), (0.40, 0.060, 0.15), ink, segments=32, rings=16)
+        for index, x in enumerate((-0.24, -0.08, 0.08, 0.24)):
+            add_cube(f"Game Teeth {index}", (x, -1.16, mouth_z + 0.025), (0.07, 0.026, 0.075), mats["white"], bevel=0.018)
+    elif expression == "Raised Brow":
+        add_curve("Half Smile", [(-0.38, -1.08, mouth_z), (0.02, -1.13, mouth_z - 0.02), (0.40, -1.10, mouth_z + 0.10)], 0.035, ink)
+    elif expression == "Side Eye":
+        add_curve("Side Smirk", [(-0.38, -1.08, mouth_z + 0.03), (0.03, -1.12, mouth_z), (0.42, -1.10, mouth_z + 0.08)], 0.035, ink)
+        add_uv("Smirk Tooth", (0.26, -1.13, mouth_z + 0.055), (0.11, 0.025, 0.045), mats["white"], segments=16, rings=8)
     else:
-        add_curve("Mouth", [(-0.35, -1.02, 2.10), (0.0, -1.08, 2.10), (0.35, -1.02, 2.10)], 0.035, ink)
-    add_uv("Chin Volume", (0, -0.66, 1.96), (0.42, 0.24, 0.24), light, segments=24, rings=12)
+        add_curve("Locked Mouth", [(-0.38, -1.08, mouth_z + 0.02), (0, -1.12, mouth_z - 0.02), (0.38, -1.08, mouth_z + 0.02)], 0.040, ink)
+    add_uv("Chin Volume", (0, -0.66, mouth_z - 0.18), (0.44, 0.24, 0.25), light, segments=24, rings=12)
 
     if species == "Snow Leopard":
         for index, (x, z) in enumerate(((-0.72, 2.45), (0.72, 2.45), (-0.52, 3.14), (0.52, 3.14))):
@@ -857,12 +928,13 @@ def create_shared_rig(token):
     rig["discipline"] = token["discipline"]
     rig["body_build"] = token["body_build"]
     rig["silhouette_system"] = "body-build-silhouette-v3"
+    rig["face_expression_system"] = "species-expression-sculpt-v3"
     return rig
 
 
 def attach_modules_to_rig(rig):
     """Attach modular parts; shared topology receives armature groups and modifiers."""
-    head_terms = ("Head", "Eye", "Iris", "Pupil", "Upper Lid", "Brow", "Muzzle", "Nose", "Nostril", "Chin", "Fang", "Mouth", "Smile", "Ear", "Rosette", "Mask", "Mohawk", "Hair", "Horn", "Tusk", "Snout", "fin", "Helmet", "Beanie", "Cap", "Lens", "Glasses", "Chin guard", "Gold Stud", "Radio Earpiece", "Radio wire")
+    head_terms = ("Head", "Eye", "Iris", "Pupil", "Upper Lid", "Lower Lid", "Brow", "Muzzle", "Nose", "Nostril", "Chin", "Fang", "Mouth", "Smile", "Smirk", "Lip", "Teeth", "Tooth", "Tongue", "Cheek", "cheek", "Temple", "Forehead", "forehead", "Jaw", "jaw", "Jowl", "jowl", "crest", "Ear", "Rosette", "Mask", "Mohawk", "Hair", "Horn", "Tusk", "Snout", "fin", "Helmet", "Beanie", "Cap", "Lens", "Glasses", "Chin guard", "Gold Stud", "Radio Earpiece", "Radio wire")
     chest_terms = ("Torso", "Brand", "Garment lower hem", "Shoulder construction", "Collar", "Puffer", "Tank", "Tee", "Front zipper", "Jersey", "Chest armor", "Shoulder armor", "Race chevron", "Shell storm", "Hood", "Drawstring", "Technical", "Neck Gaiter", "Bib strap")
     equipment_terms = ("Skateboard", "Snowboard", "Surfboard", "BMX", "Moto", "Motocross", "Ski ", "Pole ")
 
@@ -1172,6 +1244,7 @@ def main():
             "pose_mechanics": bpy.data.objects["GravityGoons_Rig"].get("pose_mechanics"),
             "visual_detail_system": bpy.data.objects["GravityGoons_Rig"].get("visual_detail_system"),
             "silhouette_system": bpy.data.objects["GravityGoons_Rig"].get("silhouette_system"),
+            "face_expression_system": bpy.data.objects["GravityGoons_Rig"].get("face_expression_system"),
             "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
             "equipment_contact_source": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_source"),
             "equipment_contact_role": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_role"),

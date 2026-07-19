@@ -23,7 +23,7 @@ def main() -> None:
 
     tokens = {item["token_id"]: item for item in json.loads(options.assignments.read_text())["tokens"]}
     files = sorted(options.render_dir.glob("[0-9][0-9][0-9][0-9].png"))
-    label_height = 118 if options.show_pose else 92
+    label_height = 144 if options.show_pose else 92
     rows = math.ceil(len(files) / options.columns)
     sheet = Image.new("RGB", (options.columns * options.cell, rows * (options.cell + label_height)), "#050609")
     draw = ImageDraw.Draw(sheet)
@@ -47,6 +47,7 @@ def main() -> None:
             if build:
                 details += f"  ·  {build}"
             draw.text((x + 16, y + options.cell + 78), details, fill="#f39a45", font=small)
+            draw.text((x + 16, y + options.cell + 107), token["expression"], fill="#c7b8ff", font=small)
     options.output.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(options.output, optimize=True)
     print(options.output)

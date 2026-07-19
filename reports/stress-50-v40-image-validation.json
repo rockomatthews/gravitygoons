@@ -1,0 +1,107 @@
+{
+  "valid": true,
+  "errors": [],
+  "images": 50,
+  "unique_hashes": 50,
+  "resolution": 384,
+  "disciplines": {
+    "BMX": 16,
+    "Motocross": 6,
+    "Skateboarding": 7,
+    "Skiing": 7,
+    "Snowboarding": 8,
+    "Surfing": 6
+  },
+  "species": {
+    "Boar": 5,
+    "Fox": 1,
+    "Gorilla": 7,
+    "Human": 12,
+    "Hyena": 5,
+    "Raccoon": 5,
+    "Ram": 3,
+    "Shark": 7,
+    "Snow Leopard": 5
+  },
+  "body_builds": {
+    "Athletic": 13,
+    "Compact": 12,
+    "Lean": 13,
+    "Power": 12
+  },
+  "perceptual_hash_bits": 256,
+  "required_minimum_perceptual_distance": 12,
+  "minimum_perceptual_distance": 18,
+  "closest_visual_pairs": [
+    {
+      "distance": 18,
+      "tokens": [
+        26,
+        46
+      ]
+    },
+    {
+      "distance": 21,
+      "tokens": [
+        5,
+        32
+      ]
+    },
+    {
+      "distance": 26,
+      "tokens": [
+        3,
+        23
+      ]
+    },
+    {
+      "distance": 30,
+      "tokens": [
+        33,
+        39
+      ]
+    },
+    {
+      "distance": 33,
+      "tokens": [
+        8,
+        10
+      ]
+    },
+    {
+      "distance": 34,
+      "tokens": [
+        2,
+        28
+      ]
+    },
+    {
+      "distance": 34,
+      "tokens": [
+        16,
+        36
+      ]
+    },
+    {
+      "distance": 35,
+      "tokens": [
+        25,
+        50
+      ]
+    },
+    {
+      "distance": 35,
+      "tokens": [
+        37,
+        41
+      ]
+    },
+    {
+      "distance": 37,
+      "tokens": [
+        14,
+        42
+      ]
+    }
+  ]
+}

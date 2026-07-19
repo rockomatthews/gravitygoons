@@ -1,0 +1,70 @@
+{
+  "valid": true,
+  "errors": [],
+  "images": 4,
+  "unique_hashes": 4,
+  "resolution": 1024,
+  "disciplines": {
+    "BMX": 2,
+    "Motocross": 1,
+    "Surfing": 1
+  },
+  "species": {
+    "Human": 1,
+    "Hyena": 2,
+    "Raccoon": 1
+  },
+  "body_builds": {
+    "Athletic": 1,
+    "Compact": 1,
+    "Lean": 1,
+    "Power": 1
+  },
+  "perceptual_hash_bits": 256,
+  "required_minimum_perceptual_distance": 12,
+  "minimum_perceptual_distance": 66,
+  "closest_visual_pairs": [
+    {
+      "distance": 66,
+      "tokens": [
+        1,
+        2
+      ]
+    },
+    {
+      "distance": 71,
+      "tokens": [
+        1,
+        4
+      ]
+    },
+    {
+      "distance": 74,
+      "tokens": [
+        2,
+        3
+      ]
+    },
+    {
+      "distance": 75,
+      "tokens": [
+        2,
+        4
+      ]
+    },
+    {
+      "distance": 77,
+      "tokens": [
+        3,
+        4
+      ]
+    },
+    {
+      "distance": 78,
+      "tokens": [
+        1,
+        3
+      ]
+    }
+  ]
+}
