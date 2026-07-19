@@ -1,0 +1,100 @@
+{
+  "valid": true,
+  "errors": [],
+  "images": 9,
+  "unique_hashes": 9,
+  "resolution": 1024,
+  "disciplines": {
+    "BMX": 2,
+    "Skateboarding": 2,
+    "Skiing": 3,
+    "Snowboarding": 1,
+    "Surfing": 1
+  },
+  "species": {
+    "Boar": 1,
+    "Fox": 1,
+    "Gorilla": 1,
+    "Human": 1,
+    "Hyena": 1,
+    "Raccoon": 1,
+    "Ram": 1,
+    "Shark": 1,
+    "Snow Leopard": 1
+  },
+  "perceptual_hash_bits": 256,
+  "required_minimum_perceptual_distance": 12,
+  "minimum_perceptual_distance": 44,
+  "closest_visual_pairs": [
+    {
+      "distance": 44,
+      "tokens": [
+        41,
+        686
+      ]
+    },
+    {
+      "distance": 55,
+      "tokens": [
+        41,
+        117
+      ]
+    },
+    {
+      "distance": 58,
+      "tokens": [
+        41,
+        561
+      ]
+    },
+    {
+      "distance": 59,
+      "tokens": [
+        117,
+        504
+      ]
+    },
+    {
+      "distance": 60,
+      "tokens": [
+        41,
+        504
+      ]
+    },
+    {
+      "distance": 62,
+      "tokens": [
+        561,
+        686
+      ]
+    },
+    {
+      "distance": 65,
+      "tokens": [
+        293,
+        561
+      ]
+    },
+    {
+      "distance": 66,
+      "tokens": [
+        504,
+        686
+      ]
+    },
+    {
+      "distance": 67,
+      "tokens": [
+        117,
+        686
+      ]
+    },
+    {
+      "distance": 69,
+      "tokens": [
+        117,
+        561
+      ]
+    }
+  ]
+}

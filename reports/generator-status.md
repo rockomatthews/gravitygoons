@@ -69,9 +69,9 @@ During the first outline test, Blender 5.2 printed a Python traceback but return
 
 ## Fifty-character stress checkpoint
 
-Tokens #0001 through #0050 were rerendered at 384x384 on the assigned-pose/body-contact/named-mechanics system with two isolated Blender workers: 50 succeeded and zero failed. Validation confirms 50 correct PNGs, 50 unique SHA-256 hashes, all six disciplines, all nine cast types, and no flat image channels. The labeled review sheet is `art/approval/stress-50-v30.png`.
+Tokens #0001 through #0050 were rerendered at 384x384 on the superseding assigned-pose/body-contact/named-mechanics/`sculpt-material-detail-v2` system with two isolated Blender workers: 50 succeeded and zero failed. Validation confirms 50 correct PNGs, 50 unique SHA-256 hashes, all six disciplines, all nine cast types, and no flat image channels. The labeled review sheet is `art/approval/stress-50-v32.png`.
 
-Validation now also computes a 256-bit character-crop perceptual hash and rejects pairs below a configurable distance (12 by default). This catches visual duplicates that would evade byte hashing through tiny text or background changes. The current 50-token batch passes with a minimum distance of 19; the closest pair remains #0005/#0032, which intentionally shares Gorilla, BMX, beanie, goggles, chinos, shoes, and background but differs in top construction, label, accessory, expression, and assigned pose.
+Validation also computes a 256-bit character-crop perceptual hash and rejects pairs below a configurable distance (12 by default). This catches visual duplicates that would evade byte hashing through tiny text or background changes. The v2 batch passes with a minimum distance of 17; the closest pair remains #0005/#0032, which intentionally shares Gorilla, BMX, beanie, goggles, chinos, shoes, and background but differs in top construction, label, accessory, expression, and assigned pose. The machine-readable report is `reports/stress-50-v32-image-validation.json`.
 
 The 50-token checkpoint proves batch stability and measurable variation, but it does not unlock the storefront or authorize the 1,000 final render. The current contact sheet remains the art-review surface for further pose and sculpt judgment.
 
@@ -106,3 +106,21 @@ The final contact-role split is 11 right-hand grips, four board foot plants, two
 A superseding true-size rehearsal rendered Surfing #0001 (`Beach Plant`), Motocross #0022 (`Bike Beside`), and Skiing #0042 (`Skis Shouldered`) at 2048x2048 with named pose mechanics, then generated their 1024x1024 marketplace files with deterministic LANCZOS resampling. Both batches pass format, uniqueness, and perceptual validation. The release manifest proves each named assigned pose, its family, pose-mechanics version, v2 contact solver, source object, and contact role. It uses repository-relative source paths and intentionally preserves the current `REPLACE_IMAGE_CID` URI, proving the launch remains gated.
 
 Review `art/approval/release-rehearsal-v31.png` and `reports/release-rehearsal-v31.json`. The rehearsal does not populate production `masters/` or `images/`, and it does not unlock the website.
+
+## Sculpt and material detail v2 checkpoint
+
+The renderer now applies deterministic micro-surface shading that separates fur/skin, cloth, accent fabric, and rubber without external texture files. Face construction gained pupils, catchlights, upper lids, nostrils, muzzle pads, chin volume, species ear interiors, and expression teeth. Apparel and equipment-ready body modules gained shoulder seams, lower hems, waistband piping, glove cuffs and knuckle armor, helmet rims and vents, and layered shoe midsoles/toe caps.
+
+Species reads were strengthened with a human nose bridge, gorilla crest and nose plane, layered ram horns and muzzle, boar nostrils, and additional feline/canid facial structure. These additions remain semantic modules attached to the locked `gravity-goons-rig-v1`; they do not alter fixed assignments or the future game bone contract. Every new render records `visual_detail_system: sculpt-material-detail-v2`, and rig validation rejects an absent or older detail system.
+
+The authoritative one-per-species proof is `art/approval/cast-detail-v2.png`. Automated results:
+
+- 9/9 correct 1024x1024 PNGs with nine unique SHA-256 hashes;
+- all nine cast types represented exactly once;
+- minimum character-crop perceptual distance 44 against the required 12;
+- 9/9 saved rigs valid with `sculpt-material-detail-v2` present;
+- maximum equipment-contact distance 0.0;
+- minimum 17 armature-deformed meshes per token;
+- equipment fully framed, with normalized extents left 0.2280, right 0.8773, bottom 0.0284, and top 0.6285.
+
+Review the machine-readable results at `reports/cast-detail-v2-image-validation.json` and `reports/cast-detail-v2-rig-validation.json`. The storefront remains gated and the production `masters/` and `images/` folders remain empty pending visual approval and a superseding full stress run.

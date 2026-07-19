@@ -32,6 +32,7 @@ def main() -> None:
     parser.add_argument("--resolution", type=int, required=True)
     parser.add_argument("--expected", type=int)
     parser.add_argument("--min-perceptual-distance", type=int, default=12)
+    parser.add_argument("--output", type=Path, help="Optional report path; defaults to <render_dir>/validation.json")
     options = parser.parse_args()
 
     tokens = {item["token_id"]: item for item in json.loads(options.assignments.read_text())["tokens"]}
@@ -96,7 +97,8 @@ def main() -> None:
         "minimum_perceptual_distance": closest_pairs[0]["distance"] if closest_pairs else None,
         "closest_visual_pairs": closest_pairs,
     }
-    output = options.render_dir / "validation.json"
+    output = options.output or options.render_dir / "validation.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
     raise SystemExit(0 if report["valid"] else 1)

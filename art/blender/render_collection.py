@@ -228,6 +228,27 @@ def add_weighted_joint(name, location, scale, material, first_bone, second_bone)
     return obj
 
 
+def add_micro_surface(material, scale, detail, strength, distance=0.08):
+    """Add deterministic, render-safe surface breakup without image textures."""
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    if bsdf is None or "Normal" not in bsdf.inputs:
+        return material
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.name = f"{material.name} Micro Surface"
+    noise.inputs["Scale"].default_value = scale
+    noise.inputs["Detail"].default_value = detail
+    noise.inputs["Roughness"].default_value = 0.72
+    bump = nodes.new("ShaderNodeBump")
+    bump.name = f"{material.name} Micro Bump"
+    bump.inputs["Strength"].default_value = strength
+    bump.inputs["Distance"].default_value = distance
+    links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return material
+
+
 def add_authored_head(name, location, scale, species, material):
     """Collection head topology with species-tuned jaw, brow, and cranium rings."""
     segments = 32
@@ -281,7 +302,7 @@ def add_authored_head(name, location, scale, species, material):
 
 def materials_for(token):
     accent_color, garment_color = BRAND_COLORS[token["parody_brand"]]
-    return {
+    materials = {
         "body": mat("Body", BODY_PALETTES[token["complexion"]], 0.72),
         "body_light": mat("Body Light", tuple(min(1, channel * 1.25) for channel in BODY_PALETTES[token["complexion"]][:3]) + (1,), 0.78),
         "ink": mat("Ink", (0.008, 0.01, 0.014, 1), 0.88),
@@ -293,6 +314,13 @@ def materials_for(token):
         "rubber": mat("Rubber", (0.018, 0.022, 0.026, 1), 0.92),
         "rarity": mat("Rarity", RARITY_COLORS[token["rarity"]], 0.38, 0.12),
     }
+    body_scale = 14.0 if token["species"] != "Human" else 24.0
+    add_micro_surface(materials["body"], body_scale, 5.0, 0.18 if token["species"] != "Human" else 0.07)
+    add_micro_surface(materials["body_light"], body_scale, 5.0, 0.14 if token["species"] != "Human" else 0.05)
+    add_micro_surface(materials["garment"], 42.0, 3.0, 0.11, 0.045)
+    add_micro_surface(materials["accent"], 34.0, 2.0, 0.06, 0.030)
+    add_micro_surface(materials["rubber"], 18.0, 4.0, 0.16, 0.055)
+    return materials
 
 
 def background(token, mats):
@@ -324,6 +352,11 @@ def face(token, mats):
         }[species]
         add_cone("Ear L", (-0.78, 0.0, 3.48), ear_scale, body, vertices=4)
         add_cone("Ear R", (0.78, 0.0, 3.48), ear_scale, body, vertices=4)
+        for side in (-1, 1):
+            add_cone(
+                f"Ear inset {side}", (side * 0.78, -0.16, 3.45),
+                tuple(value * 0.58 for value in ear_scale), mats["accent"], vertices=4,
+            )
         muzzle_scale = {
             "Snow Leopard": (0.74, 0.40, 0.42),
             "Hyena": (0.62, 0.58, 0.44),
@@ -332,19 +365,32 @@ def face(token, mats):
         }[species]
         muzzle_z = 2.30 if species in {"Hyena", "Fox"} else 2.34
         add_uv("Muzzle", (0, -0.86, muzzle_z), muzzle_scale, light)
+        for side in (-1, 1):
+            add_uv(
+                f"Muzzle Pad {side}", (side * 0.29, -1.06, muzzle_z - 0.02),
+                (0.36, 0.15, 0.25), light, segments=24, rings=12,
+            )
         nose_y = -1.36 if species in {"Hyena", "Fox"} else -1.20
         nose_scale = (0.22, 0.12, 0.15) if species == "Fox" else (0.28, 0.13, 0.17)
         add_uv("Animal Nose", (0, nose_y, muzzle_z + 0.08), nose_scale, ink, segments=20, rings=10)
+        for side in (-1, 1):
+            add_uv(f"Nostril {side}", (side * 0.095, nose_y - 0.12, muzzle_z + 0.08), (0.040, 0.018, 0.030), mats["metal"], segments=12, rings=6)
         if species == "Snow Leopard":
             for side in (-1, 1):
                 add_uv(f"Cheek ruff {side}", (side * 0.92, -0.32, 2.38), (0.38, 0.28, 0.52), light, segments=24, rings=12)
     elif species == "Ram":
         add_uv("Ram muzzle", (0, -0.82, 2.30), (0.62, 0.38, 0.43), light)
+        add_uv("Ram nose pad", (0, -1.14, 2.27), (0.34, 0.13, 0.22), ink, segments=24, rings=12)
         for side in (-1, 1):
-            add_torus(f"Horn {side}", (side * 0.94, 0.0, 2.82), 0.48, 0.14, mats["accent"], rotation=(math.pi / 2, 0.2 * side, 0))
+            add_uv(f"Ram nostril {side}", (side * 0.12, -1.25, 2.28), (0.040, 0.018, 0.030), mats["metal"], segments=12, rings=6)
+            add_torus(f"Horn outer {side}", (side * 0.94, 0.0, 2.86), 0.54, 0.15, mats["white"], rotation=(math.pi / 2, 0.2 * side, 0))
+            add_torus(f"Horn inner {side}", (side * 0.94, -0.02, 2.86), 0.31, 0.095, mats["accent"], rotation=(math.pi / 2, 0.2 * side, 0))
+            add_cone(f"Ram ear {side}", (side * 1.05, -0.02, 3.12), (0.34, 0.18, 0.26), body, rotation=(0, side * 0.70, 0), vertices=4)
     elif species == "Boar":
         add_uv("Boar snout", (0, -0.93, 2.28), (0.70, 0.42, 0.40), light)
         add_uv("Snout pad", (0, -1.28, 2.30), (0.48, 0.14, 0.26), ink)
+        for side in (-1, 1):
+            add_uv(f"Boar nostril {side}", (side * 0.20, -1.42, 2.32), (0.075, 0.025, 0.070), mats["metal"], segments=16, rings=8)
         add_cone("Tusk L", (-0.47, -1.16, 2.10), (0.13, 0.10, 0.34), mats["white"], rotation=(0.4, 0, -0.25), vertices=20)
         add_cone("Tusk R", (0.47, -1.16, 2.10), (0.13, 0.10, 0.34), mats["white"], rotation=(0.4, 0, 0.25), vertices=20)
     elif species == "Shark":
@@ -358,20 +404,36 @@ def face(token, mats):
     elif species == "Gorilla":
         add_uv("Gorilla muzzle", (0, -0.84, 2.22), (0.78, 0.40, 0.54), light)
         add_cube("Gorilla brow ridge", (0, -0.77, 3.04), (0.88, 0.13, 0.16), ink, bevel=0.18)
+        add_uv("Gorilla crest", (0, 0.02, 3.38), (0.82, 0.62, 0.28), ink, segments=24, rings=12)
+        add_uv("Gorilla nose pad", (0, -1.16, 2.42), (0.44, 0.15, 0.25), ink, segments=24, rings=12)
+        for side in (-1, 1):
+            add_uv(f"Gorilla ear {side}", (side * 1.16, -0.02, 2.72), (0.28, 0.16, 0.34), body, segments=24, rings=12)
+            add_uv(f"Gorilla nostril {side}", (side * 0.16, -1.29, 2.42), (0.055, 0.020, 0.040), mats["metal"], segments=12, rings=6)
+
+    if species == "Human":
+        add_cube("Human nose bridge", (0, -0.82, 2.62), (0.11, 0.07, 0.23), body, bevel=0.10)
+        add_uv("Human nose", (0, -0.96, 2.43), (0.15, 0.12, 0.16), body, segments=24, rings=12)
+        for side in (-1, 1):
+            add_uv(f"Human nostril {side}", (side * 0.052, -1.073, 2.40), (0.025, 0.014, 0.018), ink, segments=12, rings=6)
 
     eye_z = 2.76
     for side in (-1, 1):
         x = side * 0.43
         add_uv(f"Eye {side}", (x, -0.80, eye_z), (0.34, 0.13, 0.20), mats["white"])
         add_uv(f"Iris {side}", (x - side * 0.02, -0.91, eye_z), (0.11, 0.055, 0.12), mats["eye"])
+        add_uv(f"Pupil {side}", (x - side * 0.02, -0.958, eye_z), (0.045, 0.022, 0.064), ink, segments=16, rings=8)
+        add_uv(f"Eye catchlight {side}", (x - side * 0.045, -0.978, eye_z + 0.035), (0.018, 0.010, 0.020), mats["white"], segments=12, rings=6)
+        add_curve(f"Upper Lid {side}", [(x - 0.27, -0.925, eye_z + 0.08), (x, -0.965, eye_z + 0.17), (x + 0.27, -0.925, eye_z + 0.08)], 0.025, ink)
         brow_angle = -0.18 * side if token["expression"] in {"Cocky Grin", "Game Face", "Locked In"} else 0.06 * side
         if token["expression"] == "Raised Brow" and side == 1: brow_angle += 0.30
         add_cube(f"Brow {side}", (x, -0.92, 3.03), (0.35, 0.06, 0.07), ink, rotation=(0, 0, brow_angle), bevel=0.07)
 
     if token["expression"] in {"Cocky Grin", "Easy Smile"}:
         add_curve("Smile", [(-0.42, -1.04, 2.12), (0, -1.12, 2.00), (0.48, -1.02, 2.15)], 0.035, ink)
+        add_cone("Grin Fang", (0.31, -1.12, 2.08), (0.065, 0.035, 0.12), mats["white"], rotation=(math.pi, 0, 0), vertices=12)
     else:
         add_curve("Mouth", [(-0.35, -1.02, 2.10), (0.0, -1.08, 2.10), (0.35, -1.02, 2.10)], 0.035, ink)
+    add_uv("Chin Volume", (0, -0.66, 1.96), (0.42, 0.24, 0.24), light, segments=24, rings=12)
 
     if species == "Snow Leopard":
         for index, (x, z) in enumerate(((-0.72, 2.45), (0.72, 2.45), (-0.52, 3.14), (0.52, 3.14))):
@@ -429,6 +491,9 @@ def headwear(token, mats):
     if item in {"Half-Shell Helmet", "Full-Face Helmet"}:
         add_uv("Helmet", (0, 0.04, 3.46), (1.24, 0.92, 0.62), mats["ink"])
         add_cube("Helmet stripe", (0, -0.83, 3.52), (0.55, 0.06, 0.08), mats["accent"], bevel=0.06)
+        add_curve("Helmet lower rim", [(-1.00, -0.60, 3.26), (0, -0.90, 3.18), (1.00, -0.60, 3.26)], 0.045, mats["accent"])
+        for index, x in enumerate((-0.52, 0.0, 0.52)):
+            add_cube(f"Helmet vent {index}", (x, -0.86, 3.72), (0.13, 0.045, 0.045), mats["accent"], rotation=(0.04, 0, 0), bevel=0.04)
         if item == "Full-Face Helmet":
             add_curve("Chin guard", [(-0.82, -0.91, 2.85), (-0.98, -1.12, 2.22), (0, -1.30, 1.98), (0.98, -1.12, 2.22), (0.82, -0.91, 2.85)], 0.09, mats["ink"])
     elif item == "Beanie":
@@ -452,6 +517,12 @@ def apparel_details(token, mats, broad):
     item = token["apparel"]
     accent = mats["accent"]
     ink = mats["ink"]
+    for side in (-1, 1):
+        add_curve(
+            f"Shoulder construction seam {side}",
+            [(side * 0.58, -0.64, 1.28), (side * 0.90 * broad, -0.60, 1.08), (side * 1.18 * broad, -0.46, 0.76)],
+            0.025, accent,
+        )
     if item == "Tank Top":
         for side in (-1, 1):
             add_curve(f"Tank strap {side}", [(side * 0.76, -0.66, 1.32), (side * 0.60, -0.78, 0.88)], 0.105, accent)
@@ -521,6 +592,13 @@ def body(token, mats):
         add_weighted_joint(f"Shoulder Joint {side}", (side * 1.34 * broad, 0, 0.91), (0.43, 0.42, 0.43), arm_mat, "chest", f"upper_arm.{suffix}")
         add_weighted_joint(f"Elbow Joint {side}", (side * 1.56 * broad, -0.07, -0.31), (0.36, 0.35, 0.36), mats["body"], f"upper_arm.{suffix}", f"forearm.{suffix}")
         add_gloved_hand(side, (side * 1.68 * broad, -0.25, -1.18), mats)
+        add_torus(f"Glove Cuff {side}", (side * 1.66 * broad, -0.16, -0.94), 0.27, 0.065, mats["accent"], rotation=(0, math.pi / 2, 0))
+        for knuckle in (-0.13, 0.0, 0.13):
+            add_uv(
+                f"Glove Knuckle {knuckle} {side}",
+                (side * 1.68 * broad + knuckle, -0.50, -1.10),
+                (0.055, 0.035, 0.055), mats["metal"], segments=12, rings=6,
+            )
 
     if token["apparel"] in {"Tech Hoodie", "Shell Jacket", "Puffer Vest"}:
         add_curve("Collar", [(-0.62, -0.64, 1.27), (0, -0.82, 1.04), (0.62, -0.64, 1.27)], 0.10, mats["accent"])
@@ -530,11 +608,14 @@ def body(token, mats):
     apparel_details(token, mats, broad)
     add_text("Brand", token["parody_brand"], (0, -0.78, 0.60), max(0.14, 0.30 - len(token["parody_brand"]) * 0.009), mats["accent"])
     add_curve("Brand mark", [(-0.38, -0.81, 0.10), (-0.12, -0.85, -0.22), (0, -0.85, 0.04), (0.16, -0.85, -0.24), (0.42, -0.81, 0.12)], 0.05, mats["accent"])
+    add_curve("Garment lower hem", [(-0.92 * broad, -0.61, -0.78), (0, -0.72, -0.84), (0.92 * broad, -0.61, -0.78)], 0.035, mats["accent"])
 
     bottom = token["bottom"]
     shorts = bottom in {"Boardshorts", "Cargo Shorts", "Loose Skate Shorts", "Volley Shorts"}
     pants_mat = mats["ink"] if "Wetsuit" not in bottom else mats["garment"]
     add_cube("Waist", (0, 0, -1.25), (1.12 * broad, 0.59, 0.42), pants_mat, bevel=0.24)
+    add_curve("Waistband piping", [(-0.96 * broad, -0.57, -1.08), (0, -0.64, -1.04), (0.96 * broad, -0.57, -1.08)], 0.035, mats["accent"])
+    add_cube("Waist tab", (0, -0.63, -1.26), (0.14, 0.045, 0.11), mats["accent"], bevel=0.04)
     stance = -1 if token["stance"] == "Goofy" else 1
     for side in (-1, 1):
         x = side * 0.62 * broad
@@ -573,6 +654,8 @@ def body(token, mats):
             for toe in range(3):
                 add_uv(f"Toe {side} {toe}", (x - leg_shift + side * (toe - 1) * 0.13, -1.08, -3.68), (0.10, 0.12, 0.08), mats["body"], segments=16, rings=8)
         else:
+            add_cube(f"Foot Midsole {side}", (x - leg_shift, -0.48, foot_z - boot_scale[2] * 0.78), (boot_scale[0] * 0.94, boot_scale[1] * 0.94, 0.075), mats["white"], bevel=0.06)
+            add_cube(f"Foot Toe Cap {side}", (x - leg_shift, -0.98, foot_z - 0.02), (boot_scale[0] * 0.70, 0.15, boot_scale[2] * 0.56), mats["accent"], bevel=0.08)
             add_curve(f"Sole stripe {side}", [(x - 0.38, -1.04, -3.65), (x, -1.10, -3.62), (x + 0.38, -1.04, -3.65)], 0.035, mats["accent"])
             if not tall_boot:
                 for lace in range(3):
@@ -743,8 +826,8 @@ def create_shared_rig(token):
 
 def attach_modules_to_rig(rig):
     """Attach modular parts; shared topology receives armature groups and modifiers."""
-    head_terms = ("Head", "Eye", "Iris", "Brow", "Muzzle", "Mouth", "Smile", "Ear", "Rosette", "Mask", "Mohawk", "Hair", "Horn", "Tusk", "Snout", "fin", "Helmet", "Beanie", "Cap", "Lens", "Glasses", "Chin guard", "Gold Stud", "Radio Earpiece", "Radio wire")
-    chest_terms = ("Torso", "Brand", "Collar", "Puffer", "Tank", "Tee", "Front zipper", "Jersey", "Chest armor", "Shoulder armor", "Race chevron", "Shell storm", "Hood", "Drawstring", "Technical", "Neck Gaiter", "Bib strap")
+    head_terms = ("Head", "Eye", "Iris", "Pupil", "Upper Lid", "Brow", "Muzzle", "Nose", "Nostril", "Chin", "Fang", "Mouth", "Smile", "Ear", "Rosette", "Mask", "Mohawk", "Hair", "Horn", "Tusk", "Snout", "fin", "Helmet", "Beanie", "Cap", "Lens", "Glasses", "Chin guard", "Gold Stud", "Radio Earpiece", "Radio wire")
+    chest_terms = ("Torso", "Brand", "Garment lower hem", "Shoulder construction", "Collar", "Puffer", "Tank", "Tee", "Front zipper", "Jersey", "Chest armor", "Shoulder armor", "Race chevron", "Shell storm", "Hood", "Drawstring", "Technical", "Neck Gaiter", "Bib strap")
     equipment_terms = ("Skateboard", "Snowboard", "Surfboard", "BMX", "Moto", "Motocross", "Ski ", "Pole ")
 
     for obj in list(bpy.context.scene.objects):
@@ -945,6 +1028,7 @@ def solve_equipment_contact(rig):
     rig["equipment_contact_source"] = source.name
     rig["equipment_contact_role"] = target.get("contact_role")
     rig["equipment_contact_adjustment"] = tuple(round(value, 5) for value in adjustment)
+    rig["visual_detail_system"] = "sculpt-material-detail-v2"
     bpy.context.view_layer.update()
 
 
@@ -1049,6 +1133,7 @@ def main():
             "presentation_pose": bpy.data.objects["GravityGoons_Rig"].get("presentation_pose"),
             "pose_family": bpy.data.objects["GravityGoons_Rig"].get("pose_family"),
             "pose_mechanics": bpy.data.objects["GravityGoons_Rig"].get("pose_mechanics"),
+            "visual_detail_system": bpy.data.objects["GravityGoons_Rig"].get("visual_detail_system"),
             "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
             "equipment_contact_source": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_source"),
             "equipment_contact_role": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_role"),

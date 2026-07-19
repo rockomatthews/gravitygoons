@@ -42,7 +42,7 @@ Still gated:
 - Roster mapping: `reports/approval-gate-2-roster.md`
 - Fictional label catalog: `traits/parody-brands.json`
 
-Blender 5.1.2 crashed inside Metal device initialization on this Apple M5 before Python could execute. The machine now uses the official Apple Silicon Blender 5.2 LTS build, and the generator has completed a four-view headless render smoke test. The former 5.1.2 app is preserved as `/Applications/Blender 5.1.2 (M5 crash).app` while `/Applications/Blender.app` and the existing `blender` command launch 5.2 LTS.
+Blender 5.1.2 and 5.2.0 both crash inside Metal device initialization on this Apple M5 before Python can execute. The verified renderer is the official Apple Silicon Blender 4.5.1 LTS artifact (SHA-256 `99dcd51528cc06bd872bb28867f6663c21332f4986cc87bea95131da93a23e0f`). `scripts/blender-lts-wrapper.sh` mounts its cached DMG read-only and the existing `blender` command points to that wrapper. The incompatible apps remain preserved in `/Applications` under clearly labeled crash names.
 
 ## Generate and validate the collection data
 
@@ -97,9 +97,9 @@ Select the complete six-sport by three-pose contact matrix:
 # Produces reports/pose-contact-matrix-selection.json and 18 token IDs.
 ```
 
-The assignment-driven pipeline is operational, but its current procedural meshes are an engineering prototype rather than approved final art. `reports/generator-status.md` tracks the visual gate that must be passed before rendering all 1,000 marketplace images.
+The assignment-driven pipeline is operational and now carries the version-locked `sculpt-material-detail-v2` finish system. Review the one-per-species proof at `art/approval/cast-detail-v2.png`; `reports/generator-status.md` tracks the remaining visual gate before rendering all 1,000 marketplace images.
 
-Immutable assignment poses drive the rig through `config/pose-families.json`. Held/carry poses validate glove contact; riding/drop-in poses validate foot or boot contact. Named mechanics add pose-specific lean, torso roll, knee compression, leg action, and arm counterbalance. Pose names, motion families, mechanics version, contact sources, roles, and solver adjustments are recorded in render manifests.
+Immutable assignment poses drive the rig through `config/pose-families.json`. Held/carry poses validate glove contact; riding/drop-in poses validate foot or boot contact. Named mechanics add pose-specific lean, torso roll, knee compression, leg action, and arm counterbalance. Pose names, motion families, mechanics version, sculpt/material version, contact sources, roles, and solver adjustments are recorded in render manifests.
 
 Rigged checkpoints can be saved with `--save-blend`. Every generated rig follows `traits/rig-schema.json`; validate a saved file with:
 
