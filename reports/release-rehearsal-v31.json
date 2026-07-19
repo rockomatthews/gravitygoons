@@ -19,7 +19,7 @@
         2048,
         2048
       ],
-      "master_sha256": "c3a0780c815d2931612401b399872d8e161a22a7c36fbd24a736678be3e62e49",
+      "master_sha256": "e494e6f430d9a03b4aa10e55743de5f01eaecd56dc450a5a6c92b2b6c9820801",
       "marketplace_file": "0001.png",
       "marketplace_size": [
         1024,
@@ -46,12 +46,13 @@
         "equipment_contact_source": "Glove Palm 1",
         "file": "0001.png",
         "pose_family": "Callout",
+        "pose_mechanics": "named-pose-mechanics-v1",
         "presentation_pose": "Beach Plant",
         "rarity": "Common",
         "resolution": 2048,
         "rig_bones": 22,
         "rig_schema": "gravity-goons-rig-v1",
-        "sha256": "c3a0780c815d2931612401b399872d8e161a22a7c36fbd24a736678be3e62e49",
+        "sha256": "e494e6f430d9a03b4aa10e55743de5f01eaecd56dc450a5a6c92b2b6c9820801",
         "species": "Hyena",
         "token_id": 1
       }
@@ -64,13 +65,13 @@
         2048,
         2048
       ],
-      "master_sha256": "0e19a46b8e93619f2e2e9685fd27f2564d59389a6af5302d4340abfa0f32d7b7",
+      "master_sha256": "e4c71206913efb9e06fed06074f4a062580f21a6c9db58e118a0c4446fda712d",
       "marketplace_file": "0022.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "db278dd74966f0ad3062dc79c54078b236b1a26aafbb27a45ffbe4c723670dd6",
+      "marketplace_sha256": "026bbd952c2b37ffd7bd82624ad34d7181d5aa495eb365d19e03f3354537083e",
       "assignment_sha256": "6ad8290388ce758a98b2302deddfe4a71f0ba58c47fe36a0a9d8557cce9e05bb",
       "genesis_metadata_file": "0022.json",
       "genesis_metadata_sha256": "2712589c784da295cb4ce2b416c631cea9953b7323d742bd16d600bd78ced494",
@@ -91,12 +92,13 @@
         "equipment_contact_source": "Glove Palm 1",
         "file": "0022.png",
         "pose_family": "Ready",
+        "pose_mechanics": "named-pose-mechanics-v1",
         "presentation_pose": "Bike Beside",
         "rarity": "Rare",
         "resolution": 2048,
         "rig_bones": 22,
         "rig_schema": "gravity-goons-rig-v1",
-        "sha256": "0e19a46b8e93619f2e2e9685fd27f2564d59389a6af5302d4340abfa0f32d7b7",
+        "sha256": "e4c71206913efb9e06fed06074f4a062580f21a6c9db58e118a0c4446fda712d",
         "species": "Ram",
         "token_id": 22
       }
@@ -109,13 +111,13 @@
         2048,
         2048
       ],
-      "master_sha256": "331dff06de263cb8162f651bb1875a395dffc2ee4634145fba3a9aa72d4c304c",
+      "master_sha256": "8010c22cc88aea1ce535ea4f34fd92447159fb96f063cf8a47536e0978773d73",
       "marketplace_file": "0042.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "33c4a6e491e0eaebd26cf06c7f96501a09f0c877a951bb0a553c8f06a8a8dae1",
+      "marketplace_sha256": "76813da63b11628c783eee07e68cf5b46320448cf39b0d12d91684e85d9d5a63",
       "assignment_sha256": "977b21d5372d233ea9fc7b71d07ab112d9dbaef1d151582655d87162aba35f6e",
       "genesis_metadata_file": "0042.json",
       "genesis_metadata_sha256": "a6e0f1c346707a57884f8b7fc17c276a58b8a9483806164ad399ed522a15b86d",
@@ -127,21 +129,22 @@
         "brand": "BURNTON",
         "discipline": "Skiing",
         "equipment_contact_adjustment": [
-          0.25492,
-          -0.19776,
-          0.18655
+          0.47923,
+          -0.20688,
+          0.39639
         ],
         "equipment_contact_role": "primary-hand-grip-v1",
         "equipment_contact_solver": "body-source-assembly-translation-v2",
         "equipment_contact_source": "Glove Palm 1",
         "file": "0042.png",
         "pose_family": "Ready",
+        "pose_mechanics": "named-pose-mechanics-v1",
         "presentation_pose": "Skis Shouldered",
         "rarity": "Common",
         "resolution": 2048,
         "rig_bones": 22,
         "rig_schema": "gravity-goons-rig-v1",
-        "sha256": "331dff06de263cb8162f651bb1875a395dffc2ee4634145fba3a9aa72d4c304c",
+        "sha256": "8010c22cc88aea1ce535ea4f34fd92447159fb96f063cf8a47536e0978773d73",
         "species": "Snow Leopard",
         "token_id": 42
       }

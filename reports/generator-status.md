@@ -69,7 +69,7 @@ During the first outline test, Blender 5.2 printed a Python traceback but return
 
 ## Fifty-character stress checkpoint
 
-Tokens #0001 through #0050 were rerendered at 384x384 on the assigned-pose/body-contact system with two isolated Blender workers: 50 succeeded and zero failed. Validation confirms 50 correct PNGs, 50 unique SHA-256 hashes, all six disciplines, all nine cast types, and no flat image channels. The labeled review sheet is `art/approval/stress-50-v26.png`.
+Tokens #0001 through #0050 were rerendered at 384x384 on the assigned-pose/body-contact/named-mechanics system with two isolated Blender workers: 50 succeeded and zero failed. Validation confirms 50 correct PNGs, 50 unique SHA-256 hashes, all six disciplines, all nine cast types, and no flat image channels. The labeled review sheet is `art/approval/stress-50-v30.png`.
 
 Validation now also computes a 256-bit character-crop perceptual hash and rejects pairs below a configurable distance (12 by default). This catches visual duplicates that would evade byte hashing through tiny text or background changes. The current 50-token batch passes with a minimum distance of 19; the closest pair remains #0005/#0032, which intentionally shares Gorilla, BMX, beanie, goggles, chinos, shoes, and background but differs in top construction, label, accessory, expression, and assigned pose.
 
@@ -79,7 +79,7 @@ The 50-token checkpoint proves batch stability and measurable variation, but it 
 
 The fixed assignment's named `pose` trait now drives the rig. `config/pose-families.json` maps all 18 discipline-specific pose cases into Ready, Callout, and Charge motion families without deriving pose from token ID. Both the immutable pose name and its motion family are stored on the armature and in each render manifest.
 
-Pose-specific equipment layouts make action semantics visible: Push-Off rides a skateboard, Binding Check and Slope Ready use an underfoot snowboard, Pop-Up Ready uses an underfoot surfboard, Drop-In Ready places skis beneath the boots, and BMX Pedal Ready / Motocross Gate Ready use visible lower stance pegs. Held/carry poses retain hand contact. The labeled review sheet is `art/approval/assigned-pose-matrix-v25.png`.
+Pose-specific equipment layouts make action semantics visible: Push-Off rides a skateboard, Binding Check and Slope Ready use an underfoot snowboard, Pop-Up Ready uses an underfoot surfboard, Drop-In Ready places skis beneath the boots, and BMX Pedal Ready / Motocross Gate Ready use visible lower stance pegs. Held/carry poses retain hand contact. `named-pose-mechanics-v1` adds pose-specific torso roll, forward lean, knee compression, lead/rear leg action, and arm counterbalance. The labeled review sheet is `art/approval/assigned-pose-matrix-v29.png`.
 
 ## Measured equipment-contact checkpoint
 
@@ -92,17 +92,17 @@ The deterministic 18-case matrix covers every discipline-specific assigned pose 
 - 18/18 images valid and unique;
 - 18/18 saved rigs valid;
 - all six disciplines, all three motion families, and all 18 discipline/pose cases;
-- minimum perceptual distance 24 against the required 12;
+- minimum perceptual distance 25 against the required 12;
 - maximum equipment-contact distance 0.0;
 - minimum 17 armature-deformed meshes per token;
-- equipment remains fully framed, with normalized extents left 0.2484, right 0.9402, bottom -0.0207, and top 0.6270.
+- equipment remains fully framed, with normalized extents left 0.2386, right 0.9402, bottom -0.0311, and top 0.6474.
 
-The final contact-role split is 11 right-hand grips, four board foot plants, two bike pedal/boot contacts, and one ski-boot contact. Review `art/approval/assigned-pose-matrix-v25.png`, `reports/pose-contact-matrix-selection-v20.json`, and `reports/assigned-pose-rig-validation-v25.json`.
+The final contact-role split is 11 right-hand grips, four board foot plants, two bike pedal/boot contacts, and one ski-boot contact. Review `art/approval/assigned-pose-matrix-v29.png`, `reports/pose-contact-matrix-selection-v20.json`, and `reports/assigned-pose-rig-validation-v29.json`.
 
 ## Mint-image release rehearsal
 
 `scripts/build_release_images.py` now implements the configured 2048-master to 1024-marketplace pipeline. It validates PNG dimensions, fixed token assignments, matching genesis-metadata image filenames, and unique byte hashes at both sizes. The resulting manifest binds each token to its assignment hash, genesis metadata hash, master hash, optimized image hash, rig schema, presentation pose, and contact-solver adjustment.
 
-A superseding true-size rehearsal rendered Surfing #0001 (`Beach Plant`), Motocross #0022 (`Bike Beside`), and Skiing #0042 (`Skis Shouldered`) at 2048x2048, then generated their 1024x1024 marketplace files with deterministic LANCZOS resampling. Both batches pass format, uniqueness, and perceptual validation. The release manifest proves each named assigned pose, its family, the v2 contact solver, source object, and contact role. It uses repository-relative source paths and intentionally preserves the current `REPLACE_IMAGE_CID` URI, proving the launch remains gated.
+A superseding true-size rehearsal rendered Surfing #0001 (`Beach Plant`), Motocross #0022 (`Bike Beside`), and Skiing #0042 (`Skis Shouldered`) at 2048x2048 with named pose mechanics, then generated their 1024x1024 marketplace files with deterministic LANCZOS resampling. Both batches pass format, uniqueness, and perceptual validation. The release manifest proves each named assigned pose, its family, pose-mechanics version, v2 contact solver, source object, and contact role. It uses repository-relative source paths and intentionally preserves the current `REPLACE_IMAGE_CID` URI, proving the launch remains gated.
 
-Review `art/approval/release-rehearsal-v23.png` and `reports/release-rehearsal-v23.json`. The rehearsal does not populate production `masters/` or `images/`, and it does not unlock the website.
+Review `art/approval/release-rehearsal-v31.png` and `reports/release-rehearsal-v31.json`. The rehearsal does not populate production `masters/` or `images/`, and it does not unlock the website.

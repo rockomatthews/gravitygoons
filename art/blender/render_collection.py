@@ -862,6 +862,65 @@ def apply_pose(token, rig):
         rig.pose.bones["thigh.L"].rotation_euler[1] += math.radians(4 * stance)
         rig.pose.bones["thigh.R"].rotation_euler[1] += math.radians(-4 * stance)
 
+    def rotate(bone_name, axis, degrees):
+        rig.pose.bones[bone_name].rotation_euler[axis] += math.radians(degrees)
+
+    lead = "L" if stance < 0 else "R"
+    rear = "R" if stance < 0 else "L"
+    if pose_trait == "Push-Off":
+        rotate("pelvis", 1, 6 * stance)
+        rotate("chest", 2, 12 * stance)
+        rotate(f"thigh.{rear}", 1, -30)
+        rotate(f"shin.{rear}", 1, 36)
+        rotate(f"foot.{rear}", 1, -14)
+        rotate(f"upper_arm.{lead}", 2, -12 * stance)
+        rotate(f"upper_arm.{rear}", 2, 10 * stance)
+    elif pose_trait in {"Slope Ready", "Pop-Up Ready", "Drop-In Ready"}:
+        rotate("chest", 0, -10)
+        rotate("chest", 2, 7 * stance)
+        rotate("pelvis", 1, 5 * stance)
+        rotate("head", 0, 6)
+        rotate("thigh.L", 1, 24)
+        rotate("thigh.R", 1, -24)
+        rotate("shin.L", 1, -30)
+        rotate("shin.R", 1, 30)
+        rotate("upper_arm.L", 2, 18)
+        rotate("upper_arm.R", 2, -18)
+    elif pose_trait == "Binding Check":
+        rotate("chest", 0, -9)
+        rotate("head", 0, 12)
+        rotate("thigh.L", 1, 8)
+        rotate("thigh.R", 1, -8)
+        rotate("forearm.R", 1, 14)
+    elif pose_trait in {"Pedal Ready", "Gate Ready"}:
+        rotate("chest", 0, -8)
+        rotate("chest", 2, 6 * stance)
+        rotate(f"thigh.{lead}", 1, -28)
+        rotate(f"shin.{lead}", 1, 34)
+        rotate(f"foot.{lead}", 1, -14)
+        rotate(f"upper_arm.{rear}", 2, 8 * stance)
+    elif pose_trait == "Tail Plant":
+        rotate("chest", 2, 7 * stance)
+        rotate(f"upper_arm.{lead}", 1, 14)
+        rotate(f"forearm.{lead}", 2, -14 * stance)
+    elif pose_trait == "Bars Turned":
+        rotate("chest", 2, -7 * stance)
+        rotate("upper_arm.L", 1, -12)
+        rotate("upper_arm.R", 1, 12)
+        rotate("forearm.L", 2, 10)
+        rotate("forearm.R", 2, -10)
+    elif pose_trait == "Pole Plant":
+        rotate("chest", 0, -5)
+        rotate("upper_arm.R", 1, 16)
+        rotate("forearm.R", 2, -16)
+        rotate(f"thigh.{lead}", 1, -8)
+    elif pose_trait in {"Board Carry", "Board Under Arm", "Skis Shouldered"}:
+        rotate("chest", 2, 4 * stance)
+        rotate("upper_arm.R", 1, 10)
+        rotate("forearm.R", 2, -8)
+
+    rig["pose_mechanics"] = "named-pose-mechanics-v1"
+
 
 def solve_equipment_contact(rig):
     """Move the complete prop assembly so its authored contact meets the posed body source."""
@@ -989,6 +1048,7 @@ def main():
             "rig_bones": len(bpy.data.objects["GravityGoons_Rig"].data.bones),
             "presentation_pose": bpy.data.objects["GravityGoons_Rig"].get("presentation_pose"),
             "pose_family": bpy.data.objects["GravityGoons_Rig"].get("pose_family"),
+            "pose_mechanics": bpy.data.objects["GravityGoons_Rig"].get("pose_mechanics"),
             "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
             "equipment_contact_source": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_source"),
             "equipment_contact_role": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_role"),

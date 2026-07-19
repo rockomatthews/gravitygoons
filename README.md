@@ -99,7 +99,7 @@ Select the complete six-sport by three-pose contact matrix:
 
 The assignment-driven pipeline is operational, but its current procedural meshes are an engineering prototype rather than approved final art. `reports/generator-status.md` tracks the visual gate that must be passed before rendering all 1,000 marketplace images.
 
-Immutable assignment poses drive the rig through `config/pose-families.json`. Held/carry poses validate glove contact; riding/drop-in poses validate foot or boot contact. Pose names, motion families, contact sources, roles, and solver adjustments are recorded in render manifests.
+Immutable assignment poses drive the rig through `config/pose-families.json`. Held/carry poses validate glove contact; riding/drop-in poses validate foot or boot contact. Named mechanics add pose-specific lean, torso roll, knee compression, leg action, and arm counterbalance. Pose names, motion families, mechanics version, contact sources, roles, and solver adjustments are recorded in render manifests.
 
 Rigged checkpoints can be saved with `--save-blend`. Every generated rig follows `traits/rig-schema.json`; validate a saved file with:
 

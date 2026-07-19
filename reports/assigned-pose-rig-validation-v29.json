@@ -38,10 +38,10 @@
   "max_contact_distance": 0.0,
   "minimum_deformable_meshes": 17,
   "equipment_frame_extents": {
-    "left": 0.2484,
+    "left": 0.2386,
     "right": 0.9402,
-    "bottom": -0.0207,
-    "top": 0.627
+    "bottom": -0.0311,
+    "top": 0.6474
   },
   "results": [
     {
@@ -66,6 +66,7 @@
       "discipline": "BMX",
       "presentation_pose": "Pedal Ready",
       "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -90,6 +91,7 @@
       "discipline": "BMX",
       "presentation_pose": "Bike Beside",
       "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -105,15 +107,16 @@
       "equipment_contact_source": "Foot 1",
       "equipment_contact_role": "primary-foot-plant-v1",
       "equipment_camera_bounds": {
-        "left": 0.2731,
-        "right": 0.694,
-        "bottom": 0.0281,
-        "top": 0.2657
+        "left": 0.2605,
+        "right": 0.6814,
+        "bottom": 0.0282,
+        "top": 0.2659
       },
       "token_id": 6,
       "discipline": "Skateboarding",
       "presentation_pose": "Push-Off",
       "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -129,15 +132,16 @@
       "equipment_contact_source": "Glove Palm 1",
       "equipment_contact_role": "primary-hand-grip-v1",
       "equipment_camera_bounds": {
-        "left": 0.5068,
-        "right": 0.7818,
-        "bottom": 0.1577,
-        "top": 0.5078
+        "left": 0.487,
+        "right": 0.762,
+        "bottom": 0.1382,
+        "top": 0.4883
       },
       "token_id": 8,
       "discipline": "Skateboarding",
       "presentation_pose": "Tail Plant",
       "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -153,15 +157,16 @@
       "equipment_contact_source": "Glove Palm 1",
       "equipment_contact_role": "primary-hand-grip-v1",
       "equipment_camera_bounds": {
-        "left": 0.5637,
-        "right": 0.8387,
-        "bottom": 0.1411,
-        "top": 0.5507
+        "left": 0.585,
+        "right": 0.86,
+        "bottom": 0.1611,
+        "top": 0.5707
       },
       "token_id": 14,
       "discipline": "Snowboarding",
       "presentation_pose": "Board Carry",
       "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -186,6 +191,7 @@
       "discipline": "BMX",
       "presentation_pose": "Handlebar Lean",
       "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -201,15 +207,16 @@
       "equipment_contact_source": "Foot 1",
       "equipment_contact_role": "primary-foot-plant-v1",
       "equipment_camera_bounds": {
-        "left": 0.2484,
-        "right": 0.7572,
-        "bottom": 0.0279,
-        "top": 0.2655
+        "left": 0.2386,
+        "right": 0.7474,
+        "bottom": 0.0293,
+        "top": 0.267
       },
       "token_id": 20,
       "discipline": "Surfing",
       "presentation_pose": "Pop-Up Ready",
       "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -225,15 +232,16 @@
       "equipment_contact_source": "Foot 1",
       "equipment_contact_role": "primary-foot-plant-v1",
       "equipment_camera_bounds": {
-        "left": 0.2752,
-        "right": 0.6962,
-        "bottom": 0.0382,
-        "top": 0.2758
+        "left": 0.2797,
+        "right": 0.7006,
+        "bottom": 0.0386,
+        "top": 0.2763
       },
       "token_id": 21,
       "discipline": "Snowboarding",
       "presentation_pose": "Binding Check",
       "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -258,6 +266,7 @@
       "discipline": "Motocross",
       "presentation_pose": "Bike Beside",
       "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -282,6 +291,7 @@
       "discipline": "Skateboarding",
       "presentation_pose": "Board Beside",
       "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -297,15 +307,16 @@
       "equipment_contact_source": "Glove Palm 1",
       "equipment_contact_role": "primary-hand-grip-v1",
       "equipment_camera_bounds": {
-        "left": 0.6312,
-        "right": 0.7899,
-        "bottom": 0.1145,
-        "top": 0.5876
+        "left": 0.6522,
+        "right": 0.8109,
+        "bottom": 0.1349,
+        "top": 0.608
       },
       "token_id": 42,
       "discipline": "Skiing",
       "presentation_pose": "Skis Shouldered",
       "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -321,15 +332,16 @@
       "equipment_contact_source": "Foot 1",
       "equipment_contact_role": "primary-ski-boot-v1",
       "equipment_camera_bounds": {
-        "left": 0.2772,
-        "right": 0.7318,
-        "bottom": 0.1048,
-        "top": 0.1793
+        "left": 0.2671,
+        "right": 0.7216,
+        "bottom": 0.1061,
+        "top": 0.1806
       },
       "token_id": 56,
       "discipline": "Skiing",
       "presentation_pose": "Drop-In Ready",
       "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -345,15 +357,16 @@
       "equipment_contact_source": "Glove Palm 1",
       "equipment_contact_role": "primary-hand-grip-v1",
       "equipment_camera_bounds": {
-        "left": 0.5179,
-        "right": 0.8626,
-        "bottom": -0.0207,
-        "top": 0.5844
+        "left": 0.5221,
+        "right": 0.8668,
+        "bottom": -0.0311,
+        "top": 0.574
       },
       "token_id": 69,
       "discipline": "Surfing",
       "presentation_pose": "Board Under Arm",
       "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -369,15 +382,16 @@
       "equipment_contact_source": "Foot 1",
       "equipment_contact_role": "primary-pedal-boot-v1",
       "equipment_camera_bounds": {
-        "left": 0.3888,
-        "right": 0.8319,
-        "bottom": 0.0666,
-        "top": 0.5198
+        "left": 0.3843,
+        "right": 0.8274,
+        "bottom": 0.0701,
+        "top": 0.5233
       },
       "token_id": 89,
       "discipline": "Motocross",
       "presentation_pose": "Gate Ready",
       "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -402,6 +416,7 @@
       "discipline": "Surfing",
       "presentation_pose": "Beach Plant",
       "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -417,15 +432,16 @@
       "equipment_contact_source": "Glove Palm 1",
       "equipment_contact_role": "primary-hand-grip-v1",
       "equipment_camera_bounds": {
-        "left": 0.4803,
-        "right": 0.9206,
-        "bottom": 0.1115,
-        "top": 0.5526
+        "left": 0.4766,
+        "right": 0.917,
+        "bottom": 0.094,
+        "top": 0.5351
       },
       "token_id": 104,
       "discipline": "Motocross",
       "presentation_pose": "Bars Turned",
       "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -441,15 +457,16 @@
       "equipment_contact_source": "Glove Palm 1",
       "equipment_contact_role": "primary-hand-grip-v1",
       "equipment_camera_bounds": {
-        "left": 0.6705,
-        "right": 0.8292,
-        "bottom": 0.1448,
-        "top": 0.6179
+        "left": 0.6769,
+        "right": 0.8356,
+        "bottom": 0.1743,
+        "top": 0.6474
       },
       "token_id": 155,
       "discipline": "Skiing",
       "presentation_pose": "Pole Plant",
       "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     },
     {
@@ -465,15 +482,16 @@
       "equipment_contact_source": "Foot 1",
       "equipment_contact_role": "primary-foot-plant-v1",
       "equipment_camera_bounds": {
-        "left": 0.2848,
-        "right": 0.7057,
-        "bottom": 0.0377,
-        "top": 0.2754
+        "left": 0.275,
+        "right": 0.6959,
+        "bottom": 0.0392,
+        "top": 0.2769
       },
       "token_id": 219,
       "discipline": "Snowboarding",
       "presentation_pose": "Slope Ready",
       "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
       "contact_solver": "body-source-assembly-translation-v2"
     }
   ]

@@ -30,6 +30,8 @@ def main():
         errors.append(f"Missing bones: {missing}")
     if rig and rig.get("rig_schema") != schema["schema"]:
         errors.append(f"Wrong rig schema: {rig.get('rig_schema')}")
+    if rig and rig.get("pose_mechanics") != "named-pose-mechanics-v1":
+        errors.append(f"Missing named pose mechanics: {rig.get('pose_mechanics')}")
     attached = [obj for obj in bpy.data.objects if rig and obj.parent == rig]
     if len(attached) < 20:
         errors.append(f"Only {len(attached)} modules are attached to the rig")
@@ -106,6 +108,7 @@ def main():
         "discipline": rig.get("discipline") if rig else None,
         "presentation_pose": rig.get("presentation_pose") if rig else None,
         "pose_family": rig.get("pose_family") if rig else None,
+        "pose_mechanics": rig.get("pose_mechanics") if rig else None,
         "contact_solver": rig.get("equipment_contact_solver") if rig else None,
     }
     Path(options.report).write_text(json.dumps(report, indent=2) + "\n")
