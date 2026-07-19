@@ -74,3 +74,9 @@ Tokens #0001 through #0050 rendered at 384x384 with two isolated Blender workers
 Validation now also computes a 256-bit character-crop perceptual hash and rejects pairs below a configurable distance (12 by default). This catches visual duplicates that would evade byte hashing through tiny text or background changes. The 50-token batch passes with a minimum distance of 16; the closest pair is #0005/#0032, which intentionally shares Gorilla, BMX, beanie, goggles, chinos, shoes, and background but differs in top construction, label, accessory, and expression.
 
 The 50-token checkpoint proves batch stability and measurable variation, but it does not unlock the storefront or authorize the 1,000 final render. The current contact sheet remains the art-review surface for further pose and sculpt judgment.
+
+## Presentation-pose variation checkpoint
+
+Each token now deterministically receives one of three rig-driven presentation variants—`Ready`, `Callout`, or `Charge`—inside its discipline pose. The variant is stored on the armature and in each render manifest, adding stance variation without changing immutable gameplay traits or collection metadata.
+
+The BMX comparison at `art/approval/pose-variants-v15.png` validates three unique 768x768 images with a minimum perceptual distance of 50. The saved Charge-pose Gorilla passes the locked 22-bone schema, 17 deformable meshes, 67 attached modules, 10 BMX equipment modules, and zero errors.

@@ -77,6 +77,8 @@ RARITY_COLORS = {
     "Legendary": (1.00, 0.62, 0.03, 1),
 }
 
+POSE_VARIANTS = ("Ready", "Callout", "Charge")
+
 
 def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -754,6 +756,9 @@ def apply_pose(token, rig):
     for pose_bone in rig.pose.bones:
         pose_bone.rotation_mode = "XYZ"
     stance = -1 if token["stance"] == "Goofy" else 1
+    pose_index = token["token_id"] % len(POSE_VARIANTS)
+    pose_name = POSE_VARIANTS[pose_index]
+    rig["presentation_pose"] = pose_name
     rig.pose.bones["chest"].rotation_euler[2] = math.radians(4 * stance)
     rig.pose.bones["head"].rotation_euler[2] = math.radians(-5 * stance)
     if token["discipline"] in {"BMX", "Motocross"}:
@@ -781,6 +786,19 @@ def apply_pose(token, rig):
         rig.pose.bones["forearm.R"].rotation_euler[2] = math.radians(-10)
         rig.pose.bones["thigh.L"].rotation_euler[1] = math.radians(4)
         rig.pose.bones["thigh.R"].rotation_euler[1] = math.radians(-4)
+
+    if pose_name == "Ready":
+        rig.pose.bones["upper_arm.L"].rotation_euler[2] += math.radians(7)
+        rig.pose.bones["forearm.L"].rotation_euler[1] += math.radians(-5)
+        rig.pose.bones["head"].rotation_euler[1] += math.radians(3 * stance)
+    elif pose_name == "Callout":
+        rig.pose.bones["upper_arm.R"].rotation_euler[2] += math.radians(-9)
+        rig.pose.bones["forearm.R"].rotation_euler[1] += math.radians(7)
+        rig.pose.bones["head"].rotation_euler[2] += math.radians(3 * stance)
+    else:
+        rig.pose.bones["chest"].rotation_euler[0] += math.radians(-4)
+        rig.pose.bones["thigh.L"].rotation_euler[1] += math.radians(4 * stance)
+        rig.pose.bones["thigh.R"].rotation_euler[1] += math.radians(-4 * stance)
 
 
 def configure_scene(resolution):
@@ -880,6 +898,7 @@ def main():
             "resolution": options.resolution,
             "rig_schema": "gravity-goons-rig-v1",
             "rig_bones": len(bpy.data.objects["GravityGoons_Rig"].data.bones),
+            "presentation_pose": bpy.data.objects["GravityGoons_Rig"].get("presentation_pose"),
         }
         (manifest_dir / f"{token['token_id']:04d}.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
     print(f"Rendered {len(selected)} requested tokens into {output_dir}")
