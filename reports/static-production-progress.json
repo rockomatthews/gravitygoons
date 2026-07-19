@@ -4,11 +4,11 @@
   "structurally_valid_so_far": true,
   "errors": [],
   "target": 1000,
-  "accepted_sources": 66,
-  "remaining_sources": 934,
-  "unique_source_hashes": 66,
-  "master_images": 66,
-  "marketplace_images": 66,
+  "accepted_sources": 70,
+  "remaining_sources": 930,
+  "unique_source_hashes": 70,
+  "master_images": 70,
+  "marketplace_images": 70,
   "accepted_ids": [
     1,
     2,
@@ -34,7 +34,11 @@
     22,
     23,
     24,
+    25,
+    26,
+    27,
     28,
+    29,
     37,
     52,
     78,
@@ -78,10 +82,6 @@
     990
   ],
   "next_missing_ids": [
-    25,
-    26,
-    27,
-    29,
     30,
     31,
     32,
@@ -102,7 +102,11 @@
     48,
     49,
     50,
-    51
+    51,
+    53,
+    54,
+    55,
+    56
   ],
   "mint_gate": "closed"
 }
