@@ -3,8 +3,8 @@
   "structurally_valid_so_far": true,
   "errors": [],
   "target": 50,
-  "completed": 15,
-  "remaining": 35,
+  "completed": 19,
+  "remaining": 31,
   "completed_ids": [
     1,
     2,
@@ -19,14 +19,14 @@
     52,
     78,
     123,
-    141,
-    227
-  ],
-  "missing_ids": [
     126,
+    141,
     143,
     144,
     209,
+    227
+  ],
+  "missing_ids": [
     232,
     320,
     348,
@@ -59,6 +59,6 @@
     926,
     990
   ],
-  "unique_hashes": 15,
+  "unique_hashes": 19,
   "mint_gate": "closed"
 }
