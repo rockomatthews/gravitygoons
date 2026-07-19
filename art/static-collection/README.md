@@ -10,3 +10,22 @@ This directory is the authoritative production path for the 1,000 static NFT ima
 The procedural Blender renderer is retained only as an experiment. Its regression renders are rejected and must never be used as mint artwork or storefront inventory.
 
 The twelve numbered approvals are `0001`, `0002`, `0003`, `0006`, `0007`, `0013`, `0014`, `0019`, `0078`, `0123`, `0141`, and `0227`. These are 1,254px source proofs; the locked release workflow will create 2,048px master deliverables and 1,024px marketplace files after the approval set is accepted.
+
+Accepted static sources are promoted to traceable 2,048px masters before the
+marketplace release build. Production binaries are intentionally gitignored so
+the Vercel repository does not absorb hundreds of megabytes of NFT media:
+
+```bash
+.venv/bin/python scripts/promote_static_sources.py masters \
+  --source-dir art/static-collection/approval-v1 \
+  --source-dir art/static-collection/stress-50/generated \
+  --expected 50
+
+.venv/bin/python scripts/build_release_images.py masters images \
+  --expected 50 \
+  --manifest-output reports/stress-50-release-manifest.json
+```
+
+The final run uses the accepted 1,000-source production directory and
+`--expected 1000`. Each promoted master receives a manifest binding the source
+hash, fixed assignment hash, master hash, dimensions, and resampling method.

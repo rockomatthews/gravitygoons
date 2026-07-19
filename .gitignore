@@ -11,3 +11,7 @@ contract/verification/
 site/.env.local
 contract/.env
 renders/
+masters/
+images/
+art/static-collection/production/
+ipfs-packages/
