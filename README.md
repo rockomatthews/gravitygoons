@@ -24,6 +24,7 @@ Ready now:
 - Supabase progression migration, RLS, public read policies, and starter trick catalog;
 - deterministic Blender 4.5.1 LTS collection renderer with a locked 22-bone rig, shared weightable torso/limb topology, visible modular traits, and automated coverage selection;
 - four explicit body-build silhouettes, five authored human head profiles, eight species-specific facial constructions, and six geometric expression systems, all carried into genesis metadata and saved rig-ready scenes.
+- discipline-specific protective gear and detailed board, bike, motocross, surf, snowboard, and ski hardware under the versioned `sport-gear-detail-v4` rig contract.
 
 Still gated:
 

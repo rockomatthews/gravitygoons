@@ -680,6 +680,29 @@ def accessory(token, mats):
         add_torus("Neck Gaiter", (0, 0.0, 1.76), 0.62, 0.20, mats["accent"], rotation=(0, 0, 0))
 
 
+def sport_protection(token, mats, broad, leg_scale):
+    """Discipline-native safety gear that remains part of the shared body rig."""
+    discipline = token["discipline"]
+    stance = -1 if token["stance"] == "Goofy" else 1
+    for side in (-1, 1):
+        x = side * 0.62 * broad
+        leg_shift = 0.10 * stance * side
+        arm_x = side * 1.58 * broad
+        if discipline in {"Skateboarding", "BMX"}:
+            add_cube(f"Elbow Guard {side}", (arm_x, -0.39, -0.34), (0.26, 0.11, 0.22), mats["ink"], bevel=0.12)
+            add_cube(f"Elbow Guard Cap {side}", (arm_x, -0.51, -0.34), (0.18, 0.035, 0.14), mats["accent"], bevel=0.08)
+            add_cube(f"Knee Pad {side}", (x - leg_shift, -0.40, -2.67), (0.32 * leg_scale, 0.12, 0.28), mats["ink"], bevel=0.14)
+            add_cube(f"Knee Pad Cap {side}", (x - leg_shift, -0.53, -2.67), (0.22 * leg_scale, 0.035, 0.18), mats["accent"], bevel=0.08)
+        elif discipline == "Motocross":
+            add_cube(f"Elbow Guard {side}", (arm_x, -0.40, -0.34), (0.29, 0.13, 0.26), mats["metal"], bevel=0.12)
+            add_cube(f"Shin Guard {side}", (x - leg_shift, -0.43, -2.96), (0.34 * leg_scale, 0.13, 0.48), mats["accent"], bevel=0.14)
+            add_curve(f"Shin Guard Rib {side}", [(x - 0.22, -0.57, -3.16), (x, -0.60, -2.96), (x + 0.22, -0.57, -2.76)], 0.035, mats["metal"])
+        elif discipline in {"Snowboarding", "Skiing"}:
+            add_cube(f"Knee Reinforcement {side}", (x - leg_shift, -0.39, -2.66), (0.30 * leg_scale, 0.08, 0.24), mats["accent"], bevel=0.12)
+        elif discipline == "Surfing" and side == stance:
+            add_torus(f"Ankle Leash Cuff {side}", (x - leg_shift, -0.02, -3.24), 0.38 * leg_scale, 0.045, mats["accent"], rotation=(0, 0, 0))
+
+
 def body(token, mats):
     build = token["body_build"]
     profile = BODY_BUILD_PROFILES[build]
@@ -757,14 +780,18 @@ def body(token, mats):
         add_cube(f"Foot {side}", (x - leg_shift, -0.32, foot_z), boot_scale, shoe_mat, bevel=0.18)
         if barefoot:
             for toe in range(3):
-                add_uv(f"Toe {side} {toe}", (x - leg_shift + side * (toe - 1) * 0.13, -1.08, -3.68), (0.10, 0.12, 0.08), mats["body"], segments=16, rings=8)
+                add_uv(f"Toe {toe} {side}", (x - leg_shift + side * (toe - 1) * 0.13, -1.08, -3.68), (0.10, 0.12, 0.08), mats["body"], segments=16, rings=8)
         else:
             add_cube(f"Foot Midsole {side}", (x - leg_shift, -0.48, foot_z - boot_scale[2] * 0.78), (boot_scale[0] * 0.94, boot_scale[1] * 0.94, 0.075), mats["white"], bevel=0.06)
             add_cube(f"Foot Toe Cap {side}", (x - leg_shift, -0.98, foot_z - 0.02), (boot_scale[0] * 0.70, 0.15, boot_scale[2] * 0.56), mats["accent"], bevel=0.08)
             add_curve(f"Sole stripe {side}", [(x - 0.38, -1.04, -3.65), (x, -1.10, -3.62), (x + 0.38, -1.04, -3.65)], 0.035, mats["accent"])
             if not tall_boot:
                 for lace in range(3):
-                    add_curve(f"Shoe lace {side} {lace}", [(x - 0.24, -1.08, -3.48 - lace * 0.08), (x + 0.24, -1.08, -3.48 - lace * 0.08)], 0.022, mats["white"])
+                    add_curve(f"Shoe lace {lace} {side}", [(x - 0.24, -1.08, -3.48 - lace * 0.08), (x + 0.24, -1.08, -3.48 - lace * 0.08)], 0.022, mats["white"])
+            else:
+                for buckle in range(2):
+                    add_cube(f"Boot Buckle {buckle} {side}", (x - leg_shift, -0.72, -3.36 - buckle * 0.18), (0.28, 0.045, 0.035), mats["accent"], bevel=0.025)
+    sport_protection(token, mats, broad, leg_scale)
 
 
 def board(name, x, length, width, mats, surf=False):
@@ -775,9 +802,16 @@ def board(name, x, length, width, mats, surf=False):
     if surf:
         add_cone(f"{name} fin", (x, 0.27, -3.82), (0.16, 0.09, 0.34), mats["ink"], rotation=(math.pi / 2, 0, 0), vertices=3)
         add_curve(f"{name} leash", [(x + width * 0.50, -0.12, -3.80), (x + 0.92, -0.16, -4.04), (x + 0.70, -0.18, -4.30)], 0.030, mats["ink"])
+        for index, z in enumerate((-2.88, -3.14, -3.40)):
+            add_cube(f"{name} traction pad {index}", (x, -0.17, z), (width * 0.58, 0.018, 0.075), mats["rubber"], bevel=0.035)
     else:
         for index, z in enumerate((-1.95 - length * 0.65, -1.95 + length * 0.65)):
+            add_cylinder(f"{name} axle {index}", (x, -0.13, z), 0.055, width * 1.65, mats["metal"], rotation=(0, math.pi / 2, 0), vertices=16)
             add_cylinder(f"{name} wheel {index}", (x - width - 0.10, -0.20, z), 0.13, 0.18, mats["accent"], rotation=(0, math.pi / 2, 0), vertices=20)
+        if "Snowboard" in name:
+            for index, z in enumerate((-2.55, -1.35)):
+                add_cube(f"{name} binding base {index}", (x, -0.18, z), (width * 0.58, 0.06, 0.22), mats["metal"], bevel=0.08)
+                add_curve(f"{name} binding strap {index}", [(x - width * 0.45, -0.25, z), (x, -0.32, z + 0.08), (x + width * 0.45, -0.25, z)], 0.045, mats["accent"])
 
 
 def ride_board(name, length, width, mats, discipline, surf=False):
@@ -788,18 +822,38 @@ def ride_board(name, length, width, mats, discipline, surf=False):
     add_curve(f"{name} ride graphic", [(-0.74, -0.15, -3.94), (0.20, -0.16, -3.72), (1.10, -0.15, -3.96)], 0.065, mats["garment"])
     if surf:
         add_cone(f"{name} fin", (-1.82, 0.26, -4.12), (0.16, 0.09, 0.30), mats["ink"], rotation=(math.pi / 2, 0, math.pi / 2), vertices=3)
+        for index, x in enumerate((-0.52, -0.18, 0.16)):
+            add_cube(f"{name} traction pad {index}", (x, -0.17, -3.98), (0.12, 0.018, width * 0.55), mats["rubber"], bevel=0.04)
     else:
         for index, x in enumerate((center[0] - length * 0.68, center[0] + length * 0.68)):
+            add_cylinder(f"{name} axle {index}", (x, -0.14, center[2]), 0.055, width * 1.65, mats["metal"], rotation=(0, 0, 0), vertices=16)
             add_cylinder(f"{name} wheel {index}", (x, -0.20, -4.24), 0.13, 0.18, mats["accent"], rotation=(0, math.pi / 2, 0), vertices=20)
+        if "Snowboard" in name:
+            for index, x in enumerate((-0.48, 0.86)):
+                add_cube(f"{name} binding base {index}", (x, -0.18, -3.98), (0.24, 0.06, width * 0.58), mats["metal"], bevel=0.08)
+                add_curve(f"{name} binding strap {index}", [(x - 0.18, -0.25, -4.18), (x, -0.32, -3.98), (x + 0.18, -0.25, -3.78)], 0.045, mats["accent"])
     add_contact_target((0.62, -0.18, -3.67), discipline, source_object="Foot 1", role="foot-plant")
+
+
+def add_wheel_hardware(name, center_x, center_z, radius, mats, moto=False):
+    """Readable hub, spokes, and brake hardware for bike silhouettes."""
+    hub_radius = 0.16 if moto else 0.11
+    add_cylinder(f"{name} hub", (center_x, -0.10, center_z), hub_radius, 0.24, mats["metal"], rotation=(math.pi / 2, 0, 0), vertices=24)
+    for index in range(8):
+        angle = 2 * math.pi * index / 8
+        end = (center_x + math.cos(angle) * radius * 0.69, -0.08, center_z + math.sin(angle) * radius * 0.69)
+        add_curve(f"{name} spoke {index}", [(center_x, -0.08, center_z), end], 0.012 if not moto else 0.016, mats["metal"])
+    add_torus(f"{name} brake rotor", (center_x, -0.14, center_z), radius * (0.34 if moto else 0.28), 0.020, mats["metal"])
 
 
 def bike(name, mats, discipline, pose, moto=False):
     x = 1.92
     wheel_radius = 0.88 if not moto else 1.05
     for index, offset in enumerate((-0.95, 1.12)):
-        add_torus(f"{name} wheel {index}", (x + offset, 0.05, -3.30), wheel_radius, 0.10 if not moto else 0.18, mats["rubber"])
-        add_torus(f"{name} rim {index}", (x + offset, 0.04, -3.30), wheel_radius * 0.72, 0.035, mats["metal"])
+        center_x = x + offset
+        add_torus(f"{name} wheel {index}", (center_x, 0.05, -3.30), wheel_radius, 0.10 if not moto else 0.18, mats["rubber"])
+        add_torus(f"{name} rim {index}", (center_x, 0.04, -3.30), wheel_radius * 0.72, 0.035, mats["metal"])
+        add_wheel_hardware(f"{name} wheel {index}", center_x, -3.30, wheel_radius, mats, moto)
     if moto:
         add_uv("Moto tank", (x, -0.02, -2.12), (0.78, 0.48, 0.45), mats["accent"])
         add_cylinder("Moto engine", (x + 0.10, -0.02, -2.82), 0.48, 0.52, mats["metal"], rotation=(math.pi / 2, 0, 0))
@@ -809,6 +863,9 @@ def bike(name, mats, discipline, pose, moto=False):
         add_cylinder("Moto hand grip", (1.68, -0.12, -1.18), 0.10, 0.28, mats["rubber"], rotation=(0, math.pi / 2, 0), vertices=16)
         add_cube("Moto front fender", (x + 1.08, -0.08, -2.44), (0.70, 0.28, 0.10), mats["accent"], rotation=(0, -0.28, 0), bevel=0.12)
         add_cube("Moto seat", (x - 0.48, -0.04, -1.96), (0.58, 0.34, 0.13), mats["ink"], rotation=(0, 0.10, 0), bevel=0.10)
+        add_cube("Moto number plate", (x + 0.35, -0.40, -1.76), (0.34, 0.06, 0.28), mats["accent"], rotation=(0.08, 0, 0), bevel=0.10)
+        add_curve("Moto exhaust", [(x - 0.18, 0.16, -2.70), (x - 0.72, 0.18, -2.30), (x - 1.02, 0.18, -2.16)], 0.095, mats["metal"])
+        add_curve("Moto chain", [(x - 0.86, -0.14, -3.26), (x - 0.10, -0.16, -2.82), (x + 0.20, -0.14, -3.04)], 0.028, mats["metal"])
     else:
         add_curve("BMX frame", [(x - 0.92, 0, -3.30), (x - 0.18, 0, -2.28), (x + 0.86, 0, -3.30), (x - 0.92, 0, -3.30)], 0.075, mats["accent"])
         add_curve("BMX bars", [(x - 0.18, 0, -2.28), (x + 0.02, 0, -1.62), (x - 0.02, -0.06, -1.38), (1.68, -0.12, -1.18)], 0.055, mats["metal"])
@@ -817,6 +874,10 @@ def bike(name, mats, discipline, pose, moto=False):
         add_cube("BMX seat", (x - 0.50, -0.05, -2.14), (0.38, 0.25, 0.10), mats["ink"], rotation=(0, -0.12, 0), bevel=0.10)
         add_cylinder("BMX crank", (x - 0.08, -0.12, -2.78), 0.16, 0.10, mats["metal"], rotation=(math.pi / 2, 0, 0), vertices=20)
         add_curve("BMX pedal", [(x - 0.42, -0.18, -2.78), (x + 0.30, -0.18, -2.78)], 0.035, mats["ink"])
+        add_torus("BMX chainring", (x - 0.08, -0.18, -2.78), 0.24, 0.025, mats["accent"])
+        add_curve("BMX chain", [(x - 0.86, -0.18, -3.24), (x - 0.08, -0.18, -3.02), (x + 0.16, -0.18, -2.78)], 0.020, mats["metal"])
+        for index, peg_x in enumerate((x - 0.95, x + 1.12)):
+            add_cylinder(f"BMX axle peg {index}", (peg_x, -0.22, -3.30), 0.07, 0.34, mats["metal"], rotation=(math.pi / 2, 0, 0), vertices=16)
 
     foot_pose = pose in {"Pedal Ready", "Gate Ready"}
     if foot_pose:
@@ -853,12 +914,18 @@ def equipment(token, mats):
         if token["pose"] == "Drop-In Ready":
             for index, z in enumerate((-3.86, -4.13)):
                 add_cube(f"Ski {index}", (0.20, 0.05, z), (2.38, 0.09, 0.15), mats["accent"], rotation=(0, 0.02, -0.025), bevel=0.16)
+                add_cube(f"Ski binding {index}", (0.62, -0.10, z), (0.34, 0.08, 0.12), mats["metal"], bevel=0.06)
+                add_curve(f"Ski edge graphic {index}", [(-1.60, -0.08, z), (0.20, -0.12, z + 0.05), (1.78, -0.08, z)], 0.030, mats["garment"])
             add_contact_target((0.62, -0.18, -3.67), discipline, source_object="Foot 1", role="ski-boot")
         else:
             for index, x in enumerate((2.16, 2.63)):
                 add_cube(f"Ski {index}", (x, 0.05, -1.90), (0.15, 0.09, 2.38), mats["accent"], rotation=(0, 0.02, -0.05), bevel=0.16)
+                add_cube(f"Ski binding {index}", (x, -0.10, -2.05), (0.12, 0.08, 0.34), mats["metal"], bevel=0.06)
+                add_curve(f"Ski edge graphic {index}", [(x, -0.08, -3.62), (x + 0.05, -0.12, -1.90), (x, -0.08, -0.24)], 0.030, mats["garment"])
             for index, x in enumerate((1.72, 3.02)):
                 add_cylinder(f"Pole {index}", (x, 0, -1.90), 0.035, 4.10, mats["metal"], rotation=(0.03, 0.08, -0.06), vertices=12)
+                add_cube(f"Pole grip {index}", (x, -0.04, 0.12), (0.10, 0.08, 0.22), mats["rubber"], bevel=0.06)
+                add_torus(f"Pole basket {index}", (x, -0.02, -3.72), 0.18, 0.025, mats["accent"], rotation=(0, 0, 0))
             add_contact_target((1.72, -0.12, -1.18), discipline)
 
 
@@ -929,6 +996,7 @@ def create_shared_rig(token):
     rig["body_build"] = token["body_build"]
     rig["silhouette_system"] = "body-build-silhouette-v3"
     rig["face_expression_system"] = "species-expression-sculpt-v3"
+    rig["sport_gear_system"] = "sport-gear-detail-v4"
     return rig
 
 
@@ -954,10 +1022,12 @@ def attach_modules_to_rig(rig):
             for prefix, rig_prefix in (
                 ("Upper Arm", "upper_arm"), ("Forearm", "forearm"), ("Glove", "hand"),
                 ("Shoulder Joint", "upper_arm"), ("Elbow Joint", "forearm"),
+                ("Elbow Guard", "forearm"),
                 ("Arm pattern", "upper_arm"), ("Bandage", "forearm"), ("Thigh", "thigh"), ("Hip Joint", "thigh"), ("Short cuff", "thigh"),
                 ("Cargo pocket", "thigh"), ("Shin", "shin"), ("Knee armor", "shin"),
+                ("Knee Pad", "shin"), ("Knee Reinforcement", "shin"), ("Ankle Leash Cuff", "shin"),
                 ("Knee Joint", "shin"),
-                ("Foot", "foot"), ("Boot shaft", "foot"), ("Sole stripe", "foot"),
+                ("Foot", "foot"), ("Boot shaft", "foot"), ("Boot Buckle", "foot"), ("Sole stripe", "foot"),
                 ("Shoe lace", "foot"), ("Toe", "foot"),
             ):
                 if name.startswith(prefix):
@@ -1245,6 +1315,7 @@ def main():
             "visual_detail_system": bpy.data.objects["GravityGoons_Rig"].get("visual_detail_system"),
             "silhouette_system": bpy.data.objects["GravityGoons_Rig"].get("silhouette_system"),
             "face_expression_system": bpy.data.objects["GravityGoons_Rig"].get("face_expression_system"),
+            "sport_gear_system": bpy.data.objects["GravityGoons_Rig"].get("sport_gear_system"),
             "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
             "equipment_contact_source": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_source"),
             "equipment_contact_role": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_role"),

@@ -1,0 +1,101 @@
+{
+  "valid": true,
+  "errors": [],
+  "images": 6,
+  "unique_hashes": 6,
+  "resolution": 1024,
+  "disciplines": {
+    "BMX": 1,
+    "Motocross": 1,
+    "Skateboarding": 1,
+    "Skiing": 1,
+    "Snowboarding": 1,
+    "Surfing": 1
+  },
+  "species": {
+    "Human": 3,
+    "Raccoon": 1,
+    "Shark": 1,
+    "Snow Leopard": 1
+  },
+  "body_builds": {
+    "Athletic": 3,
+    "Lean": 1,
+    "Power": 2
+  },
+  "perceptual_hash_bits": 256,
+  "required_minimum_perceptual_distance": 12,
+  "minimum_perceptual_distance": 70,
+  "closest_visual_pairs": [
+    {
+      "distance": 70,
+      "tokens": [
+        9,
+        14
+      ]
+    },
+    {
+      "distance": 72,
+      "tokens": [
+        3,
+        11
+      ]
+    },
+    {
+      "distance": 76,
+      "tokens": [
+        2,
+        9
+      ]
+    },
+    {
+      "distance": 76,
+      "tokens": [
+        2,
+        14
+      ]
+    },
+    {
+      "distance": 79,
+      "tokens": [
+        2,
+        3
+      ]
+    },
+    {
+      "distance": 83,
+      "tokens": [
+        3,
+        6
+      ]
+    },
+    {
+      "distance": 83,
+      "tokens": [
+        3,
+        9
+      ]
+    },
+    {
+      "distance": 83,
+      "tokens": [
+        6,
+        11
+      ]
+    },
+    {
+      "distance": 85,
+      "tokens": [
+        3,
+        14
+      ]
+    },
+    {
+      "distance": 90,
+      "tokens": [
+        6,
+        14
+      ]
+    }
+  ]
+}
