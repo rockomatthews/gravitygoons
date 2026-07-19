@@ -1,0 +1,114 @@
+{
+  "valid": true,
+  "errors": [],
+  "production_renderer": "STATIC_REFERENCE_DRIVEN",
+  "approval_count": 12,
+  "approval_ids": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    13,
+    14,
+    19,
+    78,
+    123,
+    141,
+    227
+  ],
+  "dimensions": {
+    "0001.png": [
+      1254,
+      1254
+    ],
+    "0002.png": [
+      1254,
+      1254
+    ],
+    "0003.png": [
+      1254,
+      1254
+    ],
+    "0006.png": [
+      1254,
+      1254
+    ],
+    "0007.png": [
+      1254,
+      1254
+    ],
+    "0013.png": [
+      1254,
+      1254
+    ],
+    "0014.png": [
+      1254,
+      1254
+    ],
+    "0019.png": [
+      1254,
+      1254
+    ],
+    "0078.png": [
+      1254,
+      1254
+    ],
+    "0123.png": [
+      1254,
+      1254
+    ],
+    "0141.png": [
+      1254,
+      1254
+    ],
+    "0227.png": [
+      1254,
+      1254
+    ]
+  },
+  "unique_hashes": 12,
+  "coverage": {
+    "cast": [
+      "Animal",
+      "Human"
+    ],
+    "disciplines": [
+      "BMX",
+      "Motocross",
+      "Skateboarding",
+      "Skiing",
+      "Snowboarding",
+      "Surfing"
+    ],
+    "rarities": [
+      "Common",
+      "Epic",
+      "Legendary",
+      "Rare",
+      "Uncommon"
+    ],
+    "species": [
+      "Boar",
+      "Gorilla",
+      "Human",
+      "Hyena",
+      "Raccoon",
+      "Shark",
+      "Snow Leopard"
+    ],
+    "brands": [
+      "AVOIDAS",
+      "CARHEART",
+      "MIKE",
+      "NORTH FAKE",
+      "POOMA",
+      "PROCRASTIGONIA",
+      "QUEAZY",
+      "VOLCANO"
+    ]
+  },
+  "collection_assignments": 1000,
+  "unique_static_prompts": 1000,
+  "mint_gate": "closed_until_1000_final_images_validate"
+}

@@ -48,7 +48,7 @@ export default function Home() {
 
       <section className="roster-showcase shell" id="roster">
         <div className="roster-copy"><p className="eyebrow">THE GOONIVERSE</p><h2>Every sport reads instantly.</h2><p>No generic floating heads. Every Goon has a full-body silhouette, visible equipment, discipline-compatible gear, and one of twelve fictional underground labels.</p><div className="brand-run">MIKE · AVOIDAS · POOMA · VANISH · NORTH FAKE · OFF-BEIGE · CARHEART · PROCRASTIGONIA · BURNTON · VOLCANO · FAUX RACING · QUEAZY</div></div>
-        <div className="roster-plane"><Image src="/collection/approval-roster-12.png" alt="Twelve representative Gravity Goons across six action sports" width={1536} height={1536} /></div>
+        <div className="roster-plane"><Image src="/collection/approval-roster-12.png" alt="Twelve metadata-matched Gravity Goons production proofs across six action sports" width={1536} height={1152} /></div>
       </section>
 
       <section className="collection-section shell" id="collection">
