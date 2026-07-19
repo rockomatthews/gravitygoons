@@ -7,9 +7,9 @@
   "master_size": 2048,
   "marketplace_size": 1024,
   "resampling": "Pillow LANCZOS",
-  "images": 58,
-  "unique_master_hashes": 58,
-  "unique_marketplace_hashes": 58,
+  "images": 62,
+  "unique_master_hashes": 62,
+  "unique_marketplace_hashes": 62,
   "records": [
     {
       "token_id": 1,
@@ -657,6 +657,135 @@
       }
     },
     {
+      "token_id": 16,
+      "name": "Gravity Goons #0016",
+      "master_file": "0016.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "7eaef3f192ac35919097b85b9f4e19a95a4b7c90141cb902733cb70d998b52ea",
+      "marketplace_file": "0016.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "04161796810c786d46e666ec488f93eba9e069716e51a0e37c297604c0d43f3d",
+      "assignment_sha256": "28d8bfedd9601e8fa825ac72ee401f1178576cf49d6c2cd194c2f54cd9937365",
+      "genesis_metadata_file": "0016.json",
+      "genesis_metadata_sha256": "4925670b906cb8eb91082a8536d6d36896f4ff1af5754dee834daad9f009595a",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0016.png",
+      "discipline": "BMX",
+      "species": "Human",
+      "rarity": "Uncommon",
+      "render": {
+        "schema": "gravity-goons-static-master-v1",
+        "token_id": 16,
+        "name": "Gravity Goons #0016",
+        "production_renderer": "STATIC_REFERENCE_DRIVEN",
+        "source_file": "art/static-collection/production/0016.png",
+        "source_size": [
+          1254,
+          1254
+        ],
+        "source_sha256": "b0d36e053a556982ea06fe0df38532aa7580b04275df249966b44400ac7324a8",
+        "master_file": "0016.png",
+        "master_size": [
+          2048,
+          2048
+        ],
+        "master_sha256": "7eaef3f192ac35919097b85b9f4e19a95a4b7c90141cb902733cb70d998b52ea",
+        "assignment_sha256": "28d8bfedd9601e8fa825ac72ee401f1178576cf49d6c2cd194c2f54cd9937365",
+        "promotion_resampling": "Pillow LANCZOS"
+      }
+    },
+    {
+      "token_id": 17,
+      "name": "Gravity Goons #0017",
+      "master_file": "0017.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "7ec5f27a0c9a15661defd20d13689256be5fbbdcb423a0dfc8be536c61865eb7",
+      "marketplace_file": "0017.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "a595e9ef74827d46140a34258544937df8fbda51fcdde432a5eea18fb1b32a03",
+      "assignment_sha256": "421091b0bbcf51890ccb0197a1280a89bd1545c67135d336cc903bdd2e1a7894",
+      "genesis_metadata_file": "0017.json",
+      "genesis_metadata_sha256": "c8f17952a8a2c223b5ac146dfa196b49fa640f890a13f9d81403e3d60118889f",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0017.png",
+      "discipline": "BMX",
+      "species": "Human",
+      "rarity": "Common",
+      "render": {
+        "schema": "gravity-goons-static-master-v1",
+        "token_id": 17,
+        "name": "Gravity Goons #0017",
+        "production_renderer": "STATIC_REFERENCE_DRIVEN",
+        "source_file": "art/static-collection/production/0017.png",
+        "source_size": [
+          1254,
+          1254
+        ],
+        "source_sha256": "72a2553d164d2eb153a9d1e5e3da875f291ce326e4ecd0292022458f6fa305bf",
+        "master_file": "0017.png",
+        "master_size": [
+          2048,
+          2048
+        ],
+        "master_sha256": "7ec5f27a0c9a15661defd20d13689256be5fbbdcb423a0dfc8be536c61865eb7",
+        "assignment_sha256": "421091b0bbcf51890ccb0197a1280a89bd1545c67135d336cc903bdd2e1a7894",
+        "promotion_resampling": "Pillow LANCZOS"
+      }
+    },
+    {
+      "token_id": 18,
+      "name": "Gravity Goons #0018",
+      "master_file": "0018.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "3ff3171237e699e865fb01ab2a187f833c4b178d2e2e80111531553edd848104",
+      "marketplace_file": "0018.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "a01e53c7c2012148ea4c07686a194877f06ec84f4676fc567864b11adf85e87a",
+      "assignment_sha256": "9a1f6858330c6ef760bedf17202ea654b61dc590b6afb2ae78431ef22f9803d6",
+      "genesis_metadata_file": "0018.json",
+      "genesis_metadata_sha256": "697f5c62b74ee097a8c6c8b13bb15a278c6101cb8ccc256d58cf914fb03b7aac",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0018.png",
+      "discipline": "Skateboarding",
+      "species": "Raccoon",
+      "rarity": "Common",
+      "render": {
+        "schema": "gravity-goons-static-master-v1",
+        "token_id": 18,
+        "name": "Gravity Goons #0018",
+        "production_renderer": "STATIC_REFERENCE_DRIVEN",
+        "source_file": "art/static-collection/production/0018.png",
+        "source_size": [
+          1254,
+          1254
+        ],
+        "source_sha256": "1b6f717034b700b0523cb339f91ef502272b65eb9dce7f41dd9306b9ef183059",
+        "master_file": "0018.png",
+        "master_size": [
+          2048,
+          2048
+        ],
+        "master_sha256": "3ff3171237e699e865fb01ab2a187f833c4b178d2e2e80111531553edd848104",
+        "assignment_sha256": "9a1f6858330c6ef760bedf17202ea654b61dc590b6afb2ae78431ef22f9803d6",
+        "promotion_resampling": "Pillow LANCZOS"
+      }
+    },
+    {
       "token_id": 19,
       "name": "Gravity Goons #0019",
       "master_file": "0019.png",
@@ -696,6 +825,49 @@
         ],
         "master_sha256": "43109bc58598a0cb9f211d13ffe6e7e37dc0738ea99517f6199f113d47c653c9",
         "assignment_sha256": "113506f8970588d8fb025df025742859d5510c184ed89fc243739d2671dac65a",
+        "promotion_resampling": "Pillow LANCZOS"
+      }
+    },
+    {
+      "token_id": 20,
+      "name": "Gravity Goons #0020",
+      "master_file": "0020.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "041a6a5aac42a2d2c2521a2c274d6eacc17ed0d5f93ce3ff7b76f939f4132b89",
+      "marketplace_file": "0020.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "c123f31555c43d1764aa29b0a2e557d8aa1bd082bf427b5dccc4654788c40ef5",
+      "assignment_sha256": "c17140362fd40865a8380ddefc0a80d472d73e8181dbdfd45d85a3c5fd44b736",
+      "genesis_metadata_file": "0020.json",
+      "genesis_metadata_sha256": "66fd4d0b0efd072f98a5b4ae6c256827c8eab8b8ed2f5c6838b1b5fc9b62b21d",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0020.png",
+      "discipline": "Surfing",
+      "species": "Gorilla",
+      "rarity": "Common",
+      "render": {
+        "schema": "gravity-goons-static-master-v1",
+        "token_id": 20,
+        "name": "Gravity Goons #0020",
+        "production_renderer": "STATIC_REFERENCE_DRIVEN",
+        "source_file": "art/static-collection/production/0020.png",
+        "source_size": [
+          1254,
+          1254
+        ],
+        "source_sha256": "14d1a59e3f005a910d896bfa5df5111abee76ef9e5a1da7ac00a5deedd40c801",
+        "master_file": "0020.png",
+        "master_size": [
+          2048,
+          2048
+        ],
+        "master_sha256": "041a6a5aac42a2d2c2521a2c274d6eacc17ed0d5f93ce3ff7b76f939f4132b89",
+        "assignment_sha256": "c17140362fd40865a8380ddefc0a80d472d73e8181dbdfd45d85a3c5fd44b736",
         "promotion_resampling": "Pillow LANCZOS"
       }
     },
