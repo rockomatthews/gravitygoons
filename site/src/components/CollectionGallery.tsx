@@ -26,7 +26,7 @@ type Token = {
 const PAGE_SIZE = 24;
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
 
-export function CollectionGallery({ tokens }: { tokens: Token[] }) {
+export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; imageBaseUrl: string }) {
   const { connect, message: walletMessage } = useWallet();
   const [discipline, setDiscipline] = useState("All");
   const [cast, setCast] = useState("All");
@@ -142,7 +142,7 @@ export function CollectionGallery({ tokens }: { tokens: Token[] }) {
           return (
             <article className={`token-card ${active ? "selected" : ""} ${available ? "" : "sold"}`} key={token.token_id}>
               <button className="card-image" onClick={() => toggle(token.token_id)} aria-label={available ? `Select ${token.name}` : `${token.name} is sold`} disabled={!available}>
-                <Image src="/collection/base-concept.png" alt={token.name} width={1024} height={1024} />
+                <Image src={imageBaseUrl + "/" + String(token.token_id).padStart(4, "0") + ".png"} alt={token.name} width={1024} height={1024} />
                 <span className={`rarity rarity-${token.rarity.toLowerCase()}`}>{token.rarity}</span>
                 <span className="select-mark">{available ? active ? "SELECTED" : "+ SELECT" : "SOLD"}</span>
               </button>

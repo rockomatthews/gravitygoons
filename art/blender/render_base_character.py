@@ -215,7 +215,12 @@ def add_background(materials):
 
 def configure_scene(resolution: int):
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
+    # Blender 5.2 renamed the Eevee engine enum back to BLENDER_EEVEE.
+    # Keep compatibility with 4.x/5.1 installs that still expose EEVEE_NEXT.
+    try:
+        scene.render.engine = "BLENDER_EEVEE"
+    except TypeError:
+        scene.render.engine = "BLENDER_EEVEE_NEXT"
     scene.render.resolution_x = resolution
     scene.render.resolution_y = resolution
     scene.render.resolution_percentage = 100
@@ -225,6 +230,8 @@ def configure_scene(resolution: int):
     scene.render.use_freestyle = True
     scene.render.line_thickness = 1.25
     scene.view_settings.look = "AgX - Medium High Contrast"
+    if scene.world is None:
+        scene.world = bpy.data.worlds.new("Gravity Goons World")
     scene.world.color = (0.015, 0.02, 0.025)
 
     bpy.ops.object.light_add(type="AREA", location=(-3.5, -4.0, 6.0))

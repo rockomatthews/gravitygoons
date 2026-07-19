@@ -10,8 +10,9 @@ export function GravityWorld() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    const compact = window.matchMedia("(max-width: 760px)").matches;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !compact, powerPreference: "high-performance" });
+    renderer.setPixelRatio(compact ? 1 : Math.min(window.devicePixelRatio, 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
@@ -23,16 +24,17 @@ export function GravityWorld() {
     const chrome = new THREE.MeshPhysicalMaterial({ color: 0x101720, metalness: 0.92, roughness: 0.17, clearcoat: 1, clearcoatRoughness: 0.12 });
     const teal = new THREE.MeshStandardMaterial({ color: 0x00e5d4, emissive: 0x00675f, emissiveIntensity: 1.7, metalness: 0.45, roughness: 0.28 });
     const coral = new THREE.MeshStandardMaterial({ color: 0xff4b35, emissive: 0x6a0d08, emissiveIntensity: 1.4, metalness: 0.35, roughness: 0.32 });
-    const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.72, 0.16, 180, 24, 2, 5), chrome);
-    const inner = new THREE.Mesh(new THREE.IcosahedronGeometry(0.96, 2), teal);
-    const orbit = new THREE.Mesh(new THREE.TorusGeometry(2.45, 0.025, 12, 180), coral);
+    const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.72, 0.16, compact ? 96 : 180, compact ? 14 : 24, 2, 5), chrome);
+    const inner = new THREE.Mesh(new THREE.IcosahedronGeometry(0.96, compact ? 1 : 2), teal);
+    const orbit = new THREE.Mesh(new THREE.TorusGeometry(2.45, 0.025, 12, compact ? 96 : 180), coral);
     orbit.rotation.x = Math.PI * 0.64;
     orbit.rotation.z = Math.PI * 0.16;
     group.add(knot, inner, orbit);
 
     const particleGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(360 * 3);
-    for (let i = 0; i < 360; i += 1) {
+    const particleCount = compact ? 160 : 360;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i += 1) {
       const radius = 3.4 + ((i * 47) % 100) / 38;
       const angle = i * 2.399963;
       positions[i * 3] = Math.cos(angle) * radius;
@@ -98,4 +100,3 @@ export function GravityWorld() {
 
   return <canvas ref={canvasRef} className="gravity-world" aria-hidden="true" />;
 }
-

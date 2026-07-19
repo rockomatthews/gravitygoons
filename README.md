@@ -16,7 +16,7 @@ Ready now:
 - contract tests for minting, reserves, wallet limits, transfers, and progression safety;
 - Next.js gallery, token detail pages, owner controls, dynamic metadata API, and demo EIP-712 signer;
 - Supabase progression migration, RLS, public read policies, and starter trick catalog;
-- procedural Blender 5.1.2 base-character script and approval concepts.
+- procedural Blender 5.2 LTS base-character script and approval concepts.
 
 Still gated:
 
@@ -36,7 +36,7 @@ Still gated:
 - Roster mapping: `reports/approval-gate-2-roster.md`
 - Fictional label catalog: `traits/parody-brands.json`
 
-The current Blender 5.1.2 Homebrew executable crashes inside its Metal device initialization on this Apple M5 machine before Python executes. The script is present and reproducible; use a working Blender 5.1.2 install or render it on CI/another Mac after the character is approved.
+Blender 5.1.2 crashed inside Metal device initialization on this Apple M5 before Python could execute. The machine now uses the official Apple Silicon Blender 5.2 LTS build, and the generator has completed a four-view headless render smoke test. The former 5.1.2 app is preserved as `/Applications/Blender 5.1.2 (M5 crash).app` while `/Applications/Blender.app` and the existing `blender` command launch 5.2 LTS.
 
 ## Generate and validate the collection data
 
@@ -112,6 +112,8 @@ The metadata route is `/api/nft/v1/[tokenId]`. It reads onchain progress first, 
 
 The storefront includes an interactive Three.js gravity field, futuristic 3D presentation, a Base wallet connection button, automatic Base network switching, live availability polling for all 1,000 IDs, sold-token disabling, exact-token checkout for up to five Goons, transaction confirmation, and automatic post-mint refresh.
 
+Until all 1,000 final images exist, keep `NEXT_PUBLIC_COLLECTION_READY=false`. The site will show the 12 distinct approval concepts and disable the collection mint UI. Only set it to `true` after validation and set `NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL` to the public HTTPS gateway directory containing `0001.png` through `1000.png`; both values are required before the live gallery can appear.
+
 ### Vercel configuration
 
 Import this repository as a new Vercel project and set **Root Directory** to `site`. Attach `gravitygoons.com` after buying it through Vercel. Configure these production environment variables before the controlled mint:
@@ -120,6 +122,8 @@ Import this repository as a new Vercel project and set **Root Directory** to `si
 - `NEXT_PUBLIC_COLLECTION_ADDRESS`
 - `NEXT_PUBLIC_PROGRESS_REGISTRY_ADDRESS`
 - `NEXT_PUBLIC_IMAGE_BASE_URI`
+- `NEXT_PUBLIC_COLLECTION_READY=false` until all 1,000 images pass validation
+- `NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY` (server only)
 - `DEMO_PROGRESS_ENABLED=false`

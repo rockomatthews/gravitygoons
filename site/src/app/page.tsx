@@ -1,4 +1,5 @@
 import collection from "@/data/collection.json";
+import { ApprovalRoster } from "@/components/ApprovalRoster";
 import { CollectionGallery } from "@/components/CollectionGallery";
 import { GravityWorld } from "@/components/GravityWorld";
 import { WalletButton } from "@/components/WalletButton";
@@ -6,11 +7,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
+  const collectionImageBaseUrl = process.env.NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL?.replace(/\/$/, "");
+  const collectionReady = process.env.NEXT_PUBLIC_COLLECTION_READY === "true" && Boolean(collectionImageBaseUrl);
+
   return (
     <main>
       <header className="nav shell">
         <a className="brand" href="#top"><span>GG</span><b>GRAVITY GOONS</b></a>
-        <nav><a href="#roster">Roster</a><a href="#collection">Mint</a><a href="#progression">Game DNA</a><Link href="/manage">Owner</Link></nav>
+        <nav><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><a href="#progression">Game DNA</a><Link href="/manage">Owner</Link></nav>
         <WalletButton />
       </header>
 
@@ -21,7 +25,7 @@ export default function Home() {
           <p className="eyebrow">1,000 FULL-BODY ATHLETES · BASE</p>
           <h1><span>BUILT TO</span><br />BREAK<br /><i>GRAVITY.</i></h1>
           <p className="lede">Six sports. Twelve underground labels. Zero mystery. Choose the exact Goon you want and carry their tricks, XP, and permanent history into the future game.</p>
-          <div className="hero-actions"><a className="button primary" href="#collection">Choose your Goon</a><span>0.003 ETH · MAX 5</span></div>
+          <div className="hero-actions"><a className="button primary" href="#collection">{collectionReady ? "Choose your Goon" : "Preview the Goons"}</a><span>{collectionReady ? "0.003 ETH · MAX 5" : "FINAL ART IN PROGRESS"}</span></div>
           <div className="launch-data"><div><b>1000</b><span>TOTAL GOONS</span></div><div><b>06</b><span>DISCIPLINES</span></div><div><b>64</b><span>TRICK SLOTS</span></div></div>
         </div>
         <div className="hero-visual">
@@ -48,8 +52,10 @@ export default function Home() {
       </section>
 
       <section className="collection-section shell" id="collection">
-        <div className="section-heading"><div><p className="eyebrow">LIVE BASE ROSTER</p><h2>Choose, connect, mint.</h2></div><p>Filter all 1,000 characters, connect a Base wallet, select up to five available IDs, and mint them without leaving GravityGoons.com.</p></div>
-        <CollectionGallery tokens={collection.tokens} />
+        <div className="section-heading"><div><p className="eyebrow">{collectionReady ? "LIVE BASE ROSTER" : "APPROVAL ROSTER"}</p><h2>{collectionReady ? "Choose, connect, mint." : "Twelve Goons. Twelve real looks."}</h2></div><p>{collectionReady ? "Filter all 1,000 characters, connect a Base wallet, select up to five available IDs, and mint them without leaving GravityGoons.com." : "The collection system contains 1,000 fixed trait assignments. These 12 concepts establish the visual range while the final 1,000 unique images are produced and validated."}</p></div>
+        {collectionReady && collectionImageBaseUrl
+          ? <CollectionGallery tokens={collection.tokens} imageBaseUrl={collectionImageBaseUrl} />
+          : <ApprovalRoster />}
       </section>
 
       <section className="game-section shell" id="progression">
@@ -61,7 +67,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="final-cta shell"><div><p className="eyebrow">NO BLIND BOX. NO REVEAL.</p><h2>See the Goon.<br />Choose the Goon.<br /><i>Become the Goon.</i></h2></div><a className="button primary" href="#collection">ENTER THE ROSTER</a></section>
+      <section className="final-cta shell"><div><p className="eyebrow">NO BLIND BOX. NO REVEAL.</p><h2>See the Goon.<br />Choose the Goon.<br /><i>Become the Goon.</i></h2></div><a className="button primary" href="#collection">{collectionReady ? "ENTER THE ROSTER" : "VIEW CONCEPT ROSTER"}</a></section>
 
       <footer className="shell"><span>GRAVITY GOONS © 2026</span><span>BUILT TO BREAK GRAVITY · BASE ERC-721</span><span>GRAVITYGOONS.COM</span></footer>
     </main>
