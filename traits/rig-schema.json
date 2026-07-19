@@ -1,0 +1,26 @@
+{
+  "schema": "gravity-goons-rig-v1",
+  "purpose": "Shared collection skeleton and stable attachment contract for future game animation.",
+  "deformation_strategy": "Rigid modular bone parenting in generator v1; authored production meshes will add normalized skin weights without renaming bones.",
+  "required_bones": [
+    "root", "pelvis", "spine", "chest", "neck", "head",
+    "upper_arm.L", "forearm.L", "hand.L",
+    "upper_arm.R", "forearm.R", "hand.R",
+    "thigh.L", "shin.L", "foot.L",
+    "thigh.R", "shin.R", "foot.R",
+    "tail", "equipment", "equipment_grip.L", "equipment_grip.R"
+  ],
+  "attachment_points": {
+    "equipment": "Large discipline prop beside or beneath the athlete",
+    "equipment_grip.L": "Left-hand board, pole, or handlebar contact",
+    "equipment_grip.R": "Right-hand board, pole, or handlebar contact",
+    "tail": "Animal tail base; unused for humans"
+  },
+  "game_contract": {
+    "bone_names_locked": true,
+    "units": "Blender meters",
+    "forward_axis": "-Y",
+    "up_axis": "+Z",
+    "root_motion_bone": "root"
+  }
+}

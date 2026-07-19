@@ -109,6 +109,49 @@ def add_torus(name, location, major, minor, material, rotation=(math.pi / 2, 0, 
     return obj
 
 
+def add_tapered_torso(name, broad, apparel, material):
+    """Authored shared torso topology with stable rings for later skin weighting."""
+    segments = 24
+    bulk = 1.12 if apparel in {"Puffer Vest", "Shell Jacket", "Armored Jersey"} else 1.0
+    rings = [
+        (-1.02, 0.88 * broad, 0.48),
+        (-0.42, 1.02 * broad, 0.58),
+        (0.36, 1.28 * broad * bulk, 0.66 * bulk),
+        (1.10, 1.43 * broad * bulk, 0.70 * bulk),
+        (1.45, 1.02 * broad, 0.57),
+    ]
+    vertices = []
+    for z, radius_x, radius_y in rings:
+        for index in range(segments):
+            angle = 2 * math.pi * index / segments
+            vertices.append((math.cos(angle) * radius_x, math.sin(angle) * radius_y, z))
+    faces = []
+    for ring in range(len(rings) - 1):
+        for index in range(segments):
+            nxt = (index + 1) % segments
+            a = ring * segments + index
+            b = ring * segments + nxt
+            c = (ring + 1) * segments + nxt
+            d = (ring + 1) * segments + index
+            faces.append((a, b, c, d))
+    faces.append(tuple(range(segments - 1, -1, -1)))
+    top = (len(rings) - 1) * segments
+    faces.append(tuple(top + index for index in range(segments)))
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(material)
+    bevel = obj.modifiers.new("Athletic silhouette bevel", "BEVEL")
+    bevel.width = 0.10
+    bevel.segments = 3
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    obj["topology_role"] = "shared-weightable-torso-v1"
+    return obj
+
+
 def materials_for(token):
     accent_color, garment_color = BRAND_COLORS[token["parody_brand"]]
     return {
@@ -189,6 +232,32 @@ def face(token, mats):
         for z in (3.34, 3.57, 3.78):
             add_cone(f"Mohawk {z}", (0, 0.30, z), (0.20, 0.18, 0.30), ink, rotation=(0.15, 0, 0), vertices=5)
 
+    if species == "Human":
+        human_hair(token, mats)
+
+
+def human_hair(token, mats):
+    style = token["hair"]
+    if style == "Bald" or token["headwear"] in {"Half-Shell Helmet", "Full-Face Helmet", "Beanie"}:
+        return
+    hair = mats["ink"]
+    if style in {"Buzz", "Waves"}:
+        add_uv(f"Hair {style}", (0, 0.05, 3.38), (1.00, 0.80, 0.42), hair)
+    elif style == "High Fade":
+        add_uv("Hair fade", (0, 0.10, 3.37), (0.88, 0.74, 0.38), hair)
+        add_cube("Hair high top", (0, -0.02, 3.68), (0.65, 0.50, 0.27), hair, bevel=0.20)
+    elif style == "Curls":
+        for index, (x, z) in enumerate(((-0.72, 3.35), (-0.38, 3.55), (0, 3.62), (0.38, 3.55), (0.72, 3.35), (-0.18, 3.35), (0.20, 3.36))):
+            add_uv(f"Hair curl {index}", (x, -0.05, z), (0.28, 0.26, 0.28), hair, segments=24, rings=12)
+    elif style in {"Braids", "Shag"}:
+        add_uv(f"Hair {style} crown", (0, 0.08, 3.42), (1.02, 0.82, 0.45), hair)
+        offsets = (-0.78, -0.48, 0.48, 0.78) if style == "Braids" else (-0.82, 0.82)
+        for index, x in enumerate(offsets):
+            add_curve(f"Hair {style} side {index}", [(x, -0.52, 3.30), (x * 1.12, -0.62, 2.80), (x * 0.94, -0.58, 2.28)], 0.085 if style == "Braids" else 0.18, hair)
+    elif style == "Bun":
+        add_uv("Hair bun crown", (0, 0.10, 3.40), (0.98, 0.78, 0.42), hair)
+        add_uv("Hair bun", (0, 0.38, 3.82), (0.42, 0.38, 0.42), hair)
+
 
 def headwear(token, mats):
     item = token["headwear"]
@@ -216,7 +285,7 @@ def eyewear(token, mats):
 
 def body(token, mats):
     broad = 1.20 if token["species"] in {"Gorilla", "Boar", "Ram"} else 1.0
-    add_uv("Torso", (0, 0.0, 0.38), (1.43 * broad, 0.72, 1.55), mats["garment"])
+    add_tapered_torso("Torso", broad, token["apparel"], mats["garment"])
     sleeveless = token["apparel"] in {"Tank Top", "Puffer Vest"}
     arm_mat = mats["body"] if sleeveless else mats["garment"]
     for side in (-1, 1):
@@ -292,6 +361,107 @@ def species_extras(token, mats):
                 add_torus(f"Tail ring {z}", (1.52, 0.26, z), 0.23, 0.055, mats["ink"], rotation=(0, 0, 0))
 
 
+def create_shared_rig(token):
+    """Create the collection-wide armature and stable future game attachment points."""
+    data = bpy.data.armatures.new("GravityGoons_Rig")
+    rig = bpy.data.objects.new("GravityGoons_Rig", data)
+    bpy.context.collection.objects.link(rig)
+    bpy.context.view_layer.objects.active = rig
+    rig.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+
+    bones = {}
+
+    def add_bone(name, head, tail, parent=None):
+        bone = data.edit_bones.new(name)
+        bone.head = head
+        bone.tail = tail
+        if parent:
+            bone.parent = bones[parent]
+        bones[name] = bone
+        return bone
+
+    add_bone("root", (0, 0, -4.40), (0, 0, -3.80))
+    add_bone("pelvis", (0, 0, -1.45), (0, 0, -0.78), "root")
+    add_bone("spine", (0, 0, -0.78), (0, 0, 0.50), "pelvis")
+    add_bone("chest", (0, 0, 0.50), (0, 0, 1.48), "spine")
+    add_bone("neck", (0, 0, 1.48), (0, 0, 2.10), "chest")
+    add_bone("head", (0, 0, 2.10), (0, 0, 3.58), "neck")
+    for side, suffix in ((-1, "L"), (1, "R")):
+        add_bone(f"upper_arm.{suffix}", (side * 0.72, 0, 1.10), (side * 1.46, 0, 0.20), "chest")
+        add_bone(f"forearm.{suffix}", (side * 1.46, 0, 0.20), (side * 1.66, -0.08, -0.72), f"upper_arm.{suffix}")
+        add_bone(f"hand.{suffix}", (side * 1.66, -0.08, -0.72), (side * 1.70, -0.18, -1.28), f"forearm.{suffix}")
+        add_bone(f"thigh.{suffix}", (side * 0.52, 0, -1.35), (side * 0.62, 0, -2.18), "pelvis")
+        add_bone(f"shin.{suffix}", (side * 0.62, 0, -2.18), (side * 0.62, 0, -3.12), f"thigh.{suffix}")
+        add_bone(f"foot.{suffix}", (side * 0.62, 0, -3.12), (side * 0.62, -0.62, -3.70), f"shin.{suffix}")
+    add_bone("tail", (0.78, 0.22, -1.35), (1.55, 0.25, -2.45), "pelvis")
+    add_bone("equipment", (2.65, 0, -3.65), (2.65, 0, -1.30), "root")
+    add_bone("equipment_grip.L", (-1.68, -0.12, -1.12), (-1.68, -0.12, -0.72), "hand.L")
+    add_bone("equipment_grip.R", (1.68, -0.12, -1.12), (1.68, -0.12, -0.72), "hand.R")
+    bpy.ops.object.mode_set(mode="OBJECT")
+    data.display_type = "STICK"
+    rig.show_in_front = True
+    rig["rig_schema"] = "gravity-goons-rig-v1"
+    rig["rig_schema_file"] = "traits/rig-schema.json"
+    rig["token_id"] = token["token_id"]
+    rig["discipline"] = token["discipline"]
+    return rig
+
+
+def attach_modules_to_rig(rig):
+    """Rigid bone parenting is the safe modular baseline; authored meshes add weights later."""
+    head_terms = ("Head", "Eye", "Iris", "Brow", "Muzzle", "Mouth", "Smile", "Ear", "Rosette", "Mask", "Mohawk", "Hair", "Horn", "Tusk", "Snout", "fin", "Helmet", "Beanie", "Cap", "Lens", "Glasses", "Chin guard")
+    chest_terms = ("Torso", "Brand", "Collar", "Puffer seam")
+    equipment_terms = ("Skateboard", "Snowboard", "Surfboard", "BMX", "Moto", "Motocross", "Ski ", "Pole ")
+
+    for obj in list(bpy.context.scene.objects):
+        if obj == rig or obj.type not in {"MESH", "CURVE", "FONT"}:
+            continue
+        name = obj.name
+        bone = None
+        if name.startswith(("Backdrop", "Ground", "Token Number")):
+            continue
+        if any(term in name for term in equipment_terms): bone = "equipment"
+        elif name.startswith("Tail"): bone = "tail"
+        elif any(term in name for term in head_terms): bone = "head"
+        elif any(term in name for term in chest_terms): bone = "chest"
+        elif name.startswith("Waist"): bone = "pelvis"
+        else:
+            for prefix, rig_prefix in (
+                ("Upper Arm", "upper_arm"), ("Forearm", "forearm"), ("Glove", "hand"),
+                ("Thigh", "thigh"), ("Shin", "shin"), ("Foot", "foot"), ("Sole stripe", "foot"),
+            ):
+                if name.startswith(prefix):
+                    bone = f"{rig_prefix}.{'L' if name.endswith('-1') else 'R'}"
+                    break
+        if bone and bone in rig.data.bones:
+            world = obj.matrix_world.copy()
+            obj.parent = rig
+            obj.parent_type = "BONE"
+            obj.parent_bone = bone
+            obj.matrix_world = world
+
+
+def apply_pose(token, rig):
+    """Small discipline-aware pose offsets prove that every module follows the shared rig."""
+    for pose_bone in rig.pose.bones:
+        pose_bone.rotation_mode = "XYZ"
+    stance = -1 if token["stance"] == "Goofy" else 1
+    rig.pose.bones["chest"].rotation_euler[1] = math.radians(3 * stance)
+    rig.pose.bones["head"].rotation_euler[1] = math.radians(-4 * stance)
+    if token["discipline"] in {"BMX", "Motocross"}:
+        rig.pose.bones["upper_arm.L"].rotation_euler[1] = math.radians(-11)
+        rig.pose.bones["upper_arm.R"].rotation_euler[1] = math.radians(11)
+        rig.pose.bones["forearm.L"].rotation_euler[2] = math.radians(9)
+        rig.pose.bones["forearm.R"].rotation_euler[2] = math.radians(-9)
+    elif token["discipline"] in {"Skateboarding", "Snowboarding", "Surfing"}:
+        rig.pose.bones[f"upper_arm.{'L' if stance < 0 else 'R'}"].rotation_euler[1] = math.radians(12)
+        rig.pose.bones[f"thigh.{'R' if stance < 0 else 'L'}"].rotation_euler[1] = math.radians(-5)
+    elif token["discipline"] == "Skiing":
+        rig.pose.bones["upper_arm.L"].rotation_euler[1] = math.radians(-8)
+        rig.pose.bones["upper_arm.R"].rotation_euler[1] = math.radians(8)
+
+
 def configure_scene(resolution):
     scene = bpy.context.scene
     try: scene.render.engine = "BLENDER_EEVEE"
@@ -325,6 +495,10 @@ def build_scene(token, resolution):
     ):
         print(f"  BUILD {name}", flush=True)
         builder(token, mats)
+    print("  BUILD shared rig", flush=True)
+    rig = create_shared_rig(token)
+    attach_modules_to_rig(rig)
+    apply_pose(token, rig)
     bpy.ops.object.camera_add(location=(5.8, -18.5, 0.8))
     camera = bpy.context.object
     camera.data.type = "ORTHO"
@@ -373,6 +547,8 @@ def main():
             "species": token["species"], "discipline": token["discipline"],
             "brand": token["parody_brand"], "rarity": token["rarity"],
             "resolution": options.resolution,
+            "rig_schema": "gravity-goons-rig-v1",
+            "rig_bones": len(bpy.data.objects["GravityGoons_Rig"].data.bones),
         }
         (manifest_dir / f"{token['token_id']:04d}.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
     print(f"Rendered {len(selected)} requested tokens into {output_dir}")

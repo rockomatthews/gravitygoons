@@ -24,6 +24,7 @@ def main() -> None:
     parser.add_argument("--resolution", type=int, default=1024)
     parser.add_argument("--workers", type=int, default=2)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--save-blend", action="store_true")
     options = parser.parse_args()
 
     all_ids = {item["token_id"] for item in json.loads(options.assignments.read_text())["tokens"]}
@@ -48,6 +49,8 @@ def main() -> None:
         ]
         if options.overwrite:
             command.append("--overwrite")
+        if options.save_blend:
+            command.append("--save-blend")
         completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
         return token_id, completed.returncode, completed.stdout + completed.stderr
 

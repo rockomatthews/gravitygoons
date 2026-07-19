@@ -85,6 +85,15 @@ Validate the images and build a review sheet:
 
 The assignment-driven pipeline is operational, but its current procedural meshes are an engineering prototype rather than approved final art. `reports/generator-status.md` tracks the visual gate that must be passed before rendering all 1,000 marketplace images.
 
+Rigged checkpoints can be saved with `--save-blend`. Every generated rig follows `traits/rig-schema.json`; validate a saved file with:
+
+```bash
+blender --background renders/rig-smoke/blend/0003.blend \
+  --python art/blender/validate_rig.py -- \
+  --schema traits/rig-schema.json \
+  --report renders/rig-smoke/rig-validation.json
+```
+
 ## Contracts
 
 ```bash

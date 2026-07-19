@@ -20,3 +20,9 @@ The first smoke batch renders six unique PNGs covering all six disciplines. Auto
 This checkpoint proves deterministic modular generation and batch safety. The geometry is intentionally still prototype quality and does **not** yet match the approved illustrated roster. Do not publish, upload, or enable minting with these renders.
 
 The next art milestone is to replace the primitive anatomy and equipment with authored shared meshes, rigs, toon materials, and silhouette-controlled trait assets. The current batch is the engineering foundation and regression fixture for that work.
+
+## Rig-ready checkpoint
+
+The renderer now creates `gravity-goons-rig-v1` for every token. It contains 22 locked bones, left/right hand grip points, a large-equipment attachment, and a tail chain root. Body, clothing, facial parts, hair, tails, and discipline props are semantically parented to this shared skeleton. A saved BMX checkpoint validated with one armature, 22 required bones, and 44 attached modules.
+
+The first weightable shared mesh has also replaced the spherical torso. Its stable vertex rings and topology role are designed to accept normalized deformation weights later without changing the public bone contract in `traits/rig-schema.json`.
