@@ -22,12 +22,12 @@ Ready now:
 - contract tests for minting, reserves, wallet limits, transfers, and progression safety;
 - Next.js gallery, token detail pages, owner controls, dynamic metadata API, and demo EIP-712 signer;
 - Supabase progression migration, RLS, public read policies, and starter trick catalog;
-- procedural Blender 5.2 LTS base-character script and approval concepts.
+- deterministic Blender 5.2 LTS collection renderer with a locked 22-bone rig, shared weightable torso/limb topology, visible modular traits, and automated coverage selection.
 
 Still gated:
 
-- approve or revise the snow-leopard base character;
-- render the 12-character approval set, trait catalog, 50-character stress test, then all 1,000 images;
+- approve a discipline-specific posed character system at final marketplace quality;
+- render the 50-character stress test, then all 1,000 final images;
 - replace IPFS and owned-domain placeholders;
 - link a real Supabase project and deploy contracts only after final assets and endpoint are permanent.
 
@@ -81,6 +81,13 @@ Validate the images and build a review sheet:
 ```bash
 .venv/bin/python scripts/validate_renders.py renders/six-sport-smoke --resolution 1024 --expected 6
 .venv/bin/python scripts/build_contact_sheet.py renders/six-sport-smoke art/approval/generator-six-sport-smoke.png
+```
+
+Select a deterministic compact batch that covers every configured visual trait:
+
+```bash
+.venv/bin/python scripts/select_trait_coverage.py --count 24
+# The first output line is directly usable as --token-ids.
 ```
 
 The assignment-driven pipeline is operational, but its current procedural meshes are an engineering prototype rather than approved final art. `reports/generator-status.md` tracks the visual gate that must be passed before rendering all 1,000 marketplace images.

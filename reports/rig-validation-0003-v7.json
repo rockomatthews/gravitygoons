@@ -1,0 +1,10 @@
+{
+  "valid": true,
+  "errors": [],
+  "schema": "gravity-goons-rig-v1",
+  "bones": 22,
+  "attached_modules": 70,
+  "equipment_modules": 10,
+  "token_id": 3,
+  "discipline": "BMX"
+}

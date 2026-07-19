@@ -34,6 +34,15 @@ def main():
     equipment = [obj for obj in attached if obj.parent_bone == "equipment"]
     if not equipment:
         errors.append("No sport equipment modules are attached")
+    deformable = [obj for obj in attached if obj.get("deformation_binding") == "armature-vertex-groups-v1"]
+    if len(deformable) < 17:
+        errors.append(f"Only {len(deformable)} shared meshes use armature vertex-group binding")
+    for obj in deformable:
+        modifiers = [modifier for modifier in obj.modifiers if modifier.type == "ARMATURE" and modifier.object == rig]
+        if not modifiers:
+            errors.append(f"Missing armature modifier: {obj.name}")
+        if not obj.vertex_groups:
+            errors.append(f"Missing deformation vertex groups: {obj.name}")
     report = {
         "valid": not errors,
         "errors": errors,
@@ -41,6 +50,7 @@ def main():
         "bones": len(actual_bones),
         "attached_modules": len(attached),
         "equipment_modules": len(equipment),
+        "deformable_meshes": len(deformable),
         "token_id": rig.get("token_id") if rig else None,
         "discipline": rig.get("discipline") if rig else None
     }

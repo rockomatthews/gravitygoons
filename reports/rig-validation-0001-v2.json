@@ -1,0 +1,10 @@
+{
+  "valid": true,
+  "errors": [],
+  "schema": "gravity-goons-rig-v1",
+  "bones": 22,
+  "attached_modules": 50,
+  "equipment_modules": 2,
+  "token_id": 1,
+  "discipline": "Surfing"
+}

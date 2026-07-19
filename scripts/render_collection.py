@@ -52,7 +52,10 @@ def main() -> None:
         if options.save_blend:
             command.append("--save-blend")
         completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
-        return token_id, completed.returncode, completed.stdout + completed.stderr
+        combined = completed.stdout + completed.stderr
+        expected_output = options.output_dir / f"{token_id:04d}.png"
+        failed = completed.returncode != 0 or "Traceback (most recent call last)" in combined or not expected_output.exists()
+        return token_id, 1 if failed else 0, combined
 
     failures: list[int] = []
     with ThreadPoolExecutor(max_workers=max(1, options.workers)) as pool:

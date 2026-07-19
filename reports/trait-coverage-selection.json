@@ -1,0 +1,450 @@
+{
+  "source": "traits/assignments.json",
+  "selection_algorithm": "deterministic-greedy-set-cover-v1",
+  "requested_count": 24,
+  "selected_count": 16,
+  "token_ids": [
+    1,
+    3,
+    22,
+    521,
+    91,
+    377,
+    77,
+    13,
+    48,
+    88,
+    6,
+    79,
+    81,
+    213,
+    7,
+    9
+  ],
+  "categories": [
+    "species",
+    "discipline",
+    "apparel",
+    "bottom",
+    "footwear",
+    "headwear",
+    "eyewear",
+    "accessory",
+    "parody_brand",
+    "rarity",
+    "expression",
+    "background"
+  ],
+  "covered_values": 102,
+  "total_values": 102,
+  "coverage_percent": 100.0,
+  "uncovered": [],
+  "selection": [
+    {
+      "token_id": 1,
+      "new_traits": [
+        "accessory: Ear Tape",
+        "apparel: Rash Guard",
+        "background: Cobalt / Pink",
+        "bottom: Boardshorts",
+        "discipline: Surfing",
+        "expression: Game Face",
+        "eyewear: Smoke Goggles",
+        "footwear: Barefoot",
+        "headwear: Beanie",
+        "parody_brand: NORTH FAKE",
+        "rarity: Common",
+        "species: Hyena"
+      ],
+      "traits": {
+        "species": "Hyena",
+        "discipline": "Surfing",
+        "apparel": "Rash Guard",
+        "bottom": "Boardshorts",
+        "footwear": "Barefoot",
+        "headwear": "Beanie",
+        "eyewear": "Smoke Goggles",
+        "accessory": "Ear Tape",
+        "parody_brand": "NORTH FAKE",
+        "rarity": "Common",
+        "expression": "Game Face",
+        "background": "Cobalt / Pink"
+      }
+    },
+    {
+      "token_id": 3,
+      "new_traits": [
+        "accessory: Bandage",
+        "apparel: Tank Top",
+        "background: Sky / Orange",
+        "bottom: Race Pants",
+        "discipline: BMX",
+        "expression: Cocky Grin",
+        "eyewear: Sport Shades",
+        "footwear: Flat-Pedal Shoes",
+        "headwear: Bare Head",
+        "parody_brand: MIKE",
+        "rarity: Uncommon",
+        "species: Raccoon"
+      ],
+      "traits": {
+        "species": "Raccoon",
+        "discipline": "BMX",
+        "apparel": "Tank Top",
+        "bottom": "Race Pants",
+        "footwear": "Flat-Pedal Shoes",
+        "headwear": "Bare Head",
+        "eyewear": "Sport Shades",
+        "accessory": "Bandage",
+        "parody_brand": "MIKE",
+        "rarity": "Uncommon",
+        "expression": "Cocky Grin",
+        "background": "Sky / Orange"
+      }
+    },
+    {
+      "token_id": 22,
+      "new_traits": [
+        "accessory: Radio Earpiece",
+        "apparel: Ventilated Jersey",
+        "background: Purple / Gold",
+        "bottom: Armored Race Pants",
+        "discipline: Motocross",
+        "expression: Raised Brow",
+        "eyewear: Clear Goggles",
+        "footwear: Motocross Boots",
+        "headwear: Full-Face Helmet",
+        "parody_brand: AVOIDAS",
+        "rarity: Rare",
+        "species: Ram"
+      ],
+      "traits": {
+        "species": "Ram",
+        "discipline": "Motocross",
+        "apparel": "Ventilated Jersey",
+        "bottom": "Armored Race Pants",
+        "footwear": "Motocross Boots",
+        "headwear": "Full-Face Helmet",
+        "eyewear": "Clear Goggles",
+        "accessory": "Radio Earpiece",
+        "parody_brand": "AVOIDAS",
+        "rarity": "Rare",
+        "expression": "Raised Brow",
+        "background": "Purple / Gold"
+      }
+    },
+    {
+      "token_id": 521,
+      "new_traits": [
+        "accessory: Gold Stud",
+        "apparel: Tech Hoodie",
+        "background: Acid Lime / Black",
+        "bottom: Baggy Snow Pants",
+        "discipline: Snowboarding",
+        "expression: Easy Smile",
+        "eyewear: Mirrored Goggles",
+        "footwear: Soft Snowboard Boots",
+        "headwear: Half-Shell Helmet",
+        "parody_brand: QUEAZY",
+        "species: Gorilla"
+      ],
+      "traits": {
+        "species": "Gorilla",
+        "discipline": "Snowboarding",
+        "apparel": "Tech Hoodie",
+        "bottom": "Baggy Snow Pants",
+        "footwear": "Soft Snowboard Boots",
+        "headwear": "Half-Shell Helmet",
+        "eyewear": "Mirrored Goggles",
+        "accessory": "Gold Stud",
+        "parody_brand": "QUEAZY",
+        "rarity": "Common",
+        "expression": "Easy Smile",
+        "background": "Acid Lime / Black"
+      }
+    },
+    {
+      "token_id": 91,
+      "new_traits": [
+        "accessory: None",
+        "apparel: Armored Jersey",
+        "background: Teal / Coral",
+        "bottom: Enduro Pants",
+        "expression: Side Eye",
+        "eyewear: None",
+        "footwear: Enduro Boots",
+        "parody_brand: PROCRASTIGONIA",
+        "rarity: Epic",
+        "species: Snow Leopard"
+      ],
+      "traits": {
+        "species": "Snow Leopard",
+        "discipline": "Motocross",
+        "apparel": "Armored Jersey",
+        "bottom": "Enduro Pants",
+        "footwear": "Enduro Boots",
+        "headwear": "Full-Face Helmet",
+        "eyewear": "None",
+        "accessory": "None",
+        "parody_brand": "PROCRASTIGONIA",
+        "rarity": "Epic",
+        "expression": "Side Eye",
+        "background": "Teal / Coral"
+      }
+    },
+    {
+      "token_id": 377,
+      "new_traits": [
+        "apparel: Puffer Vest",
+        "background: Ice / Navy",
+        "bottom: Shell Pants",
+        "discipline: Skiing",
+        "expression: Locked In",
+        "footwear: Alpine Ski Boots",
+        "headwear: Five-Panel Cap",
+        "parody_brand: OFF-BEIGE",
+        "species: Boar"
+      ],
+      "traits": {
+        "species": "Boar",
+        "discipline": "Skiing",
+        "apparel": "Puffer Vest",
+        "bottom": "Shell Pants",
+        "footwear": "Alpine Ski Boots",
+        "headwear": "Five-Panel Cap",
+        "eyewear": "None",
+        "accessory": "Radio Earpiece",
+        "parody_brand": "OFF-BEIGE",
+        "rarity": "Common",
+        "expression": "Locked In",
+        "background": "Ice / Navy"
+      }
+    },
+    {
+      "token_id": 77,
+      "new_traits": [
+        "accessory: Neck Gaiter",
+        "apparel: Zip Jersey",
+        "background: Sand / Aqua",
+        "bottom: Cargo Pants",
+        "discipline: Skateboarding",
+        "footwear: Chunky Skate Shoes",
+        "parody_brand: VANISH"
+      ],
+      "traits": {
+        "species": "Snow Leopard",
+        "discipline": "Skateboarding",
+        "apparel": "Zip Jersey",
+        "bottom": "Cargo Pants",
+        "footwear": "Chunky Skate Shoes",
+        "headwear": "Beanie",
+        "eyewear": "Mirrored Goggles",
+        "accessory": "Neck Gaiter",
+        "parody_brand": "VANISH",
+        "rarity": "Common",
+        "expression": "Cocky Grin",
+        "background": "Sand / Aqua"
+      }
+    },
+    {
+      "token_id": 13,
+      "new_traits": [
+        "apparel: Oversized Tee",
+        "bottom: Slim Chinos",
+        "footwear: High-Top BMX Shoes",
+        "rarity: Legendary",
+        "species: Shark"
+      ],
+      "traits": {
+        "species": "Shark",
+        "discipline": "BMX",
+        "apparel": "Oversized Tee",
+        "bottom": "Slim Chinos",
+        "footwear": "High-Top BMX Shoes",
+        "headwear": "Half-Shell Helmet",
+        "eyewear": "None",
+        "accessory": "Bandage",
+        "parody_brand": "PROCRASTIGONIA",
+        "rarity": "Legendary",
+        "expression": "Side Eye",
+        "background": "Ice / Navy"
+      }
+    },
+    {
+      "token_id": 48,
+      "new_traits": [
+        "apparel: Short-Sleeve Wetsuit",
+        "background: Red / Cream",
+        "bottom: Wetsuit Bottom",
+        "footwear: Reef Boots",
+        "species: Human"
+      ],
+      "traits": {
+        "species": "Human",
+        "discipline": "Surfing",
+        "apparel": "Short-Sleeve Wetsuit",
+        "bottom": "Wetsuit Bottom",
+        "footwear": "Reef Boots",
+        "headwear": "Half-Shell Helmet",
+        "eyewear": "Mirrored Goggles",
+        "accessory": "Bandage",
+        "parody_brand": "NORTH FAKE",
+        "rarity": "Uncommon",
+        "expression": "Easy Smile",
+        "background": "Red / Cream"
+      }
+    },
+    {
+      "token_id": 88,
+      "new_traits": [
+        "apparel: Shell Jacket",
+        "bottom: Freeride Pants",
+        "footwear: Freestyle Ski Boots",
+        "parody_brand: BURNTON",
+        "species: Fox"
+      ],
+      "traits": {
+        "species": "Fox",
+        "discipline": "Skiing",
+        "apparel": "Shell Jacket",
+        "bottom": "Freeride Pants",
+        "footwear": "Freestyle Ski Boots",
+        "headwear": "Five-Panel Cap",
+        "eyewear": "Clear Goggles",
+        "accessory": "Gold Stud",
+        "parody_brand": "BURNTON",
+        "rarity": "Uncommon",
+        "expression": "Cocky Grin",
+        "background": "Purple / Gold"
+      }
+    },
+    {
+      "token_id": 6,
+      "new_traits": [
+        "bottom: Loose Skate Shorts",
+        "footwear: High-Top Skate Shoes",
+        "parody_brand: VOLCANO"
+      ],
+      "traits": {
+        "species": "Human",
+        "discipline": "Skateboarding",
+        "apparel": "Zip Jersey",
+        "bottom": "Loose Skate Shorts",
+        "footwear": "High-Top Skate Shoes",
+        "headwear": "Half-Shell Helmet",
+        "eyewear": "Smoke Goggles",
+        "accessory": "Bandage",
+        "parody_brand": "VOLCANO",
+        "rarity": "Uncommon",
+        "expression": "Raised Brow",
+        "background": "Sky / Orange"
+      }
+    },
+    {
+      "token_id": 79,
+      "new_traits": [
+        "apparel: Race Jersey",
+        "bottom: Cargo Shorts",
+        "parody_brand: POOMA"
+      ],
+      "traits": {
+        "species": "Human",
+        "discipline": "BMX",
+        "apparel": "Race Jersey",
+        "bottom": "Cargo Shorts",
+        "footwear": "High-Top BMX Shoes",
+        "headwear": "Bare Head",
+        "eyewear": "Clear Goggles",
+        "accessory": "Gold Stud",
+        "parody_brand": "POOMA",
+        "rarity": "Rare",
+        "expression": "Raised Brow",
+        "background": "Sand / Aqua"
+      }
+    },
+    {
+      "token_id": 81,
+      "new_traits": [
+        "bottom: Cuffed Chinos",
+        "footwear: Low-Top Skate Shoes",
+        "parody_brand: FAUX RACING"
+      ],
+      "traits": {
+        "species": "Gorilla",
+        "discipline": "Skateboarding",
+        "apparel": "Oversized Tee",
+        "bottom": "Cuffed Chinos",
+        "footwear": "Low-Top Skate Shoes",
+        "headwear": "Beanie",
+        "eyewear": "Clear Goggles",
+        "accessory": "Bandage",
+        "parody_brand": "FAUX RACING",
+        "rarity": "Uncommon",
+        "expression": "Easy Smile",
+        "background": "Acid Lime / Black"
+      }
+    },
+    {
+      "token_id": 213,
+      "new_traits": [
+        "bottom: Snow Bib",
+        "footwear: Stiff Snowboard Boots",
+        "parody_brand: CARHEART"
+      ],
+      "traits": {
+        "species": "Hyena",
+        "discipline": "Snowboarding",
+        "apparel": "Tech Hoodie",
+        "bottom": "Snow Bib",
+        "footwear": "Stiff Snowboard Boots",
+        "headwear": "Bare Head",
+        "eyewear": "Smoke Goggles",
+        "accessory": "Gold Stud",
+        "parody_brand": "CARHEART",
+        "rarity": "Rare",
+        "expression": "Game Face",
+        "background": "Cobalt / Pink"
+      }
+    },
+    {
+      "token_id": 7,
+      "new_traits": [
+        "bottom: Ski Bib"
+      ],
+      "traits": {
+        "species": "Hyena",
+        "discipline": "Skiing",
+        "apparel": "Puffer Vest",
+        "bottom": "Ski Bib",
+        "footwear": "Alpine Ski Boots",
+        "headwear": "Full-Face Helmet",
+        "eyewear": "None",
+        "accessory": "Gold Stud",
+        "parody_brand": "VOLCANO",
+        "rarity": "Common",
+        "expression": "Cocky Grin",
+        "background": "Sky / Orange"
+      }
+    },
+    {
+      "token_id": 9,
+      "new_traits": [
+        "bottom: Volley Shorts"
+      ],
+      "traits": {
+        "species": "Shark",
+        "discipline": "Surfing",
+        "apparel": "Tank Top",
+        "bottom": "Volley Shorts",
+        "footwear": "Reef Boots",
+        "headwear": "Beanie",
+        "eyewear": "Clear Goggles",
+        "accessory": "Neck Gaiter",
+        "parody_brand": "PROCRASTIGONIA",
+        "rarity": "Uncommon",
+        "expression": "Locked In",
+        "background": "Red / Cream"
+      }
+    }
+  ]
+}
