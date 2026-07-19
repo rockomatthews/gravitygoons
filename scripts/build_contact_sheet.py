@@ -38,10 +38,15 @@ def main() -> None:
             image = image.convert("RGB").resize((options.cell, options.cell), Image.Resampling.LANCZOS)
             sheet.paste(image, (x, y))
         draw.rectangle((x, y + options.cell, x + options.cell, y + options.cell + label_height), fill="#0c1118")
-        draw.text((x + 16, y + options.cell + 13), f"#{token['token_id']:04d}  {token['species'].upper()}", fill="#edf8f6", font=font)
+        cast_label = token["archetype"] if token["species"] == "Human" else token["species"]
+        draw.text((x + 16, y + options.cell + 13), f"#{token['token_id']:04d}  {cast_label.upper()}", fill="#edf8f6", font=font)
         draw.text((x + 16, y + options.cell + 49), f"{token['discipline']}  ·  {token['parody_brand']}", fill="#18f1dc", font=small)
         if options.show_pose:
-            draw.text((x + 16, y + options.cell + 78), f"{token['pose']}  ·  {token['stance']}", fill="#f39a45", font=small)
+            build = token.get("body_build")
+            details = f"{token['pose']}  ·  {token['stance']}"
+            if build:
+                details += f"  ·  {build}"
+            draw.text((x + 16, y + options.cell + 78), details, fill="#f39a45", font=small)
     options.output.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(options.output, optimize=True)
     print(options.output)

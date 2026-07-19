@@ -10,6 +10,10 @@ from pathlib import Path
 
 DEFAULT_CATEGORIES = (
     "species",
+    "archetype",
+    "body_build",
+    "complexion",
+    "hair",
     "discipline",
     "apparel",
     "bottom",

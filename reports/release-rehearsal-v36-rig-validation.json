@@ -1,0 +1,143 @@
+{
+  "valid": true,
+  "blend_files": 4,
+  "valid_files": 4,
+  "failures": [],
+  "disciplines": [
+    "BMX",
+    "Motocross",
+    "Surfing"
+  ],
+  "presentation_poses": [
+    "Beach Plant",
+    "Bike Beside",
+    "Gate Ready",
+    "Pedal Ready"
+  ],
+  "pose_families": [
+    "Callout",
+    "Charge"
+  ],
+  "max_contact_distance": 0.0,
+  "minimum_deformable_meshes": 17,
+  "equipment_frame_extents": {
+    "left": 0.3843,
+    "right": 0.9277,
+    "bottom": 0.017,
+    "top": 0.6221
+  },
+  "results": [
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 101,
+      "equipment_modules": 6,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.583,
+        "right": 0.9277,
+        "bottom": 0.017,
+        "top": 0.6221
+      },
+      "token_id": 1,
+      "discipline": "Surfing",
+      "presentation_pose": "Beach Plant",
+      "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Lean",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 100,
+      "equipment_modules": 14,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Foot 1",
+      "equipment_contact_role": "primary-pedal-boot-v1",
+      "equipment_camera_bounds": {
+        "left": 0.3843,
+        "right": 0.8274,
+        "bottom": 0.0701,
+        "top": 0.5233
+      },
+      "token_id": 2,
+      "discipline": "Motocross",
+      "presentation_pose": "Gate Ready",
+      "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Athletic",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 113,
+      "equipment_modules": 13,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Foot 1",
+      "equipment_contact_role": "primary-pedal-boot-v1",
+      "equipment_camera_bounds": {
+        "left": 0.4126,
+        "right": 0.8307,
+        "bottom": 0.056,
+        "top": 0.5094
+      },
+      "token_id": 3,
+      "discipline": "BMX",
+      "presentation_pose": "Pedal Ready",
+      "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Power",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 117,
+      "equipment_modules": 11,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.4575,
+        "right": 0.8724,
+        "bottom": 0.0989,
+        "top": 0.5213
+      },
+      "token_id": 4,
+      "discipline": "BMX",
+      "presentation_pose": "Bike Beside",
+      "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Compact",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    }
+  ]
+}

@@ -34,6 +34,9 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
   const imageBase = process.env.NEXT_PUBLIC_IMAGE_BASE_URI ?? collection.collection.image_base_uri;
   const attributes: Array<Record<string, string | number>> = [
     { trait_type: "Cast", value: token.cast }, { trait_type: "Species", value: token.species },
+    { trait_type: "Archetype", value: token.archetype }, { trait_type: "Body Build", value: token.body_build },
+    { trait_type: "Complexion", value: token.complexion }, { trait_type: "Eyes", value: token.eyes },
+    { trait_type: "Hair / Fur", value: token.hair },
     { trait_type: "Discipline", value: token.discipline }, { trait_type: "Stance", value: token.stance },
     { trait_type: "Expression", value: token.expression }, { trait_type: "Headwear", value: token.headwear },
     { trait_type: "Eyewear", value: token.eyewear }, { trait_type: "Parody Brand", value: token.parody_brand },
@@ -46,6 +49,7 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
     { display_type: "number", trait_type: "Level", value: progress.level || 1 },
     { display_type: "number", trait_type: "XP", value: Number(progress.xp) },
     { display_type: "number", trait_type: "Tricks Learned", value: learned.length, max_value: 64 },
+    { trait_type: "Progress Schema", value: `v${collection.collection.schema_version}` },
     ...learned.map((value) => ({ trait_type: "Learned Trick", value })),
   ];
   const metadata = {
@@ -54,7 +58,14 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
     image: `${imageBase}${String(tokenId).padStart(4, "0")}.png`,
     external_url: `https://gravitygoons.com/character/${String(tokenId).padStart(4, "0")}`,
     attributes,
-    properties: { schema_version: 1, catalog_version: progress.catalogVersion, chain_nonce: progress.nonce },
+    properties: {
+      discipline: token.discipline,
+      progress_registry: collection.collection.progress_registry_address,
+      schema_version: collection.collection.schema_version,
+      catalog_version: progress.catalogVersion,
+      chain_nonce: progress.nonce,
+      genesis_metadata: `${collection.collection.genesis_metadata_base_uri}${String(tokenId).padStart(4, "0")}.json`,
+    },
   };
   const body = JSON.stringify(metadata);
   const etag = `"${createHash("sha256").update(body).digest("hex")}"`;

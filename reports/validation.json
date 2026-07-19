@@ -44,6 +44,12 @@
     "Twin-Tip Skis and Poles": 166,
     "Snowboard with Bindings": 167
   },
+  "body_builds": {
+    "Lean": 250,
+    "Athletic": 250,
+    "Power": 250,
+    "Compact": 250
+  },
   "stat_rule": "Each token totals 30; every stat is between 4 and 8.",
   "sport_compatibility": "Every pose, top, bottom, footwear item, and equipment prop matches its discipline."
 }

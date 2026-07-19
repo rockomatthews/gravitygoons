@@ -5,6 +5,7 @@
 The collection renderer is now assignment-driven. It reads the fixed 1,000-token trait file and constructs a separate Blender scene for each requested token, including:
 
 - animal or human cast and body palette;
+- explicit Lean, Athletic, Power, or Compact body build;
 - species-specific head, ears, muzzle, horns, tusks, mask, rosettes, mohawk, fin, and tail cues;
 - expression, eyes, headwear, and eyewear;
 - sport-compatible apparel, bottoms, footwear, fictional label, and color system;
@@ -69,9 +70,9 @@ During the first outline test, Blender 5.2 printed a Python traceback but return
 
 ## Fifty-character stress checkpoint
 
-Tokens #0001 through #0050 were rerendered at 384x384 on the superseding assigned-pose/body-contact/named-mechanics/`sculpt-material-detail-v2` system with two isolated Blender workers: 50 succeeded and zero failed. Validation confirms 50 correct PNGs, 50 unique SHA-256 hashes, all six disciplines, all nine cast types, and no flat image channels. The labeled review sheet is `art/approval/stress-50-v32.png`.
+Tokens #0001 through #0050 were rerendered at 384x384 on the superseding `body-build-silhouette-v3` / assigned-pose / body-contact / named-mechanics / `sculpt-material-detail-v2` system with two isolated Blender workers: 50 succeeded and zero failed. Validation confirms 50 correct PNGs, 50 unique SHA-256 hashes, all six disciplines, all nine cast types, all four body builds, and no flat image channels. The labeled review sheet is `art/approval/stress-50-v37.png`.
 
-Validation also computes a 256-bit character-crop perceptual hash and rejects pairs below a configurable distance (12 by default). This catches visual duplicates that would evade byte hashing through tiny text or background changes. The v2 batch passes with a minimum distance of 17; the closest pair remains #0005/#0032, which intentionally shares Gorilla, BMX, beanie, goggles, chinos, shoes, and background but differs in top construction, label, accessory, expression, and assigned pose. The machine-readable report is `reports/stress-50-v32-image-validation.json`.
+Validation also computes a 256-bit character-crop perceptual hash and rejects pairs below a configurable distance (12 by default). This catches visual duplicates that would evade byte hashing through tiny text or background changes. The current batch passes with a minimum distance of 18. Every saved `.blend` also passes the current rig contract: 50/50 valid, zero measured equipment-contact error, at least 17 deformable meshes per token, all six disciplines, all three motion families, and 16 of the 18 named pose cases present in the sample. Equipment remains inside the camera tolerance. The machine-readable reports are `reports/stress-50-v37-image-validation.json` and `reports/stress-50-v37-rig-validation.json`.
 
 The 50-token checkpoint proves batch stability and measurable variation, but it does not unlock the storefront or authorize the 1,000 final render. The current contact sheet remains the art-review surface for further pose and sculpt judgment.
 
@@ -103,9 +104,9 @@ The final contact-role split is 11 right-hand grips, four board foot plants, two
 
 `scripts/build_release_images.py` now implements the configured 2048-master to 1024-marketplace pipeline. It validates PNG dimensions, fixed token assignments, matching genesis-metadata image filenames, and unique byte hashes at both sizes. The resulting manifest binds each token to its assignment hash, genesis metadata hash, master hash, optimized image hash, rig schema, presentation pose, and contact-solver adjustment.
 
-A superseding detail-v2 true-size rehearsal rendered Surfing #0001 (`Beach Plant`), Motocross #0022 (`Bike Beside`), and Skiing #0042 (`Skis Shouldered`) at 2048x2048 with `sculpt-material-detail-v2` and named pose mechanics, then generated their 1024x1024 marketplace files with deterministic LANCZOS resampling. Both batches pass format, uniqueness, and perceptual validation: the masters have minimum perceptual distance 61 and the marketplace images 60 against the required 12. The release manifest proves each named assigned pose, its family, pose-mechanics version, v2 contact solver, source object, contact role, and detail-system version. The three saved scenes also pass rig validation with zero measured contact error and at least 17 deformable meshes each. The manifest uses repository-relative source paths and intentionally preserves the current `REPLACE_IMAGE_CID` URI, proving the launch remains gated.
+A superseding silhouette-v3 true-size rehearsal rendered tokens #0001 through #0004 at 2048x2048, covering Lean, Athletic, Power, and Compact builds with `sculpt-material-detail-v2` and named pose mechanics, then generated their 1024x1024 marketplace files with deterministic LANCZOS resampling. Both batches pass format, uniqueness, and perceptual validation: the masters have minimum perceptual distance 62 and the marketplace images 63 against the required 12. The release manifest proves each body build, assigned pose, motion family, pose-mechanics version, v2 contact solver, contact role, and detail-system version. All four saved scenes pass rig validation with zero measured contact error and at least 17 deformable meshes each. The manifest uses repository-relative source paths and intentionally preserves the current `REPLACE_IMAGE_CID` URI, proving the launch remains gated.
 
-Review `art/approval/release-rehearsal-v33.png`, `reports/release-rehearsal-v33.json`, and `reports/release-rehearsal-v33-rig-validation.json`. The rehearsal does not populate production `masters/` or `images/`, and it does not unlock the website.
+Review `art/approval/release-rehearsal-v36.png`, `reports/release-rehearsal-v36.json`, and `reports/release-rehearsal-v36-rig-validation.json`. The rehearsal does not populate production `masters/` or `images/`, and it does not unlock the website.
 
 ## Sculpt and material detail v2 checkpoint
 
@@ -124,3 +125,11 @@ The authoritative one-per-species proof is `art/approval/cast-detail-v2.png`. Au
 - equipment fully framed, with normalized extents left 0.2280, right 0.8773, bottom 0.0284, and top 0.6285.
 
 Review the machine-readable results at `reports/cast-detail-v2-image-validation.json` and `reports/cast-detail-v2-rig-validation.json`. The storefront remains gated and the production `masters/` and `images/` folders remain empty pending visual approval and a superseding full stress run.
+
+## Body-build and human-profile silhouette v3 checkpoint
+
+`Body Build` is now an immutable, marketplace-visible genesis trait. Lean, Athletic, Power, and Compact each occur exactly 250 times. The renderer applies separate torso width/depth, arm mass, and leg mass profiles while preserving the same 22-bone game contract. Garment-specific cut multipliers further distinguish fitted rash guards and wetsuits from oversized tees, shells, armor, and puffer vests. Saved scenes record `silhouette_system: body-build-silhouette-v3`, and rig validation rejects older scenes as current output.
+
+The first four fixed tokens provide one proof of each build at `art/approval/body-build-v34.png`. All four 1024 renders are unique with minimum perceptual distance 60, and all four saved scenes validate with zero equipment-contact error and at least 17 deformable meshes.
+
+Human metadata no longer points five labels at one head. Angular, Round, Long, Square, and Heart now drive five authored jaw/cranium ring profiles and proportion sets inside the shared head topology. The one-per-profile proof at `art/approval/human-archetypes-v35.png` validates 5/5 unique images with minimum perceptual distance 41; all five saved scenes pass the rig and contact checks. These are rig-ready modular sculpts, not a claim that production skin weighting and gameplay animations are finished.

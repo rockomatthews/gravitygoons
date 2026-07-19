@@ -1,0 +1,171 @@
+{
+  "valid": true,
+  "blend_files": 5,
+  "valid_files": 5,
+  "failures": [],
+  "disciplines": [
+    "BMX",
+    "Motocross",
+    "Skiing"
+  ],
+  "presentation_poses": [
+    "Bars Turned",
+    "Gate Ready",
+    "Pedal Ready",
+    "Pole Plant"
+  ],
+  "pose_families": [
+    "Callout",
+    "Charge"
+  ],
+  "max_contact_distance": 0.0,
+  "minimum_deformable_meshes": 17,
+  "equipment_frame_extents": {
+    "left": 0.3766,
+    "right": 0.9079,
+    "bottom": 0.0615,
+    "top": 0.6285
+  },
+  "results": [
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 82,
+      "equipment_modules": 4,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.6531,
+        "right": 0.8118,
+        "bottom": 0.1459,
+        "top": 0.619
+      },
+      "token_id": 41,
+      "discipline": "Skiing",
+      "presentation_pose": "Pole Plant",
+      "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Lean",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 93,
+      "equipment_modules": 12,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.4676,
+        "right": 0.9079,
+        "bottom": 0.0869,
+        "top": 0.528
+      },
+      "token_id": 149,
+      "discipline": "Motocross",
+      "presentation_pose": "Bars Turned",
+      "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Lean",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 92,
+      "equipment_modules": 14,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Foot 1",
+      "equipment_contact_role": "primary-pedal-boot-v1",
+      "equipment_camera_bounds": {
+        "left": 0.3819,
+        "right": 0.825,
+        "bottom": 0.0706,
+        "top": 0.5237
+      },
+      "token_id": 152,
+      "discipline": "Motocross",
+      "presentation_pose": "Gate Ready",
+      "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Compact",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 80,
+      "equipment_modules": 4,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.6611,
+        "right": 0.8197,
+        "bottom": 0.1554,
+        "top": 0.6285
+      },
+      "token_id": 234,
+      "discipline": "Skiing",
+      "presentation_pose": "Pole Plant",
+      "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Athletic",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 97,
+      "equipment_modules": 13,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Foot 1",
+      "equipment_contact_role": "primary-pedal-boot-v1",
+      "equipment_camera_bounds": {
+        "left": 0.3766,
+        "right": 0.7947,
+        "bottom": 0.0615,
+        "top": 0.5148
+      },
+      "token_id": 465,
+      "discipline": "BMX",
+      "presentation_pose": "Pedal Ready",
+      "pose_family": "Charge",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "body_build": "Lean",
+      "silhouette_system": "body-build-silhouette-v3",
+      "contact_solver": "body-source-assembly-translation-v2"
+    }
+  ]
+}

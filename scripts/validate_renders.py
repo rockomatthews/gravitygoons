@@ -41,6 +41,7 @@ def main() -> None:
     hashes: dict[str, list[int]] = {}
     disciplines: Counter[str] = Counter()
     species: Counter[str] = Counter()
+    body_builds: Counter[str] = Counter()
     visual_hashes: dict[int, int] = {}
 
     for path in files:
@@ -62,6 +63,8 @@ def main() -> None:
         hashes.setdefault(digest, []).append(token_id)
         disciplines[token["discipline"]] += 1
         species[token["species"]] += 1
+        if token.get("body_build"):
+            body_builds[token["body_build"]] += 1
 
     duplicates = [ids for ids in hashes.values() if len(ids) > 1]
     if duplicates:
@@ -92,6 +95,7 @@ def main() -> None:
         "resolution": options.resolution,
         "disciplines": dict(sorted(disciplines.items())),
         "species": dict(sorted(species.items())),
+        "body_builds": dict(sorted(body_builds.items())),
         "perceptual_hash_bits": 256,
         "required_minimum_perceptual_distance": options.min_perceptual_distance,
         "minimum_perceptual_distance": closest_pairs[0]["distance"] if closest_pairs else None,

@@ -12,6 +12,7 @@ type Token = {
   name: string;
   cast: string;
   species: string;
+  body_build: string;
   discipline: string;
   rarity: string;
   expression: string;
@@ -30,6 +31,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const { connect, message: walletMessage } = useWallet();
   const [discipline, setDiscipline] = useState("All");
   const [cast, setCast] = useState("All");
+  const [bodyBuild, setBodyBuild] = useState("All");
   const [rarity, setRarity] = useState("All");
   const [brand, setBrand] = useState("All");
   const [playStyle, setPlayStyle] = useState("All");
@@ -72,15 +74,16 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   }, [refreshAvailability]);
 
   const filtered = useMemo(() => tokens.filter((token) => {
-    const search = `${token.name} ${token.species} ${token.discipline} ${token.parody_brand} ${token.play_style}`.toLowerCase();
+    const search = `${token.name} ${token.species} ${token.body_build} ${token.discipline} ${token.parody_brand} ${token.play_style}`.toLowerCase();
     return (discipline === "All" || token.discipline === discipline)
       && (cast === "All" || token.cast === cast)
+      && (bodyBuild === "All" || token.body_build === bodyBuild)
       && (rarity === "All" || token.rarity === rarity)
       && (brand === "All" || token.parody_brand === brand)
       && (playStyle === "All" || token.play_style === playStyle)
       && (availabilityFilter === "All" || (availabilityFilter === "Available" ? availableIds?.has(token.token_id) !== false : availableIds?.has(token.token_id) === false))
       && search.includes(query.toLowerCase());
-  }), [tokens, discipline, cast, rarity, brand, playStyle, availabilityFilter, availableIds, query]);
+  }), [tokens, discipline, cast, bodyBuild, rarity, brand, playStyle, availabilityFilter, availableIds, query]);
   const brands = useMemo(() => ["All", ...Array.from(new Set(tokens.map((token) => token.parody_brand))).sort()], [tokens]);
   const visible = filtered.slice(0, page * PAGE_SIZE);
 
@@ -128,6 +131,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
         <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Search token, species, sport…" />
         <select value={discipline} onChange={(event) => { setDiscipline(event.target.value); setPage(1); }}>{disciplines.map((item) => <option key={item}>{item}</option>)}</select>
         <select value={cast} onChange={(event) => { setCast(event.target.value); setPage(1); }}>{["All", "Animal", "Human"].map((item) => <option key={item}>{item}</option>)}</select>
+        <select value={bodyBuild} onChange={(event) => { setBodyBuild(event.target.value); setPage(1); }}>{["All", "Lean", "Athletic", "Power", "Compact"].map((item) => <option key={item}>{item}</option>)}</select>
         <select value={rarity} onChange={(event) => { setRarity(event.target.value); setPage(1); }}>{["All", "Common", "Uncommon", "Rare", "Epic", "Legendary"].map((item) => <option key={item}>{item}</option>)}</select>
         <select value={brand} onChange={(event) => { setBrand(event.target.value); setPage(1); }}>{brands.map((item) => <option key={item}>{item}</option>)}</select>
         <select value={playStyle} onChange={(event) => { setPlayStyle(event.target.value); setPage(1); }}>{["All", "Speed", "Air", "Control", "Style", "Toughness"].map((item) => <option key={item}>{item}</option>)}</select>
@@ -148,7 +152,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
               </button>
               <div className="card-copy">
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>
-                <h3>{token.species}</h3>
+                <h3>{token.species} · {token.body_build}</h3>
                 <p className="card-brand">{token.parody_brand} · {token.sport_equipment}</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
               </div>

@@ -22,12 +22,13 @@ Ready now:
 - contract tests for minting, reserves, wallet limits, transfers, and progression safety;
 - Next.js gallery, token detail pages, owner controls, dynamic metadata API, and demo EIP-712 signer;
 - Supabase progression migration, RLS, public read policies, and starter trick catalog;
-- deterministic Blender 5.2 LTS collection renderer with a locked 22-bone rig, shared weightable torso/limb topology, visible modular traits, and automated coverage selection.
+- deterministic Blender 4.5.1 LTS collection renderer with a locked 22-bone rig, shared weightable torso/limb topology, visible modular traits, and automated coverage selection;
+- four explicit body-build silhouettes and five authored human face profiles, all carried into genesis metadata and saved rig-ready scenes.
 
 Still gated:
 
 - approve a discipline-specific posed character system at final marketplace quality;
-- render the 50-character stress test, then all 1,000 final images;
+- rerender the 50-character stress test on the current silhouette system, then render all 1,000 final images only after visual approval;
 - replace IPFS and owned-domain placeholders;
 - link a real Supabase project and deploy contracts only after final assets and endpoint are permanent.
 

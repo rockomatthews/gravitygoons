@@ -141,6 +141,7 @@ def build_assignments(config: dict) -> list[dict]:
                 "cast": cast,
                 "species": species,
                 "archetype": archetype,
+                "body_build": config["body_builds"][(token_id - 1) % len(config["body_builds"])],
                 "complexion": complexion,
                 "discipline": discipline,
                 "stance": rng.choice(["Regular", "Goofy"]),
@@ -182,6 +183,7 @@ def metadata_for(item: dict, config: dict) -> dict:
         {"trait_type": "Cast", "value": item["cast"]},
         {"trait_type": "Species", "value": item["species"]},
         {"trait_type": "Archetype", "value": item["archetype"]},
+        {"trait_type": "Body Build", "value": item["body_build"]},
         {"trait_type": "Complexion", "value": item["complexion"]},
         {"trait_type": "Discipline", "value": item["discipline"]},
         {"trait_type": "Stance", "value": item["stance"]},
@@ -232,6 +234,7 @@ def validate(assignments: list[dict], config: dict) -> dict:
     discipline = Counter(item["discipline"] for item in assignments)
     brands = Counter(item["parody_brand"] for item in assignments)
     equipment = Counter(item["sport_equipment"] for item in assignments)
+    body_builds = Counter(item["body_build"] for item in assignments)
     signatures = {assignment_signature(item) for item in assignments}
     errors: list[str] = []
     if len(assignments) != config["supply"]:
@@ -244,6 +247,8 @@ def validate(assignments: list[dict], config: dict) -> dict:
         errors.append("Duplicate assignment signatures")
     if set(brands) != set(config["parody_brands"]):
         errors.append("Not every parody brand appears in the collection")
+    if set(body_builds) != set(config["body_builds"]):
+        errors.append("Not every body build appears in the collection")
     for item in assignments:
         values = list(item["stats"].values())
         if sum(values) != 30 or min(values) < 4 or max(values) > 8:
@@ -265,6 +270,7 @@ def validate(assignments: list[dict], config: dict) -> dict:
         "disciplines": dict(discipline),
         "parody_brands": dict(brands),
         "sport_equipment": dict(equipment),
+        "body_builds": dict(body_builds),
         "stat_rule": "Each token totals 30; every stat is between 4 and 8.",
         "sport_compatibility": "Every pose, top, bottom, footwear item, and equipment prop matches its discipline.",
     }

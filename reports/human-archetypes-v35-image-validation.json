@@ -1,0 +1,95 @@
+{
+  "valid": true,
+  "errors": [],
+  "images": 5,
+  "unique_hashes": 5,
+  "resolution": 1024,
+  "disciplines": {
+    "BMX": 1,
+    "Motocross": 2,
+    "Skiing": 2
+  },
+  "species": {
+    "Human": 5
+  },
+  "body_builds": {
+    "Athletic": 1,
+    "Compact": 1,
+    "Lean": 3
+  },
+  "perceptual_hash_bits": 256,
+  "required_minimum_perceptual_distance": 12,
+  "minimum_perceptual_distance": 41,
+  "closest_visual_pairs": [
+    {
+      "distance": 41,
+      "tokens": [
+        152,
+        465
+      ]
+    },
+    {
+      "distance": 45,
+      "tokens": [
+        41,
+        234
+      ]
+    },
+    {
+      "distance": 50,
+      "tokens": [
+        149,
+        465
+      ]
+    },
+    {
+      "distance": 50,
+      "tokens": [
+        234,
+        465
+      ]
+    },
+    {
+      "distance": 57,
+      "tokens": [
+        41,
+        465
+      ]
+    },
+    {
+      "distance": 57,
+      "tokens": [
+        149,
+        152
+      ]
+    },
+    {
+      "distance": 59,
+      "tokens": [
+        152,
+        234
+      ]
+    },
+    {
+      "distance": 60,
+      "tokens": [
+        41,
+        152
+      ]
+    },
+    {
+      "distance": 66,
+      "tokens": [
+        149,
+        234
+      ]
+    },
+    {
+      "distance": 73,
+      "tokens": [
+        41,
+        149
+      ]
+    }
+  ]
+}

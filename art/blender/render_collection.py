@@ -77,6 +77,12 @@ RARITY_COLORS = {
     "Legendary": (1.00, 0.62, 0.03, 1),
 }
 POSE_FAMILIES = json.loads((ROOT / "config" / "pose-families.json").read_text())
+BODY_BUILD_PROFILES = {
+    "Lean": {"torso": 0.90, "depth": 0.88, "arms": 0.84, "legs": 0.88},
+    "Athletic": {"torso": 1.00, "depth": 1.00, "arms": 1.00, "legs": 1.00},
+    "Power": {"torso": 1.14, "depth": 1.10, "arms": 1.15, "legs": 1.12},
+    "Compact": {"torso": 0.96, "depth": 1.06, "arms": 1.08, "legs": 1.10},
+}
 
 
 def cli() -> argparse.Namespace:
@@ -124,16 +130,27 @@ def add_contact_target(location, discipline, maximum_distance=0.42, source_objec
     return target
 
 
-def add_tapered_torso(name, broad, apparel, material):
+def add_tapered_torso(name, broad, apparel, body_build, material):
     """Authored shared torso topology with stable rings for later skin weighting."""
     segments = 24
-    bulk = 1.12 if apparel in {"Puffer Vest", "Shell Jacket", "Armored Jersey"} else 1.0
+    profile = BODY_BUILD_PROFILES[body_build]
+    garment_bulk = {
+        "Puffer Vest": 1.18,
+        "Shell Jacket": 1.10,
+        "Armored Jersey": 1.12,
+        "Oversized Tee": 1.08,
+        "Short-Sleeve Wetsuit": 0.94,
+        "Rash Guard": 0.96,
+        "Tank Top": 0.97,
+    }.get(apparel, 1.0)
+    width = profile["torso"]
+    depth = profile["depth"]
     rings = [
-        (-1.02, 0.88 * broad, 0.48),
-        (-0.42, 1.02 * broad, 0.58),
-        (0.36, 1.28 * broad * bulk, 0.66 * bulk),
-        (1.10, 1.43 * broad * bulk, 0.70 * bulk),
-        (1.45, 1.02 * broad, 0.57),
+        (-1.02, 0.88 * broad * width, 0.48 * depth),
+        (-0.42, 1.02 * broad * width, 0.58 * depth),
+        (0.36, 1.28 * broad * width * garment_bulk, 0.66 * depth * garment_bulk),
+        (1.10, 1.43 * broad * width * garment_bulk, 0.70 * depth * garment_bulk),
+        (1.45, 1.02 * broad * width, 0.57 * depth),
     ]
     vertices = []
     for z, radius_x, radius_y in rings:
@@ -249,11 +266,15 @@ def add_micro_surface(material, scale, detail, strength, distance=0.08):
     return material
 
 
-def add_authored_head(name, location, scale, species, material):
+def add_authored_head(name, location, scale, species, material, archetype=None):
     """Collection head topology with species-tuned jaw, brow, and cranium rings."""
     segments = 32
     profiles = {
-        "Human": (0.46, 0.72, 0.95, 1.00, 0.82, 0.38),
+        "Angular": (0.38, 0.64, 0.90, 1.00, 0.80, 0.34),
+        "Round": (0.58, 0.84, 1.02, 1.04, 0.88, 0.44),
+        "Long": (0.42, 0.66, 0.90, 0.98, 0.78, 0.34),
+        "Square": (0.62, 0.86, 1.02, 1.02, 0.82, 0.38),
+        "Heart": (0.38, 0.66, 0.96, 1.06, 0.90, 0.40),
         "Snow Leopard": (0.52, 0.80, 1.05, 1.03, 0.83, 0.36),
         "Hyena": (0.48, 0.76, 0.96, 1.02, 0.86, 0.38),
         "Fox": (0.40, 0.70, 0.92, 1.00, 0.84, 0.36),
@@ -264,7 +285,8 @@ def add_authored_head(name, location, scale, species, material):
         "Gorilla": (0.68, 0.94, 1.12, 1.10, 0.88, 0.40),
     }
     ring_heights = (-1.0, -0.72, -0.24, 0.30, 0.72, 1.0)
-    radii = profiles[species]
+    cast_profile = archetype if species == "Human" else species
+    radii = profiles[cast_profile]
     vertices = []
     for ring_index, (z_factor, radius) in enumerate(zip(ring_heights, radii)):
         for index in range(segments):
@@ -296,7 +318,7 @@ def add_authored_head(name, location, scale, species, material):
     for polygon in mesh.polygons:
         polygon.use_smooth = True
     obj["topology_role"] = "authored-head-sculpt-v1"
-    obj["cast_profile"] = species
+    obj["cast_profile"] = cast_profile
     return obj
 
 
@@ -338,10 +360,17 @@ def face(token, mats):
     light = mats["body_light"]
     ink = mats["ink"]
     species = token["species"]
-    head_scale = (1.05, 0.82, 1.08) if species == "Human" else (1.18, 0.88, 1.10)
+    human_scales = {
+        "Angular": (1.02, 0.79, 1.08),
+        "Round": (1.10, 0.86, 1.00),
+        "Long": (0.97, 0.80, 1.18),
+        "Square": (1.11, 0.82, 1.05),
+        "Heart": (1.08, 0.82, 1.08),
+    }
+    head_scale = human_scales[token["archetype"]] if species == "Human" else (1.18, 0.88, 1.10)
     if species == "Gorilla": head_scale = (1.27, 0.92, 1.08)
     if species == "Shark": head_scale = (1.10, 1.12, 1.00)
-    add_authored_head("Head", (0, -0.04, 2.62), head_scale, species, body)
+    add_authored_head("Head", (0, -0.04, 2.62), head_scale, species, body, token.get("archetype"))
 
     if species in {"Snow Leopard", "Hyena", "Fox", "Raccoon"}:
         ear_scale = {
@@ -581,16 +610,21 @@ def accessory(token, mats):
 
 
 def body(token, mats):
-    broad = 1.20 if token["species"] in {"Gorilla", "Boar", "Ram"} else 1.0
-    add_tapered_torso("Torso", broad, token["apparel"], mats["garment"])
+    build = token["body_build"]
+    profile = BODY_BUILD_PROFILES[build]
+    species_broad = 1.20 if token["species"] in {"Gorilla", "Boar", "Ram"} else 1.0
+    broad = species_broad * profile["torso"]
+    arm_scale = profile["arms"]
+    leg_scale = profile["legs"]
+    add_tapered_torso("Torso", species_broad, token["apparel"], build, mats["garment"])
     sleeveless = token["apparel"] in {"Tank Top", "Puffer Vest"}
     arm_mat = mats["body"] if sleeveless else mats["garment"]
     for side in (-1, 1):
-        add_weightable_limb(f"Upper Arm {side}", (side * 1.45 * broad, 0, 0.20), (0.42 * broad, 0.42, 0.86), arm_mat)
-        add_weightable_limb(f"Forearm {side}", (side * 1.62 * broad, -0.10, -0.64), (0.35, 0.35, 0.75), mats["body"])
+        add_weightable_limb(f"Upper Arm {side}", (side * 1.45 * broad, 0, 0.20), (0.42 * species_broad * arm_scale, 0.42 * arm_scale, 0.86), arm_mat)
+        add_weightable_limb(f"Forearm {side}", (side * 1.62 * broad, -0.10, -0.64), (0.35 * arm_scale, 0.35 * arm_scale, 0.75), mats["body"])
         suffix = "L" if side < 0 else "R"
-        add_weighted_joint(f"Shoulder Joint {side}", (side * 1.34 * broad, 0, 0.91), (0.43, 0.42, 0.43), arm_mat, "chest", f"upper_arm.{suffix}")
-        add_weighted_joint(f"Elbow Joint {side}", (side * 1.56 * broad, -0.07, -0.31), (0.36, 0.35, 0.36), mats["body"], f"upper_arm.{suffix}", f"forearm.{suffix}")
+        add_weighted_joint(f"Shoulder Joint {side}", (side * 1.34 * broad, 0, 0.91), (0.43 * arm_scale, 0.42 * arm_scale, 0.43 * arm_scale), arm_mat, "chest", f"upper_arm.{suffix}")
+        add_weighted_joint(f"Elbow Joint {side}", (side * 1.56 * broad, -0.07, -0.31), (0.36 * arm_scale, 0.35 * arm_scale, 0.36 * arm_scale), mats["body"], f"upper_arm.{suffix}", f"forearm.{suffix}")
         add_gloved_hand(side, (side * 1.68 * broad, -0.25, -1.18), mats)
         add_torus(f"Glove Cuff {side}", (side * 1.66 * broad, -0.16, -0.94), 0.27, 0.065, mats["accent"], rotation=(0, math.pi / 2, 0))
         for knuckle in (-0.13, 0.0, 0.13):
@@ -620,12 +654,12 @@ def body(token, mats):
     for side in (-1, 1):
         x = side * 0.62 * broad
         leg_shift = 0.10 * stance * side
-        add_weightable_limb(f"Thigh {side}", (x + leg_shift, 0.02, -1.95), (0.52 * broad, 0.49, 0.85), pants_mat)
+        add_weightable_limb(f"Thigh {side}", (x + leg_shift, 0.02, -1.95), (0.52 * species_broad * leg_scale, 0.49 * leg_scale, 0.85), pants_mat)
         shin_mat = mats["body"] if shorts else pants_mat
-        add_weightable_limb(f"Shin {side}", (x - leg_shift, -0.02, -2.94), (0.42, 0.42, 0.80), shin_mat)
+        add_weightable_limb(f"Shin {side}", (x - leg_shift, -0.02, -2.94), (0.42 * leg_scale, 0.42 * leg_scale, 0.80), shin_mat)
         suffix = "L" if side < 0 else "R"
-        add_weighted_joint(f"Hip Joint {side}", (x + leg_shift * 0.5, 0.01, -1.43), (0.50, 0.47, 0.42), pants_mat, "pelvis", f"thigh.{suffix}")
-        add_weighted_joint(f"Knee Joint {side}", (x - leg_shift * 0.5, -0.01, -2.47), (0.43, 0.41, 0.38), shin_mat, f"thigh.{suffix}", f"shin.{suffix}")
+        add_weighted_joint(f"Hip Joint {side}", (x + leg_shift * 0.5, 0.01, -1.43), (0.50 * leg_scale, 0.47 * leg_scale, 0.42), pants_mat, "pelvis", f"thigh.{suffix}")
+        add_weighted_joint(f"Knee Joint {side}", (x - leg_shift * 0.5, -0.01, -2.47), (0.43 * leg_scale, 0.41 * leg_scale, 0.38), shin_mat, f"thigh.{suffix}", f"shin.{suffix}")
         if shorts:
             add_torus(f"Short cuff {side}", (x + leg_shift, 0.02, -2.37), 0.46, 0.065, mats["accent"], rotation=(0, 0, 0))
         if bottom in {"Cargo Pants", "Cargo Shorts"}:
@@ -821,6 +855,8 @@ def create_shared_rig(token):
     rig["rig_schema_file"] = "traits/rig-schema.json"
     rig["token_id"] = token["token_id"]
     rig["discipline"] = token["discipline"]
+    rig["body_build"] = token["body_build"]
+    rig["silhouette_system"] = "body-build-silhouette-v3"
     return rig
 
 
@@ -1126,6 +1162,7 @@ def main():
             "token_id": token["token_id"], "file": output.name,
             "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
             "species": token["species"], "discipline": token["discipline"],
+            "body_build": token["body_build"],
             "brand": token["parody_brand"], "rarity": token["rarity"],
             "resolution": options.resolution,
             "rig_schema": "gravity-goons-rig-v1",
@@ -1134,6 +1171,7 @@ def main():
             "pose_family": bpy.data.objects["GravityGoons_Rig"].get("pose_family"),
             "pose_mechanics": bpy.data.objects["GravityGoons_Rig"].get("pose_mechanics"),
             "visual_detail_system": bpy.data.objects["GravityGoons_Rig"].get("visual_detail_system"),
+            "silhouette_system": bpy.data.objects["GravityGoons_Rig"].get("silhouette_system"),
             "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
             "equipment_contact_source": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_source"),
             "equipment_contact_role": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_role"),
