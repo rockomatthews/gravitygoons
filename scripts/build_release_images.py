@@ -45,9 +45,19 @@ def main() -> None:
         raise SystemExit(f"Expected {options.expected} masters, found {len(master_files)}")
 
     options.output_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = options.output_dir / "release-manifest.json"
+    prior_records = {}
+    if manifest_path.exists() and options.overwrite:
+        try:
+            prior_payload = json.loads(manifest_path.read_text())
+            prior_records = {record["token_id"]: record for record in prior_payload.get("records", [])}
+        except (json.JSONDecodeError, OSError, KeyError):
+            prior_records = {}
     records = []
     master_hashes = set()
     image_hashes = set()
+    reused = 0
+    rebuilt = 0
     for master_path in master_files:
         token_id = int(master_path.stem)
         token = tokens.get(token_id)
@@ -62,13 +72,29 @@ def main() -> None:
             raise SystemExit(f"Metadata image mismatch for token {token_id}: {metadata.get('image')}")
         if output_path.exists() and not options.overwrite:
             raise SystemExit(f"Refusing to overwrite {output_path}; pass --overwrite")
+        master_digest = file_hash(master_path)
+        metadata_digest = file_hash(metadata_path)
+        assignment_digest = token_signature(token)
         with Image.open(master_path) as master:
             if master.format != "PNG" or master.size != (master_size, master_size):
                 raise SystemExit(f"Invalid master {master_path.name}: {master.format} {master.size}")
-            master_rgb = master.convert("RGB")
-            marketplace = master_rgb.resize((marketplace_size, marketplace_size), Image.Resampling.LANCZOS)
-            marketplace.save(output_path, format="PNG", optimize=True, compress_level=9)
-        master_digest = file_hash(master_path)
+            prior = prior_records.get(token_id)
+            can_reuse = bool(
+                output_path.exists()
+                and prior
+                and prior.get("master_sha256") == master_digest
+                and prior.get("assignment_sha256") == assignment_digest
+                and prior.get("genesis_metadata_sha256") == metadata_digest
+                and prior.get("marketplace_size") == [marketplace_size, marketplace_size]
+                and prior.get("marketplace_sha256") == file_hash(output_path)
+            )
+            if can_reuse:
+                reused += 1
+            else:
+                master_rgb = master.convert("RGB")
+                marketplace = master_rgb.resize((marketplace_size, marketplace_size), Image.Resampling.LANCZOS)
+                marketplace.save(output_path, format="PNG", optimize=True, compress_level=9)
+                rebuilt += 1
         image_digest = file_hash(output_path)
         if master_digest in master_hashes:
             raise SystemExit(f"Duplicate master bytes at token {token_id}")
@@ -87,9 +113,9 @@ def main() -> None:
             "marketplace_file": output_path.name,
             "marketplace_size": [marketplace_size, marketplace_size],
             "marketplace_sha256": image_digest,
-            "assignment_sha256": token_signature(token),
+            "assignment_sha256": assignment_digest,
             "genesis_metadata_file": metadata_path.name,
-            "genesis_metadata_sha256": file_hash(metadata_path),
+            "genesis_metadata_sha256": metadata_digest,
             "metadata_image_uri": metadata["image"],
             "discipline": token["discipline"],
             "species": token["species"],
@@ -117,9 +143,10 @@ def main() -> None:
         "images": len(records),
         "unique_master_hashes": len(master_hashes),
         "unique_marketplace_hashes": len(image_hashes),
+        "reused_marketplace_images": reused,
+        "rebuilt_marketplace_images": rebuilt,
         "records": records,
     }
-    manifest_path = options.output_dir / "release-manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
     if options.manifest_output:
         options.manifest_output.parent.mkdir(parents=True, exist_ok=True)

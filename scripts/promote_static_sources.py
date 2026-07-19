@@ -57,21 +57,41 @@ def main() -> None:
     source_hashes: set[str] = set()
     master_hashes: set[str] = set()
     records = []
+    reused = 0
+    rebuilt = 0
 
     for token_id, source_path in sorted(sources.items()):
         output_path = options.output_dir / f"{token_id:04d}.png"
         record_path = manifest_dir / f"{token_id:04d}.json"
         if (output_path.exists() or record_path.exists()) and not options.overwrite:
             raise SystemExit(f"Refusing to overwrite token {token_id}; pass --overwrite")
+        source_digest = file_hash(source_path)
+        assignment_digest = token_hash(tokens[token_id])
         with Image.open(source_path) as source:
             if source.format != "PNG" or source.width != source.height or source.width < 1024:
                 raise SystemExit(f"Invalid source {source_path}: {source.format} {source.size}")
             source_size = list(source.size)
-            master = source.convert("RGB").resize(
-                (master_size, master_size), Image.Resampling.LANCZOS
+            prior = None
+            if output_path.exists() and record_path.exists() and options.overwrite:
+                try:
+                    prior = json.loads(record_path.read_text())
+                except (json.JSONDecodeError, OSError):
+                    prior = None
+            can_reuse = bool(
+                prior
+                and prior.get("source_sha256") == source_digest
+                and prior.get("assignment_sha256") == assignment_digest
+                and prior.get("master_size") == [master_size, master_size]
+                and prior.get("master_sha256") == file_hash(output_path)
             )
-            master.save(output_path, format="PNG", optimize=True, compress_level=9)
-        source_digest = file_hash(source_path)
+            if can_reuse:
+                reused += 1
+            else:
+                master = source.convert("RGB").resize(
+                    (master_size, master_size), Image.Resampling.LANCZOS
+                )
+                master.save(output_path, format="PNG", optimize=True, compress_level=9)
+                rebuilt += 1
         master_digest = file_hash(output_path)
         if source_digest in source_hashes:
             raise SystemExit(f"Duplicate source bytes at token {token_id}")
@@ -94,7 +114,7 @@ def main() -> None:
             "master_file": output_path.name,
             "master_size": [master_size, master_size],
             "master_sha256": master_digest,
-            "assignment_sha256": token_hash(tokens[token_id]),
+            "assignment_sha256": assignment_digest,
             "promotion_resampling": "Pillow LANCZOS",
         }
         record_path.write_text(json.dumps(record, indent=2) + "\n")
@@ -108,6 +128,8 @@ def main() -> None:
         "sources": len(records),
         "unique_source_hashes": len(source_hashes),
         "unique_master_hashes": len(master_hashes),
+        "reused_masters": reused,
+        "rebuilt_masters": rebuilt,
         "records": records,
     }
     (options.output_dir / "promotion-manifest.json").write_text(
