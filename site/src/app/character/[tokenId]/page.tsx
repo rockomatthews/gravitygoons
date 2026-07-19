@@ -20,7 +20,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ toke
           <div className="large-stats">{Object.entries(token.stats).map(([name, value]) => <div key={name}><span>{name}</span><b>{value}</b><i style={{ width: `${value * 10}%` }} /></div>)}</div>
           <h2>Genesis traits</h2>
           <dl>{["cast", "species", "archetype", "complexion", "parody_brand", "headwear", "eyewear", "apparel", "bottom", "footwear", "sport_equipment", "pose", "play_style", "accessory", "background"].map((key) => <div key={key}><dt>{key.replaceAll("_", " ")}</dt><dd>{String(token[key as keyof typeof token])}</dd></div>)}</dl>
-          <div className="progress-preview"><span>FUTURE PROGRESSION</span><b>LEVEL 1 · 0 XP · 0/64 TRICKS</b></div>
+          <div className="progress-preview"><span>FUTURE BATTLE PROFILE · {token.discipline}</span><b>LEVEL 1 · 0 XP · 0/64 TRICKS</b></div>
         </div>
       </div>
     </main>

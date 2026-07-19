@@ -2,6 +2,12 @@
 
 Immediate-reveal, exact-token action-sports NFTs with game-ready progression foundations.
 
+## First game concept
+
+The initial Gravity Goons game is planned as a blockchain-backed, turn-based trick battle inspired by the strategic structure of action-sports call-your-trick games. Matchups are discipline-locked: skateboarders face skateboarders, BMX riders face BMX riders, surfers face surfers, and so on.
+
+On each turn, a player chooses a discipline-specific trick. The Goon's five visible stats help produce a landing probability, creating a decision between consistent lower-risk moves and difficult high-impact attempts. The exact rules, probability formula, presentation, and game engine remain intentionally open for later design.
+
 Production website: `https://gravitygoons.com`
 
 ## Current milestone

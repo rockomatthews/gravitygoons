@@ -24,7 +24,7 @@ export default function Home() {
         <div className="hero-copy">
           <p className="eyebrow">1,000 FULL-BODY ATHLETES · BASE</p>
           <h1><span>BUILT TO</span><br />BREAK<br /><i>GRAVITY.</i></h1>
-          <p className="lede">Six sports. Twelve underground labels. Zero mystery. Choose the exact Goon you want and carry their tricks, XP, and permanent history into the future game.</p>
+          <p className="lede">Six disciplines. Zero mystery. Choose your exact Goon, face rivals in the same sport, and call your tricks. Their stats shape the odds—but deciding when to play safe or risk everything is up to you.</p>
           <div className="hero-actions"><a className="button primary" href="#collection">{collectionReady ? "Choose your Goon" : "Preview the Goons"}</a><span>{collectionReady ? "0.003 ETH · MAX 5" : "FINAL ART IN PROGRESS"}</span></div>
           <div className="launch-data"><div><b>1000</b><span>TOTAL GOONS</span></div><div><b>06</b><span>DISCIPLINES</span></div><div><b>64</b><span>TRICK SLOTS</span></div></div>
         </div>
@@ -59,11 +59,12 @@ export default function Home() {
       </section>
 
       <section className="game-section shell" id="progression">
-        <div><p className="eyebrow">GAME DNA FROM GENESIS</p><h2>Your Goon keeps learning.</h2></div>
+        <div><p className="eyebrow">THE FIRST GAME CONCEPT</p><h2>Call the trick.<br />Play the odds.</h2><p className="game-intro">Gravity Goons is planned as a blockchain-backed, turn-based trick battle. Skateboarders face skateboarders, BMX riders face BMX riders, and every other Goon competes within their own discipline. The exact rules, probability model, and game engine will be designed later.</p></div>
         <div className="game-grid">
-          <article><b>01</b><h3>Balanced loadouts</h3><p>Every Goon starts with exactly 30 points across Speed, Air, Control, Style, and Toughness. Rarity never buys an unfair statistical advantage.</p></article>
-          <article><b>02</b><h3>Discipline mastery</h3><p>Each sport reserves 64 permanent trick slots with versioned catalogs, prerequisites, XP rewards, and future animation identifiers.</p></article>
-          <article><b>03</b><h3>Progress travels</h3><p>Settled XP, levels, tricks, achievements, and history stay with the NFT when it moves to a new wallet.</p></article>
+          <article><b>01</b><h3>Match your discipline</h3><p>Skaters battle skaters. Surfers battle surfers. Each of the six sports gets its own trick catalog, matchup identity, and strategic rhythm.</p></article>
+          <article><b>02</b><h3>Choose the trick</h3><p>Call the move you want your Goon to attempt. Safer tricks can apply steady pressure; ambitious tricks can change the entire battle.</p></article>
+          <article><b>03</b><h3>Know your odds</h3><p>Every Goon starts with 30 stat points, and rarity adds no bonus. Speed, Air, Control, Style, and Toughness help determine a visible landing percentage.</p></article>
+          <article><b>04</b><h3>Progress travels</h3><p>Future XP, learned tricks, achievements, and battle history are designed to stay with the NFT—even when the Goon changes wallets.</p></article>
         </div>
       </section>
 
