@@ -10,4 +10,4 @@ contract/artifacts/
 contract/verification/
 site/.env.local
 contract/.env
-
+renders/

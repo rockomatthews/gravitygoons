@@ -63,6 +63,28 @@ blender --background --python art/blender/render_base_character.py -- \
 
 The script uses Eevee Next and creates full-body front, three-quarter, profile, and clay renders with branded apparel and visible skateboard equipment, plus an editable `.blend` file.
 
+## Render assignment-driven collection prototypes
+
+Render a resumable six-sport test batch with isolated Blender processes:
+
+```bash
+cd /Users/rob/Documents/Codex/gravity-goons
+.venv/bin/python scripts/render_collection.py \
+  --output-dir renders/six-sport-smoke \
+  --token-ids 1,2,3,6,7,14 \
+  --resolution 1024 \
+  --workers 2
+```
+
+Validate the images and build a review sheet:
+
+```bash
+.venv/bin/python scripts/validate_renders.py renders/six-sport-smoke --resolution 1024 --expected 6
+.venv/bin/python scripts/build_contact_sheet.py renders/six-sport-smoke art/approval/generator-six-sport-smoke.png
+```
+
+The assignment-driven pipeline is operational, but its current procedural meshes are an engineering prototype rather than approved final art. `reports/generator-status.md` tracks the visual gate that must be passed before rendering all 1,000 marketplace images.
+
 ## Contracts
 
 ```bash

@@ -18,8 +18,8 @@
     "render": {
       "master_size": 2048,
       "marketplace_size": 1024,
-      "engine": "BLENDER_EEVEE_NEXT",
-      "blender_version": "5.1.2"
+      "engine": "BLENDER_EEVEE",
+      "blender_version": "5.2.0 LTS"
     },
     "rarity_quotas": {
       "Common": 550,
