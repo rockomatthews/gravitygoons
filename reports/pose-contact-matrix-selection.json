@@ -1,0 +1,194 @@
+{
+  "algorithm": "discipline-pose-matrix-diverse-species-v1",
+  "token_ids": [
+    6,
+    10,
+    8,
+    15,
+    49,
+    38,
+    9,
+    1,
+    29,
+    3,
+    4,
+    5,
+    27,
+    22,
+    89,
+    42,
+    70,
+    182
+  ],
+  "cases": 18,
+  "disciplines": [
+    "Skateboarding",
+    "Snowboarding",
+    "Surfing",
+    "BMX",
+    "Motocross",
+    "Skiing"
+  ],
+  "poses": [
+    "Ready",
+    "Callout",
+    "Charge"
+  ],
+  "species_counts": {
+    "Boar": 2,
+    "Fox": 2,
+    "Gorilla": 2,
+    "Human": 2,
+    "Hyena": 2,
+    "Raccoon": 2,
+    "Ram": 2,
+    "Shark": 2,
+    "Snow Leopard": 2
+  },
+  "selection": [
+    {
+      "token_id": 6,
+      "discipline": "Skateboarding",
+      "presentation_pose": "Ready",
+      "species": "Human",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 10,
+      "discipline": "Skateboarding",
+      "presentation_pose": "Callout",
+      "species": "Snow Leopard",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 8,
+      "discipline": "Skateboarding",
+      "presentation_pose": "Charge",
+      "species": "Raccoon",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 15,
+      "discipline": "Snowboarding",
+      "presentation_pose": "Ready",
+      "species": "Ram",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 49,
+      "discipline": "Snowboarding",
+      "presentation_pose": "Callout",
+      "species": "Gorilla",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 38,
+      "discipline": "Snowboarding",
+      "presentation_pose": "Charge",
+      "species": "Boar",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 9,
+      "discipline": "Surfing",
+      "presentation_pose": "Ready",
+      "species": "Shark",
+      "stance": "Regular",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 1,
+      "discipline": "Surfing",
+      "presentation_pose": "Callout",
+      "species": "Hyena",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 29,
+      "discipline": "Surfing",
+      "presentation_pose": "Charge",
+      "species": "Fox",
+      "stance": "Regular",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 3,
+      "discipline": "BMX",
+      "presentation_pose": "Ready",
+      "species": "Raccoon",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 4,
+      "discipline": "BMX",
+      "presentation_pose": "Callout",
+      "species": "Hyena",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 5,
+      "discipline": "BMX",
+      "presentation_pose": "Charge",
+      "species": "Gorilla",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 27,
+      "discipline": "Motocross",
+      "presentation_pose": "Ready",
+      "species": "Human",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 22,
+      "discipline": "Motocross",
+      "presentation_pose": "Callout",
+      "species": "Ram",
+      "stance": "Regular",
+      "rarity": "Rare"
+    },
+    {
+      "token_id": 89,
+      "discipline": "Motocross",
+      "presentation_pose": "Charge",
+      "species": "Shark",
+      "stance": "Regular",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 42,
+      "discipline": "Skiing",
+      "presentation_pose": "Ready",
+      "species": "Snow Leopard",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 70,
+      "discipline": "Skiing",
+      "presentation_pose": "Callout",
+      "species": "Boar",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 182,
+      "discipline": "Skiing",
+      "presentation_pose": "Charge",
+      "species": "Fox",
+      "stance": "Regular",
+      "rarity": "Uncommon"
+    }
+  ]
+}

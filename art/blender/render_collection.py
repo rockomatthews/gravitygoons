@@ -111,6 +111,19 @@ def add_torus(name, location, major, minor, material, rotation=(math.pi / 2, 0, 
     return obj
 
 
+def add_contact_target(location, discipline, maximum_distance=0.42):
+    target = bpy.data.objects.new("Sport Contact R", None)
+    target.empty_display_type = "SPHERE"
+    target.empty_display_size = 0.10
+    target.location = location
+    target.hide_render = True
+    target["contact_role"] = "primary-right-hand-grip-v1"
+    target["discipline"] = discipline
+    target["maximum_distance"] = maximum_distance
+    bpy.context.collection.objects.link(target)
+    return target
+
+
 def add_tapered_torso(name, broad, apparel, material):
     """Authored shared torso topology with stable rings for later skin weighting."""
     segments = 24
@@ -580,7 +593,7 @@ def board(name, x, length, width, mats, surf=False):
 
 
 def bike(name, mats, moto=False):
-    x = 2.15
+    x = 1.92
     wheel_radius = 0.88 if not moto else 1.05
     for index, offset in enumerate((-0.95, 1.12)):
         add_torus(f"{name} wheel {index}", (x + offset, 0.05, -3.30), wheel_radius, 0.10 if not moto else 0.18, mats["rubber"])
@@ -590,12 +603,16 @@ def bike(name, mats, moto=False):
         add_cylinder("Moto engine", (x + 0.10, -0.02, -2.82), 0.48, 0.52, mats["metal"], rotation=(math.pi / 2, 0, 0))
         add_curve("Moto frame", [(x - 0.78, 0, -3.28), (x - 0.18, 0, -2.12), (x + 0.82, 0, -3.25)], 0.10, mats["accent"])
         add_curve("Moto fork", [(x + 0.84, -0.02, -3.20), (x + 0.48, -0.04, -1.78)], 0.085, mats["metal"])
-        add_curve("Moto handlebar", [(x + 0.22, -0.03, -1.72), (x + 0.94, -0.08, -1.62)], 0.060, mats["ink"])
+        add_curve("Moto handlebar", [(x + 0.48, -0.04, -1.78), (x + 0.18, -0.08, -1.42), (1.68, -0.12, -1.18)], 0.060, mats["ink"])
+        add_cylinder("Moto hand grip", (1.68, -0.12, -1.18), 0.10, 0.28, mats["rubber"], rotation=(0, math.pi / 2, 0), vertices=16)
+        add_contact_target((1.68, -0.12, -1.18), "Motocross")
         add_cube("Moto front fender", (x + 1.08, -0.08, -2.44), (0.70, 0.28, 0.10), mats["accent"], rotation=(0, -0.28, 0), bevel=0.12)
         add_cube("Moto seat", (x - 0.48, -0.04, -1.96), (0.58, 0.34, 0.13), mats["ink"], rotation=(0, 0.10, 0), bevel=0.10)
     else:
         add_curve("BMX frame", [(x - 0.92, 0, -3.30), (x - 0.18, 0, -2.28), (x + 0.86, 0, -3.30), (x - 0.92, 0, -3.30)], 0.075, mats["accent"])
-        add_curve("BMX bars", [(x - 0.18, 0, -2.28), (x + 0.02, 0, -1.62), (x + 0.55, 0, -1.62)], 0.055, mats["metal"])
+        add_curve("BMX bars", [(x - 0.18, 0, -2.28), (x + 0.02, 0, -1.62), (x - 0.02, -0.06, -1.38), (1.68, -0.12, -1.18)], 0.055, mats["metal"])
+        add_cylinder("BMX hand grip", (1.68, -0.12, -1.18), 0.09, 0.26, mats["rubber"], rotation=(0, math.pi / 2, 0), vertices=16)
+        add_contact_target((1.68, -0.12, -1.18), "BMX")
         add_curve("BMX fork", [(x + 0.86, 0, -3.30), (x + 0.02, 0, -1.62)], 0.055, mats["metal"])
         add_cube("BMX seat", (x - 0.50, -0.05, -2.14), (0.38, 0.25, 0.10), mats["ink"], rotation=(0, -0.12, 0), bevel=0.10)
         add_cylinder("BMX crank", (x - 0.08, -0.12, -2.78), 0.16, 0.10, mats["metal"], rotation=(math.pi / 2, 0, 0), vertices=20)
@@ -604,16 +621,23 @@ def bike(name, mats, moto=False):
 
 def equipment(token, mats):
     discipline = token["discipline"]
-    if discipline == "Skateboarding": board("Skateboard", 2.25, 1.55, 0.32, mats)
-    elif discipline == "Snowboarding": board("Snowboard", 2.25, 2.05, 0.42, mats)
-    elif discipline == "Surfing": board("Surfboard", 2.25, 2.65, 0.56, mats, surf=True)
+    if discipline == "Skateboarding":
+        board("Skateboard", 2.05, 1.55, 0.32, mats)
+        add_contact_target((1.73, -0.18, -1.18), discipline)
+    elif discipline == "Snowboarding":
+        board("Snowboard", 2.10, 2.05, 0.42, mats)
+        add_contact_target((1.68, -0.18, -1.18), discipline)
+    elif discipline == "Surfing":
+        board("Surfboard", 2.18, 2.65, 0.56, mats, surf=True)
+        add_contact_target((1.62, -0.18, -1.18), discipline)
     elif discipline == "BMX": bike("BMX", mats)
     elif discipline == "Motocross": bike("Motocross", mats, moto=True)
     elif discipline == "Skiing":
-        for index, x in enumerate((2.25, 2.72)):
+        for index, x in enumerate((2.16, 2.63)):
             add_cube(f"Ski {index}", (x, 0.05, -1.90), (0.15, 0.09, 2.38), mats["accent"], rotation=(0, 0.02, -0.05), bevel=0.16)
-        for index, x in enumerate((1.88, 3.12)):
+        for index, x in enumerate((1.72, 3.02)):
             add_cylinder(f"Pole {index}", (x, 0, -1.90), 0.035, 4.10, mats["metal"], rotation=(0.03, 0.08, -0.06), vertices=12)
+        add_contact_target((1.72, -0.12, -1.18), discipline)
 
 
 def species_extras(token, mats):
@@ -801,6 +825,30 @@ def apply_pose(token, rig):
         rig.pose.bones["thigh.R"].rotation_euler[1] += math.radians(-4 * stance)
 
 
+def solve_equipment_contact(rig):
+    """Move the complete prop assembly so its authored grip meets the posed right hand."""
+    target = bpy.data.objects.get("Sport Contact R")
+    hand = bpy.data.objects.get("Glove Palm 1")
+    if target is None or hand is None:
+        raise RuntimeError("Sport contact solver requires Sport Contact R and Glove Palm 1")
+    bpy.context.view_layer.update()
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    hand_location = hand.evaluated_get(depsgraph).matrix_world.translation.copy()
+    target_location = target.evaluated_get(depsgraph).matrix_world.translation.copy()
+    adjustment = hand_location - target_location
+    equipment_objects = [obj for obj in bpy.context.scene.objects if obj.parent == rig and obj.parent_bone == "equipment"]
+    if not equipment_objects:
+        raise RuntimeError("Sport contact solver found no equipment assembly")
+    for obj in equipment_objects:
+        matrix = obj.matrix_world.copy()
+        matrix.translation += adjustment
+        obj.matrix_world = matrix
+    target.location += adjustment
+    rig["equipment_contact_solver"] = "right-hand-assembly-translation-v1"
+    rig["equipment_contact_adjustment"] = tuple(round(value, 5) for value in adjustment)
+    bpy.context.view_layer.update()
+
+
 def configure_scene(resolution):
     scene = bpy.context.scene
     try: scene.render.engine = "BLENDER_EEVEE"
@@ -848,6 +896,7 @@ def build_scene(token, resolution):
     rig = create_shared_rig(token)
     attach_modules_to_rig(rig)
     apply_pose(token, rig)
+    solve_equipment_contact(rig)
     bpy.ops.object.camera_add(location=(5.8, -18.5, 0.8))
     camera = bpy.context.object
     camera.data.type = "ORTHO"
@@ -899,6 +948,8 @@ def main():
             "rig_schema": "gravity-goons-rig-v1",
             "rig_bones": len(bpy.data.objects["GravityGoons_Rig"].data.bones),
             "presentation_pose": bpy.data.objects["GravityGoons_Rig"].get("presentation_pose"),
+            "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
+            "equipment_contact_adjustment": list(bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_adjustment", ())),
         }
         (manifest_dir / f"{token['token_id']:04d}.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
     print(f"Rendered {len(selected)} requested tokens into {output_dir}")

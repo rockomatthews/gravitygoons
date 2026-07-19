@@ -80,3 +80,29 @@ The 50-token checkpoint proves batch stability and measurable variation, but it 
 Each token now deterministically receives one of three rig-driven presentation variants—`Ready`, `Callout`, or `Charge`—inside its discipline pose. The variant is stored on the armature and in each render manifest, adding stance variation without changing immutable gameplay traits or collection metadata.
 
 The BMX comparison at `art/approval/pose-variants-v15.png` validates three unique 768x768 images with a minimum perceptual distance of 50. The saved Charge-pose Gorilla passes the locked 22-bone schema, 17 deformable meshes, 67 attached modules, 10 BMX equipment modules, and zero errors.
+
+## Measured equipment-contact checkpoint
+
+Every discipline prop now defines a hidden primary right-hand grip target. After the discipline and presentation pose are applied, the generator evaluates the posed glove and translates the complete equipment assembly until that grip target meets the hand. The adjustment is recorded on the rig and in the render manifest.
+
+Rig validation now rejects missing contact targets, missing glove palms, excessive grip distance, and any equipment assembly extending outside the camera frame. The first unsolved six-sport test correctly rejected five sports, including a 1.202-unit Motocross gap; the solver then reduced all six to zero measured distance.
+
+The deterministic 18-case matrix covers all six disciplines crossed with Ready, Callout, and Charge. It deliberately represents every species exactly twice. Results:
+
+- 18/18 images valid and unique;
+- 18/18 saved rigs valid;
+- all six disciplines and all three presentation poses;
+- minimum perceptual distance 34 against the required 12;
+- maximum equipment-contact distance 0.0;
+- minimum 17 armature-deformed meshes per token;
+- equipment remains fully framed, with normalized extents left 0.4447, right 0.9433, bottom 0.0052, and top 0.6270.
+
+Review `art/approval/contact-matrix-v18.png`, `reports/pose-contact-matrix-selection.json`, and `reports/contact-matrix-rig-validation-v18.json`.
+
+## Mint-image release rehearsal
+
+`scripts/build_release_images.py` now implements the configured 2048-master to 1024-marketplace pipeline. It validates PNG dimensions, fixed token assignments, matching genesis-metadata image filenames, and unique byte hashes at both sizes. The resulting manifest binds each token to its assignment hash, genesis metadata hash, master hash, optimized image hash, rig schema, presentation pose, and contact-solver adjustment.
+
+A true-size rehearsal rendered Surfing #0001, Motocross #0022, and Skiing #0042 at 2048x2048, then generated their 1024x1024 marketplace files with deterministic LANCZOS resampling. Both batches pass format, uniqueness, and perceptual validation. The release manifest uses repository-relative source paths and intentionally preserves the current `REPLACE_IMAGE_CID` URI, proving the launch remains gated.
+
+Review `art/approval/release-rehearsal-v19.png` and `reports/release-rehearsal-v19.json`. The rehearsal does not populate production `masters/` or `images/`, and it does not unlock the website.

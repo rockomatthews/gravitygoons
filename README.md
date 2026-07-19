@@ -90,6 +90,13 @@ Select a deterministic compact batch that covers every configured visual trait:
 # The first output line is directly usable as --token-ids.
 ```
 
+Select the complete six-sport by three-pose contact matrix:
+
+```bash
+.venv/bin/python scripts/select_pose_matrix.py
+# Produces reports/pose-contact-matrix-selection.json and 18 token IDs.
+```
+
 The assignment-driven pipeline is operational, but its current procedural meshes are an engineering prototype rather than approved final art. `reports/generator-status.md` tracks the visual gate that must be passed before rendering all 1,000 marketplace images.
 
 Rigged checkpoints can be saved with `--save-blend`. Every generated rig follows `traits/rig-schema.json`; validate a saved file with:
@@ -100,6 +107,24 @@ blender --background renders/rig-smoke/blend/0003.blend \
   --schema traits/rig-schema.json \
   --report renders/rig-smoke/rig-validation.json
 ```
+
+Validate every saved `.blend` checkpoint in parallel, including required bones, armature-bound meshes, hand-to-equipment contact, and camera framing:
+
+```bash
+.venv/bin/python scripts/validate_blend_batch.py renders/contact-matrix/blend \
+  --blender /Applications/Blender.app/Contents/MacOS/Blender \
+  --workers 2 \
+  --output reports/contact-matrix-rig-validation.json
+```
+
+Build mint-release marketplace images from final 2048 masters:
+
+```bash
+.venv/bin/python scripts/build_release_images.py masters images \
+  --expected 1000
+```
+
+The release builder reads the configured 2048/1024 sizes, refuses missing or malformed masters, verifies every token against its fixed assignment and genesis metadata filename, creates deterministic LANCZOS marketplace PNGs, rejects duplicate file hashes, and writes `images/release-manifest.json`. Do not run the 1,000-token release command until the final art gate is approved.
 
 ## Contracts
 

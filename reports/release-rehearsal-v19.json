@@ -1,0 +1,141 @@
+{
+  "schema": "gravity-goons-image-release-v1",
+  "collection": "Gravity Goons",
+  "seed": 260718,
+  "source_assignments": "traits/assignments.json",
+  "source_metadata": "genesis_metadata",
+  "master_size": 2048,
+  "marketplace_size": 1024,
+  "resampling": "Pillow LANCZOS",
+  "images": 3,
+  "unique_master_hashes": 3,
+  "unique_marketplace_hashes": 3,
+  "records": [
+    {
+      "token_id": 1,
+      "name": "Gravity Goons #0001",
+      "master_file": "0001.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "92f75520b33c44dfc0e5eee0a58eae0dff669633e73c01e4fba08213afc7a69a",
+      "marketplace_file": "0001.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "a22d0e0a181a9aadf7d928929b0515e7ff7cee6ca648710a2a88c8f2592d7297",
+      "assignment_sha256": "c3c698d1faa865567ebfb67c0a7425562966a68070c8f5f28cc398da261d927c",
+      "genesis_metadata_file": "0001.json",
+      "genesis_metadata_sha256": "5b2ec84555ed7032aadcac66400a276e5cb2923dca8a6ca564bc00c5d3583105",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0001.png",
+      "discipline": "Surfing",
+      "species": "Hyena",
+      "rarity": "Common",
+      "render": {
+        "brand": "NORTH FAKE",
+        "discipline": "Surfing",
+        "equipment_contact_adjustment": [
+          0.6001,
+          0.08811,
+          0.33789
+        ],
+        "equipment_contact_solver": "right-hand-assembly-translation-v1",
+        "file": "0001.png",
+        "presentation_pose": "Callout",
+        "rarity": "Common",
+        "resolution": 2048,
+        "rig_bones": 22,
+        "rig_schema": "gravity-goons-rig-v1",
+        "sha256": "92f75520b33c44dfc0e5eee0a58eae0dff669633e73c01e4fba08213afc7a69a",
+        "species": "Hyena",
+        "token_id": 1
+      }
+    },
+    {
+      "token_id": 22,
+      "name": "Gravity Goons #0022",
+      "master_file": "0022.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "16a5eece4694f86a281793c2f5b070d3ce247c4b2047cd3525c07c2cc4595316",
+      "marketplace_file": "0022.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "4cd8ff2ee8b944ee04984e931ee05d6f705e3cf38f6e0a0a3710bed8cbcdb0ce",
+      "assignment_sha256": "6ad8290388ce758a98b2302deddfe4a71f0ba58c47fe36a0a9d8557cce9e05bb",
+      "genesis_metadata_file": "0022.json",
+      "genesis_metadata_sha256": "2712589c784da295cb4ce2b416c631cea9953b7323d742bd16d600bd78ced494",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0022.png",
+      "discipline": "Motocross",
+      "species": "Ram",
+      "rarity": "Rare",
+      "render": {
+        "brand": "AVOIDAS",
+        "discipline": "Motocross",
+        "equipment_contact_adjustment": [
+          0.8549,
+          -0.59483,
+          0.5998
+        ],
+        "equipment_contact_solver": "right-hand-assembly-translation-v1",
+        "file": "0022.png",
+        "presentation_pose": "Callout",
+        "rarity": "Rare",
+        "resolution": 2048,
+        "rig_bones": 22,
+        "rig_schema": "gravity-goons-rig-v1",
+        "sha256": "16a5eece4694f86a281793c2f5b070d3ce247c4b2047cd3525c07c2cc4595316",
+        "species": "Ram",
+        "token_id": 22
+      }
+    },
+    {
+      "token_id": 42,
+      "name": "Gravity Goons #0042",
+      "master_file": "0042.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "7cc09045782a41724a110efd3f25b2e003eec92f3126610c5b83945ffbe6bab5",
+      "marketplace_file": "0042.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "a09fc2f548ffdb19829f1483d9dd604e13c0ab3b861e8826c7982f3dae9be8eb",
+      "assignment_sha256": "977b21d5372d233ea9fc7b71d07ab112d9dbaef1d151582655d87162aba35f6e",
+      "genesis_metadata_file": "0042.json",
+      "genesis_metadata_sha256": "a6e0f1c346707a57884f8b7fc17c276a58b8a9483806164ad399ed522a15b86d",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0042.png",
+      "discipline": "Skiing",
+      "species": "Snow Leopard",
+      "rarity": "Common",
+      "render": {
+        "brand": "BURNTON",
+        "discipline": "Skiing",
+        "equipment_contact_adjustment": [
+          0.25492,
+          -0.19776,
+          0.18655
+        ],
+        "equipment_contact_solver": "right-hand-assembly-translation-v1",
+        "file": "0042.png",
+        "presentation_pose": "Ready",
+        "rarity": "Common",
+        "resolution": 2048,
+        "rig_bones": 22,
+        "rig_schema": "gravity-goons-rig-v1",
+        "sha256": "7cc09045782a41724a110efd3f25b2e003eec92f3126610c5b83945ffbe6bab5",
+        "species": "Snow Leopard",
+        "token_id": 42
+      }
+    }
+  ]
+}
