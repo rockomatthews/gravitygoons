@@ -18,6 +18,7 @@ type Token = {
   expression: string;
   parody_brand: string;
   play_style: string;
+  trick_specialty: string;
   sport_equipment: string;
   bottom: string;
   footwear: string;
@@ -74,7 +75,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   }, [refreshAvailability]);
 
   const filtered = useMemo(() => tokens.filter((token) => {
-    const search = `${token.name} ${token.species} ${token.body_build} ${token.discipline} ${token.parody_brand} ${token.play_style}`.toLowerCase();
+    const search = `${token.name} ${token.species} ${token.body_build} ${token.discipline} ${token.parody_brand} ${token.play_style} ${token.trick_specialty}`.toLowerCase();
     return (discipline === "All" || token.discipline === discipline)
       && (cast === "All" || token.cast === cast)
       && (bodyBuild === "All" || token.body_build === bodyBuild)

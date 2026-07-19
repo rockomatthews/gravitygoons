@@ -43,6 +43,7 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
     { trait_type: "Apparel", value: token.apparel }, { trait_type: "Bottom", value: token.bottom },
     { trait_type: "Footwear", value: token.footwear }, { trait_type: "Sport Equipment", value: token.sport_equipment },
     { trait_type: "Pose", value: token.pose }, { trait_type: "Play Style", value: token.play_style },
+    { trait_type: "Trick Specialty", value: token.trick_specialty },
     { trait_type: "Accessory", value: token.accessory }, { trait_type: "Background", value: token.background },
     { trait_type: "Rarity", value: token.rarity },
     ...Object.entries(token.stats).map(([trait_type, value]) => ({ display_type: "number", trait_type, value, max_value: 10 })),

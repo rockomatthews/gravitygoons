@@ -81,6 +81,10 @@
       "value": "Speed"
     },
     {
+      "trait_type": "Trick Specialty",
+      "value": "Alley-Oop"
+    },
+    {
       "trait_type": "Accessory",
       "value": "Neck Gaiter"
     },

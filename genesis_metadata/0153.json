@@ -81,6 +81,10 @@
       "value": "Speed"
     },
     {
+      "trait_type": "Trick Specialty",
+      "value": "Barspin"
+    },
+    {
       "trait_type": "Accessory",
       "value": "None"
     },

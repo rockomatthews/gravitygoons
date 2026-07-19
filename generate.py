@@ -80,6 +80,22 @@ STAT_BASES = {
 }
 STAT_NAMES = ["Speed", "Air", "Control", "Style", "Toughness"]
 
+TRICK_SPECIALTIES = {
+    "Skateboarding": ["Kickflip", "Heelflip", "Boardslide", "360 Flip", "Hardflip"],
+    "Snowboarding": ["Indy Grab", "Method", "Frontside 360", "Cork 720", "Double Backflip"],
+    "Surfing": ["Cutback", "Floater", "Tube Ride", "Air Reverse", "Alley-Oop"],
+    "BMX": ["Barspin", "Tailwhip", "Tabletop", "Backflip", "Flair"],
+    "Motocross": ["Can-Can", "Nac-Nac", "Superman", "Whip", "Tsunami"],
+    "Skiing": ["Mute Grab", "Rail Slide", "Cork 540", "Switch 900", "Double Cork 1080"],
+}
+
+
+def trick_specialty(seed: int, token_id: int, discipline: str) -> str:
+    """Assign a stable future-game specialty without marking the trick as learned."""
+    digest = hashlib.sha256(f"{seed}:trick:{token_id}:{discipline}".encode()).digest()
+    options = TRICK_SPECIALTIES[discipline]
+    return options[int.from_bytes(digest[:4], "big") % len(options)]
+
 
 def quota_list(quotas: dict[str, int]) -> list[str]:
     return [name for name, count in quotas.items() for _ in range(count)]
@@ -167,6 +183,9 @@ def build_assignments(config: dict) -> list[dict]:
                 "schema_version": config["schema_version"],
             }
             item["play_style"] = max(item["stats"], key=item["stats"].get)
+            item["trick_specialty"] = trick_specialty(
+                config["seed"], token_id, discipline
+            )
             signature = assignment_signature(item)
             if signature not in signatures:
                 signatures.add(signature)
@@ -199,6 +218,7 @@ def metadata_for(item: dict, config: dict) -> dict:
         {"trait_type": "Sport Equipment", "value": item["sport_equipment"]},
         {"trait_type": "Pose", "value": item["pose"]},
         {"trait_type": "Play Style", "value": item["play_style"]},
+        {"trait_type": "Trick Specialty", "value": item["trick_specialty"]},
         {"trait_type": "Accessory", "value": item["accessory"]},
         {"trait_type": "Background", "value": item["background"]},
         {"trait_type": "Rarity", "value": item["rarity"]},

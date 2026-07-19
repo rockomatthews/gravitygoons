@@ -19,4 +19,4 @@ This roster tests the new full-body character-select direction across every disc
 | 11 | Human | Motocross | FAUX RACING | Helmet and motocross bike |
 | 12 | Human | Snowboarding | QUEAZY | Snowboard and bindings |
 
-The sheet is visual direction, not the final deterministic render set. Text and original symbols will be authored as controlled Blender assets so spelling and logo geometry do not depend on image generation.
+The sheet is the mandatory production style and quality reference, not a substitute for the final 1,000 images. Final art is static and reference-driven; the rejected procedural Blender figures are non-production. Image text and original fictional symbols must be reviewed against metadata before approval.

@@ -17,8 +17,10 @@
   "render": {
     "master_size": 2048,
     "marketplace_size": 1024,
-    "engine": "BLENDER_EEVEE",
-    "blender_version": "5.2.0 LTS"
+    "engine": "STATIC_REFERENCE_DRIVEN",
+    "style_reference": "site/public/collection/approval-roster-12.png",
+    "production_status": "GATED_UNTIL_1000_FINAL_IMAGES_VALIDATE",
+    "blender_status": "EXPERIMENTAL_NON_PRODUCTION"
   },
   "rarity_quotas": {
     "Common": 550,

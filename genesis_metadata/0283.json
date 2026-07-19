@@ -81,6 +81,10 @@
       "value": "Toughness"
     },
     {
+      "trait_type": "Trick Specialty",
+      "value": "Whip"
+    },
+    {
       "trait_type": "Accessory",
       "value": "None"
     },
