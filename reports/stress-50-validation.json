@@ -1,10 +1,10 @@
 {
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "structurally_valid_so_far": true,
   "errors": [],
   "target": 50,
-  "completed": 47,
-  "remaining": 3,
+  "completed": 50,
+  "remaining": 0,
   "completed_ids": [
     1,
     2,
@@ -52,13 +52,12 @@
     808,
     811,
     824,
-    833
-  ],
-  "missing_ids": [
+    833,
     835,
     926,
     990
   ],
-  "unique_hashes": 47,
+  "missing_ids": [],
+  "unique_hashes": 50,
   "mint_gate": "closed"
 }
