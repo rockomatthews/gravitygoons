@@ -30,7 +30,7 @@ export default function Home() {
         </div>
         <div className="hero-visual">
           <div className="gravity-halo" />
-          <div className="goon-card-3d"><Image src="/collection/base-concept.png" alt="Gravity Goons snow leopard skateboarder" width={1024} height={1024} priority /></div>
+          <div className="goon-card-3d"><Image src="/collection/production-preview/0034.png" alt="Gravity Goons #0034, a final production boar skateboarder render" width={1024} height={1024} priority /></div>
           <div className="floating-tag tag-one">SKATE // 001</div>
           <div className="floating-tag tag-two">STYLE <b>08</b></div>
           <div className="floating-tag tag-three">MIKE™*</div>
@@ -52,7 +52,7 @@ export default function Home() {
       </section>
 
       <section className="collection-section shell" id="collection">
-        <div className="section-heading"><div><p className="eyebrow">{collectionReady ? "LIVE BASE ROSTER" : "APPROVAL ROSTER"}</p><h2>{collectionReady ? "Choose, connect, mint." : "Twelve Goons. Twelve real looks."}</h2></div><p>{collectionReady ? "Filter all 1,000 characters, connect a Base wallet, select up to five available IDs, and mint them without leaving GravityGoons.com." : "The collection system contains 1,000 fixed trait assignments. These 12 concepts establish the visual range while the final 1,000 unique images are produced and validated."}</p></div>
+        <div className="section-heading"><div><p className="eyebrow">{collectionReady ? "LIVE BASE ROSTER" : "FINAL RENDER PREVIEW"}</p><h2>{collectionReady ? "Choose, connect, mint." : "Real Goons. Real collection art."}</h2></div><p>{collectionReady ? "Filter all 1,000 characters, connect a Base wallet, select up to five available IDs, and mint them without leaving GravityGoons.com." : "Preview accepted final renders pulled directly from the production collection. All 1,000 trait assignments are fixed; artwork and metadata are being matched and validated one Goon at a time."}</p></div>
         {collectionReady && collectionImageBaseUrl
           ? <CollectionGallery tokens={collection.tokens} imageBaseUrl={collectionImageBaseUrl} />
           : <ApprovalRoster />}

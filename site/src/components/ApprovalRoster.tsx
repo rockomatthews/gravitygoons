@@ -1,32 +1,32 @@
 import Image from "next/image";
 
 const athletes = [
-  { id: "0001", species: "Hyena", discipline: "Surfing", brand: "NORTH FAKE", rarity: "Common", trick: "Alley-Oop" },
-  { id: "0002", species: "Human", discipline: "Motocross", brand: "POOMA", rarity: "Common", trick: "Superman" },
-  { id: "0003", species: "Raccoon", discipline: "BMX", brand: "MIKE", rarity: "Uncommon", trick: "Backflip" },
-  { id: "0006", species: "Human", discipline: "Skateboarding", brand: "VOLCANO", rarity: "Uncommon", trick: "Boardslide" },
-  { id: "0007", species: "Hyena", discipline: "Skiing", brand: "VOLCANO", rarity: "Common", trick: "Switch 900" },
-  { id: "0013", species: "Shark", discipline: "BMX", brand: "PROCRASTIGONIA", rarity: "Legendary", trick: "Backflip" },
-  { id: "0014", species: "Snow Leopard", discipline: "Snowboarding", brand: "QUEAZY", rarity: "Rare", trick: "Indy Grab" },
-  { id: "0019", species: "Boar", discipline: "Skateboarding", brand: "CARHEART", rarity: "Rare", trick: "Boardslide" },
-  { id: "0078", species: "Hyena", discipline: "Surfing", brand: "QUEAZY", rarity: "Epic", trick: "Air Reverse" },
-  { id: "0123", species: "Human", discipline: "Snowboarding", brand: "CARHEART", rarity: "Legendary", trick: "Method" },
-  { id: "0141", species: "Human", discipline: "Skiing", brand: "AVOIDAS", rarity: "Epic", trick: "Switch 900" },
-  { id: "0227", species: "Gorilla", discipline: "Skateboarding", brand: "AVOIDAS", rarity: "Rare", trick: "Hardflip" },
+  { id: "0030", species: "Gorilla", discipline: "Surfing", brand: "MIKE", rarity: "Common", trick: "Floater" },
+  { id: "0031", species: "Human", discipline: "Snowboarding", brand: "AVOIDAS", rarity: "Uncommon", trick: "Cork 720" },
+  { id: "0032", species: "Gorilla", discipline: "BMX", brand: "POOMA", rarity: "Common", trick: "Flair" },
+  { id: "0033", species: "Ram", discipline: "BMX", brand: "CARHEART", rarity: "Uncommon", trick: "Flair" },
+  { id: "0034", species: "Boar", discipline: "Skateboarding", brand: "MIKE", rarity: "Uncommon", trick: "360 Flip" },
+  { id: "0035", species: "Raccoon", discipline: "Skateboarding", brand: "PROCRASTIGONIA", rarity: "Common", trick: "360 Flip" },
+  { id: "0036", species: "Shark", discipline: "BMX", brand: "OFF-BEIGE", rarity: "Rare", trick: "Barspin" },
+  { id: "0038", species: "Boar", discipline: "Snowboarding", brand: "PROCRASTIGONIA", rarity: "Common", trick: "Frontside 360" },
+  { id: "0039", species: "Shark", discipline: "BMX", brand: "BURNTON", rarity: "Common", trick: "Backflip" },
+  { id: "0040", species: "Boar", discipline: "BMX", brand: "MIKE", rarity: "Uncommon", trick: "Tailwhip" },
+  { id: "0041", species: "Human", discipline: "Skiing", brand: "VANISH", rarity: "Common", trick: "Double Cork 1080" },
+  { id: "0042", species: "Snow Leopard", discipline: "Skiing", brand: "BURNTON", rarity: "Common", trick: "Switch 900" },
 ];
 
 export function ApprovalRoster() {
   return (
     <div>
       <aside className="production-notice">
-        <div><span>PRODUCTION STATUS</span><b>FINAL ART IN PROGRESS</b></div>
-        <p>These are 12 metadata-matched production proofs—not 1,000 finished NFTs. Minting stays disabled until every final image matches its token data and passes uniqueness validation.</p>
+        <div><span>LIVE PRODUCTION PREVIEW</span><b>REAL FINAL RENDERS</b></div>
+        <p>Every athlete below is an accepted, metadata-matched collection render. Production continues toward all 1,000, and minting stays disabled until the complete collection passes validation.</p>
       </aside>
       <div className="approval-grid">
         {athletes.map((athlete) => (
           <article className="approval-card" key={athlete.id}>
             <Image
-              src={`/collection/approval-v1/${athlete.id}.png`}
+              src={`/collection/production-preview/${athlete.id}.png`}
               alt={`Gravity Goons #${athlete.id}, ${athlete.brand} ${athlete.species} ${athlete.discipline} athlete`}
               width={1254}
               height={1254}
