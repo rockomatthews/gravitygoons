@@ -29,3 +29,14 @@ the Vercel repository does not absorb hundreds of megabytes of NFT media:
 The final run uses the accepted 1,000-source production directory and
 `--expected 1000`. Each promoted master receives a manifest binding the source
 hash, fixed assignment hash, master hash, dimensions, and resampling method.
+
+Track accepted source progress across approvals, the stress gate, and the
+gitignored full-production directory with:
+
+```bash
+python3 scripts/validate_static_production.py
+```
+
+The tracker rejects duplicate token IDs, exact image duplicates, non-PNG files,
+non-square sources, and sources below 1,024px. Visual metadata alignment remains
+a mandatory human review before a source is accepted.
