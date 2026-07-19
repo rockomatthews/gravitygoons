@@ -46,19 +46,20 @@ def main():
         if not obj.vertex_groups:
             errors.append(f"Missing deformation vertex groups: {obj.name}")
     contact = bpy.data.objects.get("Sport Contact R")
-    hand = bpy.data.objects.get("Glove Palm 1")
+    contact_source_name = contact.get("source_object", "Glove Palm 1") if contact else None
+    source = bpy.data.objects.get(contact_source_name) if contact_source_name else None
     contact_distance = None
     contact_limit = None
     if contact is None:
         errors.append("Missing primary sport contact target")
-    elif hand is None:
-        errors.append("Missing right glove palm for sport contact validation")
+    elif source is None:
+        errors.append(f"Missing configured sport contact source: {contact_source_name}")
     else:
         bpy.context.view_layer.update()
         depsgraph = bpy.context.evaluated_depsgraph_get()
-        hand_location = hand.evaluated_get(depsgraph).matrix_world.translation
+        source_location = source.evaluated_get(depsgraph).matrix_world.translation
         contact_location = contact.evaluated_get(depsgraph).matrix_world.translation
-        contact_distance = (Vector(hand_location) - Vector(contact_location)).length
+        contact_distance = (Vector(source_location) - Vector(contact_location)).length
         contact_limit = float(contact.get("maximum_distance", 0.42))
         if contact_distance > contact_limit:
             errors.append(f"Primary right-hand sport contact floats by {contact_distance:.3f} (limit {contact_limit:.3f})")
@@ -95,6 +96,8 @@ def main():
         "deformable_meshes": len(deformable),
         "equipment_contact_distance": round(contact_distance, 4) if contact_distance is not None else None,
         "equipment_contact_limit": contact_limit,
+        "equipment_contact_source": contact_source_name,
+        "equipment_contact_role": contact.get("contact_role") if contact else None,
         "equipment_camera_bounds": (
             {key: round(value, 4) for key, value in equipment_camera_bounds.items()}
             if equipment_camera_bounds else None
@@ -102,6 +105,7 @@ def main():
         "token_id": rig.get("token_id") if rig else None,
         "discipline": rig.get("discipline") if rig else None,
         "presentation_pose": rig.get("presentation_pose") if rig else None,
+        "pose_family": rig.get("pose_family") if rig else None,
         "contact_solver": rig.get("equipment_contact_solver") if rig else None,
     }
     Path(options.report).write_text(json.dumps(report, indent=2) + "\n")

@@ -1,0 +1,150 @@
+{
+  "schema": "gravity-goons-image-release-v1",
+  "collection": "Gravity Goons",
+  "seed": 260718,
+  "source_assignments": "traits/assignments.json",
+  "source_metadata": "genesis_metadata",
+  "master_size": 2048,
+  "marketplace_size": 1024,
+  "resampling": "Pillow LANCZOS",
+  "images": 3,
+  "unique_master_hashes": 3,
+  "unique_marketplace_hashes": 3,
+  "records": [
+    {
+      "token_id": 1,
+      "name": "Gravity Goons #0001",
+      "master_file": "0001.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "c3a0780c815d2931612401b399872d8e161a22a7c36fbd24a736678be3e62e49",
+      "marketplace_file": "0001.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "a22d0e0a181a9aadf7d928929b0515e7ff7cee6ca648710a2a88c8f2592d7297",
+      "assignment_sha256": "c3c698d1faa865567ebfb67c0a7425562966a68070c8f5f28cc398da261d927c",
+      "genesis_metadata_file": "0001.json",
+      "genesis_metadata_sha256": "5b2ec84555ed7032aadcac66400a276e5cb2923dca8a6ca564bc00c5d3583105",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0001.png",
+      "discipline": "Surfing",
+      "species": "Hyena",
+      "rarity": "Common",
+      "render": {
+        "brand": "NORTH FAKE",
+        "discipline": "Surfing",
+        "equipment_contact_adjustment": [
+          0.6001,
+          0.08811,
+          0.33789
+        ],
+        "equipment_contact_role": "primary-hand-grip-v1",
+        "equipment_contact_solver": "body-source-assembly-translation-v2",
+        "equipment_contact_source": "Glove Palm 1",
+        "file": "0001.png",
+        "pose_family": "Callout",
+        "presentation_pose": "Beach Plant",
+        "rarity": "Common",
+        "resolution": 2048,
+        "rig_bones": 22,
+        "rig_schema": "gravity-goons-rig-v1",
+        "sha256": "c3a0780c815d2931612401b399872d8e161a22a7c36fbd24a736678be3e62e49",
+        "species": "Hyena",
+        "token_id": 1
+      }
+    },
+    {
+      "token_id": 22,
+      "name": "Gravity Goons #0022",
+      "master_file": "0022.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "0e19a46b8e93619f2e2e9685fd27f2564d59389a6af5302d4340abfa0f32d7b7",
+      "marketplace_file": "0022.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "db278dd74966f0ad3062dc79c54078b236b1a26aafbb27a45ffbe4c723670dd6",
+      "assignment_sha256": "6ad8290388ce758a98b2302deddfe4a71f0ba58c47fe36a0a9d8557cce9e05bb",
+      "genesis_metadata_file": "0022.json",
+      "genesis_metadata_sha256": "2712589c784da295cb4ce2b416c631cea9953b7323d742bd16d600bd78ced494",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0022.png",
+      "discipline": "Motocross",
+      "species": "Ram",
+      "rarity": "Rare",
+      "render": {
+        "brand": "AVOIDAS",
+        "discipline": "Motocross",
+        "equipment_contact_adjustment": [
+          0.6742,
+          -0.33917,
+          0.33227
+        ],
+        "equipment_contact_role": "primary-hand-grip-v1",
+        "equipment_contact_solver": "body-source-assembly-translation-v2",
+        "equipment_contact_source": "Glove Palm 1",
+        "file": "0022.png",
+        "pose_family": "Ready",
+        "presentation_pose": "Bike Beside",
+        "rarity": "Rare",
+        "resolution": 2048,
+        "rig_bones": 22,
+        "rig_schema": "gravity-goons-rig-v1",
+        "sha256": "0e19a46b8e93619f2e2e9685fd27f2564d59389a6af5302d4340abfa0f32d7b7",
+        "species": "Ram",
+        "token_id": 22
+      }
+    },
+    {
+      "token_id": 42,
+      "name": "Gravity Goons #0042",
+      "master_file": "0042.png",
+      "master_size": [
+        2048,
+        2048
+      ],
+      "master_sha256": "331dff06de263cb8162f651bb1875a395dffc2ee4634145fba3a9aa72d4c304c",
+      "marketplace_file": "0042.png",
+      "marketplace_size": [
+        1024,
+        1024
+      ],
+      "marketplace_sha256": "33c4a6e491e0eaebd26cf06c7f96501a09f0c877a951bb0a553c8f06a8a8dae1",
+      "assignment_sha256": "977b21d5372d233ea9fc7b71d07ab112d9dbaef1d151582655d87162aba35f6e",
+      "genesis_metadata_file": "0042.json",
+      "genesis_metadata_sha256": "a6e0f1c346707a57884f8b7fc17c276a58b8a9483806164ad399ed522a15b86d",
+      "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0042.png",
+      "discipline": "Skiing",
+      "species": "Snow Leopard",
+      "rarity": "Common",
+      "render": {
+        "brand": "BURNTON",
+        "discipline": "Skiing",
+        "equipment_contact_adjustment": [
+          0.25492,
+          -0.19776,
+          0.18655
+        ],
+        "equipment_contact_role": "primary-hand-grip-v1",
+        "equipment_contact_solver": "body-source-assembly-translation-v2",
+        "equipment_contact_source": "Glove Palm 1",
+        "file": "0042.png",
+        "pose_family": "Ready",
+        "presentation_pose": "Skis Shouldered",
+        "rarity": "Common",
+        "resolution": 2048,
+        "rig_bones": 22,
+        "rig_schema": "gravity-goons-rig-v1",
+        "sha256": "331dff06de263cb8162f651bb1875a395dffc2ee4634145fba3a9aa72d4c304c",
+        "species": "Snow Leopard",
+        "token_id": 42
+      }
+    }
+  ]
+}

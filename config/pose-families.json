@@ -1,0 +1,32 @@
+{
+  "Skateboarding": {
+    "Board Beside": "Ready",
+    "Tail Plant": "Callout",
+    "Push-Off": "Charge"
+  },
+  "Snowboarding": {
+    "Board Carry": "Ready",
+    "Binding Check": "Callout",
+    "Slope Ready": "Charge"
+  },
+  "Surfing": {
+    "Board Under Arm": "Ready",
+    "Beach Plant": "Callout",
+    "Pop-Up Ready": "Charge"
+  },
+  "BMX": {
+    "Handlebar Lean": "Ready",
+    "Bike Beside": "Callout",
+    "Pedal Ready": "Charge"
+  },
+  "Motocross": {
+    "Bike Beside": "Ready",
+    "Bars Turned": "Callout",
+    "Gate Ready": "Charge"
+  },
+  "Skiing": {
+    "Skis Shouldered": "Ready",
+    "Pole Plant": "Callout",
+    "Drop-In Ready": "Charge"
+  }
+}

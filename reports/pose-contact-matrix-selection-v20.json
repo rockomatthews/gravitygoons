@@ -1,0 +1,231 @@
+{
+  "algorithm": "discipline-pose-matrix-diverse-species-v1",
+  "token_ids": [
+    34,
+    8,
+    6,
+    14,
+    21,
+    219,
+    69,
+    97,
+    20,
+    16,
+    4,
+    3,
+    22,
+    104,
+    89,
+    42,
+    155,
+    56
+  ],
+  "cases": 18,
+  "disciplines": [
+    "Skateboarding",
+    "Snowboarding",
+    "Surfing",
+    "BMX",
+    "Motocross",
+    "Skiing"
+  ],
+  "pose_families": [
+    "Ready",
+    "Callout",
+    "Charge"
+  ],
+  "assigned_poses": [
+    "Bars Turned",
+    "Beach Plant",
+    "Bike Beside",
+    "Binding Check",
+    "Board Beside",
+    "Board Carry",
+    "Board Under Arm",
+    "Drop-In Ready",
+    "Gate Ready",
+    "Handlebar Lean",
+    "Pedal Ready",
+    "Pole Plant",
+    "Pop-Up Ready",
+    "Push-Off",
+    "Skis Shouldered",
+    "Slope Ready",
+    "Tail Plant"
+  ],
+  "species_counts": {
+    "Boar": 2,
+    "Fox": 2,
+    "Gorilla": 2,
+    "Human": 2,
+    "Hyena": 2,
+    "Raccoon": 2,
+    "Ram": 2,
+    "Shark": 2,
+    "Snow Leopard": 2
+  },
+  "selection": [
+    {
+      "token_id": 34,
+      "discipline": "Skateboarding",
+      "presentation_pose": "Board Beside",
+      "pose_family": "Ready",
+      "species": "Boar",
+      "stance": "Regular",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 8,
+      "discipline": "Skateboarding",
+      "presentation_pose": "Tail Plant",
+      "pose_family": "Callout",
+      "species": "Raccoon",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 6,
+      "discipline": "Skateboarding",
+      "presentation_pose": "Push-Off",
+      "pose_family": "Charge",
+      "species": "Human",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 14,
+      "discipline": "Snowboarding",
+      "presentation_pose": "Board Carry",
+      "pose_family": "Ready",
+      "species": "Snow Leopard",
+      "stance": "Regular",
+      "rarity": "Rare"
+    },
+    {
+      "token_id": 21,
+      "discipline": "Snowboarding",
+      "presentation_pose": "Binding Check",
+      "pose_family": "Callout",
+      "species": "Hyena",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 219,
+      "discipline": "Snowboarding",
+      "presentation_pose": "Slope Ready",
+      "pose_family": "Charge",
+      "species": "Ram",
+      "stance": "Goofy",
+      "rarity": "Epic"
+    },
+    {
+      "token_id": 69,
+      "discipline": "Surfing",
+      "presentation_pose": "Board Under Arm",
+      "pose_family": "Ready",
+      "species": "Fox",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 97,
+      "discipline": "Surfing",
+      "presentation_pose": "Beach Plant",
+      "pose_family": "Callout",
+      "species": "Shark",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 20,
+      "discipline": "Surfing",
+      "presentation_pose": "Pop-Up Ready",
+      "pose_family": "Charge",
+      "species": "Gorilla",
+      "stance": "Goofy",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 16,
+      "discipline": "BMX",
+      "presentation_pose": "Handlebar Lean",
+      "pose_family": "Ready",
+      "species": "Human",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 4,
+      "discipline": "BMX",
+      "presentation_pose": "Bike Beside",
+      "pose_family": "Callout",
+      "species": "Hyena",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 3,
+      "discipline": "BMX",
+      "presentation_pose": "Pedal Ready",
+      "pose_family": "Charge",
+      "species": "Raccoon",
+      "stance": "Goofy",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 22,
+      "discipline": "Motocross",
+      "presentation_pose": "Bike Beside",
+      "pose_family": "Ready",
+      "species": "Ram",
+      "stance": "Regular",
+      "rarity": "Rare"
+    },
+    {
+      "token_id": 104,
+      "discipline": "Motocross",
+      "presentation_pose": "Bars Turned",
+      "pose_family": "Callout",
+      "species": "Fox",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 89,
+      "discipline": "Motocross",
+      "presentation_pose": "Gate Ready",
+      "pose_family": "Charge",
+      "species": "Shark",
+      "stance": "Regular",
+      "rarity": "Uncommon"
+    },
+    {
+      "token_id": 42,
+      "discipline": "Skiing",
+      "presentation_pose": "Skis Shouldered",
+      "pose_family": "Ready",
+      "species": "Snow Leopard",
+      "stance": "Regular",
+      "rarity": "Common"
+    },
+    {
+      "token_id": 155,
+      "discipline": "Skiing",
+      "presentation_pose": "Pole Plant",
+      "pose_family": "Callout",
+      "species": "Boar",
+      "stance": "Regular",
+      "rarity": "Epic"
+    },
+    {
+      "token_id": 56,
+      "discipline": "Skiing",
+      "presentation_pose": "Drop-In Ready",
+      "pose_family": "Charge",
+      "species": "Gorilla",
+      "stance": "Goofy",
+      "rarity": "Common"
+    }
+  ]
+}

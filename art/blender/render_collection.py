@@ -76,8 +76,7 @@ RARITY_COLORS = {
     "Rare": (0.05, 0.38, 0.96, 1), "Epic": (0.50, 0.14, 0.92, 1),
     "Legendary": (1.00, 0.62, 0.03, 1),
 }
-
-POSE_VARIANTS = ("Ready", "Callout", "Charge")
+POSE_FAMILIES = json.loads((ROOT / "config" / "pose-families.json").read_text())
 
 
 def cli() -> argparse.Namespace:
@@ -111,13 +110,14 @@ def add_torus(name, location, major, minor, material, rotation=(math.pi / 2, 0, 
     return obj
 
 
-def add_contact_target(location, discipline, maximum_distance=0.42):
+def add_contact_target(location, discipline, maximum_distance=0.42, source_object="Glove Palm 1", role="hand-grip"):
     target = bpy.data.objects.new("Sport Contact R", None)
     target.empty_display_type = "SPHERE"
     target.empty_display_size = 0.10
     target.location = location
     target.hide_render = True
-    target["contact_role"] = "primary-right-hand-grip-v1"
+    target["contact_role"] = f"primary-{role}-v1"
+    target["source_object"] = source_object
     target["discipline"] = discipline
     target["maximum_distance"] = maximum_distance
     bpy.context.collection.objects.link(target)
@@ -592,7 +592,21 @@ def board(name, x, length, width, mats, surf=False):
             add_cylinder(f"{name} wheel {index}", (x - width - 0.10, -0.20, z), 0.13, 0.18, mats["accent"], rotation=(0, math.pi / 2, 0), vertices=20)
 
 
-def bike(name, mats, moto=False):
+def ride_board(name, length, width, mats, discipline, surf=False):
+    """Across-body board layout for riding, binding-check, and pop-up poses."""
+    center = (0.20, 0.05, -3.98)
+    add_cube(name, center, (length, 0.12, width), mats["ink"], rotation=(0, 0.02, -0.025), bevel=0.28)
+    add_cube(f"{name} deck face", (center[0], -0.09, center[2] + 0.03), (length * 0.90, 0.025, width * 0.80), mats["accent"], rotation=(0, 0.02, -0.025), bevel=0.22)
+    add_curve(f"{name} ride graphic", [(-0.74, -0.15, -3.94), (0.20, -0.16, -3.72), (1.10, -0.15, -3.96)], 0.065, mats["garment"])
+    if surf:
+        add_cone(f"{name} fin", (-1.82, 0.26, -4.12), (0.16, 0.09, 0.30), mats["ink"], rotation=(math.pi / 2, 0, math.pi / 2), vertices=3)
+    else:
+        for index, x in enumerate((center[0] - length * 0.68, center[0] + length * 0.68)):
+            add_cylinder(f"{name} wheel {index}", (x, -0.20, -4.24), 0.13, 0.18, mats["accent"], rotation=(0, math.pi / 2, 0), vertices=20)
+    add_contact_target((0.62, -0.18, -3.67), discipline, source_object="Foot 1", role="foot-plant")
+
+
+def bike(name, mats, discipline, pose, moto=False):
     x = 1.92
     wheel_radius = 0.88 if not moto else 1.05
     for index, offset in enumerate((-0.95, 1.12)):
@@ -605,39 +619,59 @@ def bike(name, mats, moto=False):
         add_curve("Moto fork", [(x + 0.84, -0.02, -3.20), (x + 0.48, -0.04, -1.78)], 0.085, mats["metal"])
         add_curve("Moto handlebar", [(x + 0.48, -0.04, -1.78), (x + 0.18, -0.08, -1.42), (1.68, -0.12, -1.18)], 0.060, mats["ink"])
         add_cylinder("Moto hand grip", (1.68, -0.12, -1.18), 0.10, 0.28, mats["rubber"], rotation=(0, math.pi / 2, 0), vertices=16)
-        add_contact_target((1.68, -0.12, -1.18), "Motocross")
         add_cube("Moto front fender", (x + 1.08, -0.08, -2.44), (0.70, 0.28, 0.10), mats["accent"], rotation=(0, -0.28, 0), bevel=0.12)
         add_cube("Moto seat", (x - 0.48, -0.04, -1.96), (0.58, 0.34, 0.13), mats["ink"], rotation=(0, 0.10, 0), bevel=0.10)
     else:
         add_curve("BMX frame", [(x - 0.92, 0, -3.30), (x - 0.18, 0, -2.28), (x + 0.86, 0, -3.30), (x - 0.92, 0, -3.30)], 0.075, mats["accent"])
         add_curve("BMX bars", [(x - 0.18, 0, -2.28), (x + 0.02, 0, -1.62), (x - 0.02, -0.06, -1.38), (1.68, -0.12, -1.18)], 0.055, mats["metal"])
         add_cylinder("BMX hand grip", (1.68, -0.12, -1.18), 0.09, 0.26, mats["rubber"], rotation=(0, math.pi / 2, 0), vertices=16)
-        add_contact_target((1.68, -0.12, -1.18), "BMX")
         add_curve("BMX fork", [(x + 0.86, 0, -3.30), (x + 0.02, 0, -1.62)], 0.055, mats["metal"])
         add_cube("BMX seat", (x - 0.50, -0.05, -2.14), (0.38, 0.25, 0.10), mats["ink"], rotation=(0, -0.12, 0), bevel=0.10)
         add_cylinder("BMX crank", (x - 0.08, -0.12, -2.78), 0.16, 0.10, mats["metal"], rotation=(math.pi / 2, 0, 0), vertices=20)
         add_curve("BMX pedal", [(x - 0.42, -0.18, -2.78), (x + 0.30, -0.18, -2.78)], 0.035, mats["ink"])
 
+    foot_pose = pose in {"Pedal Ready", "Gate Ready"}
+    if foot_pose:
+        add_curve(f"{name} stance peg", [(x - 0.18, -0.12, -2.88), (1.02, -0.18, -3.62)], 0.055, mats["metal"])
+        add_cylinder(f"{name} foot peg", (1.02, -0.20, -3.62), 0.08, 0.34, mats["rubber"], rotation=(0, math.pi / 2, 0), vertices=16)
+        add_contact_target((1.02, -0.20, -3.62), discipline, source_object="Foot 1", role="pedal-boot")
+    else:
+        add_contact_target((1.68, -0.12, -1.18), discipline)
+
 
 def equipment(token, mats):
     discipline = token["discipline"]
     if discipline == "Skateboarding":
-        board("Skateboard", 2.05, 1.55, 0.32, mats)
-        add_contact_target((1.73, -0.18, -1.18), discipline)
+        if token["pose"] == "Push-Off":
+            ride_board("Skateboard", 1.55, 0.32, mats, discipline)
+        else:
+            board("Skateboard", 2.05, 1.55, 0.32, mats)
+            add_contact_target((1.73, -0.18, -1.18), discipline)
     elif discipline == "Snowboarding":
-        board("Snowboard", 2.10, 2.05, 0.42, mats)
-        add_contact_target((1.68, -0.18, -1.18), discipline)
+        if token["pose"] in {"Binding Check", "Slope Ready"}:
+            ride_board("Snowboard", 2.05, 0.42, mats, discipline)
+        else:
+            board("Snowboard", 2.10, 2.05, 0.42, mats)
+            add_contact_target((1.68, -0.18, -1.18), discipline)
     elif discipline == "Surfing":
-        board("Surfboard", 2.18, 2.65, 0.56, mats, surf=True)
-        add_contact_target((1.62, -0.18, -1.18), discipline)
-    elif discipline == "BMX": bike("BMX", mats)
-    elif discipline == "Motocross": bike("Motocross", mats, moto=True)
+        if token["pose"] == "Pop-Up Ready":
+            ride_board("Surfboard", 2.65, 0.56, mats, discipline, surf=True)
+        else:
+            board("Surfboard", 2.18, 2.65, 0.56, mats, surf=True)
+            add_contact_target((1.62, -0.18, -1.18), discipline)
+    elif discipline == "BMX": bike("BMX", mats, discipline, token["pose"])
+    elif discipline == "Motocross": bike("Motocross", mats, discipline, token["pose"], moto=True)
     elif discipline == "Skiing":
-        for index, x in enumerate((2.16, 2.63)):
-            add_cube(f"Ski {index}", (x, 0.05, -1.90), (0.15, 0.09, 2.38), mats["accent"], rotation=(0, 0.02, -0.05), bevel=0.16)
-        for index, x in enumerate((1.72, 3.02)):
-            add_cylinder(f"Pole {index}", (x, 0, -1.90), 0.035, 4.10, mats["metal"], rotation=(0.03, 0.08, -0.06), vertices=12)
-        add_contact_target((1.72, -0.12, -1.18), discipline)
+        if token["pose"] == "Drop-In Ready":
+            for index, z in enumerate((-3.86, -4.13)):
+                add_cube(f"Ski {index}", (0.20, 0.05, z), (2.38, 0.09, 0.15), mats["accent"], rotation=(0, 0.02, -0.025), bevel=0.16)
+            add_contact_target((0.62, -0.18, -3.67), discipline, source_object="Foot 1", role="ski-boot")
+        else:
+            for index, x in enumerate((2.16, 2.63)):
+                add_cube(f"Ski {index}", (x, 0.05, -1.90), (0.15, 0.09, 2.38), mats["accent"], rotation=(0, 0.02, -0.05), bevel=0.16)
+            for index, x in enumerate((1.72, 3.02)):
+                add_cylinder(f"Pole {index}", (x, 0, -1.90), 0.035, 4.10, mats["metal"], rotation=(0.03, 0.08, -0.06), vertices=12)
+            add_contact_target((1.72, -0.12, -1.18), discipline)
 
 
 def species_extras(token, mats):
@@ -780,9 +814,13 @@ def apply_pose(token, rig):
     for pose_bone in rig.pose.bones:
         pose_bone.rotation_mode = "XYZ"
     stance = -1 if token["stance"] == "Goofy" else 1
-    pose_index = token["token_id"] % len(POSE_VARIANTS)
-    pose_name = POSE_VARIANTS[pose_index]
-    rig["presentation_pose"] = pose_name
+    pose_trait = token["pose"]
+    try:
+        pose_family = POSE_FAMILIES[token["discipline"]][pose_trait]
+    except KeyError as error:
+        raise ValueError(f"Unknown discipline pose mapping: {token['discipline']} / {pose_trait}") from error
+    rig["presentation_pose"] = pose_trait
+    rig["pose_family"] = pose_family
     rig.pose.bones["chest"].rotation_euler[2] = math.radians(4 * stance)
     rig.pose.bones["head"].rotation_euler[2] = math.radians(-5 * stance)
     if token["discipline"] in {"BMX", "Motocross"}:
@@ -811,11 +849,11 @@ def apply_pose(token, rig):
         rig.pose.bones["thigh.L"].rotation_euler[1] = math.radians(4)
         rig.pose.bones["thigh.R"].rotation_euler[1] = math.radians(-4)
 
-    if pose_name == "Ready":
+    if pose_family == "Ready":
         rig.pose.bones["upper_arm.L"].rotation_euler[2] += math.radians(7)
         rig.pose.bones["forearm.L"].rotation_euler[1] += math.radians(-5)
         rig.pose.bones["head"].rotation_euler[1] += math.radians(3 * stance)
-    elif pose_name == "Callout":
+    elif pose_family == "Callout":
         rig.pose.bones["upper_arm.R"].rotation_euler[2] += math.radians(-9)
         rig.pose.bones["forearm.R"].rotation_euler[1] += math.radians(7)
         rig.pose.bones["head"].rotation_euler[2] += math.radians(3 * stance)
@@ -826,16 +864,16 @@ def apply_pose(token, rig):
 
 
 def solve_equipment_contact(rig):
-    """Move the complete prop assembly so its authored grip meets the posed right hand."""
+    """Move the complete prop assembly so its authored contact meets the posed body source."""
     target = bpy.data.objects.get("Sport Contact R")
-    hand = bpy.data.objects.get("Glove Palm 1")
-    if target is None or hand is None:
-        raise RuntimeError("Sport contact solver requires Sport Contact R and Glove Palm 1")
+    source = bpy.data.objects.get(target.get("source_object", "Glove Palm 1")) if target else None
+    if target is None or source is None:
+        raise RuntimeError("Sport contact solver requires a target and its configured source object")
     bpy.context.view_layer.update()
     depsgraph = bpy.context.evaluated_depsgraph_get()
-    hand_location = hand.evaluated_get(depsgraph).matrix_world.translation.copy()
+    source_location = source.evaluated_get(depsgraph).matrix_world.translation.copy()
     target_location = target.evaluated_get(depsgraph).matrix_world.translation.copy()
-    adjustment = hand_location - target_location
+    adjustment = source_location - target_location
     equipment_objects = [obj for obj in bpy.context.scene.objects if obj.parent == rig and obj.parent_bone == "equipment"]
     if not equipment_objects:
         raise RuntimeError("Sport contact solver found no equipment assembly")
@@ -844,7 +882,9 @@ def solve_equipment_contact(rig):
         matrix.translation += adjustment
         obj.matrix_world = matrix
     target.location += adjustment
-    rig["equipment_contact_solver"] = "right-hand-assembly-translation-v1"
+    rig["equipment_contact_solver"] = "body-source-assembly-translation-v2"
+    rig["equipment_contact_source"] = source.name
+    rig["equipment_contact_role"] = target.get("contact_role")
     rig["equipment_contact_adjustment"] = tuple(round(value, 5) for value in adjustment)
     bpy.context.view_layer.update()
 
@@ -948,7 +988,10 @@ def main():
             "rig_schema": "gravity-goons-rig-v1",
             "rig_bones": len(bpy.data.objects["GravityGoons_Rig"].data.bones),
             "presentation_pose": bpy.data.objects["GravityGoons_Rig"].get("presentation_pose"),
+            "pose_family": bpy.data.objects["GravityGoons_Rig"].get("pose_family"),
             "equipment_contact_solver": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_solver"),
+            "equipment_contact_source": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_source"),
+            "equipment_contact_role": bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_role"),
             "equipment_contact_adjustment": list(bpy.data.objects["GravityGoons_Rig"].get("equipment_contact_adjustment", ())),
         }
         (manifest_dir / f"{token['token_id']:04d}.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")

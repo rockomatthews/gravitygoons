@@ -17,23 +17,27 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--assignments", type=Path, default=Path("traits/assignments.json"))
     parser.add_argument("--output", type=Path, default=Path("reports/pose-contact-matrix-selection.json"))
+    parser.add_argument("--pose-families", type=Path, default=Path("config/pose-families.json"))
     options = parser.parse_args()
     tokens = json.loads(options.assignments.read_text())["tokens"]
+    pose_families = json.loads(options.pose_families.read_text())
     selected = []
     species_usage: Counter[str] = Counter()
 
     for discipline in DISCIPLINES:
-        for pose_index, pose in enumerate(POSES):
+        for pose_family in POSES:
             candidates = [
                 token for token in tokens
-                if token["discipline"] == discipline and token["token_id"] % len(POSES) == pose_index
+                if token["discipline"] == discipline
+                and pose_families[discipline][token["pose"]] == pose_family
             ]
             candidate = min(candidates, key=lambda token: (species_usage[token["species"]], token["token_id"]))
             species_usage[candidate["species"]] += 1
             selected.append({
                 "token_id": candidate["token_id"],
                 "discipline": discipline,
-                "presentation_pose": pose,
+                "presentation_pose": candidate["pose"],
+                "pose_family": pose_family,
                 "species": candidate["species"],
                 "stance": candidate["stance"],
                 "rarity": candidate["rarity"],
@@ -44,7 +48,8 @@ def main() -> None:
         "token_ids": [entry["token_id"] for entry in selected],
         "cases": len(selected),
         "disciplines": list(DISCIPLINES),
-        "poses": list(POSES),
+        "pose_families": list(POSES),
+        "assigned_poses": sorted({entry["presentation_pose"] for entry in selected}),
         "species_counts": dict(sorted(species_usage.items())),
         "selection": selected,
     }

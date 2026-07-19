@@ -59,6 +59,7 @@ def main() -> None:
         "failures": failures,
         "disciplines": sorted({report["discipline"] for report in results}),
         "presentation_poses": sorted({report["presentation_pose"] for report in results}),
+        "pose_families": sorted({report["pose_family"] for report in results}),
         "max_contact_distance": max((report["equipment_contact_distance"] for report in results), default=None),
         "minimum_deformable_meshes": min((report["deformable_meshes"] for report in results), default=None),
         "equipment_frame_extents": ({
