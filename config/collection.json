@@ -9,6 +9,18 @@
   "mint_price_eth": "0.003",
   "max_per_wallet": 5,
   "royalty_bps": 500,
+  "gameplay": {
+    "base_stat_points": 30,
+    "rarity_signature_edge_percentage_points": {
+      "Common": 0,
+      "Uncommon": 1,
+      "Rare": 2,
+      "Epic": 3,
+      "Legendary": 4
+    },
+    "rarity_edge_scope": "signature_trick_only",
+    "rarity_edge_policy": "Rarity adds a small fixed percentage-point bonus only when the Goon attempts its visible trick specialty. It does not change base stats or every-trick odds."
+  },
   "image_base_uri": "ipfs://REPLACE_IMAGE_CID/",
   "genesis_metadata_base_uri": "ipfs://REPLACE_GENESIS_CID/",
   "dynamic_metadata_base_url": "https://gravitygoons.com/api/nft/v1/",

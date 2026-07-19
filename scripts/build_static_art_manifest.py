@@ -19,6 +19,15 @@ STYLE_LOCK = (
     "toy-like proportions, simplified mannequins, card UI, captions, watermarks, or real trademarks."
 )
 
+POSE_GUIDANCE = {
+    "Tail Plant": (
+        "Tail Plant geometry is mandatory: keep the skateboard flat on the ground; place the rear "
+        "shoe on the short tail/back quarter behind the rear truck; keep the other shoe on the ground. "
+        "Show exactly two trucks and four wheels. Never put a foot on the nose or between the trucks, "
+        "and never float or stand the board vertically."
+    )
+}
+
 
 def prompt_for(token: dict) -> str:
     person = (
@@ -28,10 +37,12 @@ def prompt_for(token: dict) -> str:
     )
     eyewear = "no eyewear" if token["eyewear"] == "None" else token["eyewear"].lower()
     accessory = "no extra accessory" if token["accessory"] == "None" else token["accessory"].lower()
+    pose_guidance = f"{POSE_GUIDANCE[token['pose']]} " if token["pose"] in POSE_GUIDANCE else ""
     return (
         f"{STYLE_LOCK} Create a NEW unique Gravity Goon: {person}, {token['body_build'].lower()} "
         f"athletic build, {token['eyes'].lower()} eyes, {token['expression'].lower()} expression. "
         f"Discipline: {token['discipline']}; {token['stance'].lower()} stance; pose: {token['pose']}. "
+        f"{pose_guidance}"
         f"Show the complete {token['sport_equipment']} prominently. Outfit: {token['apparel']}, "
         f"{token['bottom']}, {token['footwear']}, {token['headwear']}, {eyewear}, {accessory}. "
         f"Use fictional label {token['parody_brand']} with an original abstract symbol only. "

@@ -98,6 +98,12 @@
     },
     {
       "display_type": "number",
+      "trait_type": "Signature Edge",
+      "value": 0,
+      "max_value": 4
+    },
+    {
+      "display_type": "number",
       "trait_type": "Speed",
       "value": 6,
       "max_value": 10

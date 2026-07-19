@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import collection from "@/data/collection.json";
+import { signatureEdgeForRarity } from "@/lib/gameplay";
 import tricks from "@/data/tricks.json";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { publicClient, registryAbi, registryAddress, ZERO_ADDRESS } from "@/lib/contracts";
@@ -46,6 +47,7 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
     { trait_type: "Trick Specialty", value: token.trick_specialty },
     { trait_type: "Accessory", value: token.accessory }, { trait_type: "Background", value: token.background },
     { trait_type: "Rarity", value: token.rarity },
+    { display_type: "number", trait_type: "Signature Edge", value: signatureEdgeForRarity(token.rarity), max_value: 4 },
     ...Object.entries(token.stats).map(([trait_type, value]) => ({ display_type: "number", trait_type, value, max_value: 10 })),
     { display_type: "number", trait_type: "Level", value: progress.level || 1 },
     { display_type: "number", trait_type: "XP", value: Number(progress.xp) },

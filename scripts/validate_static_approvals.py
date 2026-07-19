@@ -48,6 +48,14 @@ def main() -> None:
         errors.append("Assignments and prompt manifest must both contain 1,000 tokens")
     if len({entry["prompt"] for entry in prompts}) != 1000:
         errors.append("Static-art prompts must be unique")
+    tail_plant_ids = [token["token_id"] for token in tokens if token["pose"] == "Tail Plant"]
+    malformed_tail_prompts = [
+        token_id for token_id in tail_plant_ids
+        if "rear shoe on the short tail/back quarter behind the rear truck" not in prompts[token_id - 1]["prompt"]
+        or "Never put a foot on the nose or between the trucks" not in prompts[token_id - 1]["prompt"]
+    ]
+    if malformed_tail_prompts:
+        errors.append(f"Tail Plant prompts missing canonical foot/board geometry: {malformed_tail_prompts}")
     coverage = {
         "cast": sorted({token["cast"] for token in selected}),
         "disciplines": sorted({token["discipline"] for token in selected}),
@@ -74,6 +82,10 @@ def main() -> None:
         "coverage": coverage,
         "collection_assignments": len(tokens),
         "unique_static_prompts": len({entry["prompt"] for entry in prompts}),
+        "tail_plant_prompt_rules": {
+            "assignments": len(tail_plant_ids),
+            "malformed": malformed_tail_prompts,
+        },
         "mint_gate": "closed_until_1000_final_images_validate",
     }
     REPORT.write_text(json.dumps(report, indent=2) + "\n")

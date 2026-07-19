@@ -63,7 +63,7 @@ export default function Home() {
         <div className="game-grid">
           <article><b>01</b><h3>Match your discipline</h3><p>Skaters battle skaters. Surfers battle surfers. Each of the six sports gets its own trick catalog, matchup identity, and strategic rhythm.</p></article>
           <article><b>02</b><h3>Choose the trick</h3><p>Call the move you want your Goon to attempt. Safer tricks can apply steady pressure; ambitious tricks can change the entire battle.</p></article>
-          <article><b>03</b><h3>Know your odds</h3><p>Every Goon starts with 30 stat points, and rarity adds no bonus. Speed, Air, Control, Style, and Toughness help determine a visible landing percentage.</p></article>
+          <article><b>03</b><h3>Know your odds</h3><p>Every Goon starts with 30 balanced stat points. Rarity adds a small signature-trick edge: Common +0, Uncommon +1, Rare +2, Epic +3, and Legendary +4 percentage points. Stats still drive the matchup; rarity never guarantees the landing.</p></article>
           <article><b>04</b><h3>Progress travels</h3><p>Future XP, learned tricks, achievements, and battle history are designed to stay with the NFT—even when the Goon changes wallets.</p></article>
         </div>
       </section>

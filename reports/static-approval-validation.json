@@ -110,5 +110,9 @@
   },
   "collection_assignments": 1000,
   "unique_static_prompts": 1000,
+  "tail_plant_prompt_rules": {
+    "assignments": 55,
+    "malformed": []
+  },
   "mint_gate": "closed_until_1000_final_images_validate"
 }

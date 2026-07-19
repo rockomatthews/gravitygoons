@@ -6,6 +6,7 @@ import { createWalletClient, custom, parseEther } from "viem";
 import { base } from "viem/chains";
 import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { useWallet } from "@/components/WalletProvider";
+import { signatureEdgeForRarity } from "@/lib/gameplay";
 
 type Token = {
   token_id: number;
@@ -155,6 +156,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>
                 <h3>{token.species} · {token.body_build}</h3>
                 <p className="card-brand">{token.parody_brand} · {token.sport_equipment}</p>
+                <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
               </div>
             </article>

@@ -320,13 +320,13 @@
         2048,
         2048
       ],
-      "master_sha256": "63c942b3f5d6bdd1d07ad23e15202401228b4692c4e3fe08a2a777bf5fca6ca3",
+      "master_sha256": "0047aedadc6cd89e1160280bf733687e1a60f45343cb0d04642d6abc37dc96b4",
       "marketplace_file": "0008.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "e297e931db844fc08ffdc5077e188298bb059764465c6bff9d4927cb87eea693",
+      "marketplace_sha256": "0132a73eef4e1687f5199208a257ef290e8374900829ee366a7612c8c0daa87f",
       "assignment_sha256": "69d30a87be1ed0a8b9461c422cf83e9c064baa70ae0e1d5957a4e8a6e487c661",
       "genesis_metadata_file": "0008.json",
       "genesis_metadata_sha256": "bf9363357195f0b19c011ee2913c663b26b7d80a4541255260a1a349227bd4dd",
@@ -344,13 +344,13 @@
           1254,
           1254
         ],
-        "source_sha256": "827cffea6938a617b7377948d417b9d00ebaf78be5c8d6d971db6408ddb7ec91",
+        "source_sha256": "3be03ae3c99acd061f21d5e258d81c63f0e696fc6ebccd2ccdc3040698cb2cc5",
         "master_file": "0008.png",
         "master_size": [
           2048,
           2048
         ],
-        "master_sha256": "63c942b3f5d6bdd1d07ad23e15202401228b4692c4e3fe08a2a777bf5fca6ca3",
+        "master_sha256": "0047aedadc6cd89e1160280bf733687e1a60f45343cb0d04642d6abc37dc96b4",
         "assignment_sha256": "69d30a87be1ed0a8b9461c422cf83e9c064baa70ae0e1d5957a4e8a6e487c661",
         "promotion_resampling": "Pillow LANCZOS"
       }
@@ -406,13 +406,13 @@
         2048,
         2048
       ],
-      "master_sha256": "5fb7721ff726b7417e2d84658f7b419241d7d26cc8d831f1349a658c8d8da070",
+      "master_sha256": "fe05964e48c1c939204d0b35c3ef9d840695e0797cfd28038d61a6361cc5a8d3",
       "marketplace_file": "0010.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "eace33fdab22f74a93aea68142575c55126a1559e17744961503a64c9da22f95",
+      "marketplace_sha256": "782c1093c2cbae017cac4ac81feb6e045f27d410e933671aeb08b557520ee4de",
       "assignment_sha256": "2b2148ae5fe38df605b81aa72e5356c24c58f6fa91bbd2b4d790f1f3ef9d553d",
       "genesis_metadata_file": "0010.json",
       "genesis_metadata_sha256": "76e7aa85915ecb30b0a315e9b88ad970ecc2122be782debde7137e5df95f9177",
@@ -430,13 +430,13 @@
           1254,
           1254
         ],
-        "source_sha256": "b8802bf555b2dddfbc39e73704a915b75c2f0122c4b844dd80ac8117c7ca052b",
+        "source_sha256": "bf71eac3bee86f4cb9c99dbce580113ff02827362c209f7278965ca14764e874",
         "master_file": "0010.png",
         "master_size": [
           2048,
           2048
         ],
-        "master_sha256": "5fb7721ff726b7417e2d84658f7b419241d7d26cc8d831f1349a658c8d8da070",
+        "master_sha256": "fe05964e48c1c939204d0b35c3ef9d840695e0797cfd28038d61a6361cc5a8d3",
         "assignment_sha256": "2b2148ae5fe38df605b81aa72e5356c24c58f6fa91bbd2b4d790f1f3ef9d553d",
         "promotion_resampling": "Pillow LANCZOS"
       }
@@ -1395,13 +1395,13 @@
         2048,
         2048
       ],
-      "master_sha256": "9aeb94584ee5db1f27239d2d623ce7da162a53e3a7cbdd5e8c27babeac6cfa93",
+      "master_sha256": "4f7d06944a9bd5011f0dfa7c8cb5019f8899f185eafc72e8d3a672878267ad5e",
       "marketplace_file": "0144.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "c8f24c6629fbca21b01d4f58d83933051ec6ff23d312b90926ee258141e9fa9b",
+      "marketplace_sha256": "8dfa549a46a77a58e1768bbba5c291bec4195904d3b7a6f57039ccb11d1ef340",
       "assignment_sha256": "6a0a54683abb0950abd2ce813e0d6367aee18a7d4c4ec6af68725095685b268b",
       "genesis_metadata_file": "0144.json",
       "genesis_metadata_sha256": "22404581daafbeb9f3bedc723faa2ddad0dc16f4b66b6ca3bce10ebe7e96f9f0",
@@ -1419,13 +1419,13 @@
           1254,
           1254
         ],
-        "source_sha256": "9304331fa47db9d2769c7c22aec858980513642818bb01cc0b3905d3e057fdfa",
+        "source_sha256": "d937bd4f382dac5630d9eb7472bb7948bbaa93d15ca749c48272aa6daae093ee",
         "master_file": "0144.png",
         "master_size": [
           2048,
           2048
         ],
-        "master_sha256": "9aeb94584ee5db1f27239d2d623ce7da162a53e3a7cbdd5e8c27babeac6cfa93",
+        "master_sha256": "4f7d06944a9bd5011f0dfa7c8cb5019f8899f185eafc72e8d3a672878267ad5e",
         "assignment_sha256": "6a0a54683abb0950abd2ce813e0d6367aee18a7d4c4ec6af68725095685b268b",
         "promotion_resampling": "Pillow LANCZOS"
       }
@@ -1696,13 +1696,13 @@
         2048,
         2048
       ],
-      "master_sha256": "201eba39347dd0f5e7d2c0e81cad69ecb00add1aecc9bb76ef3d9bb964972ea2",
+      "master_sha256": "6759da6e670c54698f8ad0bc323aa49b183213fdff9c23bd6aa19e4fd89c1496",
       "marketplace_file": "0353.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "af92d5273ca5e6173ed8d0bf63afffc622d113894ba59f80c2444fabc7f7cf97",
+      "marketplace_sha256": "c44b00b92b6802e1b93d031be1e0adca5da9cd54d744fa14a9cce14ae872e97b",
       "assignment_sha256": "7250e404ec5f4e85fd5f88343d90dda8f070c2ef8323709456af96c577ffd088",
       "genesis_metadata_file": "0353.json",
       "genesis_metadata_sha256": "5b586721b910f80c8ac1f0102e36eb7b1708b988dfca2a9fddfa6cf38d946c1e",
@@ -1720,13 +1720,13 @@
           1254,
           1254
         ],
-        "source_sha256": "a548d19568da020c1471b733b90e36d4aa03790c9fc8b0f1388eb417ad6ef28c",
+        "source_sha256": "8ada0c4a70e92876db804a692f985c85dea0a9672abb1cd75d14e8468d4c5a68",
         "master_file": "0353.png",
         "master_size": [
           2048,
           2048
         ],
-        "master_sha256": "201eba39347dd0f5e7d2c0e81cad69ecb00add1aecc9bb76ef3d9bb964972ea2",
+        "master_sha256": "6759da6e670c54698f8ad0bc323aa49b183213fdff9c23bd6aa19e4fd89c1496",
         "assignment_sha256": "7250e404ec5f4e85fd5f88343d90dda8f070c2ef8323709456af96c577ffd088",
         "promotion_resampling": "Pillow LANCZOS"
       }

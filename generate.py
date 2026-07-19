@@ -198,6 +198,7 @@ def build_assignments(config: dict) -> list[dict]:
 
 def metadata_for(item: dict, config: dict) -> dict:
     token_id = item["token_id"]
+    signature_edge = config["gameplay"]["rarity_signature_edge_percentage_points"][item["rarity"]]
     attributes = [
         {"trait_type": "Cast", "value": item["cast"]},
         {"trait_type": "Species", "value": item["species"]},
@@ -222,6 +223,7 @@ def metadata_for(item: dict, config: dict) -> dict:
         {"trait_type": "Accessory", "value": item["accessory"]},
         {"trait_type": "Background", "value": item["background"]},
         {"trait_type": "Rarity", "value": item["rarity"]},
+        {"display_type": "number", "trait_type": "Signature Edge", "value": signature_edge, "max_value": 4},
     ]
     attributes.extend(
         {"display_type": "number", "trait_type": name, "value": value, "max_value": 10}
@@ -269,6 +271,9 @@ def validate(assignments: list[dict], config: dict) -> dict:
         errors.append("Not every parody brand appears in the collection")
     if set(body_builds) != set(config["body_builds"]):
         errors.append("Not every body build appears in the collection")
+    rarity_edges = config.get("gameplay", {}).get("rarity_signature_edge_percentage_points", {})
+    if rarity_edges != {"Common": 0, "Uncommon": 1, "Rare": 2, "Epic": 3, "Legendary": 4}:
+        errors.append("Rarity signature-edge schedule does not match the locked +0/+1/+2/+3/+4 rule")
     for item in assignments:
         values = list(item["stats"].values())
         if sum(values) != 30 or min(values) < 4 or max(values) > 8:
@@ -292,6 +297,8 @@ def validate(assignments: list[dict], config: dict) -> dict:
         "sport_equipment": dict(equipment),
         "body_builds": dict(body_builds),
         "stat_rule": "Each token totals 30; every stat is between 4 and 8.",
+        "rarity_signature_edge": rarity_edges,
+        "rarity_edge_scope": config.get("gameplay", {}).get("rarity_edge_scope"),
         "sport_compatibility": "Every pose, top, bottom, footwear item, and equipment prop matches its discipline.",
     }
 

@@ -134,6 +134,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .card-brand { min-height: 28px; margin: 0 0 12px; color: var(--teal); font: 800 8px/1.5 var(--mono); text-transform: uppercase; }
 .mini-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .mini-stats span { padding: 6px 2px; background: #1a222c; color: #c7d1d6; text-align: center; font: 8px var(--mono); }
+.signature-edge { margin: 8px 0; color: #ffca38; font: 700 8px var(--mono); letter-spacing: .04em; text-transform: uppercase; }
 .load { display: flex; margin: 40px auto; }
 .mint-dock { position: fixed; left: 50%; bottom: 18px; z-index: 50; width: min(800px, calc(100% - 28px)); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 14px; color: var(--void); background: #eefaf7f2; backdrop-filter: blur(16px); border: 1px solid white; box-shadow: 0 25px 90px #000; transform: translate(-50%, 150%); transition: transform .35s; }
 .mint-dock.show { transform: translate(-50%, 0); }
@@ -167,6 +168,10 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .large-stats div { display: grid; grid-template-columns: 100px 30px 1fr; align-items: center; gap: 10px; }
 .large-stats span { font: 10px var(--mono); text-transform: uppercase; }
 .large-stats i { height: 7px; display: block; background: var(--teal); box-shadow: 0 0 12px #18f1dc66; }
+.signature-edge-detail { margin: 0 0 36px; padding: 18px; border: 1px solid #ffca3855; background: linear-gradient(135deg, #ffca3814, #18f1dc0b); }
+.signature-edge-detail span { display: block; color: #ffca38; font: 800 9px var(--mono); letter-spacing: .12em; }
+.signature-edge-detail b { display: block; margin-top: 8px; color: #fff; font: 800 15px var(--display); text-transform: uppercase; }
+.signature-edge-detail p { margin: 7px 0 0; color: #9daab4; font: 10px/1.55 var(--mono); }
 .character-detail dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .character-detail dl div { padding: 12px; background: #111820; border: 1px solid #202a33; }
 .character-detail dt { color: var(--muted); font: 8px var(--mono); text-transform: uppercase; }

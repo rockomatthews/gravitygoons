@@ -2,6 +2,7 @@ import collection from "@/data/collection.json";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { RARITY_EDGE_DESCRIPTION, signatureEdgeForRarity } from "@/lib/gameplay";
 
 export default async function CharacterPage({ params }: { params: Promise<{ tokenId: string }> }) {
   const { tokenId: raw } = await params;
@@ -18,6 +19,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ toke
           <h1>{token.name}</h1>
           <p>{token.species} · {token.expression} · {token.stance}</p>
           <div className="large-stats">{Object.entries(token.stats).map(([name, value]) => <div key={name}><span>{name}</span><b>{value}</b><i style={{ width: `${value * 10}%` }} /></div>)}</div>
+          <div className="signature-edge-detail"><span>SIGNATURE TRICK EDGE</span><b>{token.trick_specialty} · +{signatureEdgeForRarity(token.rarity)} percentage points</b><p>{RARITY_EDGE_DESCRIPTION}</p></div>
           <h2>Genesis traits</h2>
           <dl>{["cast", "species", "archetype", "body_build", "complexion", "parody_brand", "headwear", "eyewear", "apparel", "bottom", "footwear", "sport_equipment", "pose", "play_style", "trick_specialty", "accessory", "background"].map((key) => <div key={key}><dt>{key.replaceAll("_", " ")}</dt><dd>{String(token[key as keyof typeof token])}</dd></div>)}</dl>
           <div className="progress-preview"><span>FUTURE BATTLE PROFILE · {token.discipline}</span><b>LEVEL 1 · 0 XP · 0/64 TRICKS</b></div>

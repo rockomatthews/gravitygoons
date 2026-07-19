@@ -51,5 +51,13 @@
     "Compact": 250
   },
   "stat_rule": "Each token totals 30; every stat is between 4 and 8.",
+  "rarity_signature_edge": {
+    "Common": 0,
+    "Uncommon": 1,
+    "Rare": 2,
+    "Epic": 3,
+    "Legendary": 4
+  },
+  "rarity_edge_scope": "signature_trick_only",
   "sport_compatibility": "Every pose, top, bottom, footwear item, and equipment prop matches its discipline."
 }

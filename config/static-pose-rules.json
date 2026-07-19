@@ -1,0 +1,14 @@
+{
+  "Tail Plant": {
+    "canonical_display_pose": "Skateboard flat on the ground; rear shoe on the short tail behind the rear truck; other shoe on the ground; no shoe on the nose or between the trucks.",
+    "required_checks": [
+      "complete skateboard",
+      "exactly two trucks",
+      "exactly four wheels",
+      "rear shoe behind rear truck",
+      "support shoe on ground",
+      "no foot on nose",
+      "no floating board"
+    ]
+  }
+}
