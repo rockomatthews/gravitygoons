@@ -19,16 +19,16 @@
         2048,
         2048
       ],
-      "master_sha256": "e494e6f430d9a03b4aa10e55743de5f01eaecd56dc450a5a6c92b2b6c9820801",
+      "master_sha256": "8f143b0c57ebac9cca99ca06b843163b3d5588a54049fbb1c5041c366bd0917d",
       "marketplace_file": "0001.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "a22d0e0a181a9aadf7d928929b0515e7ff7cee6ca648710a2a88c8f2592d7297",
+      "marketplace_sha256": "64948555b2438013f3c3bd575a1c2d14df42c9d83d7cf1ddeac20fade8e2b700",
       "assignment_sha256": "c3c698d1faa865567ebfb67c0a7425562966a68070c8f5f28cc398da261d927c",
       "genesis_metadata_file": "0001.json",
-      "genesis_metadata_sha256": "5b2ec84555ed7032aadcac66400a276e5cb2923dca8a6ca564bc00c5d3583105",
+      "genesis_metadata_sha256": "4691d430b0a03f0a1344196a1ace71bbfb20977d760c9f821bbb800a44b1ebc5",
       "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0001.png",
       "discipline": "Surfing",
       "species": "Hyena",
@@ -52,9 +52,10 @@
         "resolution": 2048,
         "rig_bones": 22,
         "rig_schema": "gravity-goons-rig-v1",
-        "sha256": "e494e6f430d9a03b4aa10e55743de5f01eaecd56dc450a5a6c92b2b6c9820801",
+        "sha256": "8f143b0c57ebac9cca99ca06b843163b3d5588a54049fbb1c5041c366bd0917d",
         "species": "Hyena",
-        "token_id": 1
+        "token_id": 1,
+        "visual_detail_system": "sculpt-material-detail-v2"
       }
     },
     {
@@ -65,16 +66,16 @@
         2048,
         2048
       ],
-      "master_sha256": "e4c71206913efb9e06fed06074f4a062580f21a6c9db58e118a0c4446fda712d",
+      "master_sha256": "98f425eb016744cce7580f65c5a058cde9a51d3d4047168455eaa96e96395ed3",
       "marketplace_file": "0022.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "026bbd952c2b37ffd7bd82624ad34d7181d5aa495eb365d19e03f3354537083e",
+      "marketplace_sha256": "aba25a7ee919309b9262a5a78dafa8623b4ac9d6753f7057bbe3bbf2761076d8",
       "assignment_sha256": "6ad8290388ce758a98b2302deddfe4a71f0ba58c47fe36a0a9d8557cce9e05bb",
       "genesis_metadata_file": "0022.json",
-      "genesis_metadata_sha256": "2712589c784da295cb4ce2b416c631cea9953b7323d742bd16d600bd78ced494",
+      "genesis_metadata_sha256": "745a6907f6d7167803fc992b27cba70aec7b852f99cf1cbafb4a53c6bdbc0ddf",
       "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0022.png",
       "discipline": "Motocross",
       "species": "Ram",
@@ -98,9 +99,10 @@
         "resolution": 2048,
         "rig_bones": 22,
         "rig_schema": "gravity-goons-rig-v1",
-        "sha256": "e4c71206913efb9e06fed06074f4a062580f21a6c9db58e118a0c4446fda712d",
+        "sha256": "98f425eb016744cce7580f65c5a058cde9a51d3d4047168455eaa96e96395ed3",
         "species": "Ram",
-        "token_id": 22
+        "token_id": 22,
+        "visual_detail_system": "sculpt-material-detail-v2"
       }
     },
     {
@@ -111,16 +113,16 @@
         2048,
         2048
       ],
-      "master_sha256": "8010c22cc88aea1ce535ea4f34fd92447159fb96f063cf8a47536e0978773d73",
+      "master_sha256": "a078ce610bdbad3a719e4fc503c71fae7ff36a99f0df7972af255164082c8486",
       "marketplace_file": "0042.png",
       "marketplace_size": [
         1024,
         1024
       ],
-      "marketplace_sha256": "76813da63b11628c783eee07e68cf5b46320448cf39b0d12d91684e85d9d5a63",
+      "marketplace_sha256": "f929cc881476771b13bf2d925e8bb4211fac00c10e4055c7428926423dd1a6f3",
       "assignment_sha256": "977b21d5372d233ea9fc7b71d07ab112d9dbaef1d151582655d87162aba35f6e",
       "genesis_metadata_file": "0042.json",
-      "genesis_metadata_sha256": "a6e0f1c346707a57884f8b7fc17c276a58b8a9483806164ad399ed522a15b86d",
+      "genesis_metadata_sha256": "8c801753fde511f62ea2d957d8cdb03c073b7a19981823c123c7e51efbd861de",
       "metadata_image_uri": "ipfs://REPLACE_IMAGE_CID/0042.png",
       "discipline": "Skiing",
       "species": "Snow Leopard",
@@ -144,9 +146,10 @@
         "resolution": 2048,
         "rig_bones": 22,
         "rig_schema": "gravity-goons-rig-v1",
-        "sha256": "8010c22cc88aea1ce535ea4f34fd92447159fb96f063cf8a47536e0978773d73",
+        "sha256": "a078ce610bdbad3a719e4fc503c71fae7ff36a99f0df7972af255164082c8486",
         "species": "Snow Leopard",
-        "token_id": 42
+        "token_id": 42,
+        "visual_detail_system": "sculpt-material-detail-v2"
       }
     }
   ]

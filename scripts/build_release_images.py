@@ -30,6 +30,7 @@ def main() -> None:
     parser.add_argument("--metadata-dir", type=Path, default=ROOT / "genesis_metadata")
     parser.add_argument("--expected", type=int)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--manifest-output", type=Path, help="Optional second path for the release manifest")
     options = parser.parse_args()
 
     assignment_data = json.loads(options.assignments.read_text())
@@ -120,6 +121,9 @@ def main() -> None:
     }
     manifest_path = options.output_dir / "release-manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+    if options.manifest_output:
+        options.manifest_output.parent.mkdir(parents=True, exist_ok=True)
+        options.manifest_output.write_text(json.dumps(manifest, indent=2) + "\n")
     print(json.dumps({key: value for key, value in manifest.items() if key != "records"}, indent=2))
 
 

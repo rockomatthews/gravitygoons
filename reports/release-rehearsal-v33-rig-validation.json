@@ -1,0 +1,108 @@
+{
+  "valid": true,
+  "blend_files": 3,
+  "valid_files": 3,
+  "failures": [],
+  "disciplines": [
+    "Motocross",
+    "Skiing",
+    "Surfing"
+  ],
+  "presentation_poses": [
+    "Beach Plant",
+    "Bike Beside",
+    "Skis Shouldered"
+  ],
+  "pose_families": [
+    "Callout",
+    "Ready"
+  ],
+  "max_contact_distance": 0.0,
+  "minimum_deformable_meshes": 17,
+  "equipment_frame_extents": {
+    "left": 0.493,
+    "right": 0.9402,
+    "bottom": 0.0219,
+    "top": 0.627
+  },
+  "results": [
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 101,
+      "equipment_modules": 6,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.5956,
+        "right": 0.9402,
+        "bottom": 0.0219,
+        "top": 0.627
+      },
+      "token_id": 1,
+      "discipline": "Surfing",
+      "presentation_pose": "Beach Plant",
+      "pose_family": "Callout",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 101,
+      "equipment_modules": 12,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.493,
+        "right": 0.9333,
+        "bottom": 0.1003,
+        "top": 0.5414
+      },
+      "token_id": 22,
+      "discipline": "Motocross",
+      "presentation_pose": "Bike Beside",
+      "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "contact_solver": "body-source-assembly-translation-v2"
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "schema": "gravity-goons-rig-v1",
+      "bones": 22,
+      "attached_modules": 101,
+      "equipment_modules": 4,
+      "deformable_meshes": 17,
+      "equipment_contact_distance": 0.0,
+      "equipment_contact_limit": 0.42,
+      "equipment_contact_source": "Glove Palm 1",
+      "equipment_contact_role": "primary-hand-grip-v1",
+      "equipment_camera_bounds": {
+        "left": 0.6522,
+        "right": 0.8109,
+        "bottom": 0.1349,
+        "top": 0.608
+      },
+      "token_id": 42,
+      "discipline": "Skiing",
+      "presentation_pose": "Skis Shouldered",
+      "pose_family": "Ready",
+      "pose_mechanics": "named-pose-mechanics-v1",
+      "visual_detail_system": "sculpt-material-detail-v2",
+      "contact_solver": "body-source-assembly-translation-v2"
+    }
+  ]
+}

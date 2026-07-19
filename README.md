@@ -123,10 +123,11 @@ Build mint-release marketplace images from final 2048 masters:
 
 ```bash
 .venv/bin/python scripts/build_release_images.py masters images \
-  --expected 1000
+  --expected 1000 \
+  --manifest-output reports/final-release-manifest.json
 ```
 
-The release builder reads the configured 2048/1024 sizes, refuses missing or malformed masters, verifies every token against its fixed assignment and genesis metadata filename, creates deterministic LANCZOS marketplace PNGs, rejects duplicate file hashes, and writes `images/release-manifest.json`. Do not run the 1,000-token release command until the final art gate is approved.
+The release builder reads the configured 2048/1024 sizes, refuses missing or malformed masters, verifies every token against its fixed assignment and genesis metadata filename, creates deterministic LANCZOS marketplace PNGs, rejects duplicate file hashes, and writes `images/release-manifest.json`. `--manifest-output` optionally stores a tracked copy of the same evidence in `reports/`. Do not run the 1,000-token release command until the final art gate is approved.
 
 ## Contracts
 

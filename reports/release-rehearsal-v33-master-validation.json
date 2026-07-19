@@ -1,0 +1,43 @@
+{
+  "valid": true,
+  "errors": [],
+  "images": 3,
+  "unique_hashes": 3,
+  "resolution": 2048,
+  "disciplines": {
+    "Motocross": 1,
+    "Skiing": 1,
+    "Surfing": 1
+  },
+  "species": {
+    "Hyena": 1,
+    "Ram": 1,
+    "Snow Leopard": 1
+  },
+  "perceptual_hash_bits": 256,
+  "required_minimum_perceptual_distance": 12,
+  "minimum_perceptual_distance": 61,
+  "closest_visual_pairs": [
+    {
+      "distance": 61,
+      "tokens": [
+        1,
+        42
+      ]
+    },
+    {
+      "distance": 84,
+      "tokens": [
+        22,
+        42
+      ]
+    },
+    {
+      "distance": 93,
+      "tokens": [
+        1,
+        22
+      ]
+    }
+  ]
+}
