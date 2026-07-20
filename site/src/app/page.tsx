@@ -13,7 +13,9 @@ export default function Home() {
   return (
     <main>
       <header className="nav shell">
-        <a className="brand" href="#top"><span>GG</span><b>GRAVITY GOONS</b></a>
+        <a className="brand" href="#top" aria-label="Gravity Goons home">
+          <Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority />
+        </a>
         <nav><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><a href="#progression">Game DNA</a><Link href="/manage">Owner</Link></nav>
         <WalletButton />
       </header>

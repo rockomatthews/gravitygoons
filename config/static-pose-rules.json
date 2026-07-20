@@ -10,5 +10,30 @@
       "no foot on nose",
       "no floating board"
     ]
+  },
+  "Pop-Up Ready": {
+    "canonical_display_pose": "Surfer and surfboard travel on one shared axis; both feet are supported by the deck, with rear foot over the tail pad and front foot across the centerline; no foot floats beside the board.",
+    "required_checks": [
+      "one complete surfboard",
+      "both feet supported by deck",
+      "rear foot over tail pad",
+      "front foot across board centerline",
+      "hips and shoulders aligned with board travel",
+      "athlete and board face the same direction",
+      "no floating foot",
+      "no contradictory motion"
+    ]
+  },
+  "Binding Check": {
+    "canonical_display_pose": "Snowboard lies flat while the athlete crouches beside it with both boots outside the bindings and both hands checking the nearest binding; no crossed leg and no boot entering the opposite-side binding.",
+    "required_checks": [
+      "one complete snowboard",
+      "exactly two bindings",
+      "both boots outside bindings",
+      "hands on nearest binding",
+      "no crossed leg",
+      "no boot in opposite binding",
+      "board flat and supported"
+    ]
   }
 }
