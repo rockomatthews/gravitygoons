@@ -2,13 +2,13 @@
   "ready_for_base_sale": false,
   "mint_gate_should_be_open": false,
   "counts": {
-    "masters": 218,
-    "marketplace_images": 218,
+    "masters": 266,
+    "marketplace_images": 266,
     "metadata": 1000
   },
   "blockers": [
-    "masters: 218/1000",
-    "marketplace images: 218/1000",
+    "masters: 266/1000",
+    "marketplace images: 266/1000",
     "image IPFS CID not configured",
     "genesis metadata IPFS CID not configured",
     "progress registry not deployed"
