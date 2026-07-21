@@ -2,6 +2,7 @@ import collection from "@/data/collection.json";
 import { ApprovalRoster } from "@/components/ApprovalRoster";
 import { CollectionGallery } from "@/components/CollectionGallery";
 import { GravityWorld } from "@/components/GravityWorld";
+import { GameExplainer } from "@/components/GameExplainer";
 import { WalletButton } from "@/components/WalletButton";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +17,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Gravity Goons home">
           <Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority />
         </a>
-        <nav><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><Link href="/game">PvP Arena</Link><a href="#progression">Game DNA</a><Link href="/manage">Owner</Link></nav>
+        <nav><a href="#how-to-play">How to Play</a><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><Link href="/game">PvP Arena</Link><Link href="/manage">Owner</Link></nav>
         <WalletButton />
       </header>
 
@@ -39,6 +40,8 @@ export default function Home() {
           <div className="sticker">PICK<br />THE EXACT<br />GOON</div>
         </div>
       </section>
+
+      <GameExplainer />
 
       <section className="marquee"><div>SKATEBOARDING · SNOWBOARDING · SURFING · BMX · MOTOCROSS · SKIING · BREAK GRAVITY · SKATEBOARDING · SNOWBOARDING · SURFING · BMX · MOTOCROSS · SKIING · BREAK GRAVITY · </div></section>
 
