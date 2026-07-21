@@ -2,6 +2,7 @@ import collection from "@/data/collection.json";
 import { ApprovalRoster } from "@/components/ApprovalRoster";
 import { CollectionGallery } from "@/components/CollectionGallery";
 import { GravityWorld } from "@/components/GravityWorld";
+import { GameExplainer } from "@/components/GameExplainer";
 import { WalletButton } from "@/components/WalletButton";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +17,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Gravity Goons home">
           <Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority />
         </a>
-        <nav><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><a href="#progression">Game DNA</a><Link href="/manage">Owner</Link></nav>
+        <nav><a href="#how-to-play">How to Play</a><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><Link href="/game">PvP Arena</Link><Link href="/manage">Owner</Link></nav>
         <WalletButton />
       </header>
 
@@ -40,6 +41,8 @@ export default function Home() {
         </div>
       </section>
 
+      <GameExplainer />
+
       <section className="marquee"><div>SKATEBOARDING · SNOWBOARDING · SURFING · BMX · MOTOCROSS · SKIING · BREAK GRAVITY · SKATEBOARDING · SNOWBOARDING · SURFING · BMX · MOTOCROSS · SKIING · BREAK GRAVITY · </div></section>
 
       <section className="banner-cinema" aria-label="Gravity Goons cinematic collection banner">
@@ -61,7 +64,7 @@ export default function Home() {
       </section>
 
       <section className="game-section shell" id="progression">
-        <div><p className="eyebrow">THE FIRST GAME CONCEPT</p><h2>Call the trick.<br />Play the odds.</h2><p className="game-intro">Gravity Goons is planned as a blockchain-backed, turn-based trick battle. Skateboarders face skateboarders, BMX riders face BMX riders, and every other Goon competes within their own discipline. The exact rules, probability model, and game engine will be designed later.</p></div>
+        <div><p className="eyebrow">THE FIRST GAME MODE</p><h2>Call the trick.<br />Play the odds.</h2><p className="game-intro">Two discipline-matched Goons select tricks in secret. Difficulty creates risk, originality falls when a trick is repeated, and the round loser takes the next letter. First athlete to spell the discipline word loses the match.</p><Link className="button primary" href="/game">ENTER THE PVP LAB</Link></div>
         <div className="game-grid">
           <article><b>01</b><h3>Match your discipline</h3><p>Skaters battle skaters. Surfers battle surfers. Each of the six sports gets its own trick catalog, matchup identity, and strategic rhythm.</p></article>
           <article><b>02</b><h3>Choose the trick</h3><p>Call the move you want your Goon to attempt. Safer tricks can apply steady pressure; ambitious tricks can change the entire battle.</p></article>
