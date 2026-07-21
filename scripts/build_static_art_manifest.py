@@ -21,11 +21,23 @@ STYLE_LOCK = (
 
 POSE_GUIDANCE = {
     "Tail Plant": (
-        "Tail Plant geometry is mandatory: keep the skateboard flat on the ground; place the rear "
-        "shoe on the short tail/back quarter behind the rear truck; keep the other shoe on the ground. "
-        "Show exactly two trucks and four wheels. Never put a foot on the nose or between the trucks, "
-        "and never float or stand the board vertically."
-    )
+        "Tail Plant geometry is mandatory: plant the short skateboard tail on the ground and raise the "
+        "long nose upward at a controlled diagonal. Place the rear shoe directly on the short tail/back "
+        "quarter behind the rear truck so only the front toe/front third of that shoe presses the planted "
+        "tail while the heel and most of the shoe visibly overhang behind it; keep the other shoe flat on "
+        "the ground beside the board. Preserve normal skateboard proportions: the concave tail stays much "
+        "shorter than the shoe, must not stretch or widen to match the sole, and the toe must visibly contact "
+        "the tail with no air gap. Show exactly "
+        "two trucks and four wheels. Never put a foot on the "
+        "nose or between the trucks, never put the board flat beneath both feet, and never float the board."
+    ),
+    "Pop-Up Ready": (
+        "Surf direction geometry is mandatory: show the entire surfboard on one clear travel axis. "
+        "The narrow pointed nose is the front, while the broad tail, traction pad, and fins are all at "
+        "the rear. Both feet must be fully supported by the deck, with the rear foot over the traction "
+        "pad and the front foot toward the nose. Hips, shoulders, knees, head, board, and wave must all "
+        "face the same direction; never show a backward board or a mirrored rider traveling against it."
+    ),
 }
 
 
@@ -38,6 +50,13 @@ def prompt_for(token: dict) -> str:
     eyewear = "no eyewear" if token["eyewear"] == "None" else token["eyewear"].lower()
     accessory = "no extra accessory" if token["accessory"] == "None" else token["accessory"].lower()
     pose_guidance = f"{POSE_GUIDANCE[token['pose']]} " if token["pose"] in POSE_GUIDANCE else ""
+    if token["pose"] == "Pop-Up Ready":
+        lead_foot = "left" if token["stance"] == "Regular" else "right"
+        rear_foot = "right" if token["stance"] == "Regular" else "left"
+        pose_guidance += (
+            f"For this {token['stance'].lower()} stance, the anatomical {lead_foot} foot is forward "
+            f"toward the pointed nose and the anatomical {rear_foot} foot is rearward on the traction pad. "
+        )
     return (
         f"{STYLE_LOCK} Create a NEW unique Gravity Goon: {person}, {token['body_build'].lower()} "
         f"athletic build, {token['eyes'].lower()} eyes, {token['expression'].lower()} expression. "

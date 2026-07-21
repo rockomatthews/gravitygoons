@@ -51,11 +51,24 @@ def main() -> None:
     tail_plant_ids = [token["token_id"] for token in tokens if token["pose"] == "Tail Plant"]
     malformed_tail_prompts = [
         token_id for token_id in tail_plant_ids
-        if "rear shoe on the short tail/back quarter behind the rear truck" not in prompts[token_id - 1]["prompt"]
+        if "rear shoe directly on the short tail/back quarter behind the rear truck" not in prompts[token_id - 1]["prompt"]
         or "Never put a foot on the nose or between the trucks" not in prompts[token_id - 1]["prompt"]
+        or "plant the short skateboard tail on the ground" not in prompts[token_id - 1]["prompt"]
+        or "front toe/front third" not in prompts[token_id - 1]["prompt"]
+        or "heel and most of the shoe visibly overhang" not in prompts[token_id - 1]["prompt"]
+        or "tail stays much shorter than the shoe" not in prompts[token_id - 1]["prompt"]
     ]
     if malformed_tail_prompts:
         errors.append(f"Tail Plant prompts missing canonical foot/board geometry: {malformed_tail_prompts}")
+    pop_up_ids = [token["token_id"] for token in tokens if token["pose"] == "Pop-Up Ready"]
+    malformed_pop_up_prompts = [
+        token_id for token_id in pop_up_ids
+        if "narrow pointed nose is the front" not in prompts[token_id - 1]["prompt"]
+        or "traction pad, and fins are all at the rear" not in prompts[token_id - 1]["prompt"]
+        or "never show a backward board or a mirrored rider" not in prompts[token_id - 1]["prompt"]
+    ]
+    if malformed_pop_up_prompts:
+        errors.append(f"Pop-Up Ready prompts missing canonical travel geometry: {malformed_pop_up_prompts}")
     coverage = {
         "cast": sorted({token["cast"] for token in selected}),
         "disciplines": sorted({token["discipline"] for token in selected}),
@@ -85,6 +98,10 @@ def main() -> None:
         "tail_plant_prompt_rules": {
             "assignments": len(tail_plant_ids),
             "malformed": malformed_tail_prompts,
+        },
+        "pop_up_prompt_rules": {
+            "assignments": len(pop_up_ids),
+            "malformed": malformed_pop_up_prompts,
         },
         "mint_gate": "closed_until_1000_final_images_validate",
     }

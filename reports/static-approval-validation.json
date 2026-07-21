@@ -114,5 +114,9 @@
     "assignments": 55,
     "malformed": []
   },
+  "pop_up_prompt_rules": {
+    "assignments": 54,
+    "malformed": []
+  },
   "mint_gate": "closed_until_1000_final_images_validate"
 }

@@ -1,26 +1,42 @@
 {
   "Tail Plant": {
-    "canonical_display_pose": "Skateboard flat on the ground; rear shoe on the short tail behind the rear truck; other shoe on the ground; no shoe on the nose or between the trucks.",
+    "canonical_display_pose": "Short skateboard tail planted on the ground with the long nose raised diagonally; only the front toe/front third of the raised shoe presses the short tail behind the rear truck while the heel and most of the shoe overhang; other shoe stays flat on the ground.",
     "required_checks": [
       "complete skateboard",
       "exactly two trucks",
       "exactly four wheels",
-      "rear shoe behind rear truck",
+      "short tail planted on ground",
+      "normal short concave tail proportions",
+      "tail much shorter than shoe",
+      "tail not stretched or widened",
+      "long nose raised diagonally",
+      "front toe or front third of raised shoe behind rear truck",
+      "heel and most of raised shoe visibly overhang tail",
+      "toe visibly contacts tail with no air gap",
       "support shoe on ground",
       "no foot on nose",
+      "no foot between trucks",
+      "no flat riding stance",
       "no floating board"
     ]
   },
   "Pop-Up Ready": {
-    "canonical_display_pose": "Surfer and surfboard travel on one shared axis; both feet are supported by the deck, with rear foot over the tail pad and front foot across the centerline; no foot floats beside the board.",
+    "canonical_display_pose": "Surfer and surfboard travel on one shared axis; the narrow pointed nose is forward and the broad tail, traction pad, and fins are rearward; both feet are supported by the deck, with the rear foot over the tail pad and front foot toward the nose.",
     "required_checks": [
       "one complete surfboard",
+      "pointed nose at front",
+      "broad tail at rear",
+      "tail pad and fins at rear",
       "both feet supported by deck",
       "rear foot over tail pad",
-      "front foot across board centerline",
+      "front foot toward pointed nose",
+      "regular stance means anatomical left foot forward",
+      "goofy stance means anatomical right foot forward",
       "hips and shoulders aligned with board travel",
       "athlete and board face the same direction",
       "no floating foot",
+      "no backward board",
+      "no mirrored rider opposing board travel",
       "no contradictory motion"
     ]
   },
