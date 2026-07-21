@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts",
     "start": "next start",
     "lint": "eslint ."
   },
