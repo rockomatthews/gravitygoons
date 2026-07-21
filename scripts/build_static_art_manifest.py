@@ -38,6 +38,13 @@ POSE_GUIDANCE = {
         "pad and the front foot toward the nose. Hips, shoulders, knees, head, board, and wave must all "
         "face the same direction; never show a backward board or a mirrored rider traveling against it."
     ),
+    "Binding Check": (
+        "Binding Check geometry is mandatory: place one complete snowboard flat and supported on the "
+        "ground with exactly two bindings. The athlete crouches beside the board; both boots remain "
+        "fully outside both bindings while both hands inspect or adjust the nearest binding. Never cross "
+        "the legs, never place either boot into a binding, and never reach one boot toward the opposite-side "
+        "binding."
+    ),
 }
 
 

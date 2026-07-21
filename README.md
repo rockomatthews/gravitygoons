@@ -10,6 +10,9 @@ On each turn, a player chooses a discipline-specific trick. The Goon's five visi
 
 Production website: `https://gravitygoons.com`
 
+Static production uses the cost-controlled queue described in
+`harness/README.md`; agents should begin with `AGENTS.md`.
+
 ## Current milestone
 
 The repository implements the launch architecture, revised full-body **Approval Gate 1**, and a twelve-character **Gate 2 visual roster**. It does not claim that 1,000 final 3D renders exist yet: mass rendering remains gated on the collection look and trait catalog.

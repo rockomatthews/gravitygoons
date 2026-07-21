@@ -40,3 +40,24 @@ python3 scripts/validate_static_production.py
 The tracker rejects duplicate token IDs, exact image duplicates, non-PNG files,
 non-square sources, and sources below 1,024px. Visual metadata alignment remains
 a mandatory human review before a source is accepted.
+
+## Cost-controlled generation queue
+
+Before any paid/static image generation round, rebuild the deterministic prompt
+manifest and run the no-write harness preflight:
+
+```bash
+python3 scripts/build_static_art_manifest.py
+python3 scripts/build_generation_queue.py --check-only
+```
+
+Build twelve four-image rounds containing only currently unaccepted token IDs:
+
+```bash
+python3 scripts/build_generation_queue.py --count 48 --group-size 4
+```
+
+The disposable queue is written to `.harness-state/production-queue.json`. It
+includes exact prompts, prompt hashes, fragile-pose flags, and mandatory visual
+checks. Rebuild it after every accepted batch; never regenerate an ID already
+present in an accepted source directory.

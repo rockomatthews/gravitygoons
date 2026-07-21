@@ -1,0 +1,18 @@
+{
+  "schema": "gravity-goons-production-harness-v1",
+  "assignment_file": "traits/assignments.json",
+  "prompt_manifest": "art/static-collection/prompt-manifest.json",
+  "pose_rules": "config/static-pose-rules.json",
+  "accepted_source_dirs": [
+    "art/static-collection/approval-v1",
+    "art/static-collection/stress-50/generated",
+    "art/static-collection/production"
+  ],
+  "queue_output": ".harness-state/production-queue.json",
+  "default_queue_count": 48,
+  "default_group_size": 4,
+  "max_attempts_before_rule_review": 2,
+  "never_regenerate_accepted": true,
+  "mint_gate": "closed_until_1000_final_images_validate"
+}
+
