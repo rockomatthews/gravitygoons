@@ -1,18 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Image from "next/image";
+import { useMemo, useState, type CSSProperties } from "react";
 import {
-  DISCIPLINE_WORDS,
+  SPONSOR_CATALOG,
   TRICK_CATALOG,
+  acceptSponsor,
   addTrickUse,
   landingChance,
   lettersForLosses,
   matchIsOver,
+  nextSponsorMilestone,
   originalityScore,
+  pendingSponsorOffers,
+  recordVerifiedRankedWin,
   resolveRound,
+  sponsorById,
+  unlockedTricks,
   type Athlete,
   type Discipline,
   type RoundResult,
+  type SponsorProgression,
   type TrickHistory,
 } from "@/lib/pvp";
 
@@ -42,6 +50,17 @@ function randomSeed(round: number): string {
   return `demo:${round}:${Array.from(values).map((value) => value.toString(16).padStart(8, "0")).join("")}`;
 }
 
+function demoProgression(tokenId: number): SponsorProgression {
+  const verifiedRankedWins = tokenId === 34 ? 16 : tokenId === 35 ? 4 : tokenId % 5;
+  let progression: SponsorProgression = { verifiedRankedWins, sponsors: [] };
+  for (const milestone of [5, 15]) {
+    if (verifiedRankedWins < milestone) continue;
+    const options = SPONSOR_CATALOG.filter((item) => item.requiredWins === milestone);
+    progression = acceptSponsor(progression, options[tokenId % options.length].id);
+  }
+  return progression;
+}
+
 export function GameArena({ goons }: { goons: ArenaGoon[] }) {
   const disciplines = useMemo(() => Array.from(new Set(goons.map((goon) => goon.discipline))), [goons]);
   const [discipline, setDiscipline] = useState<Discipline>("Skateboarding");
@@ -57,9 +76,16 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
   const [result, setResult] = useState<RoundResult | null>(null);
   const [prediction, setPrediction] = useState<number | null>(null);
   const [playPoints, setPlayPoints] = useState(1000);
+  const [progression, setProgression] = useState<Record<number, SponsorProgression>>(() => Object.fromEntries(
+    goons.map((goon) => [goon.tokenId, demoProgression(goon.tokenId)]),
+  ));
 
-  const firstTrick = tricks.find((trick) => trick.id === firstTrickId) ?? tricks[0];
-  const secondTrick = tricks.find((trick) => trick.id === secondTrickId) ?? tricks[1];
+  const firstProgression = progression[first.tokenId] ?? { verifiedRankedWins: 0, sponsors: [] };
+  const secondProgression = progression[second.tokenId] ?? { verifiedRankedWins: 0, sponsors: [] };
+  const firstAvailableTricks = unlockedTricks(discipline, firstProgression);
+  const secondAvailableTricks = unlockedTricks(discipline, secondProgression);
+  const firstTrick = firstAvailableTricks.find((trick) => trick.id === firstTrickId) ?? firstAvailableTricks[0];
+  const secondTrick = secondAvailableTricks.find((trick) => trick.id === secondTrickId) ?? secondAvailableTricks[1] ?? secondAvailableTricks[0];
   const ended = matchIsOver(discipline, match.losses[first.tokenId] ?? 0) || matchIsOver(discipline, match.losses[second.tokenId] ?? 0);
 
   function reset(nextDiscipline = discipline) {
@@ -103,6 +129,14 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
     if (prediction !== null && next.winnerTokenId !== null) {
       setPlayPoints((points) => Math.max(0, points + (prediction === next.winnerTokenId ? 100 : -25)));
     }
+    const completedMatch = next.loserTokenId !== null && matchIsOver(discipline, losses[next.loserTokenId]);
+    if (completedMatch && next.winnerTokenId !== null) {
+      const winnerTokenId = next.winnerTokenId;
+      setProgression((current) => ({
+        ...current,
+        [winnerTokenId]: recordVerifiedRankedWin(current[winnerTokenId] ?? { verifiedRankedWins: 0, sponsors: [] }),
+      }));
+    }
     setMatch({
       losses,
       wins,
@@ -115,6 +149,13 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
     });
     setResult(next);
     setPrediction(null);
+  }
+
+  function chooseSponsor(tokenId: number, sponsorId: string) {
+    setProgression((current) => ({
+      ...current,
+      [tokenId]: acceptSponsor(current[tokenId] ?? { verifiedRankedWins: 0, sponsors: [] }, sponsorId),
+    }));
   }
 
   return (
@@ -133,15 +174,23 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       <div className="arena-fighters">
         {[first, second].map((goon, index) => {
           const trick = index === 0 ? firstTrick : secondTrick;
+          const athleteProgression = progression[goon.tokenId] ?? { verifiedRankedWins: 0, sponsors: [] };
+          const availableTricks = unlockedTricks(discipline, athleteProgression);
+          const sponsorOffers = pendingSponsorOffers(athleteProgression)[0] ?? [];
+          const nextMilestone = nextSponsorMilestone(athleteProgression);
           const history = match.history[goon.tokenId] ?? {};
           const setter = index === 0 ? setFirstTrickId : setSecondTrickId;
           return <article className="fighter-card" key={goon.tokenId}>
-            <div className="fighter-image"><img src={goon.image} alt={goon.name} /><span>#{String(goon.tokenId).padStart(4, "0")}</span></div>
+            <div className="fighter-image"><Image src={goon.image} alt={goon.name} width={1024} height={1024} sizes="(max-width: 760px) 100vw, (max-width: 1180px) 42vw, 22vw" /><span>#{String(goon.tokenId).padStart(4, "0")}</span><div className="sponsor-sticker-stack">{athleteProgression.sponsors.map(({ sponsorId }, stickerIndex) => { const sponsor = sponsorById(sponsorId); return <i key={sponsorId} style={{ "--sticker-color": sponsor.color, transform: `rotate(${stickerIndex % 2 ? 8 : -7}deg)` } as CSSProperties}>{sponsor.shortMark}</i>; })}</div></div>
             <div className="fighter-copy"><p>{goon.species} · {goon.parodyBrand}</p><h2>{goon.name}</h2>
               <label>SELECT ATHLETE<select value={goon.tokenId} onChange={(event) => chooseAthlete(index as 0 | 1, Number(event.target.value))}>{roster.filter((option) => option.tokenId !== (index === 0 ? second.tokenId : first.tokenId)).map((option) => <option value={option.tokenId} key={option.tokenId}>{option.name} · {option.species}</option>)}</select></label>
               <div className="fighter-stats">{Object.entries(goon.stats).map(([stat, value]) => <span key={stat}>{stat.slice(0, 3).toUpperCase()} <b>{value}</b></span>)}</div>
-              <label>SELECT TRICK<select value={trick.id} onChange={(event) => setter(Number(event.target.value))}>{tricks.map((item) => <option value={item.id} key={item.id}>{item.name} · D{item.difficulty}</option>)}</select></label>
+              <label>SELECT TRICK<select value={trick.id} onChange={(event) => setter(Number(event.target.value))}>{availableTricks.map((item) => <option value={item.id} key={item.id}>{item.name} · D{item.difficulty}{item.sponsorId ? ` · ${sponsorById(item.sponsorId).shortMark}` : ""}</option>)}</select></label>
               <div className="odds-strip"><span>LAND <b>{landingChance(goon, trick)}%</b></span><span>ORIGINALITY <b>{originalityScore(history, trick.name)}%</b></span><span>USED <b>{history[trick.name.toLowerCase()] ?? 0}×</b></span></div>
+              <div className="sponsor-career">
+                <div><span>SPONSOR CAREER</span><b>{athleteProgression.verifiedRankedWins} VERIFIED WINS</b><small>{athleteProgression.sponsors.length} STICKERS · {availableTricks.length}/{tricks.length} TRICKS</small></div>
+                {sponsorOffers.length > 0 ? <div className="sponsor-offer"><span>CONTRACT OFFER — PICK ONE</span>{sponsorOffers.map((sponsor) => <button key={sponsor.id} style={{ "--sponsor-color": sponsor.color } as CSSProperties} onClick={() => chooseSponsor(goon.tokenId, sponsor.id)}><b>{sponsor.shortMark}</b><small>{sponsor.name}<br />UNLOCKS {tricks.find((item) => item.sponsorId === sponsor.id)?.name}</small></button>)}</div> : <small className="next-sponsor">{nextMilestone ? `${nextMilestone - athleteProgression.verifiedRankedWins} MORE RANKED WINS TO NEXT OFFER` : "LEGENDARY SPONSOR PATH COMPLETE"}</small>}
+              </div>
               <button className={prediction === goon.tokenId ? "prediction active" : "prediction"} onClick={() => setPrediction(goon.tokenId)}>PREDICT {goon.name.toUpperCase()} +100</button>
             </div>
           </article>;
@@ -149,7 +198,7 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       </div>
 
       <div className="arena-resolve">
-        <div>{result ? <><span>ROUND {match.rounds} // {result.reason.replaceAll("-", " ")}</span><b>{result.winnerTokenId ? `${result.attempts.find((attempt) => attempt.tokenId === result.winnerTokenId)?.trick.name} WINS` : "NO LETTER"}</b><small>SEED REVEALED: {result.seed}</small></> : <><span>HIDDEN PICKS READY</span><b>LOCK // REVEAL // RESOLVE</b><small>DEMO RESULTS ARE LOCAL AND HAVE NO ONCHAIN EFFECT</small></>}</div>
+        <div>{result ? <><span>ROUND {match.rounds} {"//"} {result.reason.replaceAll("-", " ")}</span><b>{result.winnerTokenId ? `${result.attempts.find((attempt) => attempt.tokenId === result.winnerTokenId)?.trick.name} WINS` : "NO LETTER"}</b><small>SEED REVEALED: {result.seed}</small></> : <><span>HIDDEN PICKS READY</span><b>LOCK {"//"} REVEAL {"//"} RESOLVE</b><small>DEMO RESULTS ARE LOCAL AND HAVE NO ONCHAIN EFFECT</small></>}</div>
         <button disabled={ended} onClick={resolve}>{ended ? "MATCH COMPLETE" : "RESOLVE ROUND"}</button>
         {ended && <button className="reset-match" onClick={() => reset()}>NEW MATCH</button>}
       </div>

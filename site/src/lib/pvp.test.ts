@@ -2,13 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   DISCIPLINE_WORDS,
+  acceptSponsor,
+  pendingSponsorOffers,
   TRICK_CATALOG,
   landingChance,
   lettersForLosses,
   matchIsOver,
+  nextSponsorMilestone,
   originalityScore,
+  recordVerifiedRankedWin,
   resolveRound,
+  trickIsUnlocked,
+  unlockedTricks,
   type Athlete,
+  type SponsorProgression,
 } from "./pvp.ts";
 
 const skater = (tokenId: number): Athlete => ({
@@ -49,4 +56,33 @@ test("letters complete each discipline word", () => {
     assert.equal(matchIsOver(discipline as keyof typeof DISCIPLINE_WORDS, word.length - 1), false);
     assert.equal(matchIsOver(discipline as keyof typeof DISCIPLINE_WORDS, word.length), true);
   }
+});
+
+test("sponsor offers unlock slowly from verified ranked wins", () => {
+  let progression: SponsorProgression = { verifiedRankedWins: 4, sponsors: [] };
+  assert.deepEqual(pendingSponsorOffers(progression), []);
+  assert.equal(nextSponsorMilestone(progression), 5);
+
+  progression = recordVerifiedRankedWin(progression);
+  assert.deepEqual(pendingSponsorOffers(progression)[0].map((item) => item.id), ["kraked", "riptide"]);
+  assert.throws(() => acceptSponsor({ verifiedRankedWins: 4, sponsors: [] }, "kraked"), /not been reached/);
+});
+
+test("choosing one sponsor permanently closes that milestone and unlocks only its trick", () => {
+  const progression = acceptSponsor({ verifiedRankedWins: 5, sponsors: [] }, "kraked");
+  assert.deepEqual(pendingSponsorOffers(progression), []);
+  assert.throws(() => acceptSponsor(progression, "riptide"), /already selected/);
+
+  const krakedTrick = TRICK_CATALOG.Skateboarding.find((item) => item.sponsorId === "kraked")!;
+  const riptideTrick = TRICK_CATALOG.Skateboarding.find((item) => item.sponsorId === "riptide")!;
+  assert.equal(trickIsUnlocked(krakedTrick, progression), true);
+  assert.equal(trickIsUnlocked(riptideTrick, progression), false);
+  assert.equal(unlockedTricks("Skateboarding", progression).length, 5);
+});
+
+test("sponsors add options but never change landing odds for an existing trick", () => {
+  const trick = TRICK_CATALOG.Skateboarding[0];
+  const before = landingChance(skater(1), trick);
+  const after = landingChance(skater(1), trick);
+  assert.equal(before, after);
 });

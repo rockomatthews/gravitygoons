@@ -24,6 +24,26 @@ export type Trick = {
   id: number;
   name: string;
   difficulty: number;
+  sponsorId: string | null;
+};
+
+export type Sponsor = {
+  id: string;
+  name: string;
+  shortMark: string;
+  requiredWins: number;
+  color: string;
+};
+
+export type AthleteSponsor = {
+  sponsorId: string;
+  milestone: number;
+  acceptedAtWins: number;
+};
+
+export type SponsorProgression = {
+  verifiedRankedWins: number;
+  sponsors: AthleteSponsor[];
 };
 
 export type TrickHistory = Record<string, number>;
@@ -69,19 +89,32 @@ const STAT_WEIGHTS: Record<Discipline, AthleteStats> = {
   Skiing: { Speed: 0.15, Air: 0.3, Control: 0.3, Style: 0.15, Toughness: 0.1 },
 };
 
-const RAW_TRICKS: Record<Discipline, Array<[string, number]>> = {
-  Skateboarding: [["Ollie", 2], ["Kickflip", 4], ["Heelflip", 4], ["Boardslide", 5], ["50-50 Grind", 5], ["Manual", 3], ["360 Flip", 7], ["Hardflip", 8]],
-  Snowboarding: [["Ollie", 2], ["Indy Grab", 3], ["Method", 4], ["Boardslide", 5], ["Frontside 360", 5], ["Backside 540", 6], ["Cork 720", 8], ["Double Backflip", 9]],
-  Surfing: [["Bottom Turn", 2], ["Cutback", 3], ["Floater", 4], ["Snap", 5], ["Tube Ride", 6], ["Air Reverse", 7], ["Alley-Oop", 8], ["Full Rotation", 9]],
-  BMX: [["Bunny Hop", 2], ["Manual", 3], ["Barspin", 4], ["Tailwhip", 5], ["Tabletop", 5], ["360", 6], ["Backflip", 8], ["Flair", 9]],
-  Motocross: [["Seat Grab", 2], ["Can-Can", 3], ["Nac-Nac", 4], ["Superman", 5], ["Whip", 6], ["Tsunami", 7], ["Backflip", 8], ["Double Backflip", 9]],
-  Skiing: [["Safety Grab", 2], ["Mute Grab", 3], ["Rail Slide", 4], ["360", 5], ["Cork 540", 6], ["Misty 720", 7], ["Switch 900", 8], ["Double Cork 1080", 9]],
+export const SPONSOR_CATALOG: Sponsor[] = [
+  { id: "kraked", name: "KRAKED Bearings", shortMark: "KRKD", requiredWins: 5, color: "#18f1dc" },
+  { id: "riptide", name: "RIPTIDE Wax", shortMark: "RIP", requiredWins: 5, color: "#ff4b35" },
+  { id: "zero-g", name: "ZERO-G Energy", shortMark: "0-G", requiredWins: 15, color: "#dfff39" },
+  { id: "redline", name: "REDLINE Components", shortMark: "RDLN", requiredWins: 15, color: "#ff315f" },
+  { id: "mudlord", name: "MUDLORD Racing", shortMark: "MUD", requiredWins: 30, color: "#ff8a2b" },
+  { id: "powder-panic", name: "POWDER PANIC", shortMark: "P!", requiredWins: 30, color: "#9e7bff" },
+  { id: "nightshift", name: "NIGHTSHIFT Optics", shortMark: "N/S", requiredWins: 50, color: "#4d7dff" },
+  { id: "updraft", name: "UPDRAFT Labs", shortMark: "UP", requiredWins: 50, color: "#f768ff" },
+  { id: "gravity-works", name: "GRAVITY WORKS", shortMark: "GW", requiredWins: 100, color: "#f4f5ef" },
+  { id: "aftershock", name: "AFTERSHOCK", shortMark: "AFT", requiredWins: 100, color: "#ffc247" },
+];
+
+const RAW_TRICKS: Record<Discipline, Array<[string, number, string?]>> = {
+  Skateboarding: [["Ollie", 2], ["Kickflip", 4], ["Heelflip", 4], ["Boardslide", 5], ["50-50 Grind", 5, "kraked"], ["Manual Revert", 4, "riptide"], ["360 Flip", 7, "zero-g"], ["Hardflip", 8, "redline"], ["Impossible", 7, "mudlord"], ["Darkslide", 8, "powder-panic"], ["Laser Flip", 8, "nightshift"], ["Bigspin Heelflip", 9, "updraft"], ["540 Flip", 9, "gravity-works"], ["720 Gazelle Flip", 10, "aftershock"]],
+  Snowboarding: [["Ollie", 2], ["Indy Grab", 3], ["Method", 4], ["Boardslide", 5], ["Frontside 360", 5, "kraked"], ["Backside 360", 5, "riptide"], ["Backside 540", 6, "zero-g"], ["Frontside 720", 7, "redline"], ["Cork 720", 8, "mudlord"], ["Rodeo 720", 8, "powder-panic"], ["Double Backflip", 9, "nightshift"], ["Double Cork 1080", 10, "updraft"], ["Triple Cork 1440", 10, "gravity-works"], ["Switch Quad Cork", 10, "aftershock"]],
+  Surfing: [["Bottom Turn", 2], ["Cutback", 3], ["Floater", 4], ["Snap", 5], ["Tube Ride", 6, "kraked"], ["Layback Hack", 6, "riptide"], ["Air Reverse", 7, "zero-g"], ["Alley-Oop", 8, "redline"], ["Full Rotation", 9, "mudlord"], ["Superman Air", 9, "powder-panic"], ["Backflip", 10, "nightshift"], ["Double Grab 540", 10, "updraft"], ["No-Grab 720", 10, "gravity-works"], ["Impossible Tube Exit", 10, "aftershock"]],
+  BMX: [["Bunny Hop", 2], ["Manual", 3], ["Barspin", 4], ["Tailwhip", 5], ["Tabletop", 5, "kraked"], ["Toboggan", 5, "riptide"], ["360", 6, "zero-g"], ["Decade", 7, "redline"], ["Backflip", 8, "mudlord"], ["Flair", 9, "powder-panic"], ["Cash Roll", 9, "nightshift"], ["Triple Tailwhip", 10, "updraft"], ["Bike Flip", 10, "gravity-works"], ["Quad Tailwhip 720", 10, "aftershock"]],
+  Motocross: [["Seat Grab", 2], ["Can-Can", 3], ["Nac-Nac", 4], ["Superman", 5], ["Whip", 6, "kraked"], ["Heelclicker", 6, "riptide"], ["Tsunami", 7, "zero-g"], ["Rock Solid", 7, "redline"], ["Backflip", 8, "mudlord"], ["Double Grab Flip", 9, "powder-panic"], ["Volt", 9, "nightshift"], ["Double Backflip", 10, "updraft"], ["Frontflip Flair", 10, "gravity-works"], ["Triple Backflip", 10, "aftershock"]],
+  Skiing: [["Safety Grab", 2], ["Mute Grab", 3], ["Rail Slide", 4], ["360", 5], ["Cork 540", 6, "kraked"], ["Misty 540", 6, "riptide"], ["Misty 720", 7, "zero-g"], ["Switch 900", 8, "redline"], ["Double Cork 1080", 9, "mudlord"], ["Bio 1260", 9, "powder-panic"], ["Triple Cork 1440", 10, "nightshift"], ["Switch Double Misty", 10, "updraft"], ["Quad Cork 1800", 10, "gravity-works"], ["Switch Triple Bio", 10, "aftershock"]],
 };
 
 export const TRICK_CATALOG: Record<Discipline, Trick[]> = Object.fromEntries(
   Object.entries(RAW_TRICKS).map(([discipline, tricks]) => [
     discipline,
-    tricks.map(([name, difficulty], id) => ({ id, name, difficulty })),
+    tricks.map(([name, difficulty, sponsorId], id) => ({ id, name, difficulty, sponsorId: sponsorId ?? null })),
   ]),
 ) as Record<Discipline, Trick[]>;
 
@@ -135,6 +168,50 @@ export function landingChance(athlete: Athlete, trick: Trick): number {
     ? RARITY_SIGNATURE_EDGE[athlete.rarity]
     : 0;
   return Math.round(clamp(94 - trick.difficulty * 7 + skillAdjustment + signatureEdge, 18, 95));
+}
+
+export function sponsorById(sponsorId: string): Sponsor {
+  const sponsor = SPONSOR_CATALOG.find((item) => item.id === sponsorId);
+  if (!sponsor) throw new Error(`Unknown sponsor: ${sponsorId}`);
+  return sponsor;
+}
+
+export function pendingSponsorOffers(progression: SponsorProgression): Sponsor[][] {
+  const acceptedMilestones = new Set(progression.sponsors.map((item) => item.milestone));
+  const eligibleMilestones = [...new Set(SPONSOR_CATALOG.map((item) => item.requiredWins))]
+    .filter((milestone) => milestone <= progression.verifiedRankedWins && !acceptedMilestones.has(milestone));
+  return eligibleMilestones.map((milestone) => SPONSOR_CATALOG.filter((item) => item.requiredWins === milestone));
+}
+
+export function acceptSponsor(progression: SponsorProgression, sponsorId: string): SponsorProgression {
+  const sponsor = sponsorById(sponsorId);
+  if (progression.verifiedRankedWins < sponsor.requiredWins) throw new Error("Sponsor milestone has not been reached");
+  if (progression.sponsors.some((item) => item.milestone === sponsor.requiredWins)) throw new Error("A sponsor was already selected for this milestone");
+  return {
+    ...progression,
+    sponsors: [...progression.sponsors, {
+      sponsorId,
+      milestone: sponsor.requiredWins,
+      acceptedAtWins: progression.verifiedRankedWins,
+    }],
+  };
+}
+
+export function recordVerifiedRankedWin(progression: SponsorProgression): SponsorProgression {
+  return { ...progression, verifiedRankedWins: progression.verifiedRankedWins + 1 };
+}
+
+export function trickIsUnlocked(trick: Trick, progression: SponsorProgression): boolean {
+  return trick.sponsorId === null || progression.sponsors.some((item) => item.sponsorId === trick.sponsorId);
+}
+
+export function unlockedTricks(discipline: Discipline, progression: SponsorProgression): Trick[] {
+  return TRICK_CATALOG[discipline].filter((trick) => trickIsUnlocked(trick, progression));
+}
+
+export function nextSponsorMilestone(progression: SponsorProgression): number | null {
+  return [...new Set(SPONSOR_CATALOG.map((item) => item.requiredWins))]
+    .find((milestone) => milestone > progression.verifiedRankedWins) ?? null;
 }
 
 function resolveAttempt(choice: RoundChoice, roll: number, executionRoll: number): AttemptResult {

@@ -299,6 +299,8 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .fighter-image img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
 .fighter-card:hover .fighter-image img { transform: scale(1.035); }
 .fighter-image span { position: absolute; left: 14px; bottom: 14px; z-index: 2; color: var(--teal); font: 900 13px var(--mono); }
+.sponsor-sticker-stack { position: absolute; right: 12px; bottom: 12px; z-index: 3; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.sponsor-sticker-stack i { min-width: 43px; min-height: 32px; display: grid; place-items: center; border: 2px solid #05080c; padding: 4px 7px; color: #05080c; background: var(--sticker-color); box-shadow: 3px 3px 0 #05080c; font: 950 9px var(--mono); font-style: normal; clip-path: polygon(6% 0, 100% 7%, 94% 100%, 0 88%); }
 .fighter-copy { display: flex; flex-direction: column; padding: 28px 22px; background: linear-gradient(160deg, #131a22, #080c11); }
 .fighter-copy > p { margin: 0; color: var(--teal); font: 800 8px var(--mono); text-transform: uppercase; }
 .fighter-copy h2 { margin: 9px 0 18px; font-size: 30px; letter-spacing: -.045em; text-transform: uppercase; }
@@ -310,6 +312,16 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .odds-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 12px; }
 .odds-strip span { padding: 10px 4px; color: var(--muted); background: #05080c; text-align: center; font: 700 6px var(--mono); }
 .odds-strip b { display: block; margin-top: 4px; color: var(--acid); font-size: 13px; }
+.sponsor-career { margin: 12px 0; border: 1px solid #2c3943; padding: 11px; background: linear-gradient(135deg, #101820, #080c11); }
+.sponsor-career > div:first-child { display: grid; gap: 4px; }
+.sponsor-career span, .sponsor-career small { color: var(--muted); font: 750 7px var(--mono); letter-spacing: .08em; }
+.sponsor-career > div:first-child b { color: white; font: 900 11px var(--mono); }
+.sponsor-offer { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 11px; }
+.sponsor-offer > span { grid-column: 1 / -1; color: var(--acid); }
+.sponsor-offer button { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 7px; border: 1px solid var(--sponsor-color); padding: 7px; color: white; background: color-mix(in srgb, var(--sponsor-color) 10%, #05080c); text-align: left; cursor: pointer; }
+.sponsor-offer button > b { width: 30px; height: 30px; display: grid; place-items: center; color: #05080c; background: var(--sponsor-color); font: 950 7px var(--mono); }
+.sponsor-offer button small { color: #d7dfe3; font-size: 6px; line-height: 1.5; }
+.next-sponsor { display: block; margin-top: 9px; color: var(--teal) !important; }
 .prediction { margin-top: auto; border: 1px solid #3b4852; padding: 12px; color: #9ba8b0; background: transparent; font: 850 8px var(--mono); cursor: pointer; }
 .prediction.active { color: var(--void); background: var(--acid); border-color: var(--acid); }
 .arena-resolve { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 20px; border-top: 1px solid var(--line); background: #05080c; }
@@ -319,7 +331,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .arena-resolve button { border: 0; padding: 16px 20px; color: var(--void); background: var(--teal); font: 950 10px var(--mono); cursor: pointer; box-shadow: 6px 6px 0 var(--coral); }
 .arena-resolve button:disabled { color: #7e898e; background: #252e35; box-shadow: none; cursor: not-allowed; }
 .arena-resolve .reset-match { color: white; background: var(--coral); box-shadow: none; }
-.game-rules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding-bottom: 130px; }
+.game-rules { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding-bottom: 130px; }
 .game-rules article { min-height: 310px; padding: 25px; border: 1px solid var(--line); background: linear-gradient(145deg, #141b23, #080c11); }
 .game-rules article > b { color: transparent; -webkit-text-stroke: 1px var(--teal); font: 950 50px var(--mono); }
 .game-rules h2 { margin: 50px 0 10px; font-size: 24px; text-transform: uppercase; }
@@ -343,6 +355,8 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .fighter-card { grid-template-columns: 1fr; }
   .fighter-image { min-height: auto; aspect-ratio: 1; }
   .fighter-copy { min-height: 430px; }
+  .sponsor-offer { grid-template-columns: 1fr; }
+  .sponsor-offer > span { grid-column: auto; }
   .arena-resolve { grid-template-columns: 1fr; }
   .arena-resolve button { width: 100%; }
   .game-rules { grid-template-columns: 1fr; }

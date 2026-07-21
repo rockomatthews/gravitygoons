@@ -1,4 +1,4 @@
-# Gravity Goons PvP Mechanics v0.1
+# Gravity Goons PvP Mechanics v0.2
 
 Status: mechanics branch prototype. This document does not authorize mainnet wagering or contract deployment.
 
@@ -58,6 +58,31 @@ Do not use a block timestamp, wallet address, or a server-only random number tha
 - Rarity remains a small signature-trick edge, not a blanket stat or scoring multiplier.
 - Matchmaking must never charge for better rolls or sell consumable probability boosts. Cosmetics, entry cosmetics, and season passes are safer monetization than pay-to-win boosts.
 
+## Sponsor stickers and trick progression
+
+Verified ranked match wins build the NFT athlete's sponsor career. Round wins, casual matches, forfeits arranged for farming, and unverified results do not count.
+
+Sponsor milestones are deliberately slow: 5, 15, 30, 50, and 100 verified ranked wins. At each milestone the athlete receives two fictional sponsor offers and its current owner chooses one. That choice is permanent for the milestone and follows the NFT through transfers.
+
+Each accepted sponsor:
+
+- Adds a visible sticker to the athlete's game profile and dynamic presentation layer.
+- Is retained in permanent career history, even when a newer sponsor becomes active.
+- Unlocks one discipline-specific trick from the versioned 64-slot trick catalog.
+- Adds strategic breadth but does not increase stats, landing odds, score multipliers, or rarity.
+
+The launch catalog uses original fictional brands: KRAKED Bearings, RIPTIDE Wax, ZERO-G Energy, REDLINE Components, MUDLORD Racing, POWDER PANIC, NIGHTSHIFT Optics, UPDRAFT Labs, GRAVITY WORKS, and AFTERSHOCK.
+
+Genesis art remains immutable on IPFS. Stickers are composited in the website/game profile and exposed as evolving metadata. The settled sponsor assignment and unlocked trick bitmap become progression state; an ERC-4906 metadata update can notify marketplaces after settlement.
+
+Anti-farming requirements:
+
+- Credit a completed ranked match exactly once using an idempotent match reward record.
+- Apply diminishing or zero progression to repeated wallet/token pairings.
+- Exclude self-matches, collusive clusters, suspicious forfeits, disputed matches, and voided matches.
+- Verify current Base ownership before accepting a sponsor offer.
+- Never sell sponsors, trick unlocks, ranked wins, or landing-probability boosts.
+
 ## Spectators and predictions
 
 People without an NFT can connect a Base wallet, watch matches, follow athletes, and make play-point predictions.
@@ -104,4 +129,3 @@ Required rules:
 4. Signed progression claims settled through the existing relayer/registry architecture.
 5. Ranked seasons after probability and originality telemetry is reviewed.
 6. Only then evaluate a licensed wagering integration as a separate product surface.
-
