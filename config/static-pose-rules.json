@@ -5,6 +5,9 @@
       "complete skateboard",
       "exactly two trucks",
       "exactly four wheels",
+      "grip-tape top and truck-mounted underside are opposite faces",
+      "no trucks mounted on visible grip-tape face",
+      "visible trucks require visible underside",
       "board held under arm or by deck edge",
       "both feet planted on floor",
       "no foot on skateboard",
@@ -29,7 +32,7 @@
     ]
   },
   "Pop-Up Ready": {
-    "canonical_display_pose": "Surfer and surfboard travel on one shared axis; the narrow pointed nose is forward and the broad tail, traction pad, and fins are rearward; both feet are supported by the deck, with the rear foot over the tail pad and front foot toward the nose.",
+    "canonical_display_pose": "Surfer and surfboard travel on one shared axis; the narrow pointed nose is forward and the broad tail, traction pad, and fins are rearward; both feet are supported in a diagonal stance, with the rear foot over the tail pad toward the heel-side rail and the front foot farther forward toward the toe-side rail.",
     "required_checks": [
       "one complete surfboard",
       "pointed nose at front",
@@ -37,7 +40,13 @@
       "tail pad and fins at rear",
       "both feet supported by deck",
       "rear foot over tail pad",
+      "rear foot offset toward heel-side rail",
       "front foot toward pointed nose",
+      "front foot offset toward toe-side rail",
+      "feet form a natural diagonal across the stringer",
+      "feet are not both centered on stringer",
+      "feet are not both on same side of board",
+      "visible deck or traction pad means all fins hidden on underside",
       "regular stance means anatomical left foot forward",
       "goofy stance means anatomical right foot forward",
       "hips and shoulders aligned with board travel",

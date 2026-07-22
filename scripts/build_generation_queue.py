@@ -33,8 +33,9 @@ def accepted_sources(config: dict) -> dict[int, Path]:
         directory = ROOT / relative
         for path in sorted(directory.glob("[0-9][0-9][0-9][0-9].png")):
             token_id = int(path.stem)
-            if token_id in found:
-                raise ValueError(f"Duplicate accepted source {token_id}: {found[token_id]} and {path}")
+            # Accepted directories are ordered oldest to newest. A corrected
+            # production render intentionally supersedes an approval/stress
+            # image with the same token ID.
             found[token_id] = path
     return found
 

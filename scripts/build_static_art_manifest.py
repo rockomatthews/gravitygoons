@@ -19,7 +19,10 @@ STYLE_LOCK = (
     "toy-like proportions, simplified mannequins, card UI, captions, watermarks, or real trademarks. "
     "Any assigned helmet or headwear must be worn correctly on the athlete's head in its normal upright "
     "orientation; never hang a helmet from handlebars, controls, equipment, clothing, or the background, "
-    "and never add a second loose helmet."
+    "and never add a second loose helmet. Any visible animal tail must originate anatomically from the "
+    "athlete's pelvis and remain clearly attached to the athlete. For BMX or motocross scenes, keep the "
+    "tail on the athlete's side of the bike; it must never pass through or appear to emerge from the seat, "
+    "rear fender, frame, chain, engine, spokes, or rear wheel."
 )
 
 POSE_GUIDANCE = {
@@ -34,15 +37,26 @@ POSE_GUIDANCE = {
     "Deck Carry": (
         "Skateboard carry geometry is mandatory: show one complete normal skateboard held securely under one "
         "arm or by one hand at the deck edge, with both feet planted naturally on the floor. Keep the deck, both "
-        "trucks, and exactly four wheels coherent and unobstructed. Never place either foot on the skateboard, "
-        "never balance the board on a wheel or tail, and never show a floating or malformed board."
+        "trucks, and exactly four wheels coherent and unobstructed. The grip-tape top and truck-mounted underside "
+        "are opposite faces: if the camera sees grip tape, no trucks may appear on that face; if the camera sees "
+        "the trucks, it must see the illustrated underside rather than grip tape. Never place either foot on the "
+        "skateboard, never balance the board on a wheel or tail, and never show a floating or malformed board."
     ),
     "Pop-Up Ready": (
         "Surf direction geometry is mandatory: show the entire surfboard on one clear travel axis. "
         "The narrow pointed nose is the front, while the broad tail, traction pad, and fins are all at "
-        "the rear. Both feet must be fully supported by the deck, with the rear foot over the traction "
-        "pad and the front foot toward the nose. Hips, shoulders, knees, head, board, and wave must all "
+        "the rear. Both feet must be fully supported by the deck in a natural diagonal surf stance: the "
+        "rear foot is over the traction-pad/tail zone and offset toward the surfer's heel-side rail, while "
+        "the front foot is farther forward toward the nose and offset toward the surfer's toe-side rail. "
+        "Do not place both feet on the centerline or on the same side of the stringer. Hips, shoulders, "
+        "knees, head, board, and wave must all "
         "face the same direction; never show a backward board or a mirrored rider traveling against it."
+    ),
+    "Beach Plant": (
+        "Airborne surfboard face geometry is mandatory. If the camera sees the deck/top riding surface, "
+        "show the deck, traction pad, and feet or hand contact only; every fin must be completely hidden on "
+        "the opposite underside. Show fins only when the camera clearly sees the illustrated underside, in "
+        "which case the deck traction pad cannot be visible on that same face. Never put fins on the deck."
     ),
     "Binding Check": (
         "Binding Check geometry is mandatory: place one complete snowboard flat and supported on the "
@@ -91,7 +105,8 @@ def prompt_for(token: dict) -> str:
         rear_foot = "right" if token["stance"] == "Regular" else "left"
         pose_guidance += (
             f"For this {token['stance'].lower()} stance, the anatomical {lead_foot} foot is forward "
-            f"toward the pointed nose and the anatomical {rear_foot} foot is rearward on the traction pad. "
+            f"toward the pointed nose and shifted toward its toe-side rail, while the anatomical {rear_foot} "
+            f"foot is rearward over the traction pad and shifted toward its heel-side rail. "
         )
     return (
         f"{STYLE_LOCK} Create a NEW unique Gravity Goon: {person}, {token['body_build'].lower()} "

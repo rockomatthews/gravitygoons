@@ -31,7 +31,14 @@ FINAL_CONSTRAINTS = (
     "the sport. No captions, rarity labels, stats, trick names, descriptive wall text, card UI, token number, "
     "watermark, real trademark, extra anatomy, duplicated equipment, or malformed gear. For any skateboard "
     "seen from above, the visible top must be plain matte black grip tape; underside artwork must remain fully "
-    "hidden, with only a thin natural laminated-wood edge visible."
+    "hidden, with only a thin natural laminated-wood edge visible. Never mount trucks on the grip-tape face: "
+    "visible grip tape means the trucks are hidden on the opposite face; visible trucks means the camera sees "
+    "the underside. For every surfboard, the deck/top and finned underside are opposite faces: when the deck "
+    "or traction pad is visible, all fins must be completely hidden; visible fins require a clearly visible "
+    "underside and no deck traction pad on that face. In any standing surf stance, place the rear foot over "
+    "the rear traction-pad zone toward the heel-side rail and the front foot farther forward toward the nose "
+    "and toe-side rail; never center both feet on the stringer or put them on the same side. Any visible animal tail must attach to the "
+    "athlete's pelvis and stay visually separate from all bicycle or motorcycle components."
 )
 
 
