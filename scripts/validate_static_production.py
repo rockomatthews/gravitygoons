@@ -42,9 +42,8 @@ def main() -> None:
             if token_id not in expected:
                 errors.append(f"Unexpected token source: {path}")
                 continue
-            if token_id in found:
-                errors.append(f"Duplicate token source {token_id}: {found[token_id]} and {path}")
-                continue
+            # Directories are ordered oldest to newest. A production correction
+            # intentionally supersedes an approval/stress image of the same ID.
             found[token_id] = path
 
     hashes: dict[int, str] = {}

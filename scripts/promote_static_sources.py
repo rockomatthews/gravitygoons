@@ -42,7 +42,13 @@ def main() -> None:
         for path in sorted(source_dir.glob("[0-9][0-9][0-9][0-9].png")):
             token_id = int(path.stem)
             if token_id in sources:
-                raise SystemExit(f"Duplicate source for token {token_id}: {sources[token_id]} and {path}")
+                if not options.overwrite:
+                    raise SystemExit(
+                        f"Duplicate source for token {token_id}: {sources[token_id]} and {path}"
+                    )
+                # Source directories are ordered from oldest to newest. During an
+                # intentional rebuild, let the later accepted correction replace
+                # the earlier approval/stress source for the same token.
             if token_id not in tokens:
                 raise SystemExit(f"Source has no fixed assignment: {path}")
             sources[token_id] = path

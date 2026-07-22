@@ -1,23 +1,31 @@
 {
-  "Tail Plant": {
-    "canonical_display_pose": "Short skateboard tail planted on the ground with the long nose raised diagonally; only the front toe/front third of the raised shoe presses the short tail behind the rear truck while the heel and most of the shoe overhang; other shoe stays flat on the ground.",
+  "Deck Carry": {
+    "canonical_display_pose": "One complete normal skateboard is held securely under one arm or by one hand at the deck edge while both feet remain planted naturally on the floor.",
     "required_checks": [
       "complete skateboard",
       "exactly two trucks",
       "exactly four wheels",
-      "short tail planted on ground",
-      "normal short concave tail proportions",
-      "tail much shorter than shoe",
-      "tail not stretched or widened",
-      "long nose raised diagonally",
-      "front toe or front third of raised shoe behind rear truck",
-      "heel and most of raised shoe visibly overhang tail",
-      "toe visibly contacts tail with no air gap",
-      "support shoe on ground",
-      "no foot on nose",
-      "no foot between trucks",
-      "no flat riding stance",
+      "board held under arm or by deck edge",
+      "both feet planted on floor",
+      "no foot on skateboard",
+      "no board balanced on wheel or tail",
       "no floating board"
+    ]
+  },
+  "Push-Off": {
+    "canonical_display_pose": "One foot is planted on the plain black grip-tape top of a complete skateboard while the other foot pushes from the floor or has just lifted after the push; the illustrated underside is completely hidden.",
+    "required_checks": [
+      "one complete skateboard",
+      "exactly two trucks below deck",
+      "exactly four wheels below deck",
+      "one foot planted on top grip tape",
+      "other foot pushing or freshly lifted",
+      "top surface is plain matte black grip tape",
+      "no top-deck artwork or logo",
+      "underside artwork completely hidden",
+      "only thin natural laminated-wood edge visible",
+      "no large sidewall logo",
+      "no artwork wrapping around deck edge"
     ]
   },
   "Pop-Up Ready": {

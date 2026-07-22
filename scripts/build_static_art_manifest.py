@@ -16,20 +16,26 @@ STYLE_LOCK = (
     "detailed fur or skin, realistic fabric seams and equipment materials, cinematic teal/orange "
     "rim light, crisp professional collectible finish. Full body and complete sport equipment "
     "must read at thumbnail size. Static square NFT artwork; riggability is irrelevant. Never use "
-    "toy-like proportions, simplified mannequins, card UI, captions, watermarks, or real trademarks."
+    "toy-like proportions, simplified mannequins, card UI, captions, watermarks, or real trademarks. "
+    "Any assigned helmet or headwear must be worn correctly on the athlete's head in its normal upright "
+    "orientation; never hang a helmet from handlebars, controls, equipment, clothing, or the background, "
+    "and never add a second loose helmet."
 )
 
 POSE_GUIDANCE = {
-    "Tail Plant": (
-        "Tail Plant geometry is mandatory: plant the short skateboard tail on the ground and raise the "
-        "long nose upward at a controlled diagonal. Place the rear shoe directly on the short tail/back "
-        "quarter behind the rear truck so only the front toe/front third of that shoe presses the planted "
-        "tail while the heel and most of the shoe visibly overhang behind it; keep the other shoe flat on "
-        "the ground beside the board. Preserve normal skateboard proportions: the concave tail stays much "
-        "shorter than the shoe, must not stretch or widen to match the sole, and the toe must visibly contact "
-        "the tail with no air gap. Show exactly "
-        "two trucks and four wheels. Never put a foot on the "
-        "nose or between the trucks, never put the board flat beneath both feet, and never float the board."
+    "Push-Off": (
+        "Skateboard Push-Off geometry and deck visibility are mandatory: show one foot planted on the "
+        "matte black grip-tape TOP of one complete skateboard while the other foot is clearly pushing from "
+        "the floor or lifted immediately after the push. Because the camera sees the top riding surface, it "
+        "must show plain unbranded black grip tape only. The illustrated underside must be completely hidden; "
+        "show only a thin natural laminated-wood deck edge, with no large sidewall logo, painted underside, "
+        "or artwork wrapping around the edge. Both trucks and exactly four wheels stay entirely below the deck."
+    ),
+    "Deck Carry": (
+        "Skateboard carry geometry is mandatory: show one complete normal skateboard held securely under one "
+        "arm or by one hand at the deck edge, with both feet planted naturally on the floor. Keep the deck, both "
+        "trucks, and exactly four wheels coherent and unobstructed. Never place either foot on the skateboard, "
+        "never balance the board on a wheel or tail, and never show a floating or malformed board."
     ),
     "Pop-Up Ready": (
         "Surf direction geometry is mandatory: show the entire surfboard on one clear travel axis. "
@@ -44,6 +50,29 @@ POSE_GUIDANCE = {
         "fully outside both bindings while both hands inspect or adjust the nearest binding. Never cross "
         "the legs, never place either boot into a binding, and never reach one boot toward the opposite-side "
         "binding."
+    ),
+}
+
+RARITY_GUIDANCE = {
+    "Common": (
+        "clean core collection treatment with grounded studio lighting, standard technical fabrics, "
+        "and restrained equipment graphics"
+    ),
+    "Uncommon": (
+        "visibly upgraded treatment with richer layered fabrics, custom color blocking, reflective trim, "
+        "enhanced equipment graphics, and a more dimensional environment"
+    ),
+    "Rare": (
+        "unmistakably premium treatment with bespoke apparel panels, metallic or iridescent accents, "
+        "high-detail signature equipment, dramatic rim lighting, and a distinctive cinematic environment"
+    ),
+    "Epic": (
+        "spectacular hero treatment with exotic technical materials, luminous accents, custom equipment, "
+        "dynamic atmospheric particles, powerful colored lighting, and a visually extraordinary arena"
+    ),
+    "Legendary": (
+        "singular collection-icon treatment with one-of-one couture sport gear, masterwork equipment, "
+        "radiant energy effects, monumental environment design, and unmistakable poster-level hero lighting"
     ),
 }
 
@@ -74,7 +103,9 @@ def prompt_for(token: dict) -> str:
         f"Use fictional label {token['parody_brand']} with an original abstract symbol only. "
         f"Visual play style: {token['play_style']}; future trick specialty: {token['trick_specialty']}. "
         f"Background: clean opaque {token['background']} diagonal studio design with atmospheric depth. "
-        f"Rarity styling: {token['rarity']}, expressed only through tasteful material and detail intensity. "
+        f"Rarity styling: {token['rarity']} — {RARITY_GUIDANCE[token['rarity']]}. "
+        "Rarity must be visually obvious from the artwork at thumbnail size while remaining cosmetic; "
+        "never print the rarity name, tier, stats, trick name, or descriptive UI text inside the artwork. "
         "Square 1:1, centered head-to-toe three-quarter character-select composition, safe margin around "
         "all body parts and equipment, no cropping."
     )

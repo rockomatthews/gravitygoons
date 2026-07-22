@@ -28,7 +28,7 @@ HAIR = ["Buzz", "Curls", "Braids", "Shag", "High Fade", "Waves", "Bun", "Bald"]
 SPORT_TRAITS = {
     "Skateboarding": {
         "equipment": "Skateboard",
-        "poses": ["Board Beside", "Tail Plant", "Push-Off"],
+        "poses": ["Board Beside", "Deck Carry", "Push-Off"],
         "tops": ["Tank Top", "Oversized Tee", "Zip Jersey", "Tech Hoodie"],
         "bottoms": ["Loose Skate Shorts", "Cargo Pants", "Cuffed Chinos"],
         "footwear": ["High-Top Skate Shoes", "Low-Top Skate Shoes", "Chunky Skate Shoes"],
