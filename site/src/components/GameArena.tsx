@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState, type CSSProperties } from "react";
+import { LimitlessMarketPanel } from "@/components/LimitlessMarketPanel";
 import {
   SPONSOR_CATALOG,
   TRICK_CATALOG,
@@ -170,6 +171,8 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
         <i>VS</i>
         <div><span>{second.name}</span><b>{lettersForLosses(discipline, match.losses[second.tokenId] ?? 0) || "—"}</b><small>{match.wins[second.tokenId] ?? 0} ROUND WINS</small></div>
       </div>
+
+      <LimitlessMarketPanel left={first} right={second} />
 
       <div className="arena-fighters">
         {[first, second].map((goon, index) => {

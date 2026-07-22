@@ -207,6 +207,26 @@ Import this repository as a new Vercel project and set **Root Directory** to `si
 
 Never place the game signer, relayer key, deployer key, or Supabase service-role key in a `NEXT_PUBLIC_` variable.
 
+### Limitless spectator markets
+
+The PvP lab has a feature-flagged adapter for the official `@limitless-exchange/sdk`. It is deliberately configured as a no-cash simulation by default:
+
+```bash
+LIMITLESS_MODE=mock
+LIMITLESS_TRADING_ENABLED=false
+```
+
+The game fetches the selected matchup from `/api/limitless/markets/match`. Mock mode produces deterministic play-point odds. Live mode reads an explicitly approved Limitless market and maps its YES/NO positions back to the two selected Gravity Goons. Browser code never receives API credentials.
+
+After Limitless provides partner approval and a custom match market, add a server-only mapping using the canonical key shown by the API when a mapping is missing:
+
+```bash
+LIMITLESS_MODE=live
+LIMITLESS_MATCH_MARKETS_JSON={"gravity-goons:skateboarding:34-35":{"slug":"approved-market-slug","yesTokenId":34}}
+```
+
+`LIMITLESS_API_TOKEN_ID` and `LIMITLESS_API_SECRET` are server-only. Embedded order submission remains hard-disabled at `/api/limitless/orders` until partner-account provisioning, wallet ownership, age/jurisdiction eligibility, funding, settlement, and responsible-play controls are implemented and reviewed. Do not enable `LIMITLESS_TRADING_ENABLED` merely because credentials exist.
+
 ## Mainnet launch gates
 
 Do not deploy the collection contract until all of these are final:

@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts",
+    "test:limitless": "node --test --experimental-strip-types src/lib/limitless/core.test.ts",
+    "test": "npm run test:game && npm run test:limitless",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@limitless-exchange/sdk": "^1.0.11",
     "@supabase/supabase-js": "2.110.7",
     "@types/three": "^0.185.1",
     "next": "16.2.10",

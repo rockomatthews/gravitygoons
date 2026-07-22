@@ -388,6 +388,31 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .arena-scoreboard span, .arena-scoreboard small { color: var(--muted); font: 800 9px var(--mono); }
 .arena-scoreboard b { min-height: 40px; color: var(--paper); font: 950 42px/.9 var(--mono); letter-spacing: .18em; text-shadow: 0 0 24px #18f1dc55; }
 .arena-scoreboard i { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; color: var(--void); background: var(--coral); font: 950 18px var(--mono); transform: rotate(-7deg); box-shadow: 0 0 40px #ff4b3555; }
+.limitless-panel { border-bottom: 1px solid var(--line); padding: 18px; background: radial-gradient(circle at 50% 50%, #7654ff18, transparent 55%), #070a0f; }
+.limitless-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 14px; }
+.limitless-heading > div { display: grid; gap: 3px; }
+.limitless-heading span, .limitless-heading i, .limitless-match-copy small, .limitless-outcomes span, .limitless-outcomes small { color: var(--muted); font: 800 7px var(--mono); letter-spacing: .1em; }
+.limitless-heading b { color: white; font: 950 13px var(--mono); }
+.limitless-heading i { border: 1px solid #78659e; padding: 7px 9px; color: #b69cff; background: #7d4dff17; font-style: normal; }
+.limitless-heading i.live { border-color: var(--teal); color: var(--teal); background: #18f1dc12; box-shadow: 0 0 18px #18f1dc24; }
+.limitless-match-copy { display: grid; grid-template-columns: 1fr auto auto; gap: 24px; border: 1px solid #2a333d; padding: 13px 15px; background: #0d1218; }
+.limitless-match-copy > div { display: grid; gap: 4px; }
+.limitless-match-copy strong { color: white; font: 850 11px var(--mono); text-transform: uppercase; }
+.limitless-outcomes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.limitless-outcomes > div { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 3px 12px; border: 1px solid #2a333d; padding: 14px; background: linear-gradient(145deg, #111820, #090d12); }
+.limitless-outcomes > div.teal { border-left: 3px solid var(--teal); }
+.limitless-outcomes > div.coral { border-right: 3px solid var(--coral); }
+.limitless-outcomes b { color: white; font: 900 13px var(--mono); text-transform: uppercase; }
+.limitless-outcomes strong { grid-row: span 2; color: var(--acid); font: 950 30px var(--mono); }
+.limitless-outcomes small { grid-column: 1 / 3; }
+.limitless-outcomes button { grid-column: 1 / -1; margin-top: 8px; border: 1px solid #343e47; padding: 9px; color: #748089; background: #11171d; font: 850 8px var(--mono); }
+.limitless-outcomes button:not(:disabled) { border-color: var(--teal); color: var(--void); background: var(--teal); cursor: pointer; }
+.limitless-notice { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 10px; }
+.limitless-notice p, .limitless-notice a, .limitless-state { color: #85929a; font: 750 7px/1.5 var(--mono); }
+.limitless-notice p { margin: 0; }
+.limitless-notice a { flex: 0 0 auto; color: var(--teal); text-decoration: none; }
+.limitless-state { border: 1px dashed #3a4650; padding: 24px; text-align: center; }
+.limitless-state.error { color: #ff8e80; }
 .arena-fighters { display: grid; grid-template-columns: 1fr 1fr; perspective: 1400px; }
 .fighter-card { min-width: 0; display: grid; grid-template-columns: minmax(220px, .85fr) 1.15fr; border-right: 1px solid var(--line); position: relative; }
 .fighter-card:last-child { border-right: 0; }
@@ -449,6 +474,11 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .arena-scoreboard { grid-template-columns: 1fr 44px 1fr; gap: 6px; padding-inline: 10px; }
   .arena-scoreboard i { width: 44px; height: 44px; font-size: 13px; }
   .arena-scoreboard b { font-size: 23px; }
+  .limitless-match-copy { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .limitless-match-copy > div:first-child { grid-column: 1 / -1; }
+  .limitless-outcomes { grid-template-columns: 1fr; }
+  .limitless-outcomes > div.coral { border-right: 1px solid #2a333d; border-left: 3px solid var(--coral); }
+  .limitless-notice { align-items: flex-start; flex-direction: column; }
   .fighter-card { grid-template-columns: 1fr; }
   .fighter-image { min-height: auto; aspect-ratio: 1; }
   .fighter-copy { min-height: 430px; }
