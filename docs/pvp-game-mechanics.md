@@ -97,6 +97,102 @@ Launch boundary:
 
 Do not describe play points as odds, winnings, cash, yield, or guaranteed rewards in public marketing.
 
+## Saved move cinema
+
+Live image-to-video generation is not part of round resolution. A match must
+never wait for an AI render. Instead, an NFT owner may commission a short move
+clip outside the match and attach an approved result to a trick the athlete has
+already unlocked.
+
+The presentation lookup key is `(token_id, trick_id, clip_version)`. At reveal,
+the broadcast client requests the current approved clip from a CDN. A cache hit
+plays immediately. A miss, timeout, rejected clip, or unsupported client uses a
+deterministic 2.5D animation built from the genesis image, sponsor sticker
+layer, and trick-specific camera/effect template.
+
+The NFT profile is the owner studio. Every unlocked trick appears in that
+profile with one of these states:
+
+`no_movie -> quoted -> paid -> queued -> generating -> owner_review -> approved`
+
+Exceptional states are `rejected`, `rerolling`, `failed`, `refunding`,
+`refunded`, and `unpublished`. Rejected drafts never enter the game client or
+public CDN.
+
+Owner profile boundary:
+
+1. Verify current NFT ownership and that the selected trick is already unlocked.
+2. Quote a one-time render price before accepting crypto payment.
+3. Confirm payment server-side and enqueue an asynchronous, idempotent job.
+4. Generate multiple internal takes from the immutable genesis image and a
+   versioned, discipline-specific movement template.
+5. Check identity consistency, equipment anatomy, fictional-brand policy,
+   prohibited content, duration, codec, dimensions, and safe framing.
+6. Let the owner approve one take. Publish only approved, immutable clip
+   versions and retain moderation provenance.
+7. Define retry, rejection, cancellation, and refund behavior before opening
+   payments.
+
+Seedance is the first planned generation provider. Use its asynchronous queue
+and webhook flow; never keep a browser request open while a movie renders.
+Server code submits a square five-second image-to-video job using the NFT's
+approved source image and stores the provider request ID. `FAL_KEY`, provider
+webhook verification, and storage credentials remain server-only. The initial
+target is Seedance 2.0 Fast at 720p for draft generation, with the standard tier
+available for a paid final-quality rerender only when testing proves the visual
+gain is worth the cost.
+
+The system becomes more efficient through a shared move-template memory, not by
+reusing another NFT's finished identity:
+
+- Key templates by `(discipline, trick_id, template_version)`.
+- Store the approved choreography prompt, negative equipment constraints,
+  camera path, successful seeds, reference motion, duration, and model settings.
+- Record automated and owner-review outcomes for every attempt.
+- Promote the best-performing template version for future characters while
+  preserving old versions for reproducibility.
+- Reuse an approved move as a motion reference only when provider terms and the
+  owner's product license permit it.
+- Never expose one owner's private draft or reference image to another owner.
+
+This creates a reusable Ollie, Kickflip, Tailwhip, Whip, or Cork "recipe" while
+Seedance still renders the requesting NFT's own body, gear, stance, sponsor
+marks, and environment.
+
+Move clips are cosmetic presentation. Buying or approving one must not unlock a
+trick, add stats, change landing probability, raise judged score, improve
+Limitless market treatment, or affect matchmaking. A separate cosmetic
+`cinema_progress` record may track approved clips, creator credits, audience
+favorites, and a reel-completion level without touching competitive state.
+
+Sponsors may appear in a clip only when already attached to the NFT. The
+approved sponsor stack, not an owner's prompt text, controls which fictional
+marks may be rendered. Genesis artwork remains immutable; clips are versioned
+presentation assets that follow the NFT unless product terms explicitly give a
+prior owner the right to unpublish their commissioned clip.
+
+Payment should launch with USDC on Base plus non-transferable in-game render
+credits used for promotions, refunds, or earned discounts. A new transferable
+game coin should not be required for the first release: it adds liquidity,
+pricing, treasury, disclosure, and regulatory complexity without improving the
+render pipeline. If a game coin is introduced later, the server must still issue
+a short-lived signed quote so price volatility cannot change the charge between
+button click and settlement. Payment verification must be idempotent, and a
+render job must never be created twice for one transaction.
+
+Storage and delivery requirements:
+
+- Keep originals and moderation evidence private; serve optimized derivatives
+  through a CDN with immutable hashes.
+- Target five-second square H.264 MP4 as the universal first format and add
+  WebM only after measuring browser benefit.
+- Preload metadata, not every roster video. Prefetch only the two selected
+  athletes' likely clips after trick lock.
+- Cap clip file size and decode cost so spectator playback does not delay reveal.
+- Record which clip hash played in the signed round transcript.
+- Never pass storage credentials, generation API keys, or payment-verification
+  secrets to browser code.
+
 ## Match lifecycle and missing norms
 
 Production match states:

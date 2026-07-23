@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RARITY_EDGE_DESCRIPTION, signatureEdgeForRarity } from "@/lib/gameplay";
+import { CharacterMoveLibrary } from "@/components/CharacterMoveLibrary";
+import type { Discipline } from "@/lib/pvp";
 
 export default async function CharacterPage({ params }: { params: Promise<{ tokenId: string }> }) {
   const { tokenId: raw } = await params;
@@ -25,6 +27,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ toke
           <div className="progress-preview"><span>FUTURE BATTLE PROFILE · {token.discipline}</span><b>LEVEL 1 · 0 XP · 0/64 TRICKS</b></div>
         </div>
       </div>
+      <CharacterMoveLibrary discipline={token.discipline as Discipline} tokenId={token.token_id} />
     </main>
   );
 }

@@ -227,6 +227,21 @@ LIMITLESS_MATCH_MARKETS_JSON={"gravity-goons:skateboarding:34-35":{"slug":"appro
 
 `LIMITLESS_API_TOKEN_ID` and `LIMITLESS_API_SECRET` are server-only. Embedded order submission remains hard-disabled at `/api/limitless/orders` until partner-account provisioning, wallet ownership, age/jurisdiction eligibility, funding, settlement, and responsible-play controls are implemented and reviewed. Do not enable `LIMITLESS_TRADING_ENABLED` merely because credentials exist.
 
+### Owner-rendered move cinema
+
+The game and `/moves` teaser use a pre-rendered clip model. The actual owner
+workflow lives in each `/character/[tokenId]` profile: unlocked moves without a
+clip show **Make Movie**, and completed Seedance drafts return to the same
+profile for approve, reject, or reroll. Live matches only fetch cached, approved
+clips; they never wait for generation. A deterministic 2.5D animation remains
+the universal fallback.
+
+Paid clips are cosmetic. They cannot unlock tricks, improve stats or landing
+odds, alter judged results, or influence Limitless markets. Payment submission,
+generation jobs, moderation, storage, and refunds remain intentionally
+unimplemented while the teaser is visible. The complete product boundary is in
+`docs/pvp-game-mechanics.md`.
+
 ## Mainnet launch gates
 
 Do not deploy the collection contract until all of these are final:
