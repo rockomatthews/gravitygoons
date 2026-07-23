@@ -38,7 +38,9 @@ FINAL_CONSTRAINTS = (
     "underside and no deck traction pad on that face. In any standing surf stance, place the rear foot over "
     "the rear traction-pad zone toward the heel-side rail and the front foot farther forward toward the nose "
     "and toe-side rail; never center both feet on the stringer or put them on the same side. Any visible animal tail must attach to the "
-    "athlete's pelvis and stay visually separate from all bicycle or motorcycle components."
+    "athlete's pelvis and stay visually separate from all bicycle or motorcycle components. For every BMX "
+    "Pedal Ready pose, show exactly two pedals and keep both shoes fully supported on those pedals; neither "
+    "foot may touch the ground, hover, or rest on the frame, wheel, or peg."
 )
 
 

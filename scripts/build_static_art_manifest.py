@@ -58,6 +58,12 @@ POSE_GUIDANCE = {
         "the opposite underside. Show fins only when the camera clearly sees the illustrated underside, in "
         "which case the deck traction pad cannot be visible on that same face. Never put fins on the deck."
     ),
+    "Pedal Ready": (
+        "BMX pedal geometry is mandatory: show one complete BMX bike with exactly two normal pedals, one on "
+        "each crank side. Both athlete shoes must be fully and visibly supported by their corresponding pedals "
+        "in a balanced ready-to-ride stance. Never place either foot on the ground, wheel, frame, peg, or in "
+        "midair; never omit, duplicate, or detach a pedal."
+    ),
     "Binding Check": (
         "Binding Check geometry is mandatory: place one complete snowboard flat and supported on the "
         "ground with exactly two bindings. The athlete crouches beside the board; both boots remain "

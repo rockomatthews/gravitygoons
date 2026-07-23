@@ -57,6 +57,19 @@
       "no contradictory motion"
     ]
   },
+  "Pedal Ready": {
+    "canonical_display_pose": "The athlete grips a complete BMX bike in a balanced ready-to-ride stance with both shoes fully supported by exactly two pedals.",
+    "required_checks": [
+      "one complete BMX bike",
+      "exactly two pedals",
+      "one pedal on each crank side",
+      "both shoes fully supported by pedals",
+      "no foot on ground",
+      "no hovering foot",
+      "no foot on frame wheel or peg",
+      "no missing duplicated or detached pedal"
+    ]
+  },
   "Binding Check": {
     "canonical_display_pose": "Snowboard lies flat while the athlete crouches beside it with both boots outside the bindings and both hands checking the nearest binding; no crossed leg and no boot entering the opposite-side binding.",
     "required_checks": [
