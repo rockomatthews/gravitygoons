@@ -110,6 +110,16 @@ plays immediately. A miss, timeout, rejected clip, or unsupported client uses a
 deterministic 2.5D animation built from the genesis image, sponsor sticker
 layer, and trick-specific camera/effect template.
 
+An approved move may contain separate `land` and `fall` outcome clips. The
+server resolves the attempt from the athlete's current landing chance first,
+then the broadcast plays the matching approved outcome. A movie can never
+change, reroll, or reinterpret the settled game result. If the selected outcome
+is missing, the client uses the corresponding land-or-fall 2.5D fallback.
+
+Owners review each outcome separately. Publishing the land clip does not
+implicitly approve its fall clip, and rejected drafts remain private. Match
+transcripts record the outcome type and exact clip hash that spectators saw.
+
 The NFT profile is the owner studio. Every unlocked trick appears in that
 profile with one of these states:
 

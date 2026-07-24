@@ -1,6 +1,7 @@
 import collection from "@/data/collection.json";
 import { GameArena, type ArenaGoon } from "@/components/GameArena";
 import { MoveCinemaTeaser } from "@/components/MoveCinemaTeaser";
+import { TrickOutcomeTeaser } from "@/components/TrickOutcomeTeaser";
 import { WalletButton } from "@/components/WalletButton";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,10 +24,11 @@ export default function GamePage() {
   return <main className="game-lab">
     <header className="nav shell">
       <Link className="brand" href="/"><Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority /></Link>
-      <nav><Link href="/">Collection</Link><a href="#arena">Arena</a><a href="#cinema">Move Cinema</a><a href="#rules">Rules</a></nav>
+      <nav><Link href="/">Collection</Link><a href="#outcomes">Outcomes</a><a href="#arena">Arena</a><a href="#cinema">Move Cinema</a><a href="#rules">Rules</a></nav>
       <WalletButton />
     </header>
     <section className="game-hero shell"><p className="eyebrow">PVP MECHANICS LAB // V0.2</p><h1>CALL IT.<br /><i>LAND IT.</i><br />DON&apos;T SPELL OUT.</h1><p>Two discipline-matched Goons lock tricks in secret. Difficulty sets the risk. Originality decays when a move is repeated. Ranked wins attract fictional sponsors, adding permanent stickers and new trick options.</p></section>
+    <section id="outcomes" className="shell game-outcome-teaser"><TrickOutcomeTeaser /></section>
     <section id="cinema" className="shell game-cinema-teaser"><MoveCinemaTeaser compact /></section>
     <section id="arena" className="shell"><GameArena goons={goons} /></section>
     <section id="rules" className="game-rules shell">
