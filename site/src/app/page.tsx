@@ -64,11 +64,11 @@ export default function Home() {
       </section>
 
       <section className="game-section shell" id="progression">
-        <div><p className="eyebrow">THE FIRST GAME MODE</p><h2>Call the trick.<br />Play the odds.</h2><p className="game-intro">Two discipline-matched Goons select tricks in secret. Difficulty creates risk, originality falls when a trick is repeated, and the round loser takes the next letter. First athlete to spell the discipline word loses the match.</p><Link className="button primary" href="/game">ENTER THE PVP LAB</Link></div>
+        <div><p className="eyebrow">THE FIRST GAME MODE</p><h2>Call the trick.<br />Make them answer.</h2><p className="game-intro">Gravity Goons plays like SKATE and HORSE. Land your called trick and the other Goon must attempt the same move—even when it is outside their permanent catalogue. Miss the answer, take a letter. Spell the discipline word and lose the match.</p><Link className="button primary" href="/game">ENTER THE PVP LAB</Link></div>
         <div className="game-grid">
           <article><b>01</b><h3>Match your discipline</h3><p>Skaters battle skaters. Surfers battle surfers. Each of the six sports gets its own trick catalog, matchup identity, and strategic rhythm.</p></article>
-          <article><b>02</b><h3>Choose the trick</h3><p>Call the move you want your Goon to attempt. Safer tricks can apply steady pressure; ambitious tricks can change the entire battle.</p></article>
-          <article><b>03</b><h3>Know your odds</h3><p>Every Goon starts with 30 balanced stat points. Rarity adds a small signature-trick edge: Common +0, Uncommon +1, Rare +2, Epic +3, and Legendary +4 percentage points. Stats still drive the matchup; rarity never guarantees the landing.</p></article>
+          <article><b>02</b><h3>Set and answer</h3><p>Call a move your Goon knows and land it. The responder must try that exact move; landing it wins the next call, while missing earns a letter.</p></article>
+          <article><b>03</b><h3>Learn under pressure</h3><p>Stats and similar known moves shape temporary off-catalogue attempts. Every forced try improves that Goon&apos;s chance if the trick returns later in the match.</p></article>
           <article><b>04</b><h3>Progress travels</h3><p>Future XP, learned tricks, achievements, and battle history are designed to stay with the NFT—even when the Goon changes wallets.</p></article>
         </div>
       </section>

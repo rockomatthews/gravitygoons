@@ -25,6 +25,7 @@ export type Trick = {
   name: string;
   difficulty: number;
   sponsorId: string | null;
+  families: string[];
 };
 
 export type Sponsor = {
@@ -48,10 +49,14 @@ export type SponsorProgression = {
 
 export type TrickHistory = Record<string, number>;
 
-export type RoundChoice = {
-  athlete: Athlete;
+export type SkateTurnChoice = {
+  setter: Athlete;
+  responder: Athlete;
   trick: Trick;
-  history: TrickHistory;
+  setterCatalogue: Trick[];
+  responderCatalogue: Trick[];
+  responderPractice: TrickHistory;
+  previousSetTrickName: string | null;
 };
 
 export type AttemptResult = {
@@ -59,17 +64,22 @@ export type AttemptResult = {
   trick: Trick;
   chance: number;
   landed: boolean;
-  originality: number;
-  performance: number;
-  repeatCount: number;
+  role: "setter" | "responder";
+  inCatalogue: boolean;
+  similarity: number;
+  learningBonus: number;
+  priorForcedAttempts: number;
 };
 
-export type RoundResult = {
+export type SkateTurnResult = {
   seed: string;
-  attempts: [AttemptResult, AttemptResult];
-  winnerTokenId: number | null;
-  loserTokenId: number | null;
-  reason: "land-versus-miss" | "judged-performance" | "double-miss" | "tie";
+  trick: Trick;
+  setterTokenId: number;
+  responderTokenId: number;
+  attempts: [AttemptResult, AttemptResult | null];
+  nextSetterTokenId: number;
+  letterRecipientTokenId: number | null;
+  reason: "setter-missed" | "responder-landed" | "responder-missed";
 };
 
 const RARITY_SIGNATURE_EDGE = {
@@ -114,7 +124,13 @@ const RAW_TRICKS: Record<Discipline, Array<[string, number, string?]>> = {
 export const TRICK_CATALOG: Record<Discipline, Trick[]> = Object.fromEntries(
   Object.entries(RAW_TRICKS).map(([discipline, tricks]) => [
     discipline,
-    tricks.map(([name, difficulty, sponsorId], id) => ({ id, name, difficulty, sponsorId: sponsorId ?? null })),
+    tricks.map(([name, difficulty, sponsorId], id) => ({
+      id,
+      name,
+      difficulty,
+      sponsorId: sponsorId ?? null,
+      families: trickFamilies(name),
+    })),
   ]),
 ) as Record<Discipline, Trick[]>;
 
@@ -158,16 +174,62 @@ export function repeatCount(history: TrickHistory, trickName: string): number {
   return history[normalizedName(trickName)] ?? 0;
 }
 
-export function originalityScore(history: TrickHistory, trickName: string): number {
-  return Math.max(34, 100 - repeatCount(history, trickName) * 22);
+function trickFamilies(name: string): string[] {
+  const value = normalizedName(name);
+  const families = new Set<string>();
+  if (/(360|540|720|900|1080|1260|1440|1800|rotation|bigspin|gazelle)/.test(value)) families.add("rotation");
+  if (/(flip|cork|rodeo|misty|bio|flair|cash roll|volt)/.test(value)) families.add("inversion");
+  if (/(slide|grind|rail)/.test(value)) families.add("rail");
+  if (/(grab|method|tabletop|toboggan|heelclicker|tsunami|superman)/.test(value)) families.add("grab");
+  if (/(manual|bottom turn|cutback|floater|snap|tube)/.test(value)) families.add("balance");
+  if (/(barspin|tailwhip|decade|bike flip|whip|can-can|nac-nac)/.test(value)) families.add("equipment");
+  if (families.size === 0) families.add("technical");
+  return [...families];
 }
 
-export function landingChance(athlete: Athlete, trick: Trick): number {
+export function trickIsInCatalogue(trick: Trick, catalogue: Trick[]): boolean {
+  return catalogue.some((item) => normalizedName(item.name) === normalizedName(trick.name));
+}
+
+export function trickSimilarity(trick: Trick, catalogue: Trick[]): number {
+  if (trickIsInCatalogue(trick, catalogue)) return 1;
+  if (catalogue.length === 0) return 0;
+  return Math.max(...catalogue.map((known) => {
+    const sharedFamily = trick.families.some((family) => known.families.includes(family));
+    const difficultyProximity = 1 - Math.min(8, Math.abs(trick.difficulty - known.difficulty)) / 8;
+    return Number(((sharedFamily ? 0.55 : 0) + difficultyProximity * 0.35).toFixed(2));
+  }));
+}
+
+export function forcedAttemptLearningBonus(history: TrickHistory, trickName: string): number {
+  return Math.min(24, repeatCount(history, trickName) * 6);
+}
+
+export function canSetTrick(trick: Trick, previousSetTrickName: string | null): boolean {
+  return previousSetTrickName === null || normalizedName(trick.name) !== normalizedName(previousSetTrickName);
+}
+
+export function landingChance(
+  athlete: Athlete,
+  trick: Trick,
+  options: { catalogue?: Trick[]; practice?: TrickHistory; forcedResponse?: boolean } = {},
+): number {
   const skillAdjustment = (weightedSkill(athlete) - 6) * 5;
   const signatureEdge = normalizedName(athlete.trickSpecialty) === normalizedName(trick.name)
     ? RARITY_SIGNATURE_EDGE[athlete.rarity]
     : 0;
-  return Math.round(clamp(94 - trick.difficulty * 7 + skillAdjustment + signatureEdge, 18, 95));
+  const catalogue = options.catalogue;
+  const inCatalogue = catalogue ? trickIsInCatalogue(trick, catalogue) : true;
+  const similarity = catalogue ? trickSimilarity(trick, catalogue) : 1;
+  const unfamiliarityPenalty = inCatalogue ? 0 : Math.round(18 - similarity * 10);
+  const learningBonus = options.forcedResponse
+    ? forcedAttemptLearningBonus(options.practice ?? {}, trick.name)
+    : 0;
+  return Math.round(clamp(
+    94 - trick.difficulty * 7 + skillAdjustment + signatureEdge - unfamiliarityPenalty + learningBonus,
+    8,
+    95,
+  ));
 }
 
 export function sponsorById(sponsorId: string): Sponsor {
@@ -214,60 +276,71 @@ export function nextSponsorMilestone(progression: SponsorProgression): number | 
     .find((milestone) => milestone > progression.verifiedRankedWins) ?? null;
 }
 
-function resolveAttempt(choice: RoundChoice, roll: number, executionRoll: number): AttemptResult {
-  const chance = landingChance(choice.athlete, choice.trick);
-  const originality = originalityScore(choice.history, choice.trick.name);
-  const repeats = repeatCount(choice.history, choice.trick.name);
+function resolveAttempt(
+  athlete: Athlete,
+  trick: Trick,
+  role: "setter" | "responder",
+  catalogue: Trick[],
+  practice: TrickHistory,
+  roll: number,
+): AttemptResult {
+  const forcedResponse = role === "responder";
+  const chance = landingChance(athlete, trick, { catalogue, practice, forcedResponse });
+  const inCatalogue = trickIsInCatalogue(trick, catalogue);
   const landed = roll * 100 < chance;
-  const execution = (executionRoll - 0.5) * 6;
-  const performance = landed
-    ? Number((choice.trick.difficulty * 10 + originality * 0.4 + choice.athlete.stats.Style * 2 + execution).toFixed(2))
-    : 0;
   return {
-    tokenId: choice.athlete.tokenId,
-    trick: choice.trick,
+    tokenId: athlete.tokenId,
+    trick,
     chance,
     landed,
-    originality,
-    performance,
-    repeatCount: repeats,
+    role,
+    inCatalogue,
+    similarity: trickSimilarity(trick, catalogue),
+    learningBonus: forcedResponse ? forcedAttemptLearningBonus(practice, trick.name) : 0,
+    priorForcedAttempts: forcedResponse ? repeatCount(practice, trick.name) : 0,
   };
 }
 
-export function resolveRound(first: RoundChoice, second: RoundChoice, seed: string): RoundResult {
-  if (first.athlete.tokenId === second.athlete.tokenId) throw new Error("A Goon cannot battle itself");
-  if (first.athlete.discipline !== second.athlete.discipline) throw new Error("Opponents must share a discipline");
+export function resolveSkateTurn(choice: SkateTurnChoice, seed: string): SkateTurnResult {
+  const { setter, responder, trick, setterCatalogue, responderCatalogue, responderPractice, previousSetTrickName } = choice;
+  if (setter.tokenId === responder.tokenId) throw new Error("A Goon cannot battle itself");
+  if (setter.discipline !== responder.discipline) throw new Error("Opponents must share a discipline");
   if (!seed.trim()) throw new Error("A committed round seed is required");
+  if (!trickIsInCatalogue(trick, setterCatalogue)) throw new Error("The setter can only call a trick from its unlocked catalogue");
+  if (!canSetTrick(trick, previousSetTrickName)) throw new Error("The same trick cannot be set twice in a row");
 
   const random = randomSequence(seed);
-  const attempts: [AttemptResult, AttemptResult] = [
-    resolveAttempt(first, random(), random()),
-    resolveAttempt(second, random(), random()),
-  ];
-  const [a, b] = attempts;
-
-  if (a.landed !== b.landed) {
+  const setterAttempt = resolveAttempt(setter, trick, "setter", setterCatalogue, {}, random());
+  if (!setterAttempt.landed) {
     return {
       seed,
-      attempts,
-      winnerTokenId: a.landed ? a.tokenId : b.tokenId,
-      loserTokenId: a.landed ? b.tokenId : a.tokenId,
-      reason: "land-versus-miss",
+      trick,
+      setterTokenId: setter.tokenId,
+      responderTokenId: responder.tokenId,
+      attempts: [setterAttempt, null],
+      nextSetterTokenId: responder.tokenId,
+      letterRecipientTokenId: null,
+      reason: "setter-missed",
     };
   }
-  if (!a.landed && !b.landed) {
-    return { seed, attempts, winnerTokenId: null, loserTokenId: null, reason: "double-miss" };
-  }
-  const difference = a.performance - b.performance;
-  if (Math.abs(difference) < 0.5) {
-    return { seed, attempts, winnerTokenId: null, loserTokenId: null, reason: "tie" };
-  }
+
+  const responderAttempt = resolveAttempt(
+    responder,
+    trick,
+    "responder",
+    responderCatalogue,
+    responderPractice,
+    random(),
+  );
   return {
     seed,
-    attempts,
-    winnerTokenId: difference > 0 ? a.tokenId : b.tokenId,
-    loserTokenId: difference > 0 ? b.tokenId : a.tokenId,
-    reason: "judged-performance",
+    trick,
+    setterTokenId: setter.tokenId,
+    responderTokenId: responder.tokenId,
+    attempts: [setterAttempt, responderAttempt],
+    nextSetterTokenId: responderAttempt.landed ? responder.tokenId : setter.tokenId,
+    letterRecipientTokenId: responderAttempt.landed ? null : responder.tokenId,
+    reason: responderAttempt.landed ? "responder-landed" : "responder-missed",
   };
 }
 
