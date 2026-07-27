@@ -203,6 +203,8 @@ Import this repository as a new Vercel project and set **Root Directory** to `si
 - `NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY` (server only)
+- `NEXT_PUBLIC_SITE_URL=https://gravitygoons.com`
+- `PROFILE_SESSION_SECRET` (server only, at least 32 random bytes)
 - `DEMO_PROGRESS_ENABLED=false`
 
 Never place the game signer, relayer key, deployer key, or Supabase service-role key in a `NEXT_PUBLIC_` variable.
@@ -229,18 +231,44 @@ LIMITLESS_MATCH_MARKETS_JSON={"gravity-goons:skateboarding:34-35":{"slug":"appro
 
 ### Owner-rendered move cinema
 
-The game and `/moves` teaser use a pre-rendered clip model. The actual owner
-workflow lives in each `/character/[tokenId]` profile: unlocked moves without a
-clip show **Make Movie**, and completed Seedance drafts return to the same
-profile for approve, reject, or reroll. Live matches only fetch cached, approved
-clips; they never wait for generation. A deterministic 2.5D animation remains
-the universal fallback.
+The game and `/moves` teaser use a pre-rendered clip model. Connected holders
+create a username at `/profile`; their public collection appears at
+`/[username]`, and each owned Goon's studio lives at
+`/[username]/goons/[tokenId]/moves`. Unlocked moves without a pair show **Make
+both movies**. A single order always creates separate LAND and FALL jobs.
+Completed Seedance drafts return to the studio for separate approve, reject, or
+reroll decisions. Public profiles expose approved LAND clips only. FALL clips
+remain private and are requested by the server only after a failed match result
+has already been settled.
 
 Paid clips are cosmetic. They cannot unlock tricks, improve stats or landing
-odds, alter judged results, or influence Limitless markets. Payment submission,
-generation jobs, moderation, storage, and refunds remain intentionally
-unimplemented while the teaser is visible. The complete product boundary is in
-`docs/pvp-game-mechanics.md`.
+odds, alter judged results, or influence Limitless markets. The migration
+`20260727225936_profile_move_cinema.sql` adds profiles, wallet links, a Base
+ownership index, shared choreography templates, LAND/FALL pairs, private
+outcome assets, USDC orders, Seedance jobs, and owner-review evidence. Every
+public table has RLS; orders, prompts, FALL URLs, jobs, and reviews remain
+server-only.
+
+The server uses a signed HTTP-only wallet session and rechecks current Base NFT
+ownership before quotes, payment acceptance, or draft review. Configure:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://gravitygoons.com
+PROFILE_SESSION_SECRET=replace-with-at-least-32-random-bytes
+MOVE_PAIR_PRICE_USDC_MINOR=12000000
+MOVE_PAIR_ESTIMATED_COST_USDC_MINOR=2500000
+MOVE_PAYMENT_MODE=demo
+NEXT_PUBLIC_MOVE_TREASURY_ADDRESS=0x...
+MOVE_TREASURY_ADDRESS=0x...
+FAL_KEY=server-only
+```
+
+`MOVE_PAYMENT_MODE=demo` never validates or accepts a production payment. Set it
+to `live` only after the public and server treasury values match, the Base USDC
+flow has been tested, refund rules are published, and `FAL_KEY` plus the HTTPS
+webhook are configured. Seedance uses fal's asynchronous queue and verified
+Ed25519 webhooks; no provider key reaches browser code. The complete product
+boundary remains in `docs/pvp-game-mechanics.md`.
 
 ## Mainnet launch gates
 

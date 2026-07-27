@@ -1,4 +1,5 @@
 import { TRICK_CATALOG, type Discipline } from "@/lib/pvp";
+import Link from "next/link";
 
 export function CharacterMoveLibrary({
   discipline,
@@ -36,7 +37,7 @@ export function CharacterMoveLibrary({
             <div><span>DIFFICULTY {trick.difficulty}</span><i>NO MOVIE</i></div>
             <h3>{trick.name}</h3>
             <p>Uses the shared {discipline} choreography template, then adapts it to this Goon&apos;s identity, equipment, stance, and earned sponsor stack.</p>
-            <button disabled>MAKE MOVIE</button>
+            <Link href="/profile">CONNECT OWNER</Link>
           </article>
         ))}
       </div>
@@ -48,7 +49,7 @@ export function CharacterMoveLibrary({
         <i>→</i>
         <div><span>OWNER REVIEW</span><b>Approve, reject, or use an included reroll before publishing.</b></div>
       </div>
-      <p className="character-move-note">INTERFACE PREVIEW ONLY — GENERATION, PAYMENT, AND PROFILE WRITES ARE STILL DISABLED.</p>
+      <p className="character-move-note">LIVE WORKFLOW: WALLET SIGNATURE → OWNERSHIP CHECK → USDC QUOTE → LAND + FALL JOBS → SEPARATE OWNER APPROVALS.</p>
     </section>
   );
 }
