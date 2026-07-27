@@ -57,7 +57,7 @@ python3 -m pip install -r requirements.txt
 python3 generate.py
 ```
 
-Outputs include `traits/assignments.json`, 1,000 files in `genesis_metadata/`, packed contract discipline words, storefront data, and `reports/validation.json`.
+Outputs include `traits/assignments.json`, 1,000 files in `genesis_metadata/`, packed contract discipline and rarity words, storefront data, and `reports/validation.json`.
 
 ## Render the base character
 
@@ -151,6 +151,13 @@ npm run deploy
 ```
 
 The deploy script refuses non-Base chain IDs by default, links the registry once, and leaves public minting closed. If the registry owner differs from the deployer, that owner must accept the two-step ownership transfer.
+
+Genesis mint prices are immutable rarity tiers encoded from the 1,000-token
+assignment source: Common `0.015 ETH`, Uncommon `0.0225 ETH`, Rare `0.035 ETH`,
+Epic `0.055 ETH`, and Legendary `0.08 ETH`. The contract exposes `rarityOf`,
+`priceFor`, and `mintPriceFor`; mixed selections must pay the exact on-chain
+sum. The storefront displays the same schedule and rechecks the authoritative
+total immediately before requesting the wallet transaction.
 
 ## Supabase
 

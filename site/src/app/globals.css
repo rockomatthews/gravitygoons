@@ -209,6 +209,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .card-copy > div:first-child { display: flex; justify-content: space-between; color: var(--muted); font: 9px var(--mono); }
 .card-copy h3 { margin: 11px 0 5px; font-size: 22px; letter-spacing: -.03em; }
 .card-brand { min-height: 28px; margin: 0 0 12px; color: var(--teal); font: 800 8px/1.5 var(--mono); text-transform: uppercase; }
+.card-price { display: inline-block; margin: 0 0 4px; padding: 6px 8px; border: 1px solid #18f1dc55; color: #eefaf7; background: #18f1dc0c; font: 850 9px var(--mono); letter-spacing: .05em; }
 .mini-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .mini-stats span { padding: 6px 2px; background: #1a222c; color: #c7d1d6; text-align: center; font: 8px var(--mono); }
 .signature-edge { margin: 8px 0; color: #ffca38; font: 700 8px var(--mono); letter-spacing: .04em; text-transform: uppercase; }

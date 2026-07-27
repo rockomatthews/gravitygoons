@@ -7,7 +7,13 @@
     "supply": 1000,
     "public_supply": 950,
     "creator_reserve": 50,
-    "mint_price_eth": "0.003",
+    "mint_prices_eth": {
+      "Common": "0.015",
+      "Uncommon": "0.0225",
+      "Rare": "0.035",
+      "Epic": "0.055",
+      "Legendary": "0.08"
+    },
     "max_per_wallet": 5,
     "royalty_bps": 500,
     "gameplay": {

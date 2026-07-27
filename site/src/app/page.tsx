@@ -28,7 +28,7 @@ export default function Home() {
           <p className="eyebrow">1,000 FULL-BODY ATHLETES · BASE</p>
           <h1><span>BUILT TO</span><br />BREAK<br /><i>GRAVITY.</i></h1>
           <p className="lede">Six disciplines. Zero mystery. Choose your exact Goon, face rivals in the same sport, and call your tricks. Their stats shape the odds—but deciding when to play safe or risk everything is up to you.</p>
-          <div className="hero-actions"><a className="button primary" href="#collection">{collectionReady ? "Choose your Goon" : "Preview the Goons"}</a><span>{collectionReady ? "0.003 ETH · MAX 5" : "FINAL ART IN PROGRESS"}</span></div>
+          <div className="hero-actions"><a className="button primary" href="#collection">{collectionReady ? "Choose your Goon" : "Preview the Goons"}</a><span>{collectionReady ? "0.015–0.08 ETH BY RARITY · MAX 5" : "FINAL ART IN PROGRESS"}</span></div>
           <div className="launch-data"><div><b>1000</b><span>TOTAL GOONS</span></div><div><b>06</b><span>DISCIPLINES</span></div><div><b>64</b><span>TRICK SLOTS</span></div></div>
         </div>
         <div className="hero-visual">
