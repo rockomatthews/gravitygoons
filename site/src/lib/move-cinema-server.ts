@@ -37,6 +37,12 @@ function quoteAmount(): number {
   return value;
 }
 
+function includedRerollsPerOutcome(): number {
+  const value = Number(process.env.MOVE_INCLUDED_REROLLS_PER_OUTCOME ?? 1);
+  if (!Number.isInteger(value) || value < 0 || value > 9) throw new Error("MOVE_INCLUDED_REROLLS_PER_OUTCOME must be an integer from 0 through 9.");
+  return value;
+}
+
 export async function createMoveQuote(walletAddress: string, tokenId: number, trickId: number) {
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const { trick } = tokenMove(tokenId, trickId);
@@ -220,6 +226,7 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
 
   if (decision === "reroll") {
+    if (asset.version > includedRerollsPerOutcome()) throw new Error("This movie pair has used its included reroll for this outcome. Reject this draft or purchase an additional reroll when paid rerolls launch.");
     const nextVersion = asset.version + 1;
     const rerollPrompt = note.trim() ? `${asset.prompt} Owner revision note: ${note.trim()}` : asset.prompt;
     const { data: nextData, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome: asset.outcome, version: nextVersion, status: "queued", source_image_url: asset.source_image_url, prompt: rerollPrompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();

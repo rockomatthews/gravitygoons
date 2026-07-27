@@ -56,7 +56,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       if (!response.ok) throw new Error(data.error);
       setSelectedMove(move);
       setQuote(data);
-      setStatus(`${data.displayPrice} buys both outcomes: one clean LAND and one game-only FALL. Quote expires ${new Date(data.expiresAt).toLocaleTimeString()}.`);
+      setStatus(`${data.displayPrice} buys both outcomes: one clean LAND, one game-only FALL, and one included reroll of each. Quote expires ${new Date(data.expiresAt).toLocaleTimeString()}.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Unable to quote this move.");
     } finally {
@@ -140,7 +140,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         ))}
       </section>
 
-      {quote && selectedMove && <div className="move-quote-dock"><div><span>MOVE FILM PAIR</span><b>{selectedMove.name} · LAND + FALL</b><small>{quote.displayPrice} · ONE-TIME PURCHASE</small></div><button onClick={payAndGenerate} disabled={busy}>{busy ? "PROCESSING…" : quote.demo ? "SIMULATE PAYMENT" : "PAY USDC + GENERATE"}</button><button className="quote-cancel" onClick={() => setQuote(null)}>CANCEL</button></div>}
+      {quote && selectedMove && <div className="move-quote-dock"><div><span>MOVE FILM PAIR</span><b>{selectedMove.name} · LAND + FALL</b><small>{quote.displayPrice} · INCLUDES ONE REROLL EACH</small></div><button onClick={payAndGenerate} disabled={busy}>{busy ? "PROCESSING…" : quote.demo ? "SIMULATE PAYMENT" : "PAY USDC + GENERATE"}</button><button className="quote-cancel" onClick={() => setQuote(null)}>CANCEL</button></div>}
     </div>
   );
 }

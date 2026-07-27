@@ -257,6 +257,7 @@ NEXT_PUBLIC_SITE_URL=https://gravitygoons.com
 PROFILE_SESSION_SECRET=replace-with-at-least-32-random-bytes
 MOVE_PAIR_PRICE_USDC_MINOR=12000000
 MOVE_PAIR_ESTIMATED_COST_USDC_MINOR=2500000
+MOVE_INCLUDED_REROLLS_PER_OUTCOME=1
 MOVE_PAYMENT_MODE=demo
 NEXT_PUBLIC_MOVE_TREASURY_ADDRESS=0x...
 MOVE_TREASURY_ADDRESS=0x...
@@ -269,6 +270,10 @@ flow has been tested, refund rules are published, and `FAL_KEY` plus the HTTPS
 webhook are configured. Seedance uses fal's asynchronous queue and verified
 Ed25519 webhooks; no provider key reaches browser code. The complete product
 boundary remains in `docs/pvp-game-mechanics.md`.
+
+The default $12 pair includes the first LAND and FALL generations plus one
+reroll of each outcome. Further paid rerolls are intentionally blocked until a
+separate reroll quote and payment path is launched.
 
 ## Mainnet launch gates
 
