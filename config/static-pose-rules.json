@@ -48,6 +48,8 @@
       "feet are not both on same side of board",
       "visible deck or traction pad means all fins hidden on underside",
       "regular stance means anatomical left foot forward",
+      "front-facing regular stance prefers nose image-right",
+      "viewer-right anatomical-left foot forward for front-facing regular stance",
       "goofy stance means anatomical right foot forward",
       "hips and shoulders aligned with board travel",
       "athlete and board face the same direction",
@@ -63,11 +65,61 @@
       "one complete BMX bike",
       "exactly two pedals",
       "one pedal on each crank side",
+      "both pedals visibly separated beneath shoes",
+      "each pedal connected to a coherent crank arm",
       "both shoes fully supported by pedals",
       "no foot on ground",
       "no hovering foot",
       "no foot on frame wheel or peg",
-      "no missing duplicated or detached pedal"
+      "no missing duplicated hidden or detached pedal",
+      "animal tail outside bicycle silhouette"
+    ]
+  },
+  "Handlebar Lean": {
+    "canonical_display_pose": "The grounded athlete leans naturally on one complete BMX bike while both hands contact one coherent handlebar and one complete two-pedal crankset remains clearly visible below the frame.",
+    "required_checks": [
+      "one complete BMX bike",
+      "exactly two intact wheels",
+      "one coherent handlebar stem fork and head tube",
+      "both hands naturally contact handlebars",
+      "exactly two rectangular platform pedals",
+      "both pedal bodies simultaneously visible",
+      "one pedal on each crank side",
+      "two crank arms mechanically opposite at 180 degrees",
+      "both pedals attached to one bottom bracket",
+      "both athlete feet grounded beside bike",
+      "no pedal hidden by frame chainring shoe or wheel",
+      "no pedal confused with wheel peg",
+      "animal tail outside bicycle silhouette"
+    ]
+  },
+  "Bike Beside": {
+    "canonical_display_pose": "The grounded athlete stands beside and supports one complete BMX bike with a clearly visible coherent crankset and exactly two attached platform pedals.",
+    "required_checks": [
+      "one complete BMX bike",
+      "exactly two intact wheels",
+      "athlete visibly supports bike",
+      "exactly two rectangular platform pedals",
+      "both pedal bodies simultaneously visible",
+      "one pedal on each crank side",
+      "two crank arms mechanically opposite at 180 degrees",
+      "both pedals attached to one bottom bracket",
+      "both athlete feet grounded beside bike",
+      "no pedal hidden by frame chainring shoe or wheel",
+      "no pedal confused with wheel peg",
+      "animal tail outside bicycle silhouette"
+    ]
+  },
+  "Board Beside": {
+    "canonical_display_pose": "The athlete stands beside one complete skateboard; grip tape and truck-mounted underside remain physically opposite faces.",
+    "required_checks": [
+      "one complete skateboard",
+      "exactly two trucks",
+      "exactly four wheels",
+      "trucks mounted only on underside",
+      "no trucks on visible grip tape",
+      "no contradictory deck faces",
+      "no duplicated deck hardware"
     ]
   },
   "Binding Check": {
@@ -80,6 +132,22 @@
       "no crossed leg",
       "no boot in opposite binding",
       "board flat and supported"
+    ]
+  },
+  "Bars Turned": {
+    "canonical_display_pose": "The athlete is seated on or naturally straddles one complete stationary motocross bike with both hands gripping handlebars that turn together with the front fork and front wheel.",
+    "required_checks": [
+      "one complete motocross bike",
+      "exactly two intact wheels",
+      "both hands grip handlebars",
+      "handlebars front fork and front wheel turned together",
+      "athlete seated or naturally straddling bike",
+      "both legs down in plausible supported position",
+      "no airborne trick action",
+      "no kicked-out leg",
+      "no Nac-Nac action",
+      "animal tail outside motorcycle silhouette",
+      "clear background separates tail from every bike component"
     ]
   }
 }

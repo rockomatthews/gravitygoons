@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Gravity Goons — 189 Replacement Review</title>
+    <link rel="stylesheet" href="gallery.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand-block">
+        <p class="eyebrow">GRAVITY GOONS · CORRECTED CANDIDATES</p>
+        <h1>189 Replacement Review</h1>
+        <p class="summary" id="summary">Loading replacements…</p>
+      </div>
+      <div class="header-actions">
+        <button class="button secondary" id="copy-issues" type="button">Copy re-flagged list</button>
+        <button class="button" id="download-issues" type="button">Download re-correction list</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="filters" aria-label="Gallery filters">
+        <label><span>Find</span><input id="search" type="search" placeholder="#0123, species, sponsor…" autocomplete="off" /></label>
+        <label><span>Batch</span><select id="batch"><option value="all">All 189 replacements</option></select></label>
+        <label><span>Status</span><select id="status"><option value="all">All statuses</option><option value="unreviewed">Unreviewed</option><option value="good">Looks good</option><option value="flagged">Flagged</option></select></label>
+        <label><span>Discipline</span><select id="discipline"><option value="all">All disciplines</option></select></label>
+        <label><span>Species</span><select id="species"><option value="all">All species</option></select></label>
+        <button class="button ghost" id="clear-filters" type="button">Clear filters</button>
+      </section>
+
+      <section class="review-progress" aria-label="Review progress">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-labels"><span id="visible-count">0 visible</span><span><b id="good-count">0</b> good · <b id="flagged-count">0</b> flagged · <b id="remaining-count">189</b> remaining</span></div>
+      </section>
+
+      <section class="gallery" id="gallery" aria-live="polite"></section>
+      <p class="empty" id="empty" hidden>No corrected Goons match these filters.</p>
+    </main>
+
+    <dialog id="viewer">
+      <button class="icon-button close" id="close-viewer" type="button" aria-label="Close">×</button>
+      <button class="icon-button previous" id="previous" type="button" aria-label="Previous Goon">‹</button>
+      <button class="icon-button next" id="next" type="button" aria-label="Next Goon">›</button>
+      <div class="viewer-layout">
+        <div class="full-image-wrap"><img id="full-image" alt="" /></div>
+        <aside class="review-panel">
+          <p class="eyebrow" id="modal-number"></p><h2 id="modal-title"></h2><p class="modal-subtitle" id="modal-subtitle"></p><dl id="traits"></dl>
+          <div class="review-controls"><button class="button good" id="mark-good" type="button">✓ Looks good</button><button class="button danger" id="mark-flagged" type="button">⚑ Still wrong</button></div>
+          <label class="notes-label" for="issue-note">What is still wrong?</label>
+          <textarea id="issue-note" rows="5" placeholder="Describe any remaining correction…"></textarea>
+          <div class="note-actions"><button class="button" id="save-note" type="button">Save issue</button><button class="button ghost" id="clear-review" type="button">Clear review</button></div>
+          <p class="keyboard-help">←/→ navigate · G looks good · F flag · Esc close</p>
+          <a id="open-original" class="original-link" target="_blank" rel="noreferrer">Open full-resolution replacement ↗</a>
+        </aside>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script>window.GRAVITY_GOONS_GALLERY_CONFIG = { total: 189, storageKey: "gravity-goons-replacement-review-v1" };</script>
+    <script src="replacement-gallery-data.js"></script>
+    <script src="gallery.js"></script>
+  </body>
+</html>
