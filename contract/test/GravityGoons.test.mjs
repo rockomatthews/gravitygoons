@@ -39,7 +39,7 @@ describe("Gravity Goons launch contracts", function () {
     collection = await Collection.deploy(
       owner.address,
       await registry.getAddress(),
-      "https://impact.example/api/nft/v1/",
+      "ipfs://bafybeigdyrzt4examplemetadata/",
       disciplineWords,
       rarityWords,
     );
@@ -58,7 +58,7 @@ describe("Gravity Goons launch contracts", function () {
     await (await collection.connect(collector).mintSelected([17, 812], { value: totalPrice })).wait();
     assert.equal(await collection.ownerOf(17), collector.address);
     assert.equal(await collection.ownerOf(812), collector.address);
-    assert.equal(await collection.tokenURI(17), "https://impact.example/api/nft/v1/0017");
+    assert.equal(await collection.tokenURI(17), "ipfs://bafybeigdyrzt4examplemetadata/0017.json");
     assert.equal(await collection.isAvailable(17), false);
     assert.equal(await collection.isAvailable(18), true);
     assert.equal(await collection.publicMinted(), 2n);
@@ -100,14 +100,26 @@ describe("Gravity Goons launch contracts", function () {
   });
 
   it("supports creator-selected reserve pieces and repeatable sale controls", async function () {
-    await (await collection.creatorMintSelected(owner.address, [55, 144, 987])).wait();
-    assert.equal(await collection.creatorMinted(), 3n);
-    assert.equal(await collection.ownerOf(987), owner.address);
+    assert.equal(await collection.mintOpen(), false);
+    await assert.rejects(collection.connect(collector).mintSelected([1], { value: await collection.priceFor(1) }));
+
+    const reserveIds = Array.from({ length: 50 }, (_, index) => index + 1);
+    await (await collection.creatorMintSelected(owner.address, reserveIds)).wait();
+    assert.equal(await collection.creatorMinted(), 50n);
+    assert.equal(await collection.ownerOf(50), owner.address);
+    await assert.rejects(collection.creatorMintSelected(owner.address, [51]));
+
     await (await collection.setMintOpen(true)).wait();
     assert.equal(await collection.mintOpen(), true);
     await (await collection.setMintOpen(false)).wait();
-    await (await collection.setMintOpen(true)).wait();
-    assert.equal(await collection.mintOpen(), true);
+    assert.equal(await collection.mintOpen(), false);
+  });
+
+  it("reports the immutable five-percent royalty", async function () {
+    const salePrice = parseEther("2");
+    const [recipient, royaltyAmount] = await collection.royaltyInfo(13, salePrice);
+    assert.equal(recipient.toLowerCase(), owner.address.toLowerCase());
+    assert.equal(royaltyAmount, parseEther("0.1"));
   });
 
   it("settles signed monotonic progress and keeps it attached after transfer", async function () {

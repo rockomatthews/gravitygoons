@@ -1,0 +1,19 @@
+{
+  "schema": "gravity-goons-launch-readiness-v1",
+  "counts": {
+    "masters_2048": 1000,
+    "marketplace_images_1024": 1000,
+    "finalized_metadata": 0
+  },
+  "reserve_valid": false,
+  "ipfs_verified": false,
+  "base_mainnet_deployment_recorded": false,
+  "ready_for_base_sale": false,
+  "mint_gate_should_be_open": false,
+  "blockers": [
+    "finalized IPFS metadata: 0/1000",
+    "exact 50-token creator reserve not saved at config/creator-reserve.json",
+    "dual-provider IPFS retrieval not verified",
+    "Base mainnet contracts not recorded with mint closed"
+  ]
+}

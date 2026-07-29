@@ -124,15 +124,41 @@ Validate every saved `.blend` checkpoint in parallel, including required bones, 
   --output reports/contact-matrix-rig-validation.json
 ```
 
-Build mint-release marketplace images from final 2048 masters:
+Build mint-release masters and marketplace images from the approved 1,000-token
+source map with all 189 reviewed replacements applied:
 
 ```bash
-.venv/bin/python scripts/build_release_images.py masters images \
-  --expected 1000 \
+.venv/bin/python scripts/promote_static_sources.py ipfs-packages/release-staging/masters \
+  --source-dir art/static-collection/approval-v1 \
+  --source-dir art/static-collection/stress-50/generated \
+  --source-dir art/static-collection/production \
+  --replacement-dir art/static-collection/replacement-candidates \
+  --expected 1000 --jobs 8 \
+  --manifest-output reports/final-master-manifest.json
+
+.venv/bin/python scripts/build_release_images.py \
+  ipfs-packages/release-staging/masters ipfs-packages/release-staging/images \
+  --metadata-dir genesis_metadata --expected 1000 --jobs 8 \
   --manifest-output reports/final-release-manifest.json
 ```
 
-The release builder reads the configured 2048/1024 sizes, refuses missing or malformed masters, verifies every token against its fixed assignment and genesis metadata filename, creates deterministic LANCZOS marketplace PNGs, rejects duplicate file hashes, and writes `images/release-manifest.json`. `--manifest-output` optionally stores a tracked copy of the same evidence in `reports/`. Do not run the 1,000-token release command until the final art gate is approved.
+The builders read the configured 2048/1024 sizes, refuse missing or malformed
+sources, verify every token against its fixed assignment and genesis metadata,
+create deterministic LANCZOS PNGs, reject duplicate hashes, and preserve the
+approved 1254px sources unchanged. The completed manifests must report 1,000
+unique sources, masters, and marketplace images plus 189 reviewed replacements.
+
+Open `review-gallery/creator-reserve.html` to select the exact 50-token creator
+reserve. The picker saves locally, supports full-size inspection and collection
+filters, shows tier-price and roster totals, and exports JSON/CSV only after
+exactly 50 unique IDs are selected. Validate the final JSON with:
+
+```bash
+.venv/bin/python scripts/validate_creator_reserve.py config/creator-reserve.json
+```
+
+The complete dual-IPFS, Safe, reserve-mint, site, and controlled sale sequence
+is documented in `docs/launch-runbook.md`.
 
 ## Contracts
 
@@ -142,7 +168,8 @@ npm install
 npm test
 ```
 
-Deployment configuration is documented in `contract/.env.example`. After every permanent URL and wallet address is finalized:
+Deployment configuration is documented in `contract/.env.example`. After the
+immutable metadata CID and all wallet addresses are finalized:
 
 ```bash
 cp .env.example .env
@@ -288,7 +315,7 @@ Do not deploy the collection contract until all of these are final:
 
 1. Base character and full generated art approved and validated.
 2. Optimized images and immutable genesis metadata uploaded to IPFS.
-3. Owned production domain chosen for the stable metadata endpoint.
-4. Dynamic API deployed and tested against the final IPFS CIDs.
-5. Owner/royalty wallet, deployer, game signer, and relayer security model finalized.
-6. Contracts independently reviewed, deployed, verified, and tested with one controlled mint while the public sale is closed.
+3. The exact 50-token creator reserve exported and validated.
+4. Both IPFS CIDs retrievable and hash-verified through two independent providers.
+5. 2-of-3 Safe, hardware-backed reserve recipient, deployer, game signer, and relayer security model finalized.
+6. Contracts independently reviewed, deployed, verified, and tested on Base Sepolia before a Base mainnet deployment with public minting closed.

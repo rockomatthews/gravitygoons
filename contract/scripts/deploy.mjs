@@ -9,8 +9,8 @@ const required = ["BASE_RPC_URL", "DEPLOYER_PRIVATE_KEY", "OWNER_ADDRESS", "GAME
 for (const key of required) {
   if (!process.env[key] || process.env[key].includes("REPLACE")) throw new Error(`Set ${key} in contract/.env`);
 }
-if (!process.env.METADATA_BASE_URL.startsWith("https://") || !process.env.METADATA_BASE_URL.endsWith("/")) {
-  throw new Error("METADATA_BASE_URL must be a stable HTTPS URL ending in /");
+if (!process.env.METADATA_BASE_URL.startsWith("ipfs://") || !process.env.METADATA_BASE_URL.endsWith("/")) {
+  throw new Error("METADATA_BASE_URL must be the immutable ipfs:// metadata directory CID ending in /");
 }
 
 const provider = new JsonRpcProvider(process.env.BASE_RPC_URL);

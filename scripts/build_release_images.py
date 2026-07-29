@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 from pathlib import Path
@@ -30,6 +31,7 @@ def main() -> None:
     parser.add_argument("--metadata-dir", type=Path, default=ROOT / "genesis_metadata")
     parser.add_argument("--expected", type=int)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--jobs", type=int, default=1, help="Parallel image workers")
     parser.add_argument("--manifest-output", type=Path, help="Optional second path for the release manifest")
     options = parser.parse_args()
 
@@ -58,7 +60,10 @@ def main() -> None:
     image_hashes = set()
     reused = 0
     rebuilt = 0
-    for master_path in master_files:
+    if options.jobs < 1 or options.jobs > 16:
+        raise SystemExit("--jobs must be between 1 and 16")
+
+    def build_image(master_path: Path) -> tuple[dict, str, str, bool]:
         token_id = int(master_path.stem)
         token = tokens.get(token_id)
         if token is None:
@@ -84,27 +89,23 @@ def main() -> None:
                 and prior
                 and prior.get("master_sha256") == master_digest
                 and prior.get("assignment_sha256") == assignment_digest
-                and prior.get("genesis_metadata_sha256") == metadata_digest
                 and prior.get("marketplace_size") == [marketplace_size, marketplace_size]
                 and prior.get("marketplace_sha256") == file_hash(output_path)
             )
             if can_reuse:
-                reused += 1
+                was_reused = True
             else:
                 master_rgb = master.convert("RGB")
                 marketplace = master_rgb.resize((marketplace_size, marketplace_size), Image.Resampling.LANCZOS)
-                marketplace.save(output_path, format="PNG", optimize=True, compress_level=9)
-                rebuilt += 1
+                temporary_path = output_path.with_suffix(".png.tmp")
+                with temporary_path.open("wb") as temporary:
+                    marketplace.save(temporary, format="PNG", optimize=True, compress_level=9)
+                temporary_path.replace(output_path)
+                was_reused = False
         image_digest = file_hash(output_path)
-        if master_digest in master_hashes:
-            raise SystemExit(f"Duplicate master bytes at token {token_id}")
-        if image_digest in image_hashes:
-            raise SystemExit(f"Duplicate marketplace bytes at token {token_id}")
-        master_hashes.add(master_digest)
-        image_hashes.add(image_digest)
         render_record_path = options.master_dir / "manifest" / f"{token_id:04d}.json"
         render_record = json.loads(render_record_path.read_text()) if render_record_path.exists() else None
-        records.append({
+        record = {
             "token_id": token_id,
             "name": token["name"],
             "master_file": master_path.name,
@@ -121,7 +122,22 @@ def main() -> None:
             "species": token["species"],
             "rarity": token["rarity"],
             "render": render_record,
-        })
+        }
+        return record, master_digest, image_digest, was_reused
+
+    with ThreadPoolExecutor(max_workers=options.jobs) as executor:
+        results = executor.map(build_image, master_files)
+        for record, master_digest, image_digest, was_reused in results:
+            token_id = record["token_id"]
+            if master_digest in master_hashes:
+                raise SystemExit(f"Duplicate master bytes at token {token_id}")
+            if image_digest in image_hashes:
+                raise SystemExit(f"Duplicate marketplace bytes at token {token_id}")
+            master_hashes.add(master_digest)
+            image_hashes.add(image_digest)
+            reused += int(was_reused)
+            rebuilt += int(not was_reused)
+            records.append(record)
 
     try:
         source_assignments = str(options.assignments.resolve().relative_to(ROOT.resolve()))

@@ -156,7 +156,6 @@
   "properties": {
     "discipline": "Snowboarding",
     "progress_registry": "0x0000000000000000000000000000000000000000",
-    "schema_version": 1,
-    "genesis_metadata": "ipfs://REPLACE_GENESIS_CID/0060.json"
+    "schema_version": 1
   }
 }

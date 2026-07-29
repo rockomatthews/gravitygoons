@@ -146,7 +146,7 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         _requireOwned(tokenId);
-        return string.concat(_metadataBaseURL, _paddedTokenId(tokenId));
+        return string.concat(_metadataBaseURL, _paddedTokenId(tokenId), ".json");
     }
 
     function notifyMetadataUpdate(uint256 tokenId) external {

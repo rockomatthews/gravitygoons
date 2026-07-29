@@ -6,7 +6,8 @@
   "scripts": {
     "compile": "node scripts/compile.mjs",
     "test": "npm run compile && mocha --timeout 30000 test/*.test.mjs",
-    "deploy": "npm run compile && node scripts/deploy.mjs"
+    "deploy": "npm run compile && node scripts/deploy.mjs",
+    "build:reserve-transactions": "node scripts/build-reserve-transactions.mjs"
   },
   "dependencies": {
     "@openzeppelin/contracts": "5.4.0",

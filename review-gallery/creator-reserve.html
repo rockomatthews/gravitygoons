@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Gravity Goons — Pick Your 50</title>
+    <link rel="stylesheet" href="reserve.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">GRAVITY GOONS · CREATOR RESERVE</p>
+        <h1>Pick the 50 Goons you want to keep</h1>
+        <p class="summary">Your choices save automatically in this browser. Nothing is minted from this page.</p>
+      </div>
+      <div class="header-actions">
+        <button class="button secondary" id="import-button" type="button">Import list</button>
+        <button class="button secondary" id="export-csv" type="button" disabled>Export CSV</button>
+        <button class="button" id="export-json" type="button" disabled>Save final JSON</button>
+        <input id="import-file" type="file" accept="application/json,.json,text/csv,.csv" hidden />
+      </div>
+    </header>
+
+    <main>
+      <section class="selection-dashboard" aria-label="Selection summary">
+        <div class="count-block"><span>SELECTED</span><strong><b id="selected-count">0</b> / 50</strong><div class="progress"><i id="progress-fill"></i></div></div>
+        <div class="value-block"><span>PUBLIC LIST VALUE RESERVED</span><strong><b id="selected-value">0</b> ETH</strong></div>
+        <div class="target-block"><span>ADVISORY RARITY MIX</span><div id="rarity-targets"></div></div>
+        <div class="target-block"><span>DISCIPLINE GUIDE</span><div id="discipline-targets"></div></div>
+      </section>
+
+      <p class="notice">Suggested mix: 2 Legendary · 6 Epic · 12 Rare · 15 Uncommon · 15 Common = 1.4725 ETH. This is guidance only; choose the characters you actually want.</p>
+
+      <section class="filters" aria-label="Collection filters">
+        <label><span>Find</span><input id="search" type="search" placeholder="#0013, species, trick, sponsor…" /></label>
+        <label><span>Rarity</span><select id="rarity"><option value="all">All rarities</option></select></label>
+        <label><span>Discipline</span><select id="discipline"><option value="all">All disciplines</option></select></label>
+        <label><span>Species</span><select id="species"><option value="all">All species</option></select></label>
+        <label><span>Cast</span><select id="cast"><option value="all">Animal + Human</option></select></label>
+        <label><span>Body build</span><select id="body-build"><option value="all">All builds</option></select></label>
+        <label><span>Equipment</span><select id="equipment"><option value="all">All equipment</option></select></label>
+        <label><span>Play style</span><select id="play-style"><option value="all">All styles</option></select></label>
+        <label><span>Stat</span><select id="stat"><option value="all">Any stat</option></select></label>
+        <label><span>Minimum</span><select id="stat-min"><option value="0">Any score</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+        <label><span>Show</span><select id="selection"><option value="all">Entire collection</option><option value="selected">My selected 50</option><option value="available">Not selected</option><option value="replacements">Corrected artwork</option></select></label>
+        <label><span>Sort</span><select id="sort"><option value="id">Token number</option><option value="rarity">Rarity: highest first</option><option value="discipline">Discipline</option><option value="price">Price: highest first</option></select></label>
+        <button class="button ghost" id="clear-filters" type="button">Clear filters</button>
+      </section>
+
+      <div class="results-line"><span id="visible-count">1,000 visible</span><span>Click <b>KEEP</b> to select · click the artwork to inspect full size</span></div>
+      <section class="gallery" id="gallery" aria-live="polite"></section>
+      <p class="empty" id="empty" hidden>No Goons match these filters.</p>
+    </main>
+
+    <dialog id="viewer">
+      <button class="icon-button close" id="close-viewer" type="button" aria-label="Close">×</button>
+      <div class="viewer-layout">
+        <div class="full-image-wrap"><img id="full-image" alt="" /></div>
+        <aside class="detail-panel">
+          <p class="eyebrow" id="modal-number"></p><h2 id="modal-title"></h2><p class="modal-subtitle" id="modal-subtitle"></p>
+          <button class="button keep-modal" id="modal-toggle" type="button"></button>
+          <dl id="traits"></dl>
+          <a id="open-original" target="_blank" rel="noreferrer">Open approved full-resolution source ↗</a>
+        </aside>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="gallery-data.js"></script>
+    <script src="reserve.js"></script>
+  </body>
+</html>

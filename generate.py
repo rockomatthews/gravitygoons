@@ -245,7 +245,6 @@ def metadata_for(item: dict, config: dict) -> dict:
             "discipline": item["discipline"],
             "progress_registry": config["progress_registry_address"],
             "schema_version": config["schema_version"],
-            "genesis_metadata": f"{config['genesis_metadata_base_uri']}{token_id:04d}.json",
         },
     }
 
