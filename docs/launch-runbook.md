@@ -24,6 +24,16 @@ Build the immutable staged masters and public images without changing accepted s
 The manifests must report 1,000 unique source, master, and marketplace hashes,
 exactly 189 reviewed replacements, and the separately counted creator customizations.
 
+The current deterministic packages are recorded in `reports/ipfs-package.json`:
+
+- image CID: `bafybeignb4b2xm55obk2x66vyrvmg62pgu7gutoopb4xdt2f43kgjrhzrq`
+- metadata CID: `bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe`
+- image CAR: `ipfs-packages/release-staging/gravity-goons-images.car`
+- metadata CAR: `ipfs-packages/release-staging/gravity-goons-metadata.car`
+
+Do not rebuild or replace these archives after a provider accepts either CID unless
+the release is deliberately restarted and both CIDs are replaced everywhere.
+
 ## 2. Choose the creator reserve
 
 Open `review-gallery/creator-reserve.html`, select exactly 50 characters, and save `creator-reserve.json`. Copy the reviewed export to `config/creator-reserve.json`, then validate it:
@@ -36,8 +46,8 @@ The selection is guidance-driven but never automatic. The 50 IDs in this file be
 
 ## 3. Dual-provider IPFS package
 
-1. Upload `ipfs-packages/release-staging/images/` to the primary provider and record its directory CID.
-2. Pin that exact CID with the second independent provider.
+1. Upload `gravity-goons-images.car` to the primary provider and require the recorded image CID.
+2. Import the same single-root CAR with the second independent provider.
 3. Finalize metadata with the image CID:
 
 ```bash
@@ -46,7 +56,7 @@ The selection is guidance-driven but never automatic. The 50 IDs in this file be
   --manifest-output reports/final-metadata-manifest.json
 ```
 
-4. Upload the finalized `metadata/` directory, record its CID, and pin that exact CID with the second provider.
+4. Upload `gravity-goons-metadata.car` to both providers and require the recorded metadata CID.
 5. Verify representative files and hashes through two distinct provider gateways:
 
 ```bash
@@ -61,13 +71,18 @@ Do not insert a metadata directory CID into its own files; that would be self-re
 ## 4. Safe and test deployment
 
 - Create a 2-of-3 Safe with three independently backed signer addresses.
-- Set `OWNER_ADDRESS` to that Safe and `METADATA_BASE_URL=ipfs://METADATA_CID/`.
+- Set `OWNER_ADDRESS` to that Safe and
+  `METADATA_BASE_URL=ipfs://bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe/`.
+- Set `DEPLOYMENT_STAGE=sepolia`, `ALLOW_NON_BASE=true`, and
+  `DEPLOYMENT_RECORD_OUTPUT=../reports/base-sepolia-deployment.json`.
 - Deploy to Base Sepolia with `ALLOW_NON_BASE=true`, verify both contracts, and test tier pricing, exact-ID minting, reserve minting, ownership acceptance, and closed/open/closed sale control.
 - Record the Sepolia addresses and transaction hashes before preparing mainnet.
 
 ## 5. Base mainnet deployment
 
 - Recheck the chain ID is `8453`, deploy with the Safe as collection owner, and leave `mintOpen=false`.
+- Set `DEPLOYMENT_STAGE=mainnet`, `ALLOW_MAINNET_DEPLOY=true`, `SAFE_ADDRESS` to
+  the same value as `OWNER_ADDRESS`, and write `../reports/base-mainnet-deployment.json`.
 - Have the Safe accept the registry's two-step ownership transfer.
 - Build the reserve calldata package:
 
@@ -79,7 +94,16 @@ npm run build:reserve-transactions -- \
 ```
 
 - Review both calldata entries in Safe, obtain two signer approvals, and execute them.
-- Verify all 50 IDs belong to the hardware-backed owner wallet and `creatorMinted()` equals 50.
+- Verify Safe ownership, all 50 reserve IDs, the 950 remaining public IDs, royalties,
+  metadata URI, and closed minting directly from Base:
+
+```bash
+cd contract
+BASE_RPC_URL=https://YOUR_PRODUCTION_BASE_RPC npm run verify:deployment -- \
+  ../reports/base-mainnet-deployment.json ../config/creator-reserve.json \
+  HARDWARE_OWNER_WALLET
+```
+
 - Record chain ID, contract addresses, deployment transactions, Safe address, royalty recipient, metadata CID, reserve recipient, and `mint_open: false` in `reports/base-mainnet-deployment.json`.
 
 ## 6. Site rollout and mint opening

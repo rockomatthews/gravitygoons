@@ -3,7 +3,7 @@
   "counts": {
     "masters_2048": 1000,
     "marketplace_images_1024": 1000,
-    "finalized_metadata": 0
+    "finalized_metadata": 1000
   },
   "reserve_valid": true,
   "ipfs_verified": false,
@@ -11,7 +11,6 @@
   "ready_for_base_sale": false,
   "mint_gate_should_be_open": false,
   "blockers": [
-    "finalized IPFS metadata: 0/1000",
     "dual-provider IPFS retrieval not verified",
     "Base mainnet contracts not recorded with mint closed"
   ]

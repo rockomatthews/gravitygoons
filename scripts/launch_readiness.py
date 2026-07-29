@@ -53,7 +53,23 @@ def main() -> None:
     if not ipfs_valid:
         blockers.append("dual-provider IPFS retrieval not verified")
     deployment = load(options.deployment_report)
-    deployment_valid = bool(deployment and deployment.get("chain_id") == 8453 and deployment.get("mint_open") is False)
+    collection = deployment.get("collection", {}) if deployment else {}
+    registry = deployment.get("registry", {}) if deployment else {}
+    deployment_valid = bool(
+        deployment
+        and deployment.get("chain_id") == 8453
+        and deployment.get("public_mint_open") is False
+        and deployment.get("post_safe_verification_complete") is True
+        and collection.get("mint_open") is False
+        and collection.get("creator_minted") == 50
+        and collection.get("public_minted") == 0
+        and collection.get("owner") == deployment.get("owner")
+        and registry.get("owner") == deployment.get("owner")
+        and registry.get("pending_owner") == "0x0000000000000000000000000000000000000000"
+        and deployment.get("reserve", {}).get("token_ids_verified") is True
+        and deployment.get("reserve", {}).get("remaining_public_ids") == 950
+        and deployment.get("royalty", {}).get("basis_points") == 500
+    )
     if not deployment_valid:
         blockers.append("Base mainnet contracts not recorded with mint closed")
 
