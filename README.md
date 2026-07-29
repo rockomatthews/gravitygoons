@@ -125,7 +125,8 @@ Validate every saved `.blend` checkpoint in parallel, including required bones, 
 ```
 
 Build mint-release masters and marketplace images from the approved 1,000-token
-source map with all 189 reviewed replacements applied:
+source map with all 189 reviewed replacements and any explicit creator
+customizations applied:
 
 ```bash
 .venv/bin/python scripts/promote_static_sources.py ipfs-packages/release-staging/masters \
@@ -133,6 +134,7 @@ source map with all 189 reviewed replacements applied:
   --source-dir art/static-collection/stress-50/generated \
   --source-dir art/static-collection/production \
   --replacement-dir art/static-collection/replacement-candidates \
+  --customization-dir art/static-collection/creator-customizations \
   --expected 1000 --jobs 8 \
   --manifest-output reports/final-master-manifest.json
 
@@ -146,7 +148,8 @@ The builders read the configured 2048/1024 sizes, refuse missing or malformed
 sources, verify every token against its fixed assignment and genesis metadata,
 create deterministic LANCZOS PNGs, reject duplicate hashes, and preserve the
 approved 1254px sources unchanged. The completed manifests must report 1,000
-unique sources, masters, and marketplace images plus 189 reviewed replacements.
+unique sources, masters, and marketplace images plus 189 reviewed replacements
+and the separately reported creator customizations.
 
 Open `review-gallery/creator-reserve.html` to select the exact 50-token creator
 reserve. The picker saves locally, supports full-size inspection and collection

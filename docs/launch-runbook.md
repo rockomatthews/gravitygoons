@@ -12,6 +12,7 @@ Build the immutable staged masters and public images without changing accepted s
   --source-dir art/static-collection/stress-50/generated \
   --source-dir art/static-collection/production \
   --replacement-dir art/static-collection/replacement-candidates \
+  --customization-dir art/static-collection/creator-customizations \
   --expected 1000 --jobs 8 --manifest-output reports/final-master-manifest.json
 
 .venv/bin/python scripts/build_release_images.py \
@@ -20,7 +21,8 @@ Build the immutable staged masters and public images without changing accepted s
   --manifest-output reports/final-release-manifest.json
 ```
 
-The manifests must report 1,000 unique source, master, and marketplace hashes and exactly 189 reviewed replacements.
+The manifests must report 1,000 unique source, master, and marketplace hashes,
+exactly 189 reviewed replacements, and the separately counted creator customizations.
 
 ## 2. Choose the creator reserve
 

@@ -38,6 +38,13 @@ def main() -> None:
         default=[],
         help="Recursive reviewed-replacement directory applied after accepted source dirs",
     )
+    parser.add_argument(
+        "--customization-dir",
+        action="append",
+        type=Path,
+        default=[],
+        help="Explicit creator-customization directory applied after reviewed replacements",
+    )
     parser.add_argument("--assignments", type=Path, default=ROOT / "traits" / "assignments.json")
     parser.add_argument("--expected", type=int)
     parser.add_argument("--overwrite", action="store_true")
@@ -69,6 +76,17 @@ def main() -> None:
                 raise SystemExit(f"Replacement has no fixed assignment: {path}")
             sources[token_id] = path
             replacement_ids.add(token_id)
+    customization_ids: set[int] = set()
+    for customization_dir in options.customization_dir:
+        try:
+            customizations = active_replacements(customization_dir)
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
+        for token_id, path in customizations.items():
+            if token_id not in tokens:
+                raise SystemExit(f"Customization has no fixed assignment: {path}")
+            sources[token_id] = path
+            customization_ids.add(token_id)
     if not sources:
         raise SystemExit("No numbered PNG sources found")
     if options.expected is not None and len(sources) != options.expected:
@@ -141,6 +159,7 @@ def main() -> None:
             "assignment_sha256": assignment_digest,
             "promotion_resampling": "Pillow LANCZOS",
             "reviewed_replacement": token_id in replacement_ids,
+            "creator_customization": token_id in customization_ids,
         }
         record_path.write_text(json.dumps(record, indent=2) + "\n")
         return record, source_digest, master_digest, was_reused
@@ -167,6 +186,7 @@ def main() -> None:
         "master_size": master_size,
         "sources": len(records),
         "reviewed_replacements": len(replacement_ids),
+        "creator_customizations": len(customization_ids),
         "unique_source_hashes": len(source_hashes),
         "unique_master_hashes": len(master_hashes),
         "reused_masters": reused,

@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "harness" / "production.json"
 REPLACEMENTS = ROOT / "art" / "static-collection" / "replacement-candidates"
+CUSTOMIZATIONS = ROOT / "art" / "static-collection" / "creator-customizations"
 
 
 def relative_label(path: Path, root: Path = ROOT) -> str:
@@ -49,12 +50,15 @@ def final_sources(
     root: Path = ROOT,
     harness_path: Path = HARNESS,
     replacement_dir: Path = REPLACEMENTS,
-) -> tuple[dict[int, Path], set[int]]:
-    """Overlay active reviewed replacements on the accepted 1,000-token source map."""
+    customization_dir: Path = CUSTOMIZATIONS,
+) -> tuple[dict[int, Path], set[int], set[int]]:
+    """Overlay reviewed replacements, then explicit creator customizations."""
     sources = accepted_base_sources(root, harness_path)
     replacements = active_replacements(replacement_dir)
+    customizations = active_replacements(customization_dir)
     sources.update(replacements)
-    return sources, set(replacements)
+    sources.update(customizations)
+    return sources, set(replacements), set(customizations)
 
 
 def validate_final_source_ids(sources: dict[int, Path], expected: int) -> None:

@@ -34,7 +34,7 @@ def main() -> None:
         for item in json.loads(ASSIGNMENTS.read_text())["tokens"]
     }
     prices = json.loads((ROOT / "config" / "collection.json").read_text())["mint_prices_eth"]
-    sources, replacement_ids = final_sources()
+    sources, replacement_ids, customization_ids = final_sources()
     expected = set(assignments)
     try:
         validate_final_source_ids(sources, len(expected))
@@ -80,6 +80,7 @@ def main() -> None:
                 "stats": token["stats"],
                 "price_eth": prices[token["rarity"]],
                 "reviewed_replacement": token_id in replacement_ids,
+                "creator_customization": token_id in customization_ids,
                 "thumb": f"thumbs/{token_id:04d}.webp",
                 "full": f"../{source.relative_to(ROOT).as_posix()}",
                 "source": source.relative_to(ROOT).as_posix(),
@@ -94,6 +95,7 @@ def main() -> None:
                 "gallery": str(GALLERY / "index.html"),
                 "accepted_sources": len(records),
                 "reviewed_replacements": len(replacement_ids),
+                "creator_customizations": len(customization_ids),
                 "thumbnails_rebuilt": rebuilt,
                 "thumbnails_total": len(list(THUMBS.glob("[0-9][0-9][0-9][0-9].webp"))),
             },

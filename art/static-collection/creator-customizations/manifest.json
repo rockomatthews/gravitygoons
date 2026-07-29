@@ -1,0 +1,28 @@
+{
+  "schema": "gravity-goons-creator-customizations-v1",
+  "created_at": "2026-07-29",
+  "precedence": "Applied after accepted production sources and reviewed replacements",
+  "tokens": [
+    {
+      "token_id": 207,
+      "file": "0207.png",
+      "parent": "art/static-collection/replacement-candidates/round-010/0207.png",
+      "request": "Add the supplied gray fedora and cigar while preserving the approved surfing artwork",
+      "sha256": "d5c3b1f44e389666bbb32286007467f1affa208f1a532e03d1791d088c21cd74"
+    },
+    {
+      "token_id": 854,
+      "file": "0854.png",
+      "parent": "art/static-collection/replacement-candidates/round-042/0854.png",
+      "request": "Replace the head with the supplied novelty rubber horse mask while preserving the approved BMX artwork",
+      "sha256": "70101638f45610e897d447ff0e49e0e3187dad979e50b5f209c6ab8bc67d1097"
+    },
+    {
+      "token_id": 877,
+      "file": "0877.png",
+      "parent": "art/static-collection/production/0877.png",
+      "request": "Replace the face with the supplied tongue-out clown mask while preserving the approved skiing artwork",
+      "sha256": "d2806f4afd9003530e597e827b2417e7768c577caffc598e6a6207ed43eaded6"
+    }
+  ]
+}

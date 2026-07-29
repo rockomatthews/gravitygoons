@@ -46,6 +46,16 @@ def main() -> None:
             raise SystemExit("Creator reserve must contain exactly 50 unique token IDs")
         if any(token_id not in tokens for token_id in ids):
             raise SystemExit("Creator reserve contains a token outside 1 through 1000")
+        summaries = reserve.get("tokens", [])
+        if len(summaries) != 50 or {item.get("token_id") for item in summaries} != set(ids):
+            raise SystemExit("Creator reserve token summaries must match the 50 selected IDs")
+        gallery_by_id = {item["id"]: item for item in gallery}
+        for summary in summaries:
+            current = gallery_by_id[summary["token_id"]]
+            if summary.get("source") != current["source"]:
+                raise SystemExit(
+                    f"Creator reserve source mismatch for #{summary['token_id']:04d}"
+                )
         selected = [tokens[token_id] for token_id in ids]
         expected_total = sum(prices[token["rarity"]] for token in selected)
         if Decimal(str(reserve.get("total_list_price_eth"))) != expected_total:
@@ -57,6 +67,9 @@ def main() -> None:
             "counts_by_discipline": dict(Counter(token["discipline"] for token in selected)),
             "total_list_price_eth": str(expected_total),
             "matches_advisory_rarity_target": Counter(token["rarity"] for token in selected) == Counter(TARGET),
+            "creator_customizations": sum(
+                bool(gallery_by_id[token_id].get("creator_customization")) for token_id in ids
+            ),
         })
     print(json.dumps(result, indent=2))
 
