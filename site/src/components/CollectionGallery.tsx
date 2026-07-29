@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { createWalletClient, custom, parseEther } from "viem";
+import { createWalletClient, custom, formatEther } from "viem";
 import { base } from "viem/chains";
 import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { useWallet } from "@/components/WalletProvider";
@@ -28,6 +28,17 @@ type Token = {
 
 const PAGE_SIZE = 24;
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
+const RARITY_PRICE_WEI: Record<string, bigint> = {
+  Common: 15_000_000_000_000_000n,
+  Uncommon: 22_500_000_000_000_000n,
+  Rare: 35_000_000_000_000_000n,
+  Epic: 55_000_000_000_000_000n,
+  Legendary: 80_000_000_000_000_000n,
+};
+
+function displayEth(wei: bigint): string {
+  return Number(formatEther(wei)).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+}
 
 export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; imageBaseUrl: string }) {
   const { connect, message: walletMessage } = useWallet();
@@ -87,6 +98,8 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       && search.includes(query.toLowerCase());
   }), [tokens, discipline, cast, bodyBuild, rarity, brand, playStyle, availabilityFilter, availableIds, query]);
   const brands = useMemo(() => ["All", ...Array.from(new Set(tokens.map((token) => token.parody_brand))).sort()], [tokens]);
+  const tokensById = useMemo(() => new Map(tokens.map((token) => [token.token_id, token])), [tokens]);
+  const selectedTotal = useMemo(() => selected.reduce((total, tokenId) => total + (RARITY_PRICE_WEI[tokensById.get(tokenId)?.rarity ?? ""] ?? 0n), 0n), [selected, tokensById]);
   const visible = filtered.slice(0, page * PAGE_SIZE);
 
   function toggle(tokenId: number) {
@@ -107,6 +120,8 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       const connected = await connect();
       if (!connected) return;
       const wallet = createWalletClient({ chain: base, transport: custom(window.ethereum) });
+      const authoritativePrice = await publicClient.readContract({ address: collectionAddress, abi: collectionAbi, functionName: "mintPriceFor", args: [selected] });
+      if (authoritativePrice !== selectedTotal) throw new Error("The on-chain rarity price changed. Refresh the collection before minting.");
       setStatus("Confirm the exact-token mint in your wallet…");
       const hash = await wallet.writeContract({
         address: collectionAddress,
@@ -114,7 +129,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
         functionName: "mintSelected",
         args: [selected],
         account: connected,
-        value: parseEther((0.003 * selected.length).toFixed(3)),
+        value: authoritativePrice,
       });
       setStatus(`Mint submitted ${hash.slice(0, 12)}… Waiting for Base confirmation.`);
       await publicClient.waitForTransactionReceipt({ hash });
@@ -156,6 +171,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>
                 <h3>{token.species} · {token.body_build}</h3>
                 <p className="card-brand">{token.parody_brand} · {token.sport_equipment}</p>
+                <p className="card-price">MINT · {displayEth(RARITY_PRICE_WEI[token.rarity] ?? 0n)} ETH</p>
                 <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
               </div>
@@ -167,7 +183,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       {visible.length < filtered.length && <button className="button load" onClick={() => setPage((value) => value + 1)}>Load more athletes</button>}
       <aside className={`mint-dock ${selected.length ? "show" : ""}`}>
         <div><span>YOUR LINEUP</span><b>{selected.map((id) => `#${String(id).padStart(4, "0")}`).join(" · ")}</b></div>
-        <button onClick={mintSelected} disabled={!saleOpen}>MINT {selected.length} · {(selected.length * 0.003).toFixed(3)} ETH</button>
+        <button onClick={mintSelected} disabled={!saleOpen}>MINT {selected.length} · {displayEth(selectedTotal)} ETH</button>
         {(status || walletMessage) && <p>{status || walletMessage}</p>}
       </aside>
     </div>

@@ -14,7 +14,11 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
     uint256 public constant PUBLIC_ALLOCATION = 950;
     uint256 public constant CREATOR_ALLOCATION = 50;
     uint256 public constant MAX_PER_WALLET = 5;
-    uint256 public constant MINT_PRICE = 0.003 ether;
+    uint256 public constant COMMON_PRICE = 0.015 ether;
+    uint256 public constant UNCOMMON_PRICE = 0.0225 ether;
+    uint256 public constant RARE_PRICE = 0.035 ether;
+    uint256 public constant EPIC_PRICE = 0.055 ether;
+    uint256 public constant LEGENDARY_PRICE = 0.08 ether;
     bytes4 private constant ERC4906_INTERFACE_ID = 0x49064906;
 
     uint256 public publicMinted;
@@ -23,11 +27,13 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
     address public immutable progressRegistry;
     string private _metadataBaseURL;
     uint256[12] private _disciplineWords;
+    uint256[12] private _rarityWords;
     mapping(address => uint256) public mintedByWallet;
 
     error MintClosed();
     error InvalidQuantity();
     error InvalidTokenId(uint256 tokenId);
+    error InvalidRarity(uint8 rarity);
     error TokenUnavailable(uint256 tokenId);
     error DuplicateTokenId(uint256 tokenId);
     error WalletLimitExceeded();
@@ -47,12 +53,14 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         address initialOwner,
         address registry,
         string memory metadataBaseURL,
-        uint256[12] memory disciplineWords
+        uint256[12] memory disciplineWords,
+        uint256[12] memory rarityWords
     ) ERC721("Gravity Goons", "GOONS") Ownable(initialOwner) {
         if (bytes(metadataBaseURL).length == 0) revert EmptyMetadataURL();
         progressRegistry = registry;
         _metadataBaseURL = metadataBaseURL;
         _disciplineWords = disciplineWords;
+        _rarityWords = rarityWords;
         _setDefaultRoyalty(initialOwner, 500);
     }
 
@@ -62,8 +70,8 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         if (quantity == 0 || quantity > MAX_PER_WALLET) revert InvalidQuantity();
         if (mintedByWallet[msg.sender] + quantity > MAX_PER_WALLET) revert WalletLimitExceeded();
         if (publicMinted + quantity > PUBLIC_ALLOCATION) revert PublicAllocationExceeded();
-        if (msg.value != MINT_PRICE * quantity) revert IncorrectPayment();
         _validateSelection(tokenIds);
+        if (msg.value != mintPriceFor(tokenIds)) revert IncorrectPayment();
 
         mintedByWallet[msg.sender] += quantity;
         publicMinted += quantity;
@@ -111,6 +119,29 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         uint256 position = tokenId - 1;
         (uint256 wordIndex, uint256 slot) = (position / 85, position % 85);
         return uint8((_disciplineWords[wordIndex] >> (slot * 3)) & 7);
+    }
+
+    /// @notice Returns 0 Common, 1 Uncommon, 2 Rare, 3 Epic, or 4 Legendary.
+    function rarityOf(uint256 tokenId) public view returns (uint8) {
+        if (tokenId == 0 || tokenId > MAX_SUPPLY) revert InvalidTokenId(tokenId);
+        uint256 position = tokenId - 1;
+        (uint256 wordIndex, uint256 slot) = (position / 85, position % 85);
+        uint8 rarity = uint8((_rarityWords[wordIndex] >> (slot * 3)) & 7);
+        if (rarity > 4) revert InvalidRarity(rarity);
+        return rarity;
+    }
+
+    function priceFor(uint256 tokenId) public view returns (uint256) {
+        uint8 rarity = rarityOf(tokenId);
+        if (rarity == 0) return COMMON_PRICE;
+        if (rarity == 1) return UNCOMMON_PRICE;
+        if (rarity == 2) return RARE_PRICE;
+        if (rarity == 3) return EPIC_PRICE;
+        return LEGENDARY_PRICE;
+    }
+
+    function mintPriceFor(uint16[] calldata tokenIds) public view returns (uint256 total) {
+        for (uint256 i; i < tokenIds.length; ++i) total += priceFor(tokenIds[i]);
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {

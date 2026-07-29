@@ -8,6 +8,9 @@ const root = path.resolve(import.meta.dirname, "..");
 const impactArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "GravityGoons.json")));
 const registryArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "GravityGoonsProgressRegistry.json")));
 const disciplineWords = JSON.parse(fs.readFileSync(path.join(root, "config", "discipline-words.json")));
+const rarityWords = JSON.parse(fs.readFileSync(path.join(root, "config", "rarity-words.json")));
+const assignments = JSON.parse(fs.readFileSync(path.join(root, "..", "traits", "assignments.json"))).tokens;
+const rarityIndexes = { Common: 0, Uncommon: 1, Rare: 2, Epic: 3, Legendary: 4 };
 
 describe("Gravity Goons launch contracts", function () {
   let ganacheProvider;
@@ -38,6 +41,7 @@ describe("Gravity Goons launch contracts", function () {
       await registry.getAddress(),
       "https://impact.example/api/nft/v1/",
       disciplineWords,
+      rarityWords,
     );
     await collection.waitForDeployment();
     await (await registry.setCollectionOnce(await collection.getAddress())).wait();
@@ -50,7 +54,8 @@ describe("Gravity Goons launch contracts", function () {
   it("mints exact visible token IDs and returns immediate metadata", async function () {
     assert.equal((await collection.owner()).toLowerCase(), owner.address.toLowerCase());
     await (await collection.setMintOpen(true)).wait();
-    await (await collection.connect(collector).mintSelected([17, 812], { value: parseEther("0.006") })).wait();
+    const totalPrice = await collection.mintPriceFor([17, 812]);
+    await (await collection.connect(collector).mintSelected([17, 812], { value: totalPrice })).wait();
     assert.equal(await collection.ownerOf(17), collector.address);
     assert.equal(await collection.ownerOf(812), collector.address);
     assert.equal(await collection.tokenURI(17), "https://impact.example/api/nft/v1/0017");
@@ -61,11 +66,37 @@ describe("Gravity Goons launch contracts", function () {
 
   it("rejects duplicates, sold IDs, incorrect payment, and wallet overflow", async function () {
     await (await collection.setMintOpen(true)).wait();
-    await assert.rejects(collection.connect(collector).mintSelected([4, 4], { value: parseEther("0.006") }));
-    await assert.rejects(collection.connect(collector).mintSelected([4], { value: parseEther("0.002") }));
-    await (await collection.connect(collector).mintSelected([1, 2, 3, 4, 5], { value: parseEther("0.015") })).wait();
-    await assert.rejects(collection.connect(collector).mintSelected([6], { value: parseEther("0.003") }));
-    await assert.rejects(collection.connect(secondCollector).mintSelected([1], { value: parseEther("0.003") }));
+    await assert.rejects(collection.connect(collector).mintSelected([4, 4], { value: await collection.mintPriceFor([4, 4]) }));
+    await assert.rejects(collection.connect(collector).mintSelected([4], { value: parseEther("0.015") }));
+    const firstFivePrice = await collection.mintPriceFor([1, 2, 3, 4, 5]);
+    await (await collection.connect(collector).mintSelected([1, 2, 3, 4, 5], { value: firstFivePrice })).wait();
+    await assert.rejects(collection.connect(collector).mintSelected([6], { value: await collection.priceFor(6) }));
+    await assert.rejects(collection.connect(secondCollector).mintSelected([1], { value: await collection.priceFor(1) }));
+  });
+
+  it("prices every immutable rarity tier and sums mixed selections on-chain", async function () {
+    const expected = [
+      [1, 0n, "0.015"],
+      [3, 1n, "0.0225"],
+      [14, 2n, "0.035"],
+      [78, 3n, "0.055"],
+      [13, 4n, "0.08"],
+    ];
+    for (const [tokenId, rarity, price] of expected) {
+      assert.equal(await collection.rarityOf(tokenId), rarity);
+      assert.equal(await collection.priceFor(tokenId), parseEther(price));
+    }
+    assert.equal(await collection.mintPriceFor(expected.map(([tokenId]) => tokenId)), parseEther("0.2075"));
+  });
+
+  it("packs all 1,000 immutable rarity assignments without drift", function () {
+    assert.equal(assignments.length, 1000);
+    for (const token of assignments) {
+      const position = token.token_id - 1;
+      const word = BigInt(rarityWords[Math.floor(position / 85)]);
+      const decoded = Number((word >> BigInt((position % 85) * 3)) & 7n);
+      assert.equal(decoded, rarityIndexes[token.rarity], `rarity mismatch for #${String(token.token_id).padStart(4, "0")}`);
+    }
   });
 
   it("supports creator-selected reserve pieces and repeatable sale controls", async function () {
@@ -81,7 +112,7 @@ describe("Gravity Goons launch contracts", function () {
 
   it("settles signed monotonic progress and keeps it attached after transfer", async function () {
     await (await collection.setMintOpen(true)).wait();
-    await (await collection.connect(collector).mintSelected([1], { value: parseEther("0.003") })).wait();
+    await (await collection.connect(collector).mintSelected([1], { value: await collection.priceFor(1) })).wait();
     const network = await provider.getNetwork();
     const discipline = Number(await collection.disciplineOf(1));
     const block = await provider.getBlock("latest");
@@ -132,7 +163,7 @@ describe("Gravity Goons launch contracts", function () {
 
   it("rejects wrong-discipline and decreasing progression", async function () {
     await (await collection.setMintOpen(true)).wait();
-    await (await collection.connect(collector).mintSelected([9], { value: parseEther("0.003") })).wait();
+    await (await collection.connect(collector).mintSelected([9], { value: await collection.priceFor(9) })).wait();
     const actual = Number(await collection.disciplineOf(9));
     const block = await provider.getBlock("latest");
     const network = await provider.getNetwork();
