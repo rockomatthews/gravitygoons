@@ -1,0 +1,377 @@
+{
+  "schema": "gravity-goons-flagged-replacement-progress-v1",
+  "status": "STAGED_COMPLETE_AUDIT_PASSED",
+  "flagged_total": 189,
+  "candidate_sources": 189,
+  "remaining": 0,
+  "rule_review_pending_tokens": [],
+  "accepted_originals_overwritten": false,
+  "final_audit": {
+    "completed_on": "2026-07-28",
+    "flagged_token_ids": 189,
+    "active_candidate_files": 189,
+    "unique_active_candidate_ids": 189,
+    "missing_token_ids": [],
+    "extra_token_ids": [],
+    "duplicate_active_token_ids": [],
+    "required_dimensions": "1254x1254",
+    "dimension_failures": [],
+    "rejected_archives_excluded_from_active_set": true,
+    "replacement_review_gallery": "review-gallery/replacements.html",
+    "accepted_originals_overwritten": false
+  },
+  "candidate_root": "art/static-collection/replacement-candidates",
+  "rounds": [
+    {
+      "round": 1,
+      "tokens": [5, 6, 13, 17],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-001.png"
+    },
+    {
+      "round": 2,
+      "tokens": [20, 23, 25, 38],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-002.png"
+    },
+    {
+      "round": 3,
+      "tokens": [48, 54, 55, 60],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-003.png"
+    },
+    {
+      "round": 4,
+      "tokens": [61, 75, 82],
+      "rejected_tokens": [79],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-004.png"
+    },
+    {
+      "round": 5,
+      "tokens": [89, 93, 104, 116],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-005.png"
+    },
+    {
+      "round": 6,
+      "tokens": [122, 124, 126, 130],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-006.png"
+    },
+    {
+      "round": 7,
+      "tokens": [132, 146, 151, 159],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-007.png"
+    },
+    {
+      "round": 8,
+      "tokens": [161, 165, 166, 170],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-008.png"
+    },
+    {
+      "round": 9,
+      "tokens": [199, 204, 205],
+      "rejected_tokens": [194],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-009.png"
+    },
+    {
+      "round": 10,
+      "tokens": [206, 207, 208, 216],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-010.png"
+    },
+    {
+      "round": 11,
+      "tokens": [222, 230, 233],
+      "rejected_tokens": [231],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-011.png"
+    },
+    {
+      "round": 12,
+      "tokens": [241, 244, 248],
+      "rejected_tokens": [259],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-012.png"
+    },
+    {
+      "round": 13,
+      "tokens": [261, 275, 276, 277],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-013.png"
+    },
+    {
+      "round": 14,
+      "tokens": [279, 283, 286, 287],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-014.png"
+    },
+    {
+      "round": 15,
+      "tokens": [296, 300, 306, 309],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-015.png"
+    },
+    {
+      "round": 16,
+      "tokens": [319, 324, 327, 342],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-016.png"
+    },
+    {
+      "round": 17,
+      "tokens": [352, 359, 371, 373],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-017.png"
+    },
+    {
+      "round": 18,
+      "tokens": [380, 381, 412, 416],
+      "status": "STAGED_AND_VISUALLY_CHECKED_REVIEW_NOTE_OVERRIDES_STALE_STANCE_FOR_0416",
+      "contact_sheet": "previews/replacement-round-018.png"
+    },
+    {
+      "round": 19,
+      "tokens": [419, 422, 430, 444],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-019.png"
+    },
+    {
+      "round": 20,
+      "tokens": [453, 458, 462, 463],
+      "status": "STAGED_AND_VISUALLY_CHECKED_REVIEW_NOTE_OVERRIDES_STALE_STANCE_FOR_0463",
+      "contact_sheet": "previews/replacement-round-020.png"
+    },
+    {
+      "round": 21,
+      "tokens": [465, 480, 485, 487],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-021.png"
+    },
+    {
+      "round": 22,
+      "tokens": [490, 491, 500, 503],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-022.png"
+    },
+    {
+      "round": 23,
+      "tokens": [513, 517, 523],
+      "rejected_tokens": [516],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING_REVIEW_NOTES_OVERRIDE_STALE_STANCES_FOR_0513_AND_0517",
+      "contact_sheet": "previews/replacement-round-023.png"
+    },
+    {
+      "round": 24,
+      "tokens": [529, 530, 536],
+      "rejected_tokens": [527],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-024.png"
+    },
+    {
+      "round": 25,
+      "tokens": [538, 543, 544],
+      "rejected_tokens": [541],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-025.png"
+    },
+    {
+      "round": 26,
+      "tokens": [551, 555, 561, 564],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-026.png"
+    },
+    {
+      "round": 27,
+      "tokens": [575, 580, 582],
+      "rejected_tokens": [574],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING_REVIEW_NOTE_OVERRIDES_STALE_STANCE_FOR_0575",
+      "contact_sheet": "previews/replacement-round-027.png"
+    },
+    {
+      "round": 28,
+      "tokens": [583, 591, 595],
+      "rejected_tokens": [586],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-028.png"
+    },
+    {
+      "round": 29,
+      "tokens": [598, 601, 602, 614],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-029.png"
+    },
+    {
+      "round": 30,
+      "tokens": [615, 621, 623, 624],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-030.png"
+    },
+    {
+      "round": 31,
+      "tokens": [627, 648, 651, 654],
+      "status": "STAGED_AND_VISUALLY_CHECKED_REVIEW_NOTE_OVERRIDES_STALE_STANCE_FOR_0654",
+      "contact_sheet": "previews/replacement-round-031.png"
+    },
+    {
+      "round": 32,
+      "tokens": [663, 671, 672],
+      "rejected_tokens": [658],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-032.png"
+    },
+    {
+      "round": 33,
+      "tokens": [689, 692, 695],
+      "rejected_tokens": [700],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-033.png"
+    },
+    {
+      "round": 34,
+      "tokens": [707, 709, 720],
+      "rejected_tokens": [721],
+      "status": "PARTIAL_3_STAGED_1_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-034.png"
+    },
+    {
+      "round": 35,
+      "tokens": [757, 775, 777, 778],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-035.png"
+    },
+    {
+      "round": 36,
+      "tokens": [780, 781, 782, 783],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-036.png"
+    },
+    {
+      "round": 37,
+      "tokens": [784, 785, 786, 787],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-037.png"
+    },
+    {
+      "round": 38,
+      "tokens": [788, 789, 790, 791],
+      "status": "STAGED_AND_VISUALLY_CHECKED_ONE_RETRY_FOR_UNAMBIGUOUS_GOOFY_STANCE_0790",
+      "contact_sheet": "previews/replacement-round-038.png"
+    },
+    {
+      "round": 39,
+      "tokens": [792, 793, 795, 802],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-039.png"
+    },
+    {
+      "round": 40,
+      "tokens": [804, 805, 809, 813],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-040.png"
+    },
+    {
+      "round": 41,
+      "tokens": [820, 832, 834, 836],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-041.png"
+    },
+    {
+      "round": 42,
+      "tokens": [838, 846, 854, 860],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-042.png"
+    },
+    {
+      "round": 43,
+      "tokens": [864, 879, 884],
+      "attempted_tokens": [864, 879, 882, 884],
+      "status": "STAGED_3_AND_VISUALLY_CHECKED_0882_RULE_REVIEW_PENDING_AFTER_TWO_PEDAL_GEOMETRY_FAILURES",
+      "contact_sheet": "previews/replacement-round-043.png"
+    },
+    {
+      "round": 44,
+      "tokens": [886, 887, 890],
+      "attempted_tokens": [885, 886, 887, 890],
+      "status": "STAGED_3_AND_VISUALLY_CHECKED_0885_RULE_REVIEW_PENDING_AFTER_TWO_RIGHT_FOOT_PEDAL_ASSIGNMENT_FAILURES",
+      "contact_sheet": "previews/replacement-round-044.png"
+    },
+    {
+      "round": 45,
+      "tokens": [891, 898, 901, 902],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-045.png"
+    },
+    {
+      "round": 46,
+      "tokens": [906, 923],
+      "attempted_tokens": [903, 906, 923, 925],
+      "status": "STAGED_2_AND_VISUALLY_CHECKED_0903_0925_RULE_REVIEW_PENDING_AFTER_TWO_CRANK_PEDAL_GEOMETRY_FAILURES",
+      "contact_sheet": "previews/replacement-round-046.png"
+    },
+    {
+      "round": 47,
+      "tokens": [933, 938, 943, 947],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-047.png"
+    },
+    {
+      "round": 48,
+      "tokens": [986],
+      "status": "STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-048.png"
+    },
+    {
+      "round": 49,
+      "tokens": [231, 259],
+      "attempted_tokens": [79, 194, 231, 259],
+      "status": "SECOND_STRATEGY_REBUILDS_STAGED_2_AND_VISUALLY_CHECKED_0079_0194_REMAIN_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-049.png"
+    },
+    {
+      "round": 50,
+      "tokens": [516, 527, 541],
+      "attempted_tokens": [516, 527, 541, 574],
+      "status": "REFERENCE_ASSISTED_REBUILDS_STAGED_3_AND_VISUALLY_CHECKED_0574_REMAINS_RULE_REVIEW_PENDING",
+      "contact_sheet": "previews/replacement-round-050.png"
+    },
+    {
+      "round": 51,
+      "tokens": [586, 658],
+      "attempted_tokens": [586, 658, 700, 721],
+      "status": "REFERENCE_ASSISTED_REBUILDS_STAGED_2_AND_VISUALLY_CHECKED_0700_0721_REMAIN_RULE_REVIEW_PENDING_AFTER_LONG_CRANK_FAILURES",
+      "contact_sheet": "previews/replacement-round-051.png"
+    },
+    {
+      "round": 52,
+      "tokens": [882],
+      "attempted_tokens": [79, 194, 574, 882],
+      "status": "LOCALIZED_EDITS_STAGED_1_AND_VISUALLY_CHECKED_0079_0194_0574_REMAIN_RULE_REVIEW_PENDING_AFTER_PEDAL_GEOMETRY_FAILURES",
+      "contact_sheet": "previews/replacement-round-052.png"
+    },
+    {
+      "round": 53,
+      "tokens": [885],
+      "attempted_tokens": [700, 885, 903, 925],
+      "status": "LOCALIZED_AND_REFERENCE_EDITS_STAGED_1_AND_VISUALLY_CHECKED_0700_0903_0925_REMAIN_RULE_REVIEW_PENDING_AFTER_PEDAL_GEOMETRY_FAILURES",
+      "contact_sheet": "previews/replacement-round-053.png"
+    },
+    {
+      "round": 54,
+      "tokens": [194, 721, 925],
+      "attempted_tokens": [194, 574, 721, 925],
+      "status": "REAL_DRIVETRAIN_REFERENCE_REBUILDS_STAGED_3_AND_VISUALLY_CHECKED_0574_REMAINS_RULE_REVIEW_PENDING_AFTER_EXTRA_FLOATING_PEDAL",
+      "contact_sheet": "previews/replacement-round-054.png"
+    },
+    {
+      "round": 55,
+      "tokens": [79, 574, 700, 903],
+      "status": "THREE_REFERENCE_FINAL_REBUILDS_STAGED_AND_VISUALLY_CHECKED",
+      "contact_sheet": "previews/replacement-round-055.png"
+    }
+  ]
+}
