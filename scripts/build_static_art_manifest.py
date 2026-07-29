@@ -19,10 +19,16 @@ STYLE_LOCK = (
     "toy-like proportions, simplified mannequins, card UI, captions, watermarks, or real trademarks. "
     "Any assigned helmet or headwear must be worn correctly on the athlete's head in its normal upright "
     "orientation; never hang a helmet from handlebars, controls, equipment, clothing, or the background, "
-    "and never add a second loose helmet. Any visible animal tail must originate anatomically from the "
-    "athlete's pelvis and remain clearly attached to the athlete. For BMX or motocross scenes, keep the "
-    "tail on the athlete's side of the bike; it must never pass through or appear to emerge from the seat, "
-    "rear fender, frame, chain, engine, spokes, or rear wheel."
+    "and never add a second loose helmet. Any assigned Full-Face Helmet must visibly include one continuous "
+    "protective chin bar and jaw guard connected to the helmet shell; never substitute a half-shell, open-face, "
+    "or ordinary snow helmet. Show exactly two natural eyes total; clear lenses must reveal those "
+    "same two eyes without duplicating, stacking, or reflecting extra eyes. Any visible animal tail must originate "
+    "anatomically from the athlete's pelvis with a continuous visible fur or skin connection and remain clearly "
+    "attached to the athlete; never show a floating, detached, or gap-separated tail. For BMX or motocross scenes, keep the "
+    "tail on the athlete's side of the bike with a visible strip of background separating the entire tail from "
+    "the motorcycle or bicycle; it must never touch, overlap, pass through, or appear to emerge from the seat, "
+    "rear fender, frame, chain, engine, spokes, or rear wheel. Hide the tail behind the athlete if this clear "
+    "separation cannot be shown cleanly."
 )
 
 POSE_GUIDANCE = {
@@ -50,7 +56,10 @@ POSE_GUIDANCE = {
         "the front foot is farther forward toward the nose and offset toward the surfer's toe-side rail. "
         "Do not place both feet on the centerline or on the same side of the stringer. Hips, shoulders, "
         "knees, head, board, and wave must all "
-        "face the same direction; never show a backward board or a mirrored rider traveling against it."
+        "face the same direction; never show a backward board or a mirrored rider traveling against it. "
+        "For a front-facing three-quarter regular-stance rider, prefer the pointed nose toward image-right so "
+        "the viewer-right anatomical-left foot is unmistakably forward and the viewer-left anatomical-right "
+        "foot is unmistakably rearward over the image-left tail pad."
     ),
     "Beach Plant": (
         "Airborne surfboard face geometry is mandatory. If the camera sees the deck/top riding surface, "
@@ -60,9 +69,40 @@ POSE_GUIDANCE = {
     ),
     "Pedal Ready": (
         "BMX pedal geometry is mandatory: show one complete BMX bike with exactly two normal pedals, one on "
-        "each crank side. Both athlete shoes must be fully and visibly supported by their corresponding pedals "
-        "in a balanced ready-to-ride stance. Never place either foot on the ground, wheel, frame, peg, or in "
-        "midair; never omit, duplicate, or detach a pedal."
+        "each crank side. Both pedals must be visibly separated beneath the shoes, with each pedal connected "
+        "to its own coherent crank arm. Both athlete shoes must be fully and visibly supported by their "
+        "corresponding pedals in a balanced ready-to-ride stance. Never place either foot on the ground, wheel, "
+        "frame, peg, or in midair; never omit, duplicate, detach, or hide a pedal. For an animal athlete, keep "
+        "the entire visible tail outside the bicycle silhouette with clear background separating it from the "
+        "seat, frame, chain, crank, spokes, and both wheels; hide the tail behind the athlete if that separation "
+        "cannot be shown cleanly."
+    ),
+    "Handlebar Lean": (
+        "BMX Handlebar Lean geometry is mandatory: show one complete BMX bike with exactly two intact wheels, "
+        "one coherent handlebar/stem/head-tube/fork assembly, and one complete crankset below the frame. The "
+        "grounded athlete leans naturally on the bike with both feet on the floor and both hands contacting the "
+        "same handlebar. Show exactly two unmistakable rectangular platform pedals simultaneously: one pedal on "
+        "each crank side, attached by two crank arms exactly 180 degrees apart to one bottom bracket. Stage the "
+        "bike at a three-quarter angle that exposes both pedal bodies; never hide either pedal behind the frame, "
+        "chainring, shoe, or wheel, and never confuse a pedal with an axle peg. Preserve the saddle, frame triangle, "
+        "rear stays, chain, both wheels, and front-end assembly. For an animal athlete, keep the visible tail outside "
+        "the bicycle silhouette with clear background separation."
+    ),
+    "Bike Beside": (
+        "BMX Bike Beside geometry is mandatory: show one complete BMX bike supported by the grounded athlete. "
+        "Show exactly two unmistakable rectangular platform pedals simultaneously: one pedal on each crank side, "
+        "attached by two crank arms exactly 180 degrees apart to one bottom bracket. Stage the bike at a three-quarter "
+        "angle that exposes both pedal bodies; never hide either pedal behind the frame, chainring, shoe, or wheel, "
+        "and never confuse a pedal with an axle peg. Preserve the saddle, complete frame and rear stays, chain, both "
+        "intact wheels, and coherent handlebar/stem/head-tube/fork assembly. Both athlete feet remain grounded beside "
+        "the bike. For an animal athlete, keep the visible tail outside the bicycle silhouette with clear background "
+        "separation."
+    ),
+    "Board Beside": (
+        "Skateboard face geometry is mandatory: show one complete normal skateboard held beside the athlete "
+        "with both trucks and exactly four wheels mounted only on the underside. The matte black grip-tape top "
+        "and truck-mounted underside are opposite faces. Never mount trucks or wheels on visible grip tape, "
+        "never show grip tape and trucks on the same face, and never merge or duplicate deck hardware."
     ),
     "Binding Check": (
         "Binding Check geometry is mandatory: place one complete snowboard flat and supported on the "
@@ -70,6 +110,15 @@ POSE_GUIDANCE = {
         "fully outside both bindings while both hands inspect or adjust the nearest binding. Never cross "
         "the legs, never place either boot into a binding, and never reach one boot toward the opposite-side "
         "binding."
+    ),
+    "Bars Turned": (
+        "Motocross Bars Turned geometry is mandatory: show one complete stationary motocross bike with exactly "
+        "two intact wheels. The athlete must be seated on or naturally straddling the bike with both hands "
+        "gripping the handlebars, while the handlebars, front fork, and front wheel are visibly turned together "
+        "to one side. This is a static ready pose, never a trick: both legs stay down in a plausible supported "
+        "position with no airborne, kicked-out, Nac-Nac, or one-leg-over-seat action. For an animal athlete, keep "
+        "the entire visible tail outside the motorcycle silhouette with clear background separating it from every "
+        "bike component; hide the tail behind the athlete if that separation cannot be shown cleanly."
     ),
 }
 

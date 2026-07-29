@@ -13,9 +13,9 @@ const athletes = [
     letters: "SK",
     stats: { SPD: 5, AIR: 7, CTL: 6, STY: 8, TGH: 4 },
     moves: [
-      { name: "360 FLIP", difficulty: 7, chance: 58, originality: 100 },
-      { name: "KICKFLIP", difficulty: 4, chance: 79, originality: 78 },
-      { name: "BOARDSLIDE", difficulty: 5, chance: 72, originality: 100 },
+      { name: "360 FLIP", difficulty: 7, chance: 58, status: "CALLED" },
+      { name: "KICKFLIP", difficulty: 4, chance: 79, status: "CATALOGUE" },
+      { name: "BOARDSLIDE", difficulty: 5, chance: 72, status: "CATALOGUE" },
     ],
     accent: "#18f1dc",
   },
@@ -29,9 +29,9 @@ const athletes = [
     letters: "S",
     stats: { SPD: 5, AIR: 6, CTL: 7, STY: 8, TGH: 4 },
     moves: [
-      { name: "HARD FLIP", difficulty: 8, chance: 51, originality: 100 },
-      { name: "HEELFLIP", difficulty: 4, chance: 80, originality: 100 },
-      { name: "OLLIE", difficulty: 2, chance: 94, originality: 56 },
+      { name: "360 FLIP", difficulty: 7, chance: 46, status: "TEMP TRY" },
+      { name: "HEELFLIP", difficulty: 4, chance: 80, status: "SIMILAR" },
+      { name: "OLLIE", difficulty: 2, chance: 94, status: "CATALOGUE" },
     ],
     accent: "#ff4b35",
   },
@@ -45,13 +45,13 @@ export function GameExplainer() {
           <p className="eyebrow">ONE ARENA // TWO WAYS IN</p>
           <h2>Own the athlete.<br /><i>Or call the winner.</i></h2>
         </div>
-        <p>Gravity Goons begins as a strategic card-versus-card action-sports battle. Players call tricks from an athlete&apos;s arsenal. Spectators follow every choice, percentage, letter, and result—without needing an NFT.</p>
+        <p>Gravity Goons plays like SKATE and HORSE. One Goon calls and attempts a trick. Land it and the responder must answer the same call; miss the answer and take a letter. Spectators can follow every percentage, letter, and result without owning an NFT.</p>
       </div>
 
       <div className="primer-personas">
         <article>
           <span className="persona-number">01</span>
-          <div><b>NFT OWNER // COMPETE</b><h3>Your Goon. Your calls. Their career.</h3><p>Enter discipline-matched battles, lock a trick in secret, manage risk and originality, earn wins, attract sponsors, and expand the NFT&apos;s permanent trick arsenal.</p></div>
+          <div><b>NFT OWNER // COMPETE</b><h3>Your Goon. Your calls. Their career.</h3><p>Choose a trick your Goon knows, land it to set the challenge, and force the opponent to answer. Earn wins, attract sponsors, and expand the NFT&apos;s permanent trick catalogue.</p></div>
         </article>
         <article>
           <span className="persona-number">02</span>
@@ -61,7 +61,7 @@ export function GameExplainer() {
 
       <div className="battle-console" aria-label="Concept preview of a Gravity Goons card battle">
         <div className="console-grid" aria-hidden="true" />
-        <div className="console-topline"><span>RANKED // SKATEBOARDING</span><b>ROUND 03</b><span>RULESET 0.2</span></div>
+        <div className="console-topline"><span>RANKED // SKATEBOARDING</span><b>TURN 03</b><span>RULESET 0.3</span></div>
         <div className="battle-cards">
           {athletes.map((athlete, athleteIndex) => (
             <article className={`battle-card battle-card-${athleteIndex + 1}`} style={{ "--card-accent": athlete.accent } as CSSProperties} key={athlete.id}>
@@ -74,24 +74,24 @@ export function GameExplainer() {
                 <div className="battle-identity"><div><span>{athlete.species} {"//"} {athlete.brand}</span><h3>GOON #{String(athlete.id).padStart(4, "0")}</h3></div><div><span>RECORD</span><b>{athlete.record}</b></div></div>
                 <div className="battle-stat-row">{Object.entries(athlete.stats).map(([stat, value]) => <span key={stat}>{stat}<i><em style={{ width: `${value * 10}%` }} /></i><b>{value}</b></span>)}</div>
                 <div className="arsenal-label"><span>TRICK ARSENAL</span><b>RATING {athlete.rating}</b></div>
-                <div className="move-stack">{athlete.moves.map((move, index) => <div className={index === 0 ? "move-card selected" : "move-card"} key={move.name}><span>D{move.difficulty}</span><b>{move.name}</b><small>LAND <strong>{move.chance}%</strong></small><small>ORIG <strong>{move.originality}%</strong></small></div>)}</div>
+                <div className="move-stack">{athlete.moves.map((move, index) => <div className={index === 0 ? "move-card selected" : "move-card"} key={`${move.name}-${index}`}><span>D{move.difficulty}</span><b>{move.name}</b><small>LAND <strong>{move.chance}%</strong></small><small>{move.status}</small></div>)}</div>
               </div>
             </article>
           ))}
-          <div className="battle-versus"><span>LOCKED</span><b>VS</b><small>REVEAL IN 03</small></div>
+          <div className="battle-versus"><span>CALLED</span><b>360</b><small>SET // ANSWER</small></div>
         </div>
         <div className="resolution-rail">
-          <span><i>1</i> CHOOSE</span><span><i>2</i> SIGN + LOCK</span><span><i>3</i> REVEAL</span><span><i>4</i> RESOLVE</span><span><i>5</i> SETTLE</span>
+          <span><i>1</i> CALL</span><span><i>2</i> SETTER TRIES</span><span><i>3</i> RESPONDER TRIES</span><span><i>4</i> LETTER OR TURN</span><span><i>5</i> NEXT CALL</span>
         </div>
       </div>
 
       <div className="record-layers">
         <article><span>NFT GENESIS</span><h3>Stats that matter</h3><p>Speed, Air, Control, Style, Toughness, discipline, stance, and signature trick are visible before mint and shape every matchup.</p><b>IMMUTABLE CHARACTER DNA</b></article>
-        <article><span>MATCH RECORD</span><h3>History you can audit</h3><p>Wins, losses, rating, streaks, selections, originality, and the revealed resolution seed form a signed match transcript.</p><b>SERVER-VERIFIED + REPLAYABLE</b></article>
+        <article><span>MATCH RECORD</span><h3>History you can audit</h3><p>Every call, attempt, chance, learning bonus, letter, turn change, and revealed resolution seed forms a signed match transcript.</p><b>SERVER-VERIFIED + REPLAYABLE</b></article>
         <article><span>BASE PROGRESSION</span><h3>Progress that travels</h3><p>Settled XP, level, unlocked-trick bitmap, achievements, sponsor history, and progression nonce remain attached to the NFT.</p><b>ONCHAIN CAREER STATE</b></article>
       </div>
 
-      <div className="primer-cta"><p><b>SKATE. SHRED. WAVES. BIKE. MOTO. SLOPE.</b><span>Lose rounds. Take letters. Spell the word and the match is over.</span></p><Link className="button primary" href="/game">OPEN THE PVP LAB</Link></div>
+      <div className="primer-cta"><p><b>SKATE. SHRED. WAVES. BIKE. MOTO. SLOPE.</b><span>Miss the answer. Take a letter. Spell the word and the match is over.</span></p><Link className="button primary" href="/game">OPEN THE PVP LAB</Link></div>
     </section>
   );
 }

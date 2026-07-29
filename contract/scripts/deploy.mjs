@@ -1,25 +1,54 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { ContractFactory, JsonRpcProvider, Wallet, getAddress } from "ethers";
+import { ContractFactory, JsonRpcProvider, NonceManager, Wallet, getAddress } from "ethers";
 import "dotenv/config";
 
 const root = path.resolve(import.meta.dirname, "..");
-const required = ["BASE_RPC_URL", "DEPLOYER_PRIVATE_KEY", "OWNER_ADDRESS", "GAME_SIGNER_ADDRESS", "METADATA_BASE_URL"];
+const repositoryRoot = path.resolve(root, "..");
+const required = [
+  "BASE_RPC_URL",
+  "DEPLOYER_PRIVATE_KEY",
+  "OWNER_ADDRESS",
+  "GAME_SIGNER_ADDRESS",
+  "METADATA_BASE_URL",
+  "DEPLOYMENT_STAGE",
+];
 for (const key of required) {
   if (!process.env[key] || process.env[key].includes("REPLACE")) throw new Error(`Set ${key} in contract/.env`);
 }
-if (!process.env.METADATA_BASE_URL.startsWith("https://") || !process.env.METADATA_BASE_URL.endsWith("/")) {
-  throw new Error("METADATA_BASE_URL must be a stable HTTPS URL ending in /");
+
+const stage = process.env.DEPLOYMENT_STAGE;
+if (stage !== "sepolia" && stage !== "mainnet") {
+  throw new Error("DEPLOYMENT_STAGE must be sepolia or mainnet");
+}
+if (!process.env.METADATA_BASE_URL.startsWith("ipfs://") || !process.env.METADATA_BASE_URL.endsWith("/")) {
+  throw new Error("METADATA_BASE_URL must be the immutable ipfs:// metadata directory CID ending in /");
 }
 
 const provider = new JsonRpcProvider(process.env.BASE_RPC_URL);
 const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
+const deploymentSigner = new NonceManager(deployer);
 const owner = getAddress(process.env.OWNER_ADDRESS);
 const gameSigner = getAddress(process.env.GAME_SIGNER_ADDRESS);
 const network = await provider.getNetwork();
-if (network.chainId !== 8453n && process.env.ALLOW_NON_BASE !== "true") {
-  throw new Error(`Refusing chain ${network.chainId}. Set ALLOW_NON_BASE=true only for a deliberate test deployment.`);
+const expectedChainId = stage === "mainnet" ? 8453n : 84532n;
+if (network.chainId !== expectedChainId) {
+  throw new Error(`Refusing ${stage} deployment on chain ${network.chainId}; expected ${expectedChainId}`);
+}
+if (stage === "sepolia" && process.env.ALLOW_NON_BASE !== "true") {
+  throw new Error("Set ALLOW_NON_BASE=true for the deliberate Base Sepolia test deployment");
+}
+if (stage === "mainnet") {
+  if (process.env.ALLOW_MAINNET_DEPLOY !== "true") {
+    throw new Error("Set ALLOW_MAINNET_DEPLOY=true only for the reviewed Base mainnet deployment");
+  }
+  if (!process.env.SAFE_ADDRESS || getAddress(process.env.SAFE_ADDRESS) !== owner) {
+    throw new Error("SAFE_ADDRESS must be set and match OWNER_ADDRESS for mainnet");
+  }
+}
+if ((await provider.getBalance(deployer.address)) === 0n) {
+  throw new Error(`Deployer ${deployer.address} has no native gas token on chain ${network.chainId}`);
 }
 
 function artifact(name) {
@@ -28,27 +57,94 @@ function artifact(name) {
 
 const registryArtifact = artifact("GravityGoonsProgressRegistry");
 const collectionArtifact = artifact("GravityGoons");
-const words = JSON.parse(fs.readFileSync(path.join(root, "config", "discipline-words.json"), "utf8"));
+const disciplineWords = JSON.parse(fs.readFileSync(path.join(root, "config", "discipline-words.json"), "utf8"));
+const rarityWords = JSON.parse(fs.readFileSync(path.join(root, "config", "rarity-words.json"), "utf8"));
 
-console.log(`Deploying from ${deployer.address} on chain ${network.chainId}...`);
-const registry = await new ContractFactory(registryArtifact.abi, registryArtifact.bytecode, deployer).deploy(deployer.address, gameSigner);
-await registry.waitForDeployment();
-console.log(`GravityGoonsProgressRegistry: ${await registry.getAddress()}`);
-
-const collection = await new ContractFactory(collectionArtifact.abi, collectionArtifact.bytecode, deployer).deploy(
-  owner,
-  await registry.getAddress(),
-  process.env.METADATA_BASE_URL,
-  words,
+console.log(`Deploying from ${deployer.address} on chain ${network.chainId} (${stage})...`);
+const registry = await new ContractFactory(registryArtifact.abi, registryArtifact.bytecode, deploymentSigner).deploy(
+  deployer.address,
+  gameSigner,
 );
-await collection.waitForDeployment();
-console.log(`GravityGoons: ${await collection.getAddress()}`);
+const registryDeployment = registry.deploymentTransaction();
+await registry.waitForDeployment();
+const registryAddress = await registry.getAddress();
+console.log(`GravityGoonsProgressRegistry: ${registryAddress}`);
 
-const link = await registry.setCollectionOnce(await collection.getAddress());
-await link.wait();
+const collection = await new ContractFactory(collectionArtifact.abi, collectionArtifact.bytecode, deploymentSigner).deploy(
+  owner,
+  registryAddress,
+  process.env.METADATA_BASE_URL,
+  disciplineWords,
+  rarityWords,
+);
+const collectionDeployment = collection.deploymentTransaction();
+await collection.waitForDeployment();
+const collectionAddress = await collection.getAddress();
+console.log(`GravityGoons: ${collectionAddress}`);
+
+const link = await registry.setCollectionOnce(collectionAddress);
+const linkReceipt = await link.wait();
+let ownershipTransferHash = null;
+let ownershipTransferBlock = null;
 if (owner !== deployer.address) {
   const transfer = await registry.transferOwnership(owner);
-  await transfer.wait();
-  console.log(`Registry ownership transfer proposed to ${owner}; that wallet must call acceptOwnership().`);
+  const transferReceipt = await transfer.wait();
+  ownershipTransferHash = transfer.hash;
+  ownershipTransferBlock = transferReceipt.blockNumber;
+  console.log(`Registry ownership transfer proposed to ${owner}; that account must call acceptOwnership().`);
 }
-console.log("Registry linked. Minting remains closed until the owner calls setMintOpen(true).");
+
+const registryOwner = getAddress(await registry.owner());
+const registryPendingOwner = getAddress(await registry.pendingOwner());
+const collectionOwner = getAddress(await collection.owner());
+const mintOpen = await collection.mintOpen();
+if (getAddress(await registry.collection()) !== collectionAddress) throw new Error("Registry collection link verification failed");
+if (collectionOwner !== owner) throw new Error("Collection owner verification failed");
+if (mintOpen) throw new Error("Deployment unexpectedly opened public minting");
+if (owner !== deployer.address && registryPendingOwner !== owner) throw new Error("Registry pending owner verification failed");
+
+const defaultRecord = path.join(repositoryRoot, "reports", `base-${stage}-deployment.json`);
+const recordPath = process.env.DEPLOYMENT_RECORD_OUTPUT
+  ? path.resolve(process.cwd(), process.env.DEPLOYMENT_RECORD_OUTPUT)
+  : defaultRecord;
+if (fs.existsSync(recordPath) && process.env.ALLOW_DEPLOYMENT_RECORD_OVERWRITE !== "true") {
+  throw new Error(`Refusing to overwrite deployment record ${recordPath}`);
+}
+fs.mkdirSync(path.dirname(recordPath), { recursive: true });
+const record = {
+  schema: "gravity-goons-contract-deployment-v1",
+  created_at: new Date().toISOString(),
+  stage,
+  chain_id: Number(network.chainId),
+  rpc_host: new URL(process.env.BASE_RPC_URL).host,
+  deployer: deployer.address,
+  owner,
+  safe_address: stage === "mainnet" ? owner : null,
+  game_signer: gameSigner,
+  metadata_base_url: process.env.METADATA_BASE_URL,
+  registry: {
+    address: registryAddress,
+    deployment_transaction: registryDeployment?.hash ?? null,
+    deployment_block: (await registryDeployment?.wait())?.blockNumber ?? null,
+    owner: registryOwner,
+    pending_owner: registryPendingOwner,
+    ownership_transfer_transaction: ownershipTransferHash,
+    ownership_transfer_block: ownershipTransferBlock,
+    collection: collectionAddress,
+  },
+  collection: {
+    address: collectionAddress,
+    deployment_transaction: collectionDeployment?.hash ?? null,
+    deployment_block: (await collectionDeployment?.wait())?.blockNumber ?? null,
+    owner: collectionOwner,
+    link_transaction: link.hash,
+    link_block: linkReceipt.blockNumber,
+    mint_open: false,
+    creator_minted: Number(await collection.creatorMinted()),
+    public_minted: Number(await collection.publicMinted()),
+  },
+  public_mint_open: false,
+};
+fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`);
+console.log(`Deployment record: ${recordPath}`);
+console.log("Registry linked. Public minting remains closed.");

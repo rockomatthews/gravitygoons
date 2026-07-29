@@ -9,8 +9,12 @@ export const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL ?? "https://mainn
 export const publicClient = createPublicClient({ chain: base, transport: http(baseRpcUrl) });
 
 export const collectionAbi = [
+  { type: "function", name: "ownerOf", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "address" }] },
   { type: "function", name: "mintOpen", stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
   { type: "function", name: "mintSelected", stateMutability: "payable", inputs: [{ name: "tokenIds", type: "uint16[]" }], outputs: [] },
+  { type: "function", name: "rarityOf", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "uint8" }] },
+  { type: "function", name: "priceFor", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "uint256" }] },
+  { type: "function", name: "mintPriceFor", stateMutability: "view", inputs: [{ name: "tokenIds", type: "uint16[]" }], outputs: [{ type: "uint256" }] },
   { type: "function", name: "setMintOpen", stateMutability: "nonpayable", inputs: [{ name: "open", type: "bool" }], outputs: [] },
   { type: "function", name: "creatorMintSelected", stateMutability: "nonpayable", inputs: [{ name: "recipient", type: "address" }, { name: "tokenIds", type: "uint16[]" }], outputs: [] },
   { type: "function", name: "availabilityWord", stateMutability: "view", inputs: [{ name: "startTokenId", type: "uint256" }], outputs: [{ type: "uint256" }] },
@@ -35,4 +39,3 @@ export function ipfsToHttp(uri: string): string {
   const path = uri.slice(7);
   return `https://${path.split("/")[0]}.ipfs.dweb.link/${path.split("/").slice(1).join("/")}`;
 }
-
