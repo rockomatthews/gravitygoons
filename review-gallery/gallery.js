@@ -6,6 +6,20 @@
   const total = config.total || items.length;
   const storageKey = config.storageKey || "gravity-goons-review-v1";
   const state = JSON.parse(localStorage.getItem(storageKey) || "{}");
+  const remainingResetKey = `${storageKey}:remaining-reset-2026-07-28`;
+  if (localStorage.getItem(remainingResetKey) !== "done") {
+    Object.keys(state).forEach((id) => {
+      if (state[id]?.status !== "good") delete state[id];
+    });
+    localStorage.setItem(storageKey, JSON.stringify(state));
+    localStorage.setItem(remainingResetKey, "done");
+  }
+  (config.resetBatches || []).forEach((batch) => {
+    if (localStorage.getItem(batch.key) === "done") return;
+    (batch.ids || []).forEach((id) => delete state[id]);
+    localStorage.setItem(storageKey, JSON.stringify(state));
+    localStorage.setItem(batch.key, "done");
+  });
   let visible = items;
   let currentIndex = -1;
   let toastTimer;
@@ -57,13 +71,14 @@
     const values = items.map((item) => review(item.id).status);
     const good = values.filter((value) => value === "good").length;
     const flagged = values.filter((value) => value === "flagged").length;
-    const reviewed = good + flagged;
-    $("summary").textContent = `${reviewed.toLocaleString()} of ${total.toLocaleString()} reviewed`;
+    const unreviewed = total - good - flagged;
+    const queue = total - good;
+    $("summary").textContent = `${queue.toLocaleString()} still in review · ${good.toLocaleString()} approved and removed`;
     $("good-count").textContent = good.toLocaleString();
     $("flagged-count").textContent = flagged.toLocaleString();
-    $("remaining-count").textContent = (total - reviewed).toLocaleString();
+    $("remaining-count").textContent = unreviewed.toLocaleString();
     $("visible-count").textContent = `${visible.length.toLocaleString()} visible`;
-    $("progress-fill").style.width = `${total ? (reviewed / total) * 100 : 0}%`;
+    $("progress-fill").style.width = `${total ? ((good + flagged) / total) * 100 : 0}%`;
   }
 
   function card(item) {
@@ -98,7 +113,7 @@
       const haystack = `${pad(item.id)} ${item.id} ${item.species} ${item.discipline} ${item.sponsor} ${item.pose}`.toLowerCase();
       return (!query || haystack.includes(query))
         && (!batchStart || (item.id >= batchStart && item.id < batchStart + 100))
-        && (controls.status.value === "all" || record.status === controls.status.value)
+        && (controls.status.value === "all" ? record.status !== "good" : record.status === controls.status.value)
         && (controls.discipline.value === "all" || item.discipline === controls.discipline.value)
         && (controls.species.value === "all" || item.species === controls.species.value);
     });
