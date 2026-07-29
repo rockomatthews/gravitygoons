@@ -5,6 +5,7 @@ import {
   TRICK_CATALOG,
   acceptSponsor,
   canSetTrick,
+  crowdPressurePenalty,
   forcedAttemptLearningBonus,
   landingChance,
   lettersForLosses,
@@ -13,6 +14,7 @@ import {
   pendingSponsorOffers,
   recordVerifiedRankedWin,
   resolveSkateTurn,
+  resolveSetterAttempt,
   trickIsInCatalogue,
   trickIsUnlocked,
   trickSimilarity,
@@ -132,10 +134,63 @@ test("each forced attempt improves that responder's future chance", () => {
     practice: { "360 flip": 4 },
   });
   assert.equal(forcedAttemptLearningBonus({}, trick.name), 0);
-  assert.equal(forcedAttemptLearningBonus({ "360 flip": 1 }, trick.name), 6);
-  assert.equal(forcedAttemptLearningBonus({ "360 flip": 9 }, trick.name), 24);
-  assert.equal(second, first + 6);
-  assert.equal(fifth, first + 24);
+  assert.equal(forcedAttemptLearningBonus({ "360 flip": 1 }, trick.name), 2);
+  assert.equal(forcedAttemptLearningBonus({ "360 flip": 9 }, trick.name), 6);
+  assert.equal(second, first + 2);
+  assert.equal(fifth, first + 6);
+});
+
+test("SEND IT risks the setter while making the copied answer harder", () => {
+  const trick = TRICK_CATALOG.Skateboarding[1];
+  const catalogue = TRICK_CATALOG.Skateboarding.slice(0, 4);
+  const standardSetter = landingChance(skater(1), trick, { catalogue, callMode: "standard" });
+  const sendSetter = landingChance(skater(1), trick, { catalogue, callMode: "send" });
+  const standardResponder = landingChance(skater(2), trick, {
+    catalogue,
+    callMode: "standard",
+    forcedResponse: true,
+  });
+  const sendResponder = landingChance(skater(2), trick, {
+    catalogue,
+    callMode: "send",
+    forcedResponse: true,
+  });
+  assert.equal(sendSetter, standardSetter - 10);
+  assert.equal(sendResponder, standardResponder - 15);
+});
+
+test("a responder can spend grit to focus after seeing a landed call", () => {
+  const choice = baseChoice({ callMode: "send" });
+  let seed = "";
+  for (let index = 0; index < 20_000; index += 1) {
+    const candidate = `split-attempt-${index}`;
+    if (resolveSetterAttempt(choice, candidate).landed) {
+      seed = candidate;
+      break;
+    }
+  }
+  assert.ok(seed);
+  const plain = resolveSkateTurn(choice, seed).attempts[1]!;
+  const focused = resolveSkateTurn({ ...choice, responderUsesGrit: true }, seed).attempts[1]!;
+  assert.equal(focused.chance, plain.chance + 8);
+  assert.equal(focused.gritUsed, true);
+  assert.deepEqual(resolveSetterAttempt(choice, seed), resolveSkateTurn(choice, seed).attempts[0]);
+});
+
+test("crowd pressure breaks letterless stalls without affecting the setter", () => {
+  const trick = TRICK_CATALOG.Skateboarding[1];
+  const catalogue = TRICK_CATALOG.Skateboarding.slice(0, 4);
+  assert.equal(crowdPressurePenalty(4), 0);
+  assert.equal(crowdPressurePenalty(7), 6);
+  assert.equal(crowdPressurePenalty(99), 10);
+  assert.equal(
+    landingChance(skater(2), trick, { catalogue, forcedResponse: true, letterlessTurns: 7 }),
+    landingChance(skater(2), trick, { catalogue, forcedResponse: true }) - 6,
+  );
+  assert.equal(
+    landingChance(skater(1), trick, { catalogue, letterlessTurns: 99 }),
+    landingChance(skater(1), trick, { catalogue }),
+  );
 });
 
 test("a setter miss passes control without an answer or letter", () => {

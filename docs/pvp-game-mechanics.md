@@ -1,4 +1,4 @@
-# Gravity Goons PvP Mechanics v0.3
+# Gravity Goons PvP Mechanics v0.4
 
 Status: mechanics branch prototype. This document does not authorize mainnet wagering or contract deployment.
 
@@ -13,6 +13,11 @@ Status: mechanics branch prototype. This document does not authorize mainnet wag
 - A responder can temporarily attempt a called trick even when it is outside that athlete's permanent catalogue. This does not unlock the trick.
 - The same trick cannot be called twice consecutively, but it can be called again on a later turn.
 - Completing the discipline word loses the match. There is no judged score or points winner.
+- Each player starts with three Grit. The same finite resource can be spent offensively or defensively:
+  - `SEND IT` costs one Grit when calling. It applies `-10` to the prepared setter and `-15` to the copying responder.
+  - `FOCUS` costs one Grit after the setter lands and adds `+8` to the responder's attempt.
+- The setter's attempt and responder's answer are separate player actions. The responder never auto-answers in production 1v1.
+- After four consecutive letterless turns, crowd pressure removes two points from the responder per additional turn, capped at `-10`. Any awarded letter resets pressure.
 
 | Discipline | Loss word |
 | --- | --- |
@@ -33,22 +38,27 @@ Landing probability is based on trick difficulty, the athlete's five genesis sta
 - A responder may attempt any called trick as a temporary response.
 - Off-catalogue attempts receive an unfamiliarity penalty softened by similarity to tricks the athlete already knows.
 - Similarity uses versioned trick families and difficulty proximity. It is deterministic game configuration, not AI judgment.
-- Every prior forced response to that trick adds 6 landing-chance points, capped at 24.
+- Every prior forced response to that trick adds 2 landing-chance points, capped at 6.
 - Practice is tracked per athlete, per trick, per match. It never creates a permanent unlock.
 - The no-consecutive-call rule prevents immediate spam. Later reuse remains strategic because the responder improves each time.
 
-Initial formulas live in `site/src/lib/pvp.ts`. They are versioned game configuration and must be balance-tested before ranked play.
+Initial formulas live in `site/src/lib/pvp.ts`. The reproducible fresh-roster simulation lives in
+`site/scripts/simulate-pvp-balance.mjs`; its checked report covers 10,000 matches per discipline.
+Ruleset v4 produces roughly 25 average turns for four-letter modes and 33 for five-letter modes,
+with no 250-turn timeouts in the current deterministic test run. This is a balance checkpoint,
+not proof of production fairness; real human telemetry still controls ranked launch.
 
 ## Fair resolution
 
 The UI prototype uses a revealed deterministic seed so identical inputs reproduce identical outputs. Production should use commit-reveal:
 
 1. The game service commits `hash(server_secret, match_id, turn_number)` before the setter calls.
-2. The setter signs the called trick and a client nonce. The responder signs readiness and a client nonce without choosing a counter-trick.
-3. After both signatures, the service reveals its secret.
-4. The turn seed is derived from the server secret, both client nonces, match ID, and turn number.
-5. Anyone can recompute the setter roll and, only when required, the responder roll.
-6. The signed turn transcript records catalogue status, similarity, prior forced attempts, learning bonus, letter result, and next setter.
+2. The setter signs the called trick, `standard` or `send`, remaining Grit, and a client nonce.
+3. If the setter lands, the responder signs `answer` or `focus`, remaining Grit, and a second client nonce.
+4. After the required signatures, the service reveals its secret.
+5. The turn seed is derived from the server secret, both client nonces, match ID, and turn number.
+6. Anyone can recompute the setter roll and, only when required, the responder roll.
+7. The signed turn transcript records catalogue status, call mode, Grit use, pressure, similarity, prior forced attempts, learning bonus, letter result, and next setter.
 
 Do not use a block timestamp, wallet address, or a server-only random number that cannot be audited. Chainlink VRF can be evaluated later, but per-round cost and latency make signed commit-reveal a better launch candidate on Base.
 
@@ -88,6 +98,10 @@ Anti-farming requirements:
 ## Spectators and predictions
 
 People without an NFT can connect a Base wallet, watch matches, follow athletes, and make play-point predictions.
+
+All predictions close before the first signed call. Reopening, increasing, decreasing, or cashing
+out a position after player identities, seeds, calls, disconnects, or private match state become
+known is forbidden unless a licensed partner explicitly operates a regulated in-play market.
 
 Launch boundary:
 

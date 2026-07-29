@@ -49,6 +49,18 @@ export type SponsorProgression = {
 
 export type TrickHistory = Record<string, number>;
 
+export type CallMode = "standard" | "send";
+
+export const GRIT_PER_MATCH = 3;
+export const GRIT_FOCUS_BONUS = 8;
+export const PRACTICE_BONUS_PER_ATTEMPT = 2;
+export const PRACTICE_BONUS_CAP = 6;
+export const SEND_SETTER_ADJUSTMENT = -10;
+export const SEND_RESPONDER_ADJUSTMENT = -15;
+export const PRESSURE_STARTS_AFTER = 4;
+export const PRESSURE_STEP = 2;
+export const PRESSURE_CAP = 10;
+
 export type SkateTurnChoice = {
   setter: Athlete;
   responder: Athlete;
@@ -57,6 +69,9 @@ export type SkateTurnChoice = {
   responderCatalogue: Trick[];
   responderPractice: TrickHistory;
   previousSetTrickName: string | null;
+  callMode?: CallMode;
+  responderUsesGrit?: boolean;
+  letterlessTurns?: number;
 };
 
 export type AttemptResult = {
@@ -69,6 +84,9 @@ export type AttemptResult = {
   similarity: number;
   learningBonus: number;
   priorForcedAttempts: number;
+  callMode: CallMode;
+  gritUsed: boolean;
+  pressurePenalty: number;
 };
 
 export type SkateTurnResult = {
@@ -202,7 +220,11 @@ export function trickSimilarity(trick: Trick, catalogue: Trick[]): number {
 }
 
 export function forcedAttemptLearningBonus(history: TrickHistory, trickName: string): number {
-  return Math.min(24, repeatCount(history, trickName) * 6);
+  return Math.min(PRACTICE_BONUS_CAP, repeatCount(history, trickName) * PRACTICE_BONUS_PER_ATTEMPT);
+}
+
+export function crowdPressurePenalty(letterlessTurns: number): number {
+  return Math.min(PRESSURE_CAP, Math.max(0, letterlessTurns - PRESSURE_STARTS_AFTER) * PRESSURE_STEP);
 }
 
 export function canSetTrick(trick: Trick, previousSetTrickName: string | null): boolean {
@@ -212,7 +234,14 @@ export function canSetTrick(trick: Trick, previousSetTrickName: string | null): 
 export function landingChance(
   athlete: Athlete,
   trick: Trick,
-  options: { catalogue?: Trick[]; practice?: TrickHistory; forcedResponse?: boolean } = {},
+  options: {
+    callMode?: CallMode;
+    catalogue?: Trick[];
+    forcedResponse?: boolean;
+    letterlessTurns?: number;
+    practice?: TrickHistory;
+    usesGrit?: boolean;
+  } = {},
 ): number {
   const skillAdjustment = (weightedSkill(athlete) - 6) * 5;
   const signatureEdge = normalizedName(athlete.trickSpecialty) === normalizedName(trick.name)
@@ -225,8 +254,17 @@ export function landingChance(
   const learningBonus = options.forcedResponse
     ? forcedAttemptLearningBonus(options.practice ?? {}, trick.name)
     : 0;
+  const callMode = options.callMode ?? "standard";
+  const callAdjustment = callMode === "send"
+    ? (options.forcedResponse ? SEND_RESPONDER_ADJUSTMENT : SEND_SETTER_ADJUSTMENT)
+    : 0;
+  const gritBonus = options.forcedResponse && options.usesGrit ? GRIT_FOCUS_BONUS : 0;
+  const pressurePenalty = options.forcedResponse
+    ? crowdPressurePenalty(options.letterlessTurns ?? 0)
+    : 0;
   return Math.round(clamp(
-    94 - trick.difficulty * 7 + skillAdjustment + signatureEdge - unfamiliarityPenalty + learningBonus,
+    94 - trick.difficulty * 7 + skillAdjustment + signatureEdge - unfamiliarityPenalty
+      + learningBonus + callAdjustment + gritBonus - pressurePenalty,
     8,
     95,
   ));
@@ -283,9 +321,17 @@ function resolveAttempt(
   catalogue: Trick[],
   practice: TrickHistory,
   roll: number,
+  options: { callMode: CallMode; letterlessTurns: number; usesGrit: boolean },
 ): AttemptResult {
   const forcedResponse = role === "responder";
-  const chance = landingChance(athlete, trick, { catalogue, practice, forcedResponse });
+  const chance = landingChance(athlete, trick, {
+    callMode: options.callMode,
+    catalogue,
+    forcedResponse,
+    letterlessTurns: options.letterlessTurns,
+    practice,
+    usesGrit: options.usesGrit,
+  });
   const inCatalogue = trickIsInCatalogue(trick, catalogue);
   const landed = roll * 100 < chance;
   return {
@@ -298,19 +344,37 @@ function resolveAttempt(
     similarity: trickSimilarity(trick, catalogue),
     learningBonus: forcedResponse ? forcedAttemptLearningBonus(practice, trick.name) : 0,
     priorForcedAttempts: forcedResponse ? repeatCount(practice, trick.name) : 0,
+    callMode: options.callMode,
+    gritUsed: forcedResponse && options.usesGrit,
+    pressurePenalty: forcedResponse ? crowdPressurePenalty(options.letterlessTurns) : 0,
   };
 }
 
-export function resolveSkateTurn(choice: SkateTurnChoice, seed: string): SkateTurnResult {
-  const { setter, responder, trick, setterCatalogue, responderCatalogue, responderPractice, previousSetTrickName } = choice;
+function validateTurnChoice(choice: SkateTurnChoice, seed: string): void {
+  const { setter, responder, trick, setterCatalogue, previousSetTrickName } = choice;
   if (setter.tokenId === responder.tokenId) throw new Error("A Goon cannot battle itself");
   if (setter.discipline !== responder.discipline) throw new Error("Opponents must share a discipline");
   if (!seed.trim()) throw new Error("A committed round seed is required");
   if (!trickIsInCatalogue(trick, setterCatalogue)) throw new Error("The setter can only call a trick from its unlocked catalogue");
   if (!canSetTrick(trick, previousSetTrickName)) throw new Error("The same trick cannot be set twice in a row");
+}
 
-  const random = randomSequence(seed);
-  const setterAttempt = resolveAttempt(setter, trick, "setter", setterCatalogue, {}, random());
+export function resolveSetterAttempt(choice: SkateTurnChoice, seed: string): AttemptResult {
+  validateTurnChoice(choice, seed);
+  const random = randomSequence(`${seed}:setter`);
+  return resolveAttempt(choice.setter, choice.trick, "setter", choice.setterCatalogue, {}, random(), {
+    callMode: choice.callMode ?? "standard",
+    letterlessTurns: choice.letterlessTurns ?? 0,
+    usesGrit: false,
+  });
+}
+
+export function resolveSkateTurn(choice: SkateTurnChoice, seed: string): SkateTurnResult {
+  const { setter, responder, trick, responderCatalogue, responderPractice } = choice;
+  validateTurnChoice(choice, seed);
+  const callMode = choice.callMode ?? "standard";
+  const letterlessTurns = choice.letterlessTurns ?? 0;
+  const setterAttempt = resolveSetterAttempt(choice, seed);
   if (!setterAttempt.landed) {
     return {
       seed,
@@ -324,6 +388,7 @@ export function resolveSkateTurn(choice: SkateTurnChoice, seed: string): SkateTu
     };
   }
 
+  const random = randomSequence(`${seed}:responder`);
   const responderAttempt = resolveAttempt(
     responder,
     trick,
@@ -331,6 +396,11 @@ export function resolveSkateTurn(choice: SkateTurnChoice, seed: string): SkateTu
     responderCatalogue,
     responderPractice,
     random(),
+    {
+      callMode,
+      letterlessTurns,
+      usesGrit: choice.responderUsesGrit ?? false,
+    },
   );
   return {
     seed,

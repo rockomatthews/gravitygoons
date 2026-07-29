@@ -45,7 +45,7 @@ export function GameExplainer() {
           <p className="eyebrow">ONE ARENA // TWO WAYS IN</p>
           <h2>Own the athlete.<br /><i>Or call the winner.</i></h2>
         </div>
-        <p>Gravity Goons plays like SKATE and HORSE. One Goon calls and attempts a trick. Land it and the responder must answer the same call; miss the answer and take a letter. Spectators can follow every percentage, letter, and result without owning an NFT.</p>
+        <p>Gravity Goons plays like SKATE and HORSE. One player calls and attempts a trick. Land it and the second player chooses how to answer; miss the answer and take a letter. Three Grit per player creates a visible offense-versus-defense resource battle that spectators can follow without owning an NFT.</p>
       </div>
 
       <div className="primer-personas">
@@ -61,7 +61,7 @@ export function GameExplainer() {
 
       <div className="battle-console" aria-label="Concept preview of a Gravity Goons card battle">
         <div className="console-grid" aria-hidden="true" />
-        <div className="console-topline"><span>RANKED // SKATEBOARDING</span><b>TURN 03</b><span>RULESET 0.3</span></div>
+        <div className="console-topline"><span>RANKED // SKATEBOARDING</span><b>TURN 03</b><span>RULESET 0.4</span></div>
         <div className="battle-cards">
           {athletes.map((athlete, athleteIndex) => (
             <article className={`battle-card battle-card-${athleteIndex + 1}`} style={{ "--card-accent": athlete.accent } as CSSProperties} key={athlete.id}>

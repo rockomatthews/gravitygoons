@@ -1,0 +1,126 @@
+{
+  "schema": "gravity-goons-pvp-balance-v1",
+  "ruleset_version": 4,
+  "seed": 260718,
+  "matches_per_discipline": 10000,
+  "simulation_scope": "Fresh athletes with four starter tricks; deterministic heuristic players; no sponsor unlocks.",
+  "disciplines": {
+    "Skateboarding": {
+      "roster_size": 167,
+      "average_turns": 32.9,
+      "median_turns": 32,
+      "p90_turns": 49,
+      "p95_turns": 55,
+      "maximum_turns": 95,
+      "first_setter_win_rate": 0.5157,
+      "timeouts": 0,
+      "top_call_share": {
+        "Boardslide:standard": 0.4605,
+        "Kickflip:standard": 0.2102,
+        "Heelflip:standard": 0.16,
+        "Kickflip:send": 0.0957,
+        "Heelflip:send": 0.0708,
+        "Boardslide:send": 0.003
+      }
+    },
+    "Snowboarding": {
+      "roster_size": 167,
+      "average_turns": 32.73,
+      "median_turns": 32,
+      "p90_turns": 49,
+      "p95_turns": 55,
+      "maximum_turns": 108,
+      "first_setter_win_rate": 0.5201,
+      "timeouts": 0,
+      "top_call_share": {
+        "Boardslide:standard": 0.4904,
+        "Method:standard": 0.2902,
+        "Method:send": 0.1172,
+        "Indy Grab:standard": 0.0538,
+        "Indy Grab:send": 0.0479,
+        "Ollie:standard": 0.0004,
+        "Ollie:send": 0.0001,
+        "Boardslide:send": 0
+      }
+    },
+    "Surfing": {
+      "roster_size": 167,
+      "average_turns": 33.43,
+      "median_turns": 32,
+      "p90_turns": 50,
+      "p95_turns": 55,
+      "maximum_turns": 97,
+      "first_setter_win_rate": 0.5175,
+      "timeouts": 0,
+      "top_call_share": {
+        "Snap:standard": 0.4911,
+        "Floater:standard": 0.2915,
+        "Floater:send": 0.1273,
+        "Cutback:standard": 0.0549,
+        "Cutback:send": 0.0345,
+        "Snap:send": 0.0005,
+        "Bottom Turn:standard": 0.0001,
+        "Bottom Turn:send": 0
+      }
+    },
+    "BMX": {
+      "roster_size": 167,
+      "average_turns": 24.75,
+      "median_turns": 24,
+      "p90_turns": 39,
+      "p95_turns": 44,
+      "maximum_turns": 84,
+      "first_setter_win_rate": 0.5166,
+      "timeouts": 0,
+      "top_call_share": {
+        "Tailwhip:standard": 0.4891,
+        "Barspin:standard": 0.2603,
+        "Barspin:send": 0.1403,
+        "Manual:send": 0.0594,
+        "Manual:standard": 0.0506,
+        "Bunny Hop:standard": 0.0002,
+        "Tailwhip:send": 0,
+        "Bunny Hop:send": 0
+      }
+    },
+    "Motocross": {
+      "roster_size": 166,
+      "average_turns": 24.89,
+      "median_turns": 24,
+      "p90_turns": 39,
+      "p95_turns": 44,
+      "maximum_turns": 79,
+      "first_setter_win_rate": 0.5157,
+      "timeouts": 0,
+      "top_call_share": {
+        "Superman:standard": 0.4898,
+        "Nac-Nac:standard": 0.2581,
+        "Nac-Nac:send": 0.1426,
+        "Can-Can:send": 0.0559,
+        "Can-Can:standard": 0.0532,
+        "Seat Grab:standard": 0.0003,
+        "Seat Grab:send": 0
+      }
+    },
+    "Skiing": {
+      "roster_size": 166,
+      "average_turns": 32.98,
+      "median_turns": 32,
+      "p90_turns": 50,
+      "p95_turns": 55,
+      "maximum_turns": 95,
+      "first_setter_win_rate": 0.5202,
+      "timeouts": 0,
+      "top_call_share": {
+        "360:standard": 0.4906,
+        "Rail Slide:standard": 0.2892,
+        "Rail Slide:send": 0.1239,
+        "Mute Grab:standard": 0.0559,
+        "Mute Grab:send": 0.0401,
+        "Safety Grab:standard": 0.0003,
+        "Safety Grab:send": 0,
+        "360:send": 0
+      }
+    }
+  }
+}

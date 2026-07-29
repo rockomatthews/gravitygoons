@@ -487,6 +487,14 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .arena-turn-banner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; padding: 14px 18px; border-bottom: 1px solid var(--line); color: var(--void); background: var(--acid); font-family: var(--mono); }
 .arena-turn-banner span, .arena-turn-banner small { font-size: 8px; font-weight: 900; letter-spacing: .1em; }
 .arena-turn-banner b { text-align: center; font-size: 14px; }
+.arena-strategy { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 1px; border-bottom: 1px solid var(--line); background: var(--line); }
+.arena-strategy > div { display: grid; align-content: center; gap: 7px; min-height: 100px; padding: 15px 18px; background: #080c11; }
+.arena-strategy span, .arena-strategy small { color: var(--muted); font: 800 7px var(--mono); letter-spacing: .08em; }
+.arena-strategy b { color: white; font: 900 11px var(--mono); }
+.arena-strategy > div > div { display: flex; gap: 6px; }
+.arena-strategy button { border: 1px solid #33414b; padding: 9px 11px; color: #9cabb3; background: transparent; font: 900 8px var(--mono); cursor: pointer; }
+.arena-strategy button.active { border-color: var(--acid); color: var(--void); background: var(--acid); }
+.arena-strategy button:disabled { opacity: .45; cursor: not-allowed; }
 .fighter-card.is-setter { box-shadow: inset 0 0 0 2px var(--acid); }
 .fighter-role { position: absolute; top: 13px; right: 13px; z-index: 2; border: 1px solid currentColor; padding: 7px 9px; color: var(--acid); background: #05080be8; font: 950 8px var(--mono); letter-spacing: .1em; }
 .fighter-card.is-responder .fighter-role { color: var(--coral); }
@@ -535,7 +543,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .fighter-stats b { color: white; }
 .fighter-copy label { color: var(--muted); font: 800 8px var(--mono); letter-spacing: .1em; }
 .fighter-copy select { width: 100%; margin-top: 9px; border: 1px solid #485863; padding: 13px; color: white; background: #05080c; font: 800 10px var(--mono); }
-.odds-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 12px; }
+.odds-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 12px; }
 .odds-strip span { padding: 10px 4px; color: var(--muted); background: #05080c; text-align: center; font: 700 6px var(--mono); }
 .odds-strip b { display: block; margin-top: 4px; color: var(--acid); font-size: 13px; }
 .sponsor-career { margin: 12px 0; border: 1px solid #2c3943; padding: 11px; background: linear-gradient(135deg, #101820, #080c11); }
@@ -557,6 +565,8 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .arena-resolve button { border: 0; padding: 16px 20px; color: var(--void); background: var(--teal); font: 950 10px var(--mono); cursor: pointer; box-shadow: 6px 6px 0 var(--coral); }
 .arena-resolve button:disabled { color: #7e898e; background: #252e35; box-shadow: none; cursor: not-allowed; }
 .arena-resolve .reset-match { color: white; background: var(--coral); box-shadow: none; }
+.arena-resolve .answer-actions { display: flex; grid-auto-flow: initial; gap: 10px; }
+.arena-resolve .answer-actions button:last-child { color: var(--void); background: var(--acid); box-shadow: 6px 6px 0 var(--coral); }
 .game-rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 130px; }
 .game-rules article { min-height: 310px; padding: 25px; border: 1px solid var(--line); background: linear-gradient(145deg, #141b23, #080c11); }
 .game-rules article > b { color: transparent; -webkit-text-stroke: 1px var(--teal); font: 950 50px var(--mono); }
@@ -677,6 +687,8 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .move-studio-boundary { grid-template-columns: 1fr 1fr; }
   .move-studio-boundary button { grid-column: 1 / -1; min-height: 64px; }
   .arena-fighters { grid-template-columns: 1fr; }
+  .arena-strategy { grid-template-columns: 1fr 1fr; }
+  .arena-strategy > div:first-child { grid-column: 1 / -1; }
   .fighter-card { border-right: 0; border-bottom: 1px solid var(--line); }
   .game-rules { grid-template-columns: repeat(2, 1fr); }
   .profile-goon { grid-template-columns: minmax(300px, .8fr) 1.2fr; }
@@ -712,6 +724,8 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .arena-scoreboard i { width: 44px; height: 44px; font-size: 13px; }
   .arena-scoreboard b { font-size: 23px; }
   .arena-turn-banner { grid-template-columns: 1fr; gap: 5px; text-align: center; }
+  .arena-strategy { grid-template-columns: 1fr; }
+  .arena-strategy > div:first-child { grid-column: auto; }
   .limitless-match-copy { grid-template-columns: 1fr 1fr; gap: 12px; }
   .limitless-match-copy > div:first-child { grid-column: 1 / -1; }
   .limitless-outcomes { grid-template-columns: 1fr; }
@@ -722,6 +736,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .fighter-copy { min-height: 430px; }
   .sponsor-offer { grid-template-columns: 1fr; }
   .sponsor-offer > span { grid-column: auto; }
+  .odds-strip { grid-template-columns: 1fr 1fr; }
   .arena-resolve { grid-template-columns: 1fr; }
   .arena-resolve button { width: 100%; }
   .game-rules { grid-template-columns: 1fr; }
