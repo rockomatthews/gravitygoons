@@ -1,14 +1,14 @@
 {
   "schema": "gravity-goons-base-mainnet-safe-v1",
-  "checked_at": "2026-07-31T05:21:33Z",
+  "checked_at": "2026-07-31T20:20:12Z",
   "chain_id": 8453,
   "network": "Base Mainnet",
   "name": "Gravity Goons Production",
   "address": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
   "owners": [
+    "0xAb58253C563313feE54C397f6aA877C715d8aa2c",
     "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
-    "0x8A0182c099A618583e9EF98716DAcF739b3BD944",
-    "0xFE608b2125D56EB498C812d16675e85823C4aa2F"
+    "0x8A0182c099A618583e9EF98716DAcF739b3BD944"
   ],
   "threshold": 2,
   "creator": "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
@@ -18,7 +18,23 @@
   "threshold_verified_onchain": true,
   "verified_onchain": true,
   "independent_recovery_confirmed": true,
-  "signer_compatibility_verified": false,
-  "funded": false,
-  "approved_for_contract_ownership": false
+  "signer_compatibility_verified": true,
+  "signer_tests": {
+    "metamask": true,
+    "base_app": true,
+    "rainbow": true,
+    "metamask_base_app": {
+      "safe_transaction_hash": "0x03948bd89ffaf91c6649f4a4d63a9bd08e05654eb2cbea118842d840b1c7b10a",
+      "execution_transaction": "0xa6e265b55dea8d5ff5c8ac1524673f8b9f9081235bb14f8bcc6fa0a130bb5701",
+      "execution_successful": true
+    },
+    "metamask_rainbow": {
+      "safe_transaction_hash": "0x14ec0bc817b88393da49909f17be19899f5cda04005235c08de9a8dce619ab15",
+      "execution_transaction": "0x1c67aa3c51f2370949f751f2e39fe1d824a0bb8637caa0cd9d2e2551b5748a96",
+      "execution_successful": true
+    }
+  },
+  "funded": true,
+  "balance_wei_at_check": "8000000000000",
+  "approved_for_contract_ownership": true
 }
