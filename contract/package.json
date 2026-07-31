@@ -9,6 +9,7 @@
     "deploy": "npm run compile && node scripts/deploy.mjs",
     "deploy:safe:sepolia": "node scripts/deploy-safe-sepolia.mjs",
     "safe:accept-registry:sepolia": "node scripts/accept-registry-ownership-sepolia.mjs",
+    "safe:mint-reserve:sepolia": "node scripts/mint-creator-reserve-sepolia.mjs",
     "build:reserve-transactions": "node scripts/build-reserve-transactions.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs"
   },
