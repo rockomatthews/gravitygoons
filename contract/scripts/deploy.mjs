@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { ContractFactory, JsonRpcProvider, NonceManager, Wallet, getAddress } from "ethers";
+import { Contract, ContractFactory, JsonRpcProvider, NonceManager, Wallet, getAddress } from "ethers";
 import "dotenv/config";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -61,14 +61,52 @@ const disciplineWords = JSON.parse(fs.readFileSync(path.join(root, "config", "di
 const rarityWords = JSON.parse(fs.readFileSync(path.join(root, "config", "rarity-words.json"), "utf8"));
 
 console.log(`Deploying from ${deployer.address} on chain ${network.chainId} (${stage})...`);
-const registry = await new ContractFactory(registryArtifact.abi, registryArtifact.bytecode, deploymentSigner).deploy(
-  deployer.address,
-  gameSigner,
-);
-const registryDeployment = registry.deploymentTransaction();
-await registry.waitForDeployment();
-const registryAddress = await registry.getAddress();
-console.log(`GravityGoonsProgressRegistry: ${registryAddress}`);
+let registry;
+let registryAddress;
+let registryDeploymentHash;
+let registryDeploymentBlock;
+const recoveringRegistry = Boolean(process.env.RECOVER_REGISTRY_ADDRESS || process.env.RECOVER_REGISTRY_TRANSACTION_HASH);
+if (recoveringRegistry) {
+  if (!process.env.RECOVER_REGISTRY_ADDRESS || !process.env.RECOVER_REGISTRY_TRANSACTION_HASH) {
+    throw new Error("Set both RECOVER_REGISTRY_ADDRESS and RECOVER_REGISTRY_TRANSACTION_HASH");
+  }
+  registryAddress = getAddress(process.env.RECOVER_REGISTRY_ADDRESS);
+  const priorTransaction = await provider.getTransaction(process.env.RECOVER_REGISTRY_TRANSACTION_HASH);
+  const priorReceipt = await provider.getTransactionReceipt(process.env.RECOVER_REGISTRY_TRANSACTION_HASH);
+  if (
+    !priorTransaction
+    || !priorReceipt
+    || priorReceipt.status !== 1
+    || getAddress(priorTransaction.from) !== deployer.address
+    || (await provider.getCode(registryAddress)) === "0x"
+  ) {
+    throw new Error("Recovered registry transaction or bytecode verification failed");
+  }
+  registry = new Contract(registryAddress, registryArtifact.abi, deploymentSigner);
+  if (getAddress(await registry.owner()) !== deployer.address) {
+    throw new Error("Recovered registry is not owned by the expected deployer");
+  }
+  if (getAddress(await registry.gameSigner()) !== gameSigner) {
+    throw new Error("Recovered registry game signer does not match configuration");
+  }
+  if (getAddress(await registry.collection()) !== "0x0000000000000000000000000000000000000000") {
+    throw new Error("Recovered registry is already linked to a collection");
+  }
+  registryDeploymentHash = priorTransaction.hash;
+  registryDeploymentBlock = priorReceipt.blockNumber;
+  console.log(`Recovered GravityGoonsProgressRegistry: ${registryAddress}`);
+} else {
+  registry = await new ContractFactory(registryArtifact.abi, registryArtifact.bytecode, deploymentSigner).deploy(
+    deployer.address,
+    gameSigner,
+  );
+  const registryDeployment = registry.deploymentTransaction();
+  await registry.waitForDeployment();
+  registryAddress = await registry.getAddress();
+  registryDeploymentHash = registryDeployment?.hash ?? null;
+  registryDeploymentBlock = (await registryDeployment?.wait())?.blockNumber ?? null;
+  console.log(`GravityGoonsProgressRegistry: ${registryAddress}`);
+}
 
 const collection = await new ContractFactory(collectionArtifact.abi, collectionArtifact.bytecode, deploymentSigner).deploy(
   owner,
@@ -124,8 +162,8 @@ const record = {
   metadata_base_url: process.env.METADATA_BASE_URL,
   registry: {
     address: registryAddress,
-    deployment_transaction: registryDeployment?.hash ?? null,
-    deployment_block: (await registryDeployment?.wait())?.blockNumber ?? null,
+    deployment_transaction: registryDeploymentHash,
+    deployment_block: registryDeploymentBlock,
     owner: registryOwner,
     pending_owner: registryPendingOwner,
     ownership_transfer_transaction: ownershipTransferHash,
