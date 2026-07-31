@@ -1,8 +1,8 @@
 {
   "schema": "gravity-goons-contract-security-review-v1",
-  "checked_at": "2026-07-30T22:36:38-06:00",
+  "checked_at": "2026-07-31T20:37:07Z",
   "contract_tests_passed": true,
-  "contract_test_count": 9,
+  "contract_test_count": 10,
   "website_production_dependency_vulnerabilities": 0,
   "contract_toolchain_dependency_vulnerabilities": {
     "total": 37,
@@ -35,8 +35,10 @@
   "unresolved_high_findings": 0,
   "unresolved_critical_findings": 0,
   "mainnet_deployment_authorized": false,
+  "independent_review_packet_ready": true,
+  "independent_review_scope": "contract/AUDIT_SCOPE.md",
   "notes": [
-    "Compilation and all nine local launch-contract tests pass after the static-analysis hardening changes.",
+    "Compilation and all ten local launch-contract tests pass after the static-analysis hardening changes, including all 1,000 packed rarity and discipline assignments.",
     "The website production dependency audit reports zero vulnerabilities.",
     "Slither reports zero untriaged first-party findings after filtering OpenZeppelin dependencies and documenting two intentional patterns.",
     "The Ganache findings remain isolated to the local development dependency tree and are not included in deployed bytecode.",

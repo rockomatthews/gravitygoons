@@ -11,6 +11,7 @@ const disciplineWords = JSON.parse(fs.readFileSync(path.join(root, "config", "di
 const rarityWords = JSON.parse(fs.readFileSync(path.join(root, "config", "rarity-words.json")));
 const assignments = JSON.parse(fs.readFileSync(path.join(root, "..", "traits", "assignments.json"))).tokens;
 const rarityIndexes = { Common: 0, Uncommon: 1, Rare: 2, Epic: 3, Legendary: 4 };
+const disciplineIndexes = { Skateboarding: 0, Snowboarding: 1, Surfing: 2, BMX: 3, Motocross: 4, Skiing: 5 };
 
 describe("Gravity Goons launch contracts", function () {
   let ganacheProvider;
@@ -123,6 +124,16 @@ describe("Gravity Goons launch contracts", function () {
       const word = BigInt(rarityWords[Math.floor(position / 85)]);
       const decoded = Number((word >> BigInt((position % 85) * 3)) & 7n);
       assert.equal(decoded, rarityIndexes[token.rarity], `rarity mismatch for #${String(token.token_id).padStart(4, "0")}`);
+    }
+  });
+
+  it("packs all 1,000 immutable discipline assignments without drift", function () {
+    assert.equal(assignments.length, 1000);
+    for (const token of assignments) {
+      const position = token.token_id - 1;
+      const word = BigInt(disciplineWords[Math.floor(position / 85)]);
+      const decoded = Number((word >> BigInt((position % 85) * 3)) & 7n);
+      assert.equal(decoded, disciplineIndexes[token.discipline], `discipline mismatch for #${String(token.token_id).padStart(4, "0")}`);
     }
   });
 

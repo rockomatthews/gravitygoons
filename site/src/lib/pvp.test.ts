@@ -24,6 +24,7 @@ import {
   type SkateTurnResult,
   type SponsorProgression,
 } from "./pvp.ts";
+import { seedCommitment } from "./match-integrity.ts";
 
 const skater = (tokenId: number): Athlete => ({
   tokenId,
@@ -61,6 +62,12 @@ test("a revealed seed resolves identically for every verifier", () => {
     resolveSkateTurn(choice, "match-42:turn-3:revealed-seed"),
     resolveSkateTurn(choice, "match-42:turn-3:revealed-seed"),
   );
+});
+
+test("a hidden match seed has a stable public commitment", () => {
+  const seed = "private-match-seed";
+  assert.equal(seedCommitment(seed), "0x3d5418da349cd7d8ab0bfb6fe80b8925a04b20a9ce690532f8c45b89fb9de787");
+  assert.notEqual(seedCommitment(`${seed}-changed`), seedCommitment(seed));
 });
 
 test("cross-discipline matches are rejected", () => {

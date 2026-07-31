@@ -1,10 +1,10 @@
 {
   "schema": "gravity-goons-premint-site-gates-v1",
-  "checked_at": "2026-07-30T22:36:38-06:00",
+  "checked_at": "2026-07-31T20:37:07Z",
   "build_passed": true,
   "lint_passed": true,
-  "site_tests_passed": 22,
-  "contract_tests_passed": 8,
+  "site_tests_passed": 23,
+  "contract_tests_passed": 10,
   "visual_review_passed": true,
   "desktop_viewport": "1440x900",
   "mobile_viewport": "390x844",
@@ -19,6 +19,8 @@
   "production_database_project": "cjvastibzibybugqvvhv",
   "production_database_migrations_applied": true,
   "production_database_security_advisors_clear": true,
+  "production_atomic_match_rehearsal_passed": true,
+  "production_atomic_match_rehearsal_report": "reports/production-match-atomic-rehearsal.json",
   "production_site_deployed": true,
   "production_site_url": "https://gravitygoons.com",
   "production_roster_count": 1000,
@@ -27,6 +29,7 @@
   "notes": [
     "The profile, challenge lobby, and challenge lobby hardening migrations are applied to production.",
     "The production homepage, game, profile, 1,000-entry roster, and authentication boundary passed smoke testing.",
+    "Atomic turn commit, idempotent replay, terminal settlement, rating settlement, and rollback cleanup passed directly against production.",
     "A full ownership-backed authoritative 1v1 cannot run until the production collection exists and at least two same-discipline NFTs are owned by distinct test participants.",
     "Private Broadcast triggers are defined; polling fallback is active.",
     "Ranked play contains no USDC wager path."
