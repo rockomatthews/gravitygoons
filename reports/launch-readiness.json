@@ -6,7 +6,7 @@
     "finalized_metadata": 1000
   },
   "reserve_valid": true,
-  "ipfs_verified": false,
+  "ipfs_verified": true,
   "premint_site_verified": false,
   "contract_security_verified": false,
   "production_safe_verified": false,
@@ -14,7 +14,6 @@
   "ready_for_base_sale": false,
   "mint_gate_should_be_open": false,
   "blockers": [
-    "Filebase second-provider pin and dual-provider hash retrieval not verified",
     "full ownership-backed authoritative 1v1 production E2E is pending",
     "independent human contract review is incomplete",
     "production Base 2-of-3 Safe with three independent signers not verified",

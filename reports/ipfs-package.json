@@ -33,10 +33,11 @@
     }
   },
   "providers": {
-    "primary": "pending credentials and upload",
-    "secondary": "pending credentials and pin"
+    "primary": "Pinata",
+    "secondary": "Filebase"
   },
-  "dual_provider_retrieval_verified": false,
+  "dual_provider_retrieval_verified": true,
+  "dual_provider_verification_report": "reports/ipfs-dual-provider-verification.json",
   "contract_deployed": false,
   "public_mint_open": false
 }

@@ -1,0 +1,37 @@
+{
+  "schema": "gravity-goons-ipfs-dual-provider-verification-v1",
+  "verified_at": "2026-07-31T05:09:13Z",
+  "image_cid": "bafybeignb4b2xm55obk2x66vyrvmg62pgu7gutoopb4xdt2f43kgjrhzrq",
+  "metadata_cid": "bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe",
+  "providers": [
+    {
+      "name": "Pinata",
+      "pin_status": "pinned",
+      "retrieval_base": "https://gateway.pinata.cloud/ipfs/"
+    },
+    {
+      "name": "Filebase",
+      "pin_status": "pinned",
+      "retrieval_base": "https://ipfs.filebase.io/ipfs/"
+    }
+  ],
+  "retrieval_samples": [
+    {
+      "path": "0001.png",
+      "cid": "bafybeignb4b2xm55obk2x66vyrvmg62pgu7gutoopb4xdt2f43kgjrhzrq",
+      "sha256": "687b6e8dadd0a25aec28bb6367bcf8aa4d7d87e244a89a51fae0cae5888a0099",
+      "matches_release_staging": true,
+      "pinata_matches": true,
+      "filebase_matches": true
+    },
+    {
+      "path": "0001.json",
+      "cid": "bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe",
+      "sha256": "073683779c16fc4633480007c508352597403b400f88ce6a0275c9770126278e",
+      "matches_release_staging": true,
+      "pinata_matches": true,
+      "filebase_matches": true
+    }
+  ],
+  "result": "passed"
+}
