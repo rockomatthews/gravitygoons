@@ -254,7 +254,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .zero-g-sign { position: absolute; z-index: 4; left: 51.2%; top: 6.7%; width: 16%; transform: rotate(-.5deg); filter: drop-shadow(0 0 18px #caff3880); }
 .zero-g-sign img { width: 100%; height: auto; }
 .zero-g-can { position: absolute; z-index: 6; width: 38px; height: 87px; display: grid; align-items: center; overflow: hidden; border-radius: 8px; background: linear-gradient(90deg, #172128, #abb7b8 42%, #111a20 72%); box-shadow: 0 16px 25px #000a; }
-.zero-g-can img { width: 86px; max-width: none; transform: rotate(-90deg); }
+.zero-g-can img { width: 86px; height: auto; max-width: none; transform: rotate(-90deg); }
 .can-one { right: 13.3%; bottom: 4.8%; transform: rotate(1deg); }
 .can-two { right: 20.6%; bottom: 6.2%; transform: rotate(-1deg); }
 .zero-g-copy { position: absolute; z-index: 8; left: max(34px, 5vw); bottom: max(36px, 6vh); width: min(520px, 42vw); padding: 26px; background: linear-gradient(135deg, #050609e6, #05060978); border-left: 4px solid var(--teal); backdrop-filter: blur(12px); box-shadow: 0 25px 70px #000b; }
