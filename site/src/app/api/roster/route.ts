@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import collection from "@/data/collection.json";
 import { collectionAddress } from "@/lib/contracts";
 import { readSessionAddress, SESSION_COOKIE } from "@/lib/profile-session";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -14,7 +15,17 @@ export async function GET() {
     supabase.from("pvp_token_locks").select("token_id,match_id"),
     supabase.from("game_challenges").select("id,challenger_token_id,challenged_token_id,status").in("status", ["incoming", "accepted", "active"]),
   ]);
-  const byId = new Map<number, Record<string, unknown>>();
+  const byId = new Map<number, Record<string, unknown>>(
+    collection.tokens.map((token) => [token.token_id, {
+      matches_played: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      current_streak: 0,
+      rating: 1500,
+      discipline_rank: null,
+    }]),
+  );
   for (const row of records ?? []) byId.set(row.token_id, { ...row });
   for (const row of ownership ?? []) byId.set(row.token_id, { ...byId.get(row.token_id), owner: row.owner_wallet_address, ownershipVerifiedAt: row.verified_at });
   for (const row of locks ?? []) byId.set(row.token_id, { ...byId.get(row.token_id), matchId: row.match_id });
