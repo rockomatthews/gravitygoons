@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getAddress, verifyMessage } from "viem";
+import { publicClient } from "./contracts.ts";
 
 export const NONCE_COOKIE = "gg_profile_nonce";
 export const SESSION_COOKIE = "gg_profile_session";
@@ -7,6 +8,9 @@ export const SESSION_COOKIE = "gg_profile_session";
 type SignedPayload = {
   address: string;
   nonce?: string;
+  domain?: string;
+  uri?: string;
+  chainId?: number;
   issuedAt: number;
   expiresAt: number;
 };
@@ -52,20 +56,32 @@ export function createSignInChallenge(address: string): { message: string; token
   const normalized = normalizeWallet(address);
   const issuedAt = Date.now();
   const expiresAt = issuedAt + 10 * 60 * 1000;
-  const payload: SignedPayload = { address: normalized, nonce: randomBytes(24).toString("hex"), issuedAt, expiresAt };
+  const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+  const payload: SignedPayload = {
+    address: normalized,
+    nonce: randomBytes(16).toString("hex"),
+    domain: siteUrl.host,
+    uri: siteUrl.origin,
+    chainId: 8453,
+    issuedAt,
+    expiresAt,
+  };
   return { message: challengeMessage(payload), token: encode(payload), expiresAt };
 }
 
 function challengeMessage(payload: SignedPayload): string {
   return [
-    "Sign in to Gravity Goons",
+    `${payload.domain ?? "gravitygoons.com"} wants you to sign in with your Ethereum account:`,
+    getAddress(payload.address),
     "",
-    "This signature proves wallet ownership. It does not create a blockchain transaction or spend funds.",
+    "Sign in to Gravity Goons. This signature proves wallet ownership and cannot spend funds.",
     "",
-    `Wallet: ${payload.address}`,
+    `URI: ${payload.uri ?? "https://gravitygoons.com"}`,
+    "Version: 1",
+    `Chain ID: ${payload.chainId ?? 8453}`,
     `Nonce: ${payload.nonce ?? ""}`,
-    `Issued: ${new Date(payload.issuedAt).toISOString()}`,
-    `Expires: ${new Date(payload.expiresAt).toISOString()}`,
+    `Issued At: ${new Date(payload.issuedAt).toISOString()}`,
+    `Expiration Time: ${new Date(payload.expiresAt).toISOString()}`,
   ].join("\n");
 }
 
@@ -74,7 +90,11 @@ export async function verifyChallenge(token: string | undefined, address: string
   if (!payload?.nonce) return null;
   const normalized = normalizeWallet(address);
   if (payload.address !== normalized) return null;
-  const valid = await verifyMessage({ address: getAddress(address), message: challengeMessage(payload), signature });
+  const message = challengeMessage(payload);
+  let valid = await verifyMessage({ address: getAddress(address), message, signature });
+  if (!valid) {
+    valid = await publicClient.verifyMessage({ address: getAddress(address), message, signature }).catch(() => false);
+  }
   return valid ? normalized : null;
 }
 
@@ -86,4 +106,3 @@ export function createSessionToken(address: string): string {
 export function readSessionAddress(token: string | undefined): string | null {
   return decode(token)?.address ?? null;
 }
-

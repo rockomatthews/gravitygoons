@@ -16,7 +16,7 @@ type StudioPayload = { goon: ProfileGoon; moves: StudioMove[]; demo: boolean };
 type Quote = { orderId: string; pairId: string; amountMinorUnits: number; displayPrice: string; expiresAt: string; demo: boolean };
 
 export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username: string; tokenId: number; fallbackGoon: ProfileGoon }) {
-  const { account, connect } = useWallet();
+  const { account, connect, provider } = useWallet();
   const [studio, setStudio] = useState<StudioPayload | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [selectedMove, setSelectedMove] = useState<StudioMove | null>(null);
@@ -72,8 +72,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       if (!quote.demo) {
         if (!TREASURY_ADDRESS) throw new Error("The production USDC treasury is not configured yet. The quote is valid, but payment remains closed.");
         const address = account ?? await connect();
-        if (!address || !window.ethereum) throw new Error("Connect the paying wallet first.");
-        const wallet = createWalletClient({ chain: base, transport: custom(window.ethereum) });
+        if (!address || !provider) throw new Error("Choose the paying wallet, then confirm the quote again.");
+        const wallet = createWalletClient({ chain: base, transport: custom(provider) });
         setStatus("Confirm the one-time Base USDC payment in your wallet…");
         txHash = await wallet.writeContract({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "transfer", args: [TREASURY_ADDRESS, BigInt(quote.amountMinorUnits)], account: address });
       }

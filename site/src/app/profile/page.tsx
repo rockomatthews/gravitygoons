@@ -2,13 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProfileSetup } from "@/components/ProfileSetup";
 import { ChallengeInbox } from "@/components/ChallengeInbox";
+import { WalletButton } from "@/components/WalletButton";
 
 export default function ProfilePage() {
   return (
     <main className="profile-editor-page">
       <header className="nav shell">
         <Link className="brand" href="/"><Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority /></Link>
-        <nav><Link href="/moves">Move Cinema</Link><Link href="/game">PvP Arena</Link><Link href="/founder">Profile Demo</Link></nav>
+        <nav><Link href="/arena">Live Arena</Link><Link href="/moves">Move Cinema</Link><Link href="/game">Game Lab</Link><Link href="/founder">Profile Demo</Link></nav><WalletButton />
       </header>
       <section className="profile-editor-hero shell">
         <p className="eyebrow">CONNECTED OWNER PROFILE</p>

@@ -7,7 +7,7 @@ import { useWallet } from "@/components/WalletProvider";
 type ProfileRecord = { username: string; display_name: string; bio: string };
 
 export function ProfileSetup() {
-  const { account, connect } = useWallet();
+  const { account, connect, signMessage } = useWallet();
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -32,12 +32,12 @@ export function ProfileSetup() {
     setBusy(true);
     try {
       const address = account ?? await connect();
-      if (!address || !window.ethereum) throw new Error("Connect a wallet first.");
+      if (!address) throw new Error("Choose a wallet, then press CONNECT + SIGN again.");
       setStatus("Preparing a secure profile sign-in message…");
       const challengeResponse = await fetch("/api/profile/session/nonce", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address }) });
       const challenge = await challengeResponse.json();
       if (!challengeResponse.ok) throw new Error(challenge.error);
-      const signature = await window.ethereum.request({ method: "personal_sign", params: [challenge.message, address] }) as `0x${string}`;
+      const signature = await signMessage(challenge.message, address);
       const verifyResponse = await fetch("/api/profile/session/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address, signature }) });
       const verified = await verifyResponse.json();
       if (!verifyResponse.ok) throw new Error(verified.error);
@@ -112,4 +112,3 @@ export function ProfileSetup() {
     </div>
   );
 }
-

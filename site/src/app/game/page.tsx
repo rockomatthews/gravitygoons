@@ -26,7 +26,7 @@ export default async function GamePage({ searchParams }: { searchParams: Promise
   return <main className="game-lab">
     <header className="nav shell">
       <Link className="brand" href="/"><Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority /></Link>
-      <nav><Link href="/">Collection</Link><a href="#outcomes">Outcomes</a><a href="#arena">Arena</a><a href="#cinema">Move Cinema</a><a href="#rules">Rules</a></nav>
+      <nav><Link href="/">Collection</Link><Link href="/arena">Live Arena</Link><a href="#outcomes">Outcomes</a><a href="#arena">Rules Lab</a><a href="#cinema">Move Cinema</a></nav>
       <WalletButton />
     </header>
     <section className="game-hero shell"><p className="eyebrow">{match ? "RANKED 1V1 // SERVER-AUTHORITATIVE" : "LOCAL 1V1 RULES LAB // V0.4"}</p><h1>CALL IT.<br /><i>LAND IT.</i><br />DON&apos;T SPELL OUT.</h1><p>This is turn-based SKATE, not a points contest. The setter chooses a trick and can spend scarce Grit to send a harder version. If it lands, the second player chooses whether to trust their Goon or spend Grit to focus the answer. Stats, catalogue breadth, practice, visible pressure, and resource timing all matter.</p></section>

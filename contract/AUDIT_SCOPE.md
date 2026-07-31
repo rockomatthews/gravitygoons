@@ -10,6 +10,7 @@ hashes below and requires the reviewer to assess the diff.
 | --- | --- |
 | `src/GravityGoons.sol` | `7b48d1a22b686ba717f72313fcd9e9a913f04246a35b470b8d776c2bff1fd37f` |
 | `src/GravityGoonsProgressRegistry.sol` | `c6594718da2785e39276ed17ac65350b9834a0e47add3d95b94996d6751e2a08` |
+| `src/GoonMatchEscrow.sol` | `3e5ab4cd7262201c28450ee62442991062d491f670079c60462b6e0dc92af3a6` |
 
 Compiler: Solidity `0.8.30`, EVM target `shanghai`, optimizer enabled with 200
 runs. OpenZeppelin Contracts is pinned to `5.4.0` in `package-lock.json`.
@@ -47,6 +48,14 @@ runs. OpenZeppelin Contracts is pinned to `5.4.0` in `package-lock.json`.
    bypasses mint accounting or permissions.
 10. Safe ownership transfer and registry two-step ownership cannot leave an
     unauthorized controller or an unusable pending-owner state.
+11. Match escrow accepts only fixed equal Base USDC stakes, binds both player
+    signatures to identical EIP-712 terms, verifies NFT ownership, and cannot
+    charge more than 2.5%.
+12. Escrow results require the configured signer, a transcript hash, and a
+    24-hour dispute window; voids and incomplete funding return the original
+    deposits without a fee.
+13. Settlement, dispute resolution, pausing, signer rotation, and fee changes
+    cannot be replayed or used to settle/refund the same match twice.
 
 ## Reviewer deliverables
 
@@ -57,7 +66,7 @@ runs. OpenZeppelin Contracts is pinned to `5.4.0` in `package-lock.json`.
   trait inputs, and Safe ownership handoff—not source files alone.
 - Written acknowledgement of the two documented Slither findings in
   `../reports/contract-security-review.json`, whether accepted or disputed.
-- The exact reviewed commit hash and both source hashes above.
+- The exact reviewed commit hash and all source hashes above.
 
 ## Verification commands
 
@@ -77,7 +86,7 @@ Static-analysis evidence is stored in:
 
 ## Explicitly out of scope
 
-The website, Supabase match settlement, USDC wagering, spectator markets,
-third-party marketplace contracts, Safe implementation, and hosted IPFS
-providers are not part of these two contracts. USDC wagering and real-money
-spectator markets remain disabled.
+The website, Supabase match settlement, spectator markets, third-party market
+contracts, Safe implementation, and hosted IPFS providers remain outside the
+Solidity review. Legal classification is also separate. USDC wagering and
+real-money spectator markets remain disabled until both reviews pass.

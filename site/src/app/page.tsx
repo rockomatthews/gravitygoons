@@ -3,6 +3,7 @@ import { CollectionGallery } from "@/components/CollectionGallery";
 import { ZeroGBar } from "@/components/ZeroGBar";
 import { WalletButton } from "@/components/WalletButton";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   const collectionImageBaseUrl = (process.env.NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL
@@ -15,7 +16,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Gravity Goons home">
           <Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority />
         </a>
-        <nav><a href="#collection">Enter the Roster</a></nav>
+        <nav><Link href="/arena">Live Arena</Link><a href="#collection">Enter the Roster</a></nav>
         <WalletButton />
       </header>
 

@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "node scripts/compile.mjs",
     "test": "npm run compile && mocha --timeout 30000 test/*.test.mjs",
+    "test:escrow": "npm run compile && mocha --timeout 30000 test/GoonMatchEscrow.test.mjs",
     "deploy": "npm run compile && node scripts/deploy.mjs",
     "deploy:safe:sepolia": "node scripts/deploy-safe-sepolia.mjs",
     "safe:accept-registry:sepolia": "node scripts/accept-registry-ownership-sepolia.mjs",

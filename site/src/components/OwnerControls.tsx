@@ -4,19 +4,21 @@ import { useState } from "react";
 import { createWalletClient, custom } from "viem";
 import { base } from "viem/chains";
 import { collectionAbi, collectionAddress, ZERO_ADDRESS } from "@/lib/contracts";
+import { useWallet } from "@/components/WalletProvider";
 
 export function OwnerControls() {
+  const { account, connect, provider } = useWallet();
   const [reserveIds, setReserveIds] = useState("1,2,3");
   const [recipient, setRecipient] = useState("");
   const [status, setStatus] = useState("");
 
   async function write(functionName: "setMintOpen" | "creatorMintSelected", args: readonly unknown[]) {
-    if (!window.ethereum) return setStatus("Wallet not found.");
     if (collectionAddress === ZERO_ADDRESS) return setStatus("Deploy the contract and configure its address first.");
     try {
-      const wallet = createWalletClient({ chain: base, transport: custom(window.ethereum) });
-      const [account] = await wallet.requestAddresses();
-      const hash = await wallet.writeContract({ address: collectionAddress, abi: collectionAbi, functionName, args: args as never, account });
+      const connected = account ?? await connect();
+      if (!connected || !provider) return setStatus("Choose the Safe owner wallet, then try again.");
+      const wallet = createWalletClient({ chain: base, transport: custom(provider) });
+      const hash = await wallet.writeContract({ address: collectionAddress, abi: collectionAbi, functionName, args: args as never, account: connected });
       setStatus(`Submitted ${hash}`);
     } catch (error) { setStatus(error instanceof Error ? error.message.split("\n")[0] : "Transaction cancelled."); }
   }
