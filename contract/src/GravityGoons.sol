@@ -40,11 +40,14 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
     error PublicAllocationExceeded();
     error CreatorAllocationExceeded();
     error IncorrectPayment();
+    error InvalidAddress();
     error UnauthorizedRegistry();
     error EmptyMetadataURL();
     error WithdrawalFailed();
 
     event MintOpenChanged(bool open);
+    event PublicMinted(address indexed minter, uint256 quantity, uint256 totalPublicMinted);
+    event CreatorMinted(address indexed recipient, uint256 quantity, uint256 totalCreatorMinted);
     event MetadataUpdate(uint256 indexed tokenId);
     event BatchMetadataUpdate(uint256 indexed fromTokenId, uint256 indexed toTokenId);
     event ProceedsWithdrawn(address indexed recipient, uint256 amount);
@@ -56,6 +59,7 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         uint256[12] memory disciplineWords,
         uint256[12] memory rarityWords
     ) ERC721("Gravity Goons", "GOONS") Ownable(initialOwner) {
+        if (registry == address(0)) revert InvalidAddress();
         if (bytes(metadataBaseURL).length == 0) revert EmptyMetadataURL();
         progressRegistry = registry;
         _metadataBaseURL = metadataBaseURL;
@@ -75,6 +79,7 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
 
         mintedByWallet[msg.sender] += quantity;
         publicMinted += quantity;
+        emit PublicMinted(msg.sender, quantity, publicMinted);
         for (uint256 i; i < quantity; ++i) _safeMint(msg.sender, tokenIds[i]);
     }
 
@@ -84,6 +89,7 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         if (creatorMinted + quantity > CREATOR_ALLOCATION) revert CreatorAllocationExceeded();
         _validateSelection(tokenIds);
         creatorMinted += quantity;
+        emit CreatorMinted(recipient, quantity, creatorMinted);
         for (uint256 i; i < quantity; ++i) _safeMint(recipient, tokenIds[i]);
     }
 

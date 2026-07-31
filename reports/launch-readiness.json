@@ -15,8 +15,8 @@
   "mint_gate_should_be_open": false,
   "blockers": [
     "Filebase second-provider pin and dual-provider hash retrieval not verified",
-    "production Supabase challenge migration and full authoritative 1v1 E2E not verified",
-    "static analysis and independent contract review are incomplete",
+    "full ownership-backed authoritative 1v1 production E2E is pending",
+    "independent human contract review is incomplete",
     "production Base 2-of-3 Safe with three independent signers not verified",
     "Base mainnet contracts not recorded with mint closed"
   ]

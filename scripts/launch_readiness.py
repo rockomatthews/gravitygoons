@@ -66,7 +66,10 @@ def main() -> None:
     site = load(ROOT / "reports" / "premint-site-gates.json") or {}
     site_valid = bool(site.get("build_passed") and site.get("visual_review_passed") and site.get("production_database_e2e_passed"))
     if not site_valid:
-        blockers.append("production Supabase challenge migration and full authoritative 1v1 E2E not verified")
+        if not site.get("production_database_migrations_applied"):
+            blockers.append("production Supabase challenge migrations are not verified")
+        else:
+            blockers.append("full ownership-backed authoritative 1v1 production E2E is pending")
     security = load(ROOT / "reports" / "contract-security-review.json") or {}
     security_valid = bool(
         security.get("contract_tests_passed")
@@ -76,7 +79,12 @@ def main() -> None:
         and security.get("unresolved_critical_findings") == 0
     )
     if not security_valid:
-        blockers.append("static analysis and independent contract review are incomplete")
+        if not security.get("static_analysis_passed"):
+            blockers.append("contract static analysis is incomplete")
+        elif not security.get("independent_review_complete"):
+            blockers.append("independent human contract review is incomplete")
+        else:
+            blockers.append("contract security review has unresolved high or critical findings")
     safe = load(ROOT / "reports" / "base-mainnet-safe.json") or {}
     safe_valid = bool(safe.get("chain_id") == 8453 and safe.get("threshold") == 2 and len(safe.get("owners", [])) == 3 and safe.get("verified_onchain"))
     if not safe_valid:

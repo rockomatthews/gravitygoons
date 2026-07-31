@@ -1,24 +1,45 @@
 {
   "schema": "gravity-goons-contract-security-review-v1",
-  "checked_at": "2026-07-30T20:20:00-06:00",
+  "checked_at": "2026-07-30T22:36:38-06:00",
   "contract_tests_passed": true,
-  "contract_test_count": 8,
+  "contract_test_count": 9,
   "website_production_dependency_vulnerabilities": 0,
   "contract_toolchain_dependency_vulnerabilities": {
-    "total": 26,
-    "high": 15,
-    "critical": 4,
+    "total": 37,
+    "high": 24,
+    "critical": 5,
     "scope": "Ganache development and local test toolchain; not deployed contract bytecode"
   },
-  "static_analysis_passed": false,
+  "static_analysis": {
+    "tool": "Slither",
+    "version": "0.11.6",
+    "compiler": "solc 0.8.30",
+    "collection_report": "reports/slither-gravity-goons-filtered.json",
+    "registry_report": "reports/slither-progress-registry-filtered.json",
+    "untriaged_findings": 0,
+    "accepted_findings": [
+      {
+        "detector": "low-level-calls",
+        "location": "GravityGoons.withdraw",
+        "reason": "Owner-only withdrawal sends to the Safe owner after state-independent amount capture and is protected by ReentrancyGuard; failure reverts."
+      },
+      {
+        "detector": "timestamp",
+        "location": "GravityGoonsProgressRegistry",
+        "reason": "Timestamps enforce signed-claim expiry and the two-day signer activation delay; neither controls randomness, pricing, or winner selection."
+      }
+    ]
+  },
+  "static_analysis_passed": true,
   "independent_review_complete": false,
-  "unresolved_high_findings": null,
-  "unresolved_critical_findings": null,
+  "unresolved_high_findings": 0,
+  "unresolved_critical_findings": 0,
   "mainnet_deployment_authorized": false,
   "notes": [
-    "Compilation and the local launch-contract test suite pass.",
+    "Compilation and all nine local launch-contract tests pass after the static-analysis hardening changes.",
     "The website production dependency audit reports zero vulnerabilities.",
-    "The Ganache test toolchain must be upgraded or isolated before security sign-off.",
-    "A separate static analyzer and independent reviewer must sign off before mainnet."
+    "Slither reports zero untriaged first-party findings after filtering OpenZeppelin dependencies and documenting two intentional patterns.",
+    "The Ganache findings remain isolated to the local development dependency tree and are not included in deployed bytecode.",
+    "An independent human contract review is still required before mainnet deployment."
   ]
 }

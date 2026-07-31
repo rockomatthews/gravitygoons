@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import ganache from "ganache";
-import { BrowserProvider, ContractFactory, Wallet, parseEther } from "ethers";
+import { BrowserProvider, ContractFactory, Wallet, ZeroAddress, parseEther } from "ethers";
 
 const root = path.resolve(import.meta.dirname, "..");
 const impactArtifact = JSON.parse(fs.readFileSync(path.join(root, "artifacts", "GravityGoons.json")));
@@ -62,6 +62,33 @@ describe("Gravity Goons launch contracts", function () {
     assert.equal(await collection.isAvailable(17), false);
     assert.equal(await collection.isAvailable(18), true);
     assert.equal(await collection.publicMinted(), 2n);
+  });
+
+  it("rejects a zero registry and emits explicit mint accounting events", async function () {
+    const Collection = new ContractFactory(impactArtifact.abi, impactArtifact.bytecode, owner);
+    await assert.rejects(async () => {
+      const invalid = await Collection.deploy(
+        owner.address,
+        ZeroAddress,
+        "ipfs://bafybeigdyrzt4examplemetadata/",
+        disciplineWords,
+        rarityWords,
+      );
+      await invalid.waitForDeployment();
+    });
+
+    await (await collection.setMintOpen(true)).wait();
+    const publicReceipt = await (
+      await collection.connect(collector).mintSelected([17], { value: await collection.priceFor(17) })
+    ).wait();
+    assert(publicReceipt.logs.some((log) => {
+      try { return collection.interface.parseLog(log)?.name === "PublicMinted"; } catch { return false; }
+    }));
+
+    const creatorReceipt = await (await collection.creatorMintSelected(owner.address, [18])).wait();
+    assert(creatorReceipt.logs.some((log) => {
+      try { return collection.interface.parseLog(log)?.name === "CreatorMinted"; } catch { return false; }
+    }));
   });
 
   it("rejects duplicates, sold IDs, incorrect payment, and wallet overflow", async function () {
