@@ -1,0 +1,24 @@
+{
+  "schema": "gravity-goons-registry-ownership-v1",
+  "created_at": "2026-07-31T01:13:04.965Z",
+  "stage": "sepolia",
+  "chain_id": 84532,
+  "rpc_host": "sepolia.base.org",
+  "safe_address": "0x2F5d0069499d6932ea526f4b30B33982F75A89Fe",
+  "threshold": 2,
+  "signing_owners": [
+    "0x4D0f2a76eAF53AC2ad8ea60350E65C02545A9920",
+    "0xAD4d7Ae85F2714EaCF2b5e4fc23FcfEaD21328Ed"
+  ],
+  "registry_address": "0x2113C156d996a47e025E3CCa550293bB49384dE7",
+  "previous_owner": "0x4D0f2a76eAF53AC2ad8ea60350E65C02545A9920",
+  "final_owner": "0x2F5d0069499d6932ea526f4b30B33982F75A89Fe",
+  "final_pending_owner": "0x0000000000000000000000000000000000000000",
+  "transaction": "0x3b326c0557c29934c861e0667ad3be595bfcbdf47f3ba29171b4aef6de07967a",
+  "block": 44846047,
+  "collection_address": "0xb9202c4e5Da4bBE16372317f29c6AbFe2D896908",
+  "public_mint_open": false,
+  "creator_minted": 0,
+  "public_minted": 0,
+  "test_only": true
+}

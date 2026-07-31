@@ -96,7 +96,8 @@ contract GravityGoonsProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
         Progress storage current = _progress[claim.tokenId];
         if (claim.nonce != current.nonce) revert InvalidNonce();
         if (claim.discipline != collection.disciplineOf(claim.tokenId)) revert WrongDiscipline();
-        collection.ownerOf(claim.tokenId); // Reverts for a nonexistent token.
+        address tokenOwner = collection.ownerOf(claim.tokenId); // Reverts for a nonexistent token.
+        if (tokenOwner == address(0)) revert InvalidAddress();
 
         bytes32 structHash = keccak256(abi.encode(
             PROGRESS_TYPEHASH,

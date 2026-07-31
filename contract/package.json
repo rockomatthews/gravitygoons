@@ -6,16 +6,21 @@
   "scripts": {
     "compile": "node scripts/compile.mjs",
     "test": "npm run compile && mocha --timeout 30000 test/*.test.mjs",
-    "deploy": "npm run compile && node scripts/deploy.mjs"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "5.4.0",
-    "dotenv": "17.2.3",
-    "ethers": "6.15.0",
-    "ganache": "7.9.2",
-    "solc": "0.8.30"
+    "deploy": "npm run compile && node scripts/deploy.mjs",
+    "deploy:safe:sepolia": "node scripts/deploy-safe-sepolia.mjs",
+    "safe:accept-registry:sepolia": "node scripts/accept-registry-ownership-sepolia.mjs",
+    "safe:mint-reserve:sepolia": "node scripts/mint-creator-reserve-sepolia.mjs",
+    "build:reserve-transactions": "node scripts/build-reserve-transactions.mjs",
+    "verify:deployment": "node scripts/verify-deployment.mjs",
+    "verify:safe:mainnet": "node scripts/verify-mainnet-safe.mjs"
   },
   "devDependencies": {
-    "mocha": "11.7.4"
+    "@openzeppelin/contracts": "5.4.0",
+    "@safe-global/protocol-kit": "^8.0.4",
+    "dotenv": "17.2.3",
+    "ethers": "6.17.0",
+    "ganache": "7.9.2",
+    "mocha": "11.7.4",
+    "solc": "0.8.30"
   }
 }

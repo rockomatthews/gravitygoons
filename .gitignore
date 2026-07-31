@@ -16,3 +16,5 @@ images/
 art/static-collection/production/
 ipfs-packages/
 .harness-state/
+.vercel/
+.env*

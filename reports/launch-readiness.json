@@ -1,0 +1,21 @@
+{
+  "schema": "gravity-goons-launch-readiness-v1",
+  "counts": {
+    "masters_2048": 1000,
+    "marketplace_images_1024": 1000,
+    "finalized_metadata": 1000
+  },
+  "reserve_valid": true,
+  "ipfs_verified": true,
+  "premint_site_verified": false,
+  "contract_security_verified": false,
+  "production_safe_verified": true,
+  "base_mainnet_deployment_recorded": false,
+  "ready_for_base_sale": false,
+  "mint_gate_should_be_open": false,
+  "blockers": [
+    "full ownership-backed authoritative 1v1 production E2E is pending",
+    "independent human contract review is incomplete",
+    "Base mainnet contracts not recorded with mint closed"
+  ]
+}

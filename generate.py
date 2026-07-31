@@ -245,7 +245,6 @@ def metadata_for(item: dict, config: dict) -> dict:
             "discipline": item["discipline"],
             "progress_registry": config["progress_registry_address"],
             "schema_version": config["schema_version"],
-            "genesis_metadata": f"{config['genesis_metadata_base_uri']}{token_id:04d}.json",
         },
     }
 
@@ -314,6 +313,17 @@ def discipline_words(assignments: list[dict], config: dict) -> list[str]:
     return [hex(word) for word in words]
 
 
+def rarity_words(assignments: list[dict]) -> list[str]:
+    """Pack immutable 3-bit rarity indexes into twelve uint256 constructor words."""
+    indexes = {"Common": 0, "Uncommon": 1, "Rare": 2, "Epic": 3, "Legendary": 4}
+    words = [0] * 12
+    for item in assignments:
+        position = item["token_id"] - 1
+        word_index, slot = divmod(position, 85)
+        words[word_index] |= indexes[item["rarity"]] << (slot * 3)
+    return [hex(word) for word in words]
+
+
 def main() -> None:
     config = json.loads(CONFIG_PATH.read_text())
     assignments = build_assignments(config)
@@ -337,6 +347,9 @@ def main() -> None:
     (ROOT / "reports" / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
     (ROOT / "contract" / "config" / "discipline-words.json").write_text(
         json.dumps(discipline_words(assignments, config), indent=2) + "\n"
+    )
+    (ROOT / "contract" / "config" / "rarity-words.json").write_text(
+        json.dumps(rarity_words(assignments), indent=2) + "\n"
     )
     print(json.dumps(report, indent=2))
 

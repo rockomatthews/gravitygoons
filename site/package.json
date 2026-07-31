@@ -6,13 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts",
+    "test:limitless": "node --test --experimental-strip-types src/lib/limitless/core.test.ts",
+    "test:profile": "node --test --experimental-strip-types src/lib/profile-session.test.ts",
+    "test": "npm run test:game && npm run test:limitless && npm run test:profile",
+    "analyze:game-balance": "node --experimental-strip-types scripts/simulate-pvp-balance.mjs ../reports/pvp-balance-v04.json",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@fal-ai/client": "1.10.1",
+    "@limitless-exchange/sdk": "^1.0.11",
     "@supabase/supabase-js": "2.110.7",
     "@types/three": "^0.185.1",
-    "next": "16.2.10",
+    "next": "16.2.12",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "three": "^0.185.1",
@@ -23,7 +29,11 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "eslint": "9.39.1",
-    "eslint-config-next": "16.2.10",
+    "eslint-config-next": "16.2.12",
     "typescript": "5.9.3"
+  },
+  "overrides": {
+    "postcss": "8.5.25",
+    "sharp": "0.35.3"
   }
 }

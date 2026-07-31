@@ -1,0 +1,18 @@
+{
+  "schema": "gravity-goons-safe-deployment-v1",
+  "created_at": "2026-07-31T01:07:59.854Z",
+  "stage": "sepolia",
+  "chain_id": 84532,
+  "rpc_host": "sepolia.base.org",
+  "safe_address": "0x2F5d0069499d6932ea526f4b30B33982F75A89Fe",
+  "threshold": 2,
+  "owners": [
+    "0x4D0f2a76eAF53AC2ad8ea60350E65C02545A9920",
+    "0xAD4d7Ae85F2714EaCF2b5e4fc23FcfEaD21328Ed",
+    "0xd1207CAe3C1257E99e10552475100B2cA7772d49"
+  ],
+  "deployer": "0x4D0f2a76eAF53AC2ad8ea60350E65C02545A9920",
+  "deployment_transaction": "0x3a20e1484c1cdecd765cfd75c548ce2ca6935c6389f0368690b84405bf1c5227",
+  "deployment_block": 44845813,
+  "test_only": true
+}

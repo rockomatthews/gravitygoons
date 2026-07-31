@@ -1,0 +1,43 @@
+{
+  "schema": "gravity-goons-ipfs-package-v1",
+  "created_at": "2026-07-29",
+  "collection": "Gravity Goons",
+  "collection_seed": 260718,
+  "images": {
+    "count": 1000,
+    "directory_cid": "bafybeignb4b2xm55obk2x66vyrvmg62pgu7gutoopb4xdt2f43kgjrhzrq",
+    "car_file": "ipfs-packages/release-staging/gravity-goons-images.car",
+    "car_size_bytes": 1572231035,
+    "car_sha256": "3fda149f33b7b0c812f6516c43ad244d9492443f5d257e2004d698ceb9191b34"
+  },
+  "metadata": {
+    "count": 1000,
+    "directory_cid": "bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe",
+    "base_uri": "ipfs://bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe/",
+    "car_file": "ipfs-packages/release-staging/gravity-goons-metadata.car",
+    "car_size_bytes": 3341475,
+    "car_sha256": "28009aed628cbd5efc19c0a5ba8cf7fe219bee35fef3be9470ee4a34f786c7f1"
+  },
+  "manifests": {
+    "masters": {
+      "file": "reports/final-master-manifest.json",
+      "sha256": "8eb5a0ddda0a7fe30e48c5126d20cf46b9536986abb41e9818b0c1ce52421855"
+    },
+    "marketplace": {
+      "file": "reports/final-release-manifest.json",
+      "sha256": "203eb43fbea766a1bd81a30a139d3733f3f20788fc069a613ce90b73ff65d43d"
+    },
+    "metadata": {
+      "file": "reports/final-metadata-manifest.json",
+      "sha256": "432149aebd8693c0ca530256b68df6999f5d5ae12e19238d5ba9c372be1b9f62"
+    }
+  },
+  "providers": {
+    "primary": "Pinata",
+    "secondary": "Filebase"
+  },
+  "dual_provider_retrieval_verified": true,
+  "dual_provider_verification_report": "reports/ipfs-dual-provider-verification.json",
+  "contract_deployed": false,
+  "public_mint_open": false
+}
