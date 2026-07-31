@@ -1,15 +1,13 @@
 import collection from "@/data/collection.json";
-import { ApprovalRoster } from "@/components/ApprovalRoster";
 import { CollectionGallery } from "@/components/CollectionGallery";
-import { GravityWorld } from "@/components/GravityWorld";
-import { GameExplainer } from "@/components/GameExplainer";
+import { ZeroGBar } from "@/components/ZeroGBar";
 import { WalletButton } from "@/components/WalletButton";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function Home() {
-  const collectionImageBaseUrl = process.env.NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL?.replace(/\/$/, "");
-  const collectionReady = process.env.NEXT_PUBLIC_COLLECTION_READY === "true" && Boolean(collectionImageBaseUrl);
+  const collectionImageBaseUrl = (process.env.NEXT_PUBLIC_COLLECTION_IMAGE_BASE_URL
+    ?? "https://bafybeignb4b2xm55obk2x66vyrvmg62pgu7gutoopb4xdt2f43kgjrhzrq.ipfs.dweb.link").replace(/\/$/, "");
+  const collectionReady = Boolean(collectionImageBaseUrl);
 
   return (
     <main>
@@ -17,63 +15,16 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Gravity Goons home">
           <Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority />
         </a>
-        <nav><a href="#how-to-play">How to Play</a><a href="#roster">Roster</a><a href="#collection">{collectionReady ? "Mint" : "Production"}</a><Link href="/game">PvP Arena</Link><Link href="/profile">My Profile</Link><Link href="/manage">Owner</Link></nav>
+        <nav><a href="#collection">Enter the Roster</a></nav>
         <WalletButton />
       </header>
 
-      <section className="hero shell" id="top">
-        <GravityWorld />
-        <div className="hero-grid" aria-hidden="true" />
-        <div className="hero-copy">
-          <p className="eyebrow">1,000 FULL-BODY ATHLETES · BASE</p>
-          <h1><span>BUILT TO</span><br />BREAK<br /><i>GRAVITY.</i></h1>
-          <p className="lede">Six disciplines. Zero mystery. Choose your exact Goon, face rivals in the same sport, and call your tricks. Their stats shape the odds—but deciding when to play safe or risk everything is up to you.</p>
-          <div className="hero-actions"><a className="button primary" href="#collection">{collectionReady ? "Choose your Goon" : "Preview the Goons"}</a><span>{collectionReady ? "0.015–0.08 ETH BY RARITY · MAX 5" : "FINAL ART IN PROGRESS"}</span></div>
-          <div className="launch-data"><div><b>1000</b><span>TOTAL GOONS</span></div><div><b>06</b><span>DISCIPLINES</span></div><div><b>64</b><span>TRICK SLOTS</span></div></div>
-        </div>
-        <div className="hero-visual">
-          <div className="gravity-halo" />
-          <div className="goon-card-3d"><Image src="/collection/production-preview/0034.png" alt="Gravity Goons #0034, a final production boar skateboarder render" width={1024} height={1024} priority /></div>
-          <div className="floating-tag tag-one">SKATE // 001</div>
-          <div className="floating-tag tag-two">STYLE <b>08</b></div>
-          <div className="floating-tag tag-three">MIKE™*</div>
-          <div className="sticker">PICK<br />THE EXACT<br />GOON</div>
-        </div>
-      </section>
-
-      <GameExplainer />
-
-      <section className="marquee"><div>SKATEBOARDING · SNOWBOARDING · SURFING · BMX · MOTOCROSS · SKIING · BREAK GRAVITY · SKATEBOARDING · SNOWBOARDING · SURFING · BMX · MOTOCROSS · SKIING · BREAK GRAVITY · </div></section>
-
-      <section className="banner-cinema" aria-label="Gravity Goons cinematic collection banner">
-        <Image src="/collection/gravity-goons-banner.png" alt="Gravity Goons athletes gathered in a futuristic action-sports arena" width={2048} height={768} />
-        <div className="banner-vignette" />
-        <div className="banner-caption"><span>THE GOONS HAVE LANDED</span><b>06 SPORTS // 1000 ATHLETES // ONE GRAVITY FIELD</b></div>
-      </section>
-
-      <section className="roster-showcase shell" id="roster">
-        <div className="roster-copy"><p className="eyebrow">THE GOONIVERSE</p><h2>Every sport reads instantly.</h2><p>No generic floating heads. Every Goon has a full-body silhouette, visible equipment, discipline-compatible gear, and one of twelve fictional underground labels.</p><div className="brand-run">MIKE · AVOIDAS · POOMA · VANISH · NORTH FAKE · OFF-BEIGE · CARHEART · PROCRASTIGONIA · BURNTON · VOLCANO · FAUX RACING · QUEAZY</div></div>
-        <div className="roster-plane"><Image src="/collection/approval-roster-12.png" alt="Twelve metadata-matched Gravity Goons production proofs across six action sports" width={1536} height={1152} /></div>
-      </section>
+      <ZeroGBar />
 
       <section className="collection-section shell" id="collection">
-        <div className="section-heading"><div><p className="eyebrow">{collectionReady ? "LIVE BASE ROSTER" : "FINAL RENDER PREVIEW"}</p><h2>{collectionReady ? "Choose, connect, mint." : "Real Goons. Real collection art."}</h2></div><p>{collectionReady ? "Filter all 1,000 characters, connect a Base wallet, select up to five available IDs, and mint them without leaving GravityGoons.com." : "Preview accepted final renders pulled directly from the production collection. All 1,000 trait assignments are fixed; artwork and metadata are being matched and validated one Goon at a time."}</p></div>
-        {collectionReady && collectionImageBaseUrl
-          ? <CollectionGallery tokens={collection.tokens} imageBaseUrl={collectionImageBaseUrl} />
-          : <ApprovalRoster />}
+        <div className="section-heading"><div><p className="eyebrow">{collectionReady ? "THE LIVE COLLECTION LOBBY" : "FINAL RENDER PREVIEW"}</p><h2>{collectionReady ? "Own one. Rank one. Challenge one." : "Real Goons. Real collection art."}</h2></div><p>{collectionReady ? "All 1,000 athletes live here. See exact-ID tier prices, ownership, records, discipline rank, match state, and same-discipline challenge eligibility. Public mint stays closed until every launch gate passes." : "Preview accepted final renders pulled directly from the production collection."}</p></div>
+        <CollectionGallery tokens={collection.tokens} imageBaseUrl={collectionImageBaseUrl} />
       </section>
-
-      <section className="game-section shell" id="progression">
-        <div><p className="eyebrow">THE FIRST GAME MODE</p><h2>Call the trick.<br />Make them answer.</h2><p className="game-intro">Gravity Goons plays like SKATE and HORSE. Land your called trick and the other Goon must attempt the same move—even when it is outside their permanent catalogue. Miss the answer, take a letter. Spell the discipline word and lose the match.</p><Link className="button primary" href="/game">ENTER THE PVP LAB</Link></div>
-        <div className="game-grid">
-          <article><b>01</b><h3>Match your discipline</h3><p>Skaters battle skaters. Surfers battle surfers. Each of the six sports gets its own trick catalog, matchup identity, and strategic rhythm.</p></article>
-          <article><b>02</b><h3>Set and answer</h3><p>Call a move your Goon knows and land it. The responder must try that exact move; landing it wins the next call, while missing earns a letter.</p></article>
-          <article><b>03</b><h3>Learn under pressure</h3><p>Stats and similar known moves shape temporary off-catalogue attempts. Every forced try improves that Goon&apos;s chance if the trick returns later in the match.</p></article>
-          <article><b>04</b><h3>Progress travels</h3><p>Future XP, learned tricks, achievements, and battle history are designed to stay with the NFT—even when the Goon changes wallets.</p></article>
-        </div>
-      </section>
-
-      <section className="final-cta shell"><div><p className="eyebrow">NO BLIND BOX. NO REVEAL.</p><h2>See the Goon.<br />Choose the Goon.<br /><i>Become the Goon.</i></h2></div><a className="button primary" href="#collection">{collectionReady ? "ENTER THE ROSTER" : "VIEW CONCEPT ROSTER"}</a></section>
 
       <footer className="shell"><span>GRAVITY GOONS © 2026</span><span>BUILT TO BREAK GRAVITY · BASE ERC-721</span><span>GRAVITYGOONS.COM</span></footer>
     </main>

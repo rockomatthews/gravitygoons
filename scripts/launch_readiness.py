@@ -36,6 +36,17 @@ def main() -> None:
         "marketplace_images_1024": count(options.stage / "images", ".png"),
         "finalized_metadata": count(options.stage / "metadata", ".json"),
     }
+    # Large staged files may be intentionally absent from a lightweight release checkout.
+    # In that case use the committed, hash-bearing final manifests rather than reporting zero.
+    master_manifest = load(ROOT / "reports" / "final-master-manifest.json") or {}
+    image_manifest = load(ROOT / "reports" / "final-release-manifest.json") or {}
+    metadata_manifest = load(ROOT / "reports" / "final-metadata-manifest.json") or {}
+    if counts["masters_2048"] == 0:
+        counts["masters_2048"] = int(master_manifest.get("sources", 0))
+    if counts["marketplace_images_1024"] == 0:
+        counts["marketplace_images_1024"] = int(image_manifest.get("images", 0))
+    if counts["finalized_metadata"] == 0:
+        counts["finalized_metadata"] = int(metadata_manifest.get("metadata_files", 0))
     blockers = []
     if counts["masters_2048"] != SUPPLY:
         blockers.append(f"2048 masters: {counts['masters_2048']}/{SUPPLY}")
@@ -51,7 +62,25 @@ def main() -> None:
     ipfs = load(options.ipfs_report)
     ipfs_valid = bool(ipfs and ipfs.get("dual_provider_retrieval_verified") is True)
     if not ipfs_valid:
-        blockers.append("dual-provider IPFS retrieval not verified")
+        blockers.append("Filebase second-provider pin and dual-provider hash retrieval not verified")
+    site = load(ROOT / "reports" / "premint-site-gates.json") or {}
+    site_valid = bool(site.get("build_passed") and site.get("visual_review_passed") and site.get("production_database_e2e_passed"))
+    if not site_valid:
+        blockers.append("production Supabase challenge migration and full authoritative 1v1 E2E not verified")
+    security = load(ROOT / "reports" / "contract-security-review.json") or {}
+    security_valid = bool(
+        security.get("contract_tests_passed")
+        and security.get("static_analysis_passed")
+        and security.get("independent_review_complete")
+        and security.get("unresolved_high_findings") == 0
+        and security.get("unresolved_critical_findings") == 0
+    )
+    if not security_valid:
+        blockers.append("static analysis and independent contract review are incomplete")
+    safe = load(ROOT / "reports" / "base-mainnet-safe.json") or {}
+    safe_valid = bool(safe.get("chain_id") == 8453 and safe.get("threshold") == 2 and len(safe.get("owners", [])) == 3 and safe.get("verified_onchain"))
+    if not safe_valid:
+        blockers.append("production Base 2-of-3 Safe with three independent signers not verified")
     deployment = load(options.deployment_report)
     collection = deployment.get("collection", {}) if deployment else {}
     registry = deployment.get("registry", {}) if deployment else {}
@@ -78,6 +107,9 @@ def main() -> None:
         "counts": counts,
         "reserve_valid": reserve_valid,
         "ipfs_verified": ipfs_valid,
+        "premint_site_verified": site_valid,
+        "contract_security_verified": security_valid,
+        "production_safe_verified": safe_valid,
         "base_mainnet_deployment_recorded": deployment_valid,
         "ready_for_base_sale": not blockers,
         "mint_gate_should_be_open": False,

@@ -7,11 +7,17 @@
   },
   "reserve_valid": true,
   "ipfs_verified": false,
+  "premint_site_verified": false,
+  "contract_security_verified": false,
+  "production_safe_verified": false,
   "base_mainnet_deployment_recorded": false,
   "ready_for_base_sale": false,
   "mint_gate_should_be_open": false,
   "blockers": [
-    "dual-provider IPFS retrieval not verified",
+    "Filebase second-provider pin and dual-provider hash retrieval not verified",
+    "production Supabase challenge migration and full authoritative 1v1 E2E not verified",
+    "static analysis and independent contract review are incomplete",
+    "production Base 2-of-3 Safe with three independent signers not verified",
     "Base mainnet contracts not recorded with mint closed"
   ]
 }

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 112" role="img" aria-labelledby="title">
+  <title id="title">ZERO-G ENERGY</title>
+  <defs>
+    <linearGradient id="glow" x1="0" x2="1">
+      <stop stop-color="#18f1dc"/>
+      <stop offset="1" stop-color="#caff38"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#glow)" stroke-linecap="square">
+    <circle cx="56" cy="56" r="41" stroke-width="8"/>
+    <path d="M22 56h68M56 22v68M36 76 76 36" stroke-width="5"/>
+  </g>
+  <path fill="#050609" d="m48 30 29 20-17 2 13 30-31-24 18-2z"/>
+  <g fill="#f4fff9" font-family="Arial Black,Arial,sans-serif" font-weight="900">
+    <text x="112" y="54" font-size="40" letter-spacing="-2">ZERO-G</text>
+    <text x="114" y="86" fill="#caff38" font-size="25" letter-spacing="7">ENERGY</text>
+  </g>
+</svg>

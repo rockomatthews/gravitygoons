@@ -3,12 +3,14 @@ import { GameArena, type ArenaGoon } from "@/components/GameArena";
 import { MoveCinemaTeaser } from "@/components/MoveCinemaTeaser";
 import { TrickOutcomeTeaser } from "@/components/TrickOutcomeTeaser";
 import { WalletButton } from "@/components/WalletButton";
+import { RankedMatch } from "@/components/RankedMatch";
 import Image from "next/image";
 import Link from "next/link";
 
 const previewIds = [30, 31, 32, 33, 34, 35, 36, 38, 39, 40, 41, 42];
 
-export default function GamePage() {
+export default async function GamePage({ searchParams }: { searchParams: Promise<{ match?: string }> }) {
+  const { match } = await searchParams;
   const goons = collection.tokens.filter((token) => previewIds.includes(token.token_id)).map((token) => ({
     tokenId: token.token_id,
     name: token.name,
@@ -27,7 +29,8 @@ export default function GamePage() {
       <nav><Link href="/">Collection</Link><a href="#outcomes">Outcomes</a><a href="#arena">Arena</a><a href="#cinema">Move Cinema</a><a href="#rules">Rules</a></nav>
       <WalletButton />
     </header>
-    <section className="game-hero shell"><p className="eyebrow">LOCAL 1V1 RULES LAB // V0.4</p><h1>CALL IT.<br /><i>LAND IT.</i><br />DON&apos;T SPELL OUT.</h1><p>This is turn-based SKATE, not a points contest. The setter chooses a trick and can spend scarce Grit to send a harder version. If it lands, the second player chooses whether to trust their Goon or spend Grit to focus the answer. Stats, catalogue breadth, practice, visible pressure, and resource timing all matter.</p></section>
+    <section className="game-hero shell"><p className="eyebrow">{match ? "RANKED 1V1 // SERVER-AUTHORITATIVE" : "LOCAL 1V1 RULES LAB // V0.4"}</p><h1>CALL IT.<br /><i>LAND IT.</i><br />DON&apos;T SPELL OUT.</h1><p>This is turn-based SKATE, not a points contest. The setter chooses a trick and can spend scarce Grit to send a harder version. If it lands, the second player chooses whether to trust their Goon or spend Grit to focus the answer. Stats, catalogue breadth, practice, visible pressure, and resource timing all matter.</p></section>
+    {match && <section className="shell" id="ranked-match"><RankedMatch matchId={match} /></section>}
     <section id="outcomes" className="shell game-outcome-teaser"><TrickOutcomeTeaser /></section>
     <section id="cinema" className="shell game-cinema-teaser"><MoveCinemaTeaser compact /></section>
     <section id="arena" className="shell"><GameArena goons={goons} /></section>

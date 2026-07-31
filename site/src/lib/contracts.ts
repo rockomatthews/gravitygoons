@@ -4,7 +4,11 @@ import { base } from "viem/chains";
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const collectionAddress = (process.env.NEXT_PUBLIC_COLLECTION_ADDRESS ?? ZERO_ADDRESS) as `0x${string}`;
 export const registryAddress = (process.env.NEXT_PUBLIC_PROGRESS_REGISTRY_ADDRESS ?? ZERO_ADDRESS) as `0x${string}`;
-export const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL ?? "https://mainnet.base.org";
+// QuickNode belongs in BASE_RPC_URL and is read only by the server bundle.
+// Browsers use Base's public endpoint unless an explicitly rate-limited public proxy is supplied.
+export const baseRpcUrl = typeof window === "undefined"
+  ? process.env.BASE_RPC_URL ?? "https://mainnet.base.org"
+  : process.env.NEXT_PUBLIC_BASE_RPC_URL ?? "https://mainnet.base.org";
 
 export const publicClient = createPublicClient({ chain: base, transport: http(baseRpcUrl) });
 

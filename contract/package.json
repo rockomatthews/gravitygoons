@@ -11,7 +11,8 @@
     "safe:accept-registry:sepolia": "node scripts/accept-registry-ownership-sepolia.mjs",
     "safe:mint-reserve:sepolia": "node scripts/mint-creator-reserve-sepolia.mjs",
     "build:reserve-transactions": "node scripts/build-reserve-transactions.mjs",
-    "verify:deployment": "node scripts/verify-deployment.mjs"
+    "verify:deployment": "node scripts/verify-deployment.mjs",
+    "verify:safe:mainnet": "node scripts/verify-mainnet-safe.mjs"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "5.4.0",

@@ -1,0 +1,25 @@
+{
+  "schema": "gravity-goons-premint-site-gates-v1",
+  "checked_at": "2026-07-30T20:20:00-06:00",
+  "build_passed": true,
+  "lint_passed": true,
+  "site_tests_passed": 22,
+  "contract_tests_passed": 8,
+  "visual_review_passed": true,
+  "desktop_viewport": "1440x900",
+  "mobile_viewport": "390x844",
+  "desktop_tv_hotspots": 3,
+  "mobile_tv_hotspots": 1,
+  "bathroom_profile_hotspot": true,
+  "keyboard_semantics": "native links and buttons",
+  "reduced_motion_css": true,
+  "real_energy_branding_used": false,
+  "challenge_api_implemented": true,
+  "authoritative_match_api_implemented": true,
+  "production_database_e2e_passed": false,
+  "notes": [
+    "The migration is committed but has not been applied to a production Supabase project.",
+    "Private Broadcast triggers are defined; polling fallback is active.",
+    "Ranked play contains no USDC wager path."
+  ]
+}

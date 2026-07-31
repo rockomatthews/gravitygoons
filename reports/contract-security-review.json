@@ -1,0 +1,24 @@
+{
+  "schema": "gravity-goons-contract-security-review-v1",
+  "checked_at": "2026-07-30T20:20:00-06:00",
+  "contract_tests_passed": true,
+  "contract_test_count": 8,
+  "website_production_dependency_vulnerabilities": 0,
+  "contract_toolchain_dependency_vulnerabilities": {
+    "total": 26,
+    "high": 15,
+    "critical": 4,
+    "scope": "Ganache development and local test toolchain; not deployed contract bytecode"
+  },
+  "static_analysis_passed": false,
+  "independent_review_complete": false,
+  "unresolved_high_findings": null,
+  "unresolved_critical_findings": null,
+  "mainnet_deployment_authorized": false,
+  "notes": [
+    "Compilation and the local launch-contract test suite pass.",
+    "The website production dependency audit reports zero vulnerabilities.",
+    "The Ganache test toolchain must be upgraded or isolated before security sign-off.",
+    "A separate static analyzer and independent reviewer must sign off before mainnet."
+  ]
+}

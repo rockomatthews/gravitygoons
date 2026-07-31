@@ -1,0 +1,12 @@
+{
+  "schema": "gravity-goons-ipfs-release-verification-v1",
+  "checked_at": "2026-07-30T20:20:00-06:00",
+  "images_cid": "bafybeignb4b2xm55obk2x66vyrvmg62pgu7gutoopb4xdt2f43kgjrhzrq",
+  "metadata_cid": "bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe",
+  "primary_provider": "Pinata",
+  "primary_pin_reported": true,
+  "secondary_provider": "Filebase",
+  "secondary_pin_verified": false,
+  "dual_provider_retrieval_verified": false,
+  "hash_match_verified": false
+}

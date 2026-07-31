@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ProfileSetup } from "@/components/ProfileSetup";
+import { ChallengeInbox } from "@/components/ChallengeInbox";
 
 export default function ProfilePage() {
   return (
@@ -14,8 +15,7 @@ export default function ProfilePage() {
         <h1>Your Goons.<br />Your name.<br /><i>Their highlight reel.</i></h1>
         <p>Create the public URL that displays every Goon currently owned by your verified wallet. Movie progress follows each NFT if it changes hands.</p>
       </section>
-      <section className="shell profile-editor-workspace"><ProfileSetup /></section>
+      <section className="shell profile-editor-workspace"><ProfileSetup /><ChallengeInbox /></section>
     </main>
   );
 }
-
