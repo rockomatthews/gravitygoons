@@ -86,9 +86,24 @@ def main() -> None:
         else:
             blockers.append("contract security review has unresolved high or critical findings")
     safe = load(ROOT / "reports" / "base-mainnet-safe.json") or {}
-    safe_valid = bool(safe.get("chain_id") == 8453 and safe.get("threshold") == 2 and len(safe.get("owners", [])) == 3 and safe.get("verified_onchain"))
+    safe_valid = bool(
+        safe.get("chain_id") == 8453
+        and safe.get("threshold") == 2
+        and len(safe.get("owners", [])) == 3
+        and safe.get("verified_onchain")
+        and safe.get("independent_recovery_confirmed")
+        and safe.get("signer_compatibility_verified")
+        and safe.get("approved_for_contract_ownership")
+    )
     if not safe_valid:
-        blockers.append("production Base 2-of-3 Safe with three independent signers not verified")
+        if not safe.get("verified_onchain"):
+            blockers.append("production Base 2-of-3 Safe is not verified on-chain")
+        elif not safe.get("signer_compatibility_verified"):
+            blockers.append("production Safe owner signing compatibility test is pending")
+        elif not safe.get("approved_for_contract_ownership"):
+            blockers.append("production Safe has not passed final contract-ownership approval")
+        else:
+            blockers.append("production Base 2-of-3 Safe with three independent signers not verified")
     deployment = load(options.deployment_report)
     collection = deployment.get("collection", {}) if deployment else {}
     registry = deployment.get("registry", {}) if deployment else {}

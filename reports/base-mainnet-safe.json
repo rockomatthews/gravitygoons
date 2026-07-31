@@ -1,0 +1,24 @@
+{
+  "schema": "gravity-goons-base-mainnet-safe-v1",
+  "checked_at": "2026-07-31T05:21:33Z",
+  "chain_id": 8453,
+  "network": "Base Mainnet",
+  "name": "Gravity Goons Production",
+  "address": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "owners": [
+    "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
+    "0x8A0182c099A618583e9EF98716DAcF739b3BD944",
+    "0xFE608b2125D56EB498C812d16675e85823C4aa2F"
+  ],
+  "threshold": 2,
+  "creator": "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
+  "creation_transaction": "0xed5a7fc7d209a5a4a930ea035064af4276e85536f106816fd1310883e81edc44",
+  "contract_code_verified": true,
+  "owners_verified_onchain": true,
+  "threshold_verified_onchain": true,
+  "verified_onchain": true,
+  "independent_recovery_confirmed": true,
+  "signer_compatibility_verified": false,
+  "funded": false,
+  "approved_for_contract_ownership": false
+}
