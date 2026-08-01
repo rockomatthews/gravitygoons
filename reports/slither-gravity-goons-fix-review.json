@@ -1,0 +1,27 @@
+{
+  "schema": "gravity-goons-slither-triage-v1",
+  "generated_at": "2026-08-01",
+  "tool": "Slither 0.11.6",
+  "compiler": "solc 0.8.30",
+  "target": "contract/src/GravityGoons.sol",
+  "raw_result_count": 47,
+  "dependency_results_omitted": true,
+  "first_party_results": [
+    {
+      "detector": "low-level-calls",
+      "impact": "Informational",
+      "status": "accepted",
+      "location": "GravityGoons.withdraw",
+      "reason": "The owner-only and nonReentrant withdrawal uses call so a Safe can receive ETH; a failed transfer reverts."
+    },
+    {
+      "detector": "pragma",
+      "impact": "Informational",
+      "status": "accepted",
+      "location": "GravityGoons pragma",
+      "reason": "The first-party pragma is pinned to 0.8.30. Slither reports mixed directives inherited from pinned OpenZeppelin dependencies."
+    }
+  ],
+  "untriaged_first_party_results": 0,
+  "high_or_critical_first_party_results": 0
+}

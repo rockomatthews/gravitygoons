@@ -15,7 +15,7 @@
   "mint_gate_should_be_open": false,
   "blockers": [
     "full ownership-backed authoritative 1v1 production E2E is pending",
-    "independent human contract review is incomplete",
+    "independent fix review of the launch-contract remediation commit is pending",
     "Base mainnet contracts not recorded with mint closed"
   ]
 }
