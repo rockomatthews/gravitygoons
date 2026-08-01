@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { createBaseAccountSDK } from "@base-org/account";
+import { createBaseAppDappUrl, isBaseWalletName, isMobileUserAgent } from "@/lib/wallet-links";
 
 export type EthereumProvider = {
   request<T = unknown>(args: { method: string; params?: unknown[] }): Promise<T>;
@@ -116,24 +116,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, [bindProvider, ensureBase]);
 
   const connectBase = useCallback(async () => {
-    setConnecting(true);
-    setMessage("Opening Base…");
-    try {
-      const baseProvider = createBaseAccountSDK({
-        appName: "Gravity Goons",
-        appLogoUrl: `${window.location.origin}/collection/gravity-goons-logo.png`,
-      }).getProvider() as EthereumProvider;
-      const result = await withConnectionTimeout(baseProvider.request<{ accounts?: Array<{ address?: string }> }>({
-        method: "wallet_connect",
-        params: [{ version: "1" }],
-      }));
-      const supplied = result?.accounts?.map((item) => item.address).filter(Boolean) ?? [];
-      return await withConnectionTimeout(finishConnection(baseProvider, "base", supplied));
-    } catch (error) {
-      setMessage(conciseError(error));
-      return null;
-    } finally { setConnecting(false); }
-  }, [finishConnection]);
+    const injectedBase = wallets.find((wallet) => isBaseWalletName(wallet.name));
+    if (injectedBase) {
+      setConnecting(true);
+      setMessage("Waiting for Base App approval…");
+      try { return await withConnectionTimeout(finishConnection(injectedBase.provider, "base-app")); }
+      catch (error) { setMessage(conciseError(error)); return null; }
+      finally { setConnecting(false); }
+    }
+
+    setMessage(isMobileUserAgent(navigator.userAgent) ? "Opening Gravity Goons in the Base App…" : "Opening the Base App…");
+    window.location.assign(createBaseAppDappUrl(window.location.href));
+    return null;
+  }, [finishConnection, wallets]);
 
   const connectWalletConnect = useCallback(async () => {
     const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID?.trim();
@@ -225,11 +220,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const prior = window.localStorage.getItem(STORAGE_KEY);
     if (!prior || account || connecting) return;
     const reconnect = async () => {
-      if (prior === "base") {
-        const baseProvider = createBaseAccountSDK({ appName: "Gravity Goons", appLogoUrl: `${window.location.origin}/collection/gravity-goons-logo.png` }).getProvider() as EthereumProvider;
+      if (prior === "base-app") {
+        const baseProvider = wallets.find((wallet) => isBaseWalletName(wallet.name))?.provider;
+        if (!baseProvider) return;
         const accounts = await baseProvider.request<unknown[]>({ method: "eth_accounts" }).catch(() => []);
         const next = normalizeAccount(accounts[0]);
         if (next) bindProvider(baseProvider, prior, next);
+      } else if (prior === "base") {
+        window.localStorage.removeItem(STORAGE_KEY);
       } else if (prior.startsWith("injected")) {
         const id = prior.split(":")[1];
         const selected = wallets.find((wallet) => wallet.id === id)?.provider ?? window.ethereum;
@@ -266,9 +264,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         <button className="wallet-modal-close" onClick={() => setModalOpen(false)} aria-label="Close wallet chooser">×</button>
         <span>BASE MAINNET // 8453</span>
         <h2 id="wallet-modal-title">Connect a wallet</h2>
-        <p>Use the Base App directly on your phone, scan a WalletConnect QR code, or choose a wallet detected in this browser.</p>
+        <p>Open Gravity Goons inside the Base App, use WalletConnect, or choose a wallet detected in this browser.</p>
         <div className="wallet-options">
-          <button onClick={connectBase} disabled={connecting}><b>OPEN BASE APP</b><span>Base App or Base Account</span></button>
+          <button onClick={connectBase} disabled={connecting}><b>OPEN BASE APP</b><span>Continue inside the Base App</span></button>
           <button onClick={connectWalletConnect} disabled={connecting}><b>WALLETCONNECT</b><span>Rainbow, MetaMask, and more</span></button>
           {wallets.map((wallet) => <button key={wallet.id} onClick={() => connectInjected(wallet.id)} disabled={connecting}>
             <b>WEB</b><span>{wallet.name}</span>
