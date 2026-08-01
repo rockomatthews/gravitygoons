@@ -475,18 +475,21 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 
 /* Wallet connection */
 .wallet-modal-backdrop { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 18px; background: #020407de; backdrop-filter: blur(14px); }
-.wallet-modal { width: min(560px, 100%); position: relative; border: 1px solid #18f1dc66; padding: 34px; color: white; background: radial-gradient(circle at 90% 0, #18f1dc22, transparent 34%), linear-gradient(145deg, #121b24, #05080c); box-shadow: 0 32px 120px #000, 10px 10px 0 #ff4b35; }
+.wallet-modal { width: min(590px, 100%); position: relative; border: 1px solid #18f1dc66; padding: 34px; color: white; background: radial-gradient(circle at 90% 0, #18f1dc22, transparent 34%), linear-gradient(145deg, #121b24, #05080c); box-shadow: 0 32px 120px #000, 10px 10px 0 #ff4b35; }
 .wallet-modal > span { color: var(--teal); font: 900 8px var(--mono); letter-spacing: .16em; }
-.wallet-modal h2 { margin: 14px 0 10px; font-size: clamp(36px, 8vw, 58px); line-height: .9; text-transform: uppercase; }
+.wallet-modal h2 { margin: 14px 0 10px; font-size: clamp(34px, 7vw, 52px); line-height: .9; text-transform: uppercase; }
 .wallet-modal > p { color: #a8b4bb; line-height: 1.6; }
 .wallet-modal-close { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border: 1px solid #ffffff29; color: white; background: #05080c; font-size: 24px; cursor: pointer; }
-.wallet-options { display: grid; gap: 8px; margin: 26px 0 18px; }
-.wallet-options button { min-height: 68px; display: grid; grid-template-columns: 48px 1fr; align-items: center; gap: 14px; border: 1px solid #33414b; padding: 10px 16px; color: white; background: #080d12; text-align: left; cursor: pointer; transition: border-color .18s, transform .18s; }
-.wallet-options button:hover, .wallet-options button:focus-visible { border-color: var(--teal); transform: translateX(4px); outline: none; }
+.wallet-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 24px 0 12px; }
+.wallet-options button { min-width: 0; min-height: 122px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid #33414b; padding: 13px 8px; color: white; background: #080d12; text-align: center; cursor: pointer; transition: border-color .18s, transform .18s, background .18s; }
+.wallet-options button:hover, .wallet-options button:focus-visible { border-color: var(--teal); background: #0d171e; transform: translateY(-3px); outline: none; }
 .wallet-options button:disabled { opacity: .5; cursor: wait; }
-.wallet-options button b, .wallet-options button img { width: 42px; height: 42px; display: grid; place-items: center; object-fit: contain; color: #05080c; background: var(--acid); font: 950 8px var(--mono); }
-.wallet-options button:first-child b { background: #0052ff; color: white; }
-.wallet-options button span { font: 850 11px var(--mono); }
+.wallet-options button img { width: 48px; height: 48px; display: block; border-radius: 12px; object-fit: contain; }
+.wallet-options button strong { max-width: 100%; overflow: hidden; font: 900 11px var(--mono); text-overflow: ellipsis; }
+.wallet-options button small { color: #82919a; font: 850 7px var(--mono); letter-spacing: .12em; }
+.wallet-more { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 8px; border: 1px solid #33414b; padding: 9px 12px; color: #c5d0d6; background: #080d12; font: 800 8px var(--mono); cursor: pointer; }
+.wallet-more:hover, .wallet-more:focus-visible { border-color: var(--teal); color: white; outline: none; }
+.wallet-more img { border-radius: 6px; }
 .wallet-modal-status { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 13px; border: 1px solid #ffffff1f; background: #030609; }
 .wallet-modal-status b { color: var(--coral); font: 900 7px var(--mono); }
 .wallet-modal-status span { color: #c2cbd0; font-size: 12px; }
@@ -498,8 +501,11 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .challenge-reschedule input { min-width: 0; border: 1px solid #35414b; padding: 8px; color: white; background: #070b10; font: 750 7px var(--mono); }
 
 @media (max-width: 560px) {
-  .wallet-modal { padding: 28px 20px 22px; box-shadow: 5px 5px 0 #ff4b35; }
+  .wallet-modal { padding: 28px 18px 22px; box-shadow: 5px 5px 0 #ff4b35; }
   .wallet-modal h2 { padding-right: 35px; }
+  .wallet-options { gap: 6px; }
+  .wallet-options button { min-height: 112px; padding-inline: 4px; }
+  .wallet-options button strong { font-size: 9px; }
 }
 
 /* Public Arena */

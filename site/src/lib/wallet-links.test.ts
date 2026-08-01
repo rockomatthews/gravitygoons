@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createBaseAppDappUrl, isBaseWalletName, isMobileUserAgent } from "./wallet-links.ts";
+import {
+  createBaseAppDappUrl,
+  createMetaMaskDappUrl,
+  createRainbowDappUrl,
+  isBaseWalletName,
+  isMobileUserAgent,
+  isWalletKind,
+} from "./wallet-links.ts";
 
 test("the Base App link preserves the complete Gravity Goons return URL", () => {
   const current = "https://gravitygoons.com/#collection";
@@ -19,4 +26,26 @@ test("Base and Coinbase injected providers are recognized", () => {
   assert.equal(isBaseWalletName("Base App"), true);
   assert.equal(isBaseWalletName("Coinbase Wallet"), true);
   assert.equal(isBaseWalletName("MetaMask"), false);
+});
+
+test("the MetaMask link opens the current page inside its mobile dapp browser", () => {
+  assert.equal(
+    createMetaMaskDappUrl("https://gravitygoons.com/#collection"),
+    "https://metamask.app.link/dapp/gravitygoons.com/%23collection",
+  );
+});
+
+test("the Rainbow link passes the complete page to its supported dapp route", () => {
+  const current = "https://gravitygoons.com/arena?tab=live#match";
+  const deepLink = new URL(createRainbowDappUrl(current));
+
+  assert.equal(deepLink.origin + deepLink.pathname, "https://rnbwapp.com/dapp");
+  assert.equal(deepLink.searchParams.get("url"), current);
+});
+
+test("wallet identities are matched using names and EIP-6963 reverse-DNS IDs", () => {
+  assert.equal(isWalletKind("Browser wallet", "io.metamask", "metamask"), true);
+  assert.equal(isWalletKind("Rainbow", "me.rainbow", "rainbow"), true);
+  assert.equal(isWalletKind("Coinbase Wallet", "com.coinbase.wallet", "base"), true);
+  assert.equal(isWalletKind("Rainbow", "me.rainbow", "metamask"), false);
 });

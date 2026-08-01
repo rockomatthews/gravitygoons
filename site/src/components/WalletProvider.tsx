@@ -1,19 +1,30 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { createBaseAppDappUrl, isBaseWalletName, isMobileUserAgent } from "@/lib/wallet-links";
+import Image from "next/image";
+import {
+  createBaseAppDappUrl,
+  createMetaMaskDappUrl,
+  createRainbowDappUrl,
+  isWalletKind,
+  type MobileWalletKind,
+} from "@/lib/wallet-links";
 
 export type EthereumProvider = {
   request<T = unknown>(args: { method: string; params?: unknown[] }): Promise<T>;
   on?(event: string, listener: (...args: unknown[]) => void): void;
   removeListener?(event: string, listener: (...args: unknown[]) => void): void;
   disconnect?(): Promise<void>;
+  isCoinbaseWallet?: boolean;
+  isMetaMask?: boolean;
+  isRainbow?: boolean;
 };
 
 type InjectedWallet = {
   id: string;
   name: string;
   icon: string;
+  rdns?: string;
   provider: EthereumProvider;
 };
 
@@ -36,6 +47,8 @@ type WalletState = {
   wallets: InjectedWallet[];
   connect: () => Promise<`0x${string}` | null>;
   connectBase: () => Promise<`0x${string}` | null>;
+  connectMetaMask: () => Promise<`0x${string}` | null>;
+  connectRainbow: () => Promise<`0x${string}` | null>;
   connectWalletConnect: () => Promise<`0x${string}` | null>;
   connectInjected: (walletId?: string) => Promise<`0x${string}` | null>;
   disconnect: () => Promise<void>;
@@ -115,20 +128,33 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return nextAccount;
   }, [bindProvider, ensureBase]);
 
-  const connectBase = useCallback(async () => {
-    const injectedBase = wallets.find((wallet) => isBaseWalletName(wallet.name));
-    if (injectedBase) {
+  const findWallet = useCallback((kind: MobileWalletKind) => wallets.find((wallet) => isWalletKind(wallet.name, wallet.rdns, kind)), [wallets]);
+
+  const connectMobileWallet = useCallback(async (
+    kind: MobileWalletKind,
+    label: string,
+    createDappUrl: (url: string) => string,
+  ) => {
+    const injected = findWallet(kind);
+    if (injected) {
       setConnecting(true);
-      setMessage("Waiting for Base App approval…");
-      try { return await withConnectionTimeout(finishConnection(injectedBase.provider, "base-app")); }
+      setMessage(`Waiting for ${label} approval…`);
+      try { return await withConnectionTimeout(finishConnection(injected.provider, `${kind}-app`)); }
       catch (error) { setMessage(conciseError(error)); return null; }
       finally { setConnecting(false); }
     }
 
-    setMessage(isMobileUserAgent(navigator.userAgent) ? "Opening Gravity Goons in the Base App…" : "Opening the Base App…");
-    window.location.assign(createBaseAppDappUrl(window.location.href));
+    setMessage(`Opening Gravity Goons in ${label}…`);
+    window.location.assign(createDappUrl(window.location.href));
     return null;
-  }, [finishConnection, wallets]);
+  }, [findWallet, finishConnection]);
+
+  const connectBase = useCallback(async () => {
+    return connectMobileWallet("base", "Base App", createBaseAppDappUrl);
+  }, [connectMobileWallet]);
+
+  const connectMetaMask = useCallback(async () => connectMobileWallet("metamask", "MetaMask", createMetaMaskDappUrl), [connectMobileWallet]);
+  const connectRainbow = useCallback(async () => connectMobileWallet("rainbow", "Rainbow", createRainbowDappUrl), [connectMobileWallet]);
 
   const connectWalletConnect = useCallback(async () => {
     const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID?.trim();
@@ -205,13 +231,18 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const announced = new Map<string, InjectedWallet>();
     const announce = (event: WindowEventMap["eip6963:announceProvider"]) => {
       const { info, provider: announcedProvider } = event.detail;
-      announced.set(info.uuid, { id: info.uuid, name: info.name, icon: info.icon, provider: announcedProvider });
+      announced.set(info.uuid, { id: info.uuid, name: info.name, icon: info.icon, rdns: info.rdns, provider: announcedProvider });
       setWallets(Array.from(announced.values()));
     };
     window.addEventListener("eip6963:announceProvider", announce);
     window.dispatchEvent(new Event("eip6963:requestProvider"));
     const legacyTimer = window.setTimeout(() => {
-      if (window.ethereum) setWallets((current) => current.length ? current : [{ id: "legacy", name: "Browser wallet", icon: "", provider: window.ethereum! }]);
+      if (window.ethereum) setWallets((current) => {
+        if (current.length) return current;
+        const legacy = window.ethereum!;
+        const name = legacy.isRainbow ? "Rainbow" : legacy.isCoinbaseWallet ? "Base App" : legacy.isMetaMask ? "MetaMask" : "Browser wallet";
+        return [{ id: "legacy", name, icon: "", provider: legacy }];
+      });
     }, 0);
     return () => { window.clearTimeout(legacyTimer); window.removeEventListener("eip6963:announceProvider", announce); };
   }, []);
@@ -220,12 +251,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const prior = window.localStorage.getItem(STORAGE_KEY);
     if (!prior || account || connecting) return;
     const reconnect = async () => {
-      if (prior === "base-app") {
-        const baseProvider = wallets.find((wallet) => isBaseWalletName(wallet.name))?.provider;
-        if (!baseProvider) return;
-        const accounts = await baseProvider.request<unknown[]>({ method: "eth_accounts" }).catch(() => []);
+      if (/^(base|metamask|rainbow)-app$/.test(prior)) {
+        const kind = prior.replace("-app", "") as MobileWalletKind;
+        const selectedProvider = findWallet(kind)?.provider;
+        if (!selectedProvider) return;
+        const accounts = await selectedProvider.request<unknown[]>({ method: "eth_accounts" }).catch(() => []);
         const next = normalizeAccount(accounts[0]);
-        if (next) bindProvider(baseProvider, prior, next);
+        if (next) bindProvider(selectedProvider, prior, next);
       } else if (prior === "base") {
         window.localStorage.removeItem(STORAGE_KEY);
       } else if (prior.startsWith("injected")) {
@@ -238,7 +270,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
     };
     void reconnect();
-  }, [account, bindProvider, connecting, wallets]);
+  }, [account, bindProvider, connecting, findWallet, wallets]);
 
   useEffect(() => {
     if (!provider) return;
@@ -253,9 +285,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, [provider]);
 
   const value = useMemo<WalletState>(() => ({
-    account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectWalletConnect,
+    account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect,
     connectInjected, disconnect, openModal: () => setModalOpen(true), closeModal: () => setModalOpen(false), request, signMessage,
-  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectWalletConnect, connectInjected, disconnect, request, signMessage]);
+  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect, connectInjected, disconnect, request, signMessage]);
 
   return <WalletContext.Provider value={value}>
     {children}
@@ -264,14 +296,22 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         <button className="wallet-modal-close" onClick={() => setModalOpen(false)} aria-label="Close wallet chooser">×</button>
         <span>BASE MAINNET // 8453</span>
         <h2 id="wallet-modal-title">Connect a wallet</h2>
-        <p>Open Gravity Goons inside the Base App, use WalletConnect, or choose a wallet detected in this browser.</p>
+        <p>Choose your wallet. On a phone, Gravity Goons reopens securely inside that wallet&apos;s app.</p>
         <div className="wallet-options">
-          <button onClick={connectBase} disabled={connecting}><b>OPEN BASE APP</b><span>Continue inside the Base App</span></button>
-          <button onClick={connectWalletConnect} disabled={connecting}><b>WALLETCONNECT</b><span>Rainbow, MetaMask, and more</span></button>
-          {wallets.map((wallet) => <button key={wallet.id} onClick={() => connectInjected(wallet.id)} disabled={connecting}>
-            <b>WEB</b><span>{wallet.name}</span>
-          </button>)}
+          <button onClick={connectBase} disabled={connecting} aria-label="Open Gravity Goons in the Base App">
+            <Image src="/wallets/base.svg" alt="" width={48} height={48}/><strong>Base</strong><small>OPEN APP</small>
+          </button>
+          <button onClick={connectMetaMask} disabled={connecting} aria-label="Open Gravity Goons in MetaMask">
+            <Image src="/wallets/metamask.svg" alt="" width={48} height={48}/><strong>MetaMask</strong><small>OPEN APP</small>
+          </button>
+          <button onClick={connectRainbow} disabled={connecting} aria-label="Open Gravity Goons in Rainbow">
+            <Image src="/wallets/rainbow.svg" alt="" width={48} height={48}/><strong>Rainbow</strong><small>OPEN APP</small>
+          </button>
         </div>
+        {Boolean(process.env.NEXT_PUBLIC_REOWN_PROJECT_ID?.trim()) && <button className="wallet-more" onClick={connectWalletConnect} disabled={connecting}>More wallets via WalletConnect</button>}
+        {wallets.filter((wallet) => !(["base", "metamask", "rainbow"] as MobileWalletKind[]).some((kind) => isWalletKind(wallet.name, wallet.rdns, kind))).map((wallet) => <button className="wallet-more" key={wallet.id} onClick={() => connectInjected(wallet.id)} disabled={connecting}>
+          {wallet.icon && <Image src={wallet.icon} alt="" width={24} height={24} unoptimized/>}<span>Connect {wallet.name}</span>
+        </button>)}
         <div className="wallet-modal-status" aria-live="polite"><b>{connecting ? "CONNECTING" : "STATUS"}</b><span>{message || "Choose a connection method."}</span></div>
         <button className="wallet-diagnostic-copy" type="button" onClick={() => navigator.clipboard.writeText([
           `Gravity Goons wallet status: ${message || "idle"}`,
