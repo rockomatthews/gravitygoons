@@ -10,11 +10,12 @@
   "premint_site_verified": false,
   "contract_security_verified": true,
   "production_safe_verified": true,
-  "base_mainnet_deployment_recorded": false,
+  "base_mainnet_deployment_recorded": true,
   "ready_for_base_sale": false,
   "mint_gate_should_be_open": false,
   "blockers": [
     "full ownership-backed authoritative 1v1 production E2E is pending",
-    "Base mainnet contracts not recorded with mint closed"
+    "production Safe must accept registry ownership",
+    "exact 50-token creator reserve mint and post-mint verification are pending"
   ]
 }
