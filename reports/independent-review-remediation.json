@@ -20,37 +20,37 @@
   "findings": [
     {
       "id": "L-01",
-      "status": "remediated_pending_fix_review",
+      "status": "resolved",
       "resolution": "Pinned both source pragmas to Solidity 0.8.30."
     },
     {
       "id": "L-02",
-      "status": "remediated_pending_fix_review",
+      "status": "resolved",
       "resolution": "Added a Safe-owner-controlled immediate pause for applyProgress while preserving the two-day signer rotation delay."
     },
     {
       "id": "L-03",
-      "status": "remediated_pending_fix_review",
+      "status": "resolved",
       "resolution": "Separated runtime dependencies, added a runtime-isolation verifier, made mainnet deployment refuse development tooling, and documented a fresh minimally funded ephemeral deployer procedure."
     },
     {
       "id": "INFO-01",
-      "status": "accepted_pending_fix_review",
+      "status": "accepted_by_design",
       "resolution": "Confirmed immutable tokenURI is deliberate. Dynamic progression remains in the registry and site presentation layer; ERC-4906 is only a refresh hint."
     },
     {
       "id": "INFO-02",
-      "status": "remediated_pending_fix_review",
+      "status": "resolved",
       "resolution": "Added nonReentrant to creatorMintSelected."
     },
     {
       "id": "INFO-03",
-      "status": "remediated_pending_fix_review",
+      "status": "resolved",
       "resolution": "Removed the unreachable zero-address branch and retained ownerOf solely as the nonexistent-token check."
     },
     {
       "id": "INFO-04",
-      "status": "remediated_pending_fix_review",
+      "status": "resolved",
       "resolution": "Added tests for withdrawal, signer delay and pause, setCollectionOnce, Ownable2Step, expired progress claims, and exact overpayment rejection. The suite now has 18 passing tests."
     }
   ],
@@ -65,6 +65,20 @@
     "production_dependency_audit": "0 vulnerabilities",
     "slither": "no first-party high or critical issue; intentional findings documented in reports/contract-security-review.json"
   },
+  "fix_review": {
+    "complete": true,
+    "commit": "c2704df7ac613f6c99021d6fb8de788a49007b6b",
+    "verdict": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low_open": 0,
+      "informational_open": 0
+    },
+    "new_issues": 0,
+    "report": "reports/independent-fix-review-2026-08-01.md"
+  },
+  "contract_security_gate_passed": true,
   "deployment_authorized": false,
-  "next_gate": "Independent reviewer must inspect the remediation diff and re-issue finding statuses against the new commit."
+  "next_gate": "Complete the remaining operational and production launch gates. Mainnet deployment and public minting require separate explicit authorization."
 }
