@@ -57,6 +57,7 @@ function displayEth(wei: bigint): string {
 
 export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; imageBaseUrl: string }) {
   const { account, connect, provider, signMessage, message: walletMessage } = useWallet();
+  const normalizedAccount = account?.toLowerCase() ?? null;
   const [discipline, setDiscipline] = useState("All");
   const [cast, setCast] = useState("All");
   const [bodyBuild, setBodyBuild] = useState("All");
@@ -135,12 +136,15 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const tokensById = useMemo(() => new Map(tokens.map((token) => [token.token_id, token])), [tokens]);
   const selectedTotal = useMemo(() => selected.reduce((total, tokenId) => total + (RARITY_PRICE_WEI[tokensById.get(tokenId)?.rarity ?? ""] ?? 0n), 0n), [selected, tokensById]);
   const ordered = useMemo(() => [...filtered].sort((a, b) => {
-    const aMine = liveById.get(a.token_id)?.owner === account?.toLowerCase() ? 1 : 0;
-    const bMine = liveById.get(b.token_id)?.owner === account?.toLowerCase() ? 1 : 0;
+    const aMine = normalizedAccount && liveById.get(a.token_id)?.owner === normalizedAccount ? 1 : 0;
+    const bMine = normalizedAccount && liveById.get(b.token_id)?.owner === normalizedAccount ? 1 : 0;
     return bMine - aMine || a.token_id - b.token_id;
-  }), [filtered, liveById, account]);
+  }), [filtered, liveById, normalizedAccount]);
   const visible = ordered.slice(0, page * PAGE_SIZE);
-  const myGoons = useMemo(() => tokens.filter((token) => liveById.get(token.token_id)?.owner === account?.toLowerCase()), [tokens, liveById, account]);
+  const myGoons = useMemo(() => {
+    if (!normalizedAccount) return [];
+    return tokens.filter((token) => liveById.get(token.token_id)?.owner === normalizedAccount);
+  }, [tokens, liveById, normalizedAccount]);
 
   function toggle(tokenId: number) {
     if (availableIds?.has(tokenId) === false) return;
@@ -236,7 +240,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
           const active = selected.includes(token.token_id);
           const available = availableIds?.has(token.token_id) !== false;
           const live = liveById.get(token.token_id);
-          const mine = live?.owner === account?.toLowerCase();
+          const mine = normalizedAccount !== null && live?.owner === normalizedAccount;
           const eligible = !available && !mine && Boolean(live?.owner) && !live?.matchId && !live?.challengeId
             && myGoons.some((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
           const cardStatus = mine ? "Owned by you" : available ? "Available to mint" : live?.matchId ? "In match" : live?.challengeId ? "Challenge pending" : eligible ? "Challengeable" : "Held";
