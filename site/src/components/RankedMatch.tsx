@@ -33,12 +33,12 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   const discipline = useMemo(() => match ? collection.tokens[match.first_token_id - 1].discipline as Discipline : "Skateboarding", [match]);
   const tricks = TRICK_CATALOG[discipline];
 
-  async function act(action: "call_trick" | "answer_trick", useGrit = false) {
+  async function act() {
     if (!match) return;
     setStatus("Resolving from the committed server turn…");
     const response = await fetch(`/api/matches/${matchId}/actions`, {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ turnNumber: match.next_turn_number, idempotencyKey: crypto.randomUUID(), action, trickId, useGrit }),
+      body: JSON.stringify({ turnNumber: match.next_turn_number, idempotencyKey: crypto.randomUUID(), action: "call_trick", trickId }),
     });
     const data = await response.json();
     setStatus(response.ok ? "Turn resolved and written to the audit transcript." : data.error);
@@ -58,14 +58,12 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     {match.status === "matched" && <div className="ranked-controls">
       {!pending ? <>
         <label>CALL A TRICK<select value={trickId} onChange={(event) => setTrickId(Number(event.target.value))}>{tricks.map((trick) => <option key={trick.id} value={trick.id}>{trick.name} · difficulty {trick.difficulty}</option>)}</select></label>
-        <button onClick={() => act("call_trick")}>CALL + RESOLVE SETTER</button>
+        <button onClick={act}>CALL · RUN BOTH ATTEMPTS</button>
       </> : <>
-        <p>Setter landed. The responder must answer the exact call.</p>
-        <button onClick={() => act("answer_trick")}>ANSWER</button>
-        <button onClick={() => act("answer_trick", true)}>SPEND 1 GRIT + ANSWER</button>
+        <p>This legacy response is already locked to the called trick and will resolve automatically.</p>
       </>}
     </div>}
-    <p className="ranked-status">{status} · deadline {new Date(match.action_deadline).toLocaleString()}</p>
+    <p className="ranked-status">{status} · setters have 60 seconds to select · forced replications run automatically · deadline {new Date(match.action_deadline).toLocaleString()}</p>
     <div className="ranked-transcript"><h3>Complete transcript</h3>{match.actions.map((item) => <div key={item.turn_number}><b>TURN {item.turn_number}</b><span>{item.action_type.replaceAll("_", " ")}</span></div>)}</div>
   </section>;
 }

@@ -193,7 +193,7 @@ begin
   select * into m from public.pvp_matches where id=p_match_id;
   perform public.next_arena_event(p_match_id,'player_checked_in',jsonb_build_object('bothReady',m.first_checked_in_at is not null and m.second_checked_in_at is not null));
   if m.first_checked_in_at is not null and m.second_checked_in_at is not null and now() >= m.scheduled_start_at then
-    update public.pvp_matches set status='matched',started_at=now(),action_deadline=now()+interval '2 minutes',updated_at=now() where id=p_match_id;
+    update public.pvp_matches set status='matched',started_at=now(),action_deadline=now()+interval '1 minute',updated_at=now() where id=p_match_id;
     perform public.next_arena_event(p_match_id,'started','{}'::jsonb);
   elsif m.first_checked_in_at is not null and m.second_checked_in_at is not null then
     perform public.next_arena_event(p_match_id,'ready','{}'::jsonb);
@@ -229,7 +229,7 @@ begin
 
   for m in select * from public.pvp_matches where match_mode='live_ranked' and status='queued' for update skip locked loop
     if m.first_checked_in_at is not null and m.second_checked_in_at is not null and now() >= m.scheduled_start_at then
-      update public.pvp_matches set status='matched',started_at=now(),action_deadline=now()+interval '2 minutes',updated_at=now() where id=m.id;
+      update public.pvp_matches set status='matched',started_at=now(),action_deadline=now()+interval '1 minute',updated_at=now() where id=m.id;
       perform public.next_arena_event(m.id,'started','{}'::jsonb);
       started_count := started_count + 1;
     elsif now() > m.scheduled_start_at + interval '5 minutes' then
@@ -273,7 +273,7 @@ set search_path = public
 as $$
 begin
   if new.match_mode='live_ranked' and new.status='matched' and new.action_deadline is not null and new.next_turn_number > old.next_turn_number then
-    new.action_deadline := now() + interval '2 minutes';
+    new.action_deadline := now() + interval '1 minute';
     new.first_action_at := coalesce(old.first_action_at, now());
     new.betting_closes_at := least(coalesce(new.betting_closes_at, now()), now());
   end if;

@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import collection from "@/data/collection.json";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import {
-  DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, matchIsOver, resolveSetterAttempt,
+  DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, matchIsOver,
   resolveSkateTurn, type Athlete, type CallMode, type Discipline, type TrickHistory,
 } from "@/lib/pvp";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -68,11 +68,16 @@ export async function processMatchAction(wallet: string, matchId: string, input:
     const trick = catalogue[input.trickId ?? -1];
     if (!trick) throw new Error("Unknown trick.");
     const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue: TRICK_CATALOG[responder.discipline], responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: state.previousTrick, callMode: input.callMode ?? "standard", letterlessTurns: state.letterlessTurns ?? 0 };
-    const attempt = resolveSetterAttempt(choice, seed);
-    result = { action: "call_trick", attempt, seedCommit: seedCommitment(seed) };
-    nextState.previousTrick = trick.name;
-    if (attempt.landed) nextState.pendingCall = { trickId: trick.id, seed, setterTokenId: setter.tokenId };
-    else { nextState.setterTokenId = responder.tokenId; nextState.letterlessTurns = (state.letterlessTurns ?? 0) + 1; }
+    const turn = resolveSkateTurn(choice, seed);
+    const attempt = turn.attempts[0];
+    result = { action: "call_trick", attempt, automaticResponse: turn.attempts[1], turn, seedCommit: seedCommitment(seed), seedReveal: seed };
+    nextState.previousTrick = attempt.landed ? trick.name : null;
+    nextState.pendingCall = undefined;
+    nextState.setterTokenId = turn.nextSetterTokenId;
+    if (turn.attempts[1]) nextState.practice[responder.tokenId] = addTrickUse(state.practice[responder.tokenId] ?? {}, trick.name);
+    if (turn.letterRecipientTokenId === first.tokenId) nextState.firstLosses += 1;
+    if (turn.letterRecipientTokenId === second.tokenId) nextState.secondLosses += 1;
+    nextState.letterlessTurns = turn.letterRecipientTokenId ? 0 : (state.letterlessTurns ?? 0) + 1;
   } else {
     if (!state.pendingCall) throw new Error("There is no called trick to answer.");
     const trick = catalogue[state.pendingCall.trickId];
