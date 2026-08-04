@@ -1,0 +1,16 @@
+{
+  "schema": "gravity-goons-mainnet-registry-ownership-v1",
+  "verified_at": "2026-08-04T22:55:00Z",
+  "chain_id": 8453,
+  "registry": "0x1DDbe6163cEd907135B827cf2E2Be697b5DEeA04",
+  "collection": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+  "safe": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "ownership_transaction": "0x880001102efb1ad24763ad083e0d9e360f7b8cdc89f98db3df329a77d338142b",
+  "ownership_block": 49547554,
+  "owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "pending_owner": "0x0000000000000000000000000000000000000000",
+  "verified_onchain": true,
+  "public_mint_open": false,
+  "creator_minted": 0,
+  "public_minted": 0
+}
