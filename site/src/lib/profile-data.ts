@@ -206,9 +206,27 @@ export async function syncWalletOwnership(walletAddress: string): Promise<number
   const supabase = getSupabaseAdmin();
   if (!supabase || collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
 
+  // Only minted tokens can have an owner. Reading the four availability words first
+  // avoids 1,000 reverting ownerOf calls and is much friendlier to public RPCs.
+  const availabilityWords = await Promise.all(
+    [1n, 257n, 513n, 769n].map((startTokenId) => publicClient.readContract({
+      address: collectionAddress,
+      abi: collectionAbi,
+      functionName: "availabilityWord",
+      args: [startTokenId],
+    })),
+  );
+  const mintedTokenIds: number[] = [];
+  availabilityWords.forEach((word, wordIndex) => {
+    const startTokenId = wordIndex * 256 + 1;
+    for (let bit = 0; bit < 256 && startTokenId + bit <= 1000; bit += 1) {
+      if ((word & (1n << BigInt(bit))) === 0n) mintedTokenIds.push(startTokenId + bit);
+    }
+  });
+
   const owned: number[] = [];
-  for (let start = 1; start <= 1000; start += 100) {
-    const tokenIds = Array.from({ length: Math.min(100, 1001 - start) }, (_, index) => start + index);
+  for (let start = 0; start < mintedTokenIds.length; start += 100) {
+    const tokenIds = mintedTokenIds.slice(start, start + 100);
     const results = await publicClient.multicall({
       allowFailure: true,
       contracts: tokenIds.map((tokenId) => ({ address: collectionAddress, abi: collectionAbi, functionName: "ownerOf" as const, args: [BigInt(tokenId)] })),
