@@ -201,10 +201,9 @@ export async function saveProfileForWallet(walletAddress: string, input: { usern
   return profile;
 }
 
-export async function syncWalletOwnership(walletAddress: string): Promise<number[]> {
+export async function readWalletOwnership(walletAddress: string): Promise<number[]> {
   const wallet = walletAddress.toLowerCase();
-  const supabase = getSupabaseAdmin();
-  if (!supabase || collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
+  if (collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
 
   // Only minted tokens can have an owner. Reading the four availability words first
   // avoids 1,000 reverting ownerOf calls and is much friendlier to public RPCs.
@@ -231,10 +230,20 @@ export async function syncWalletOwnership(walletAddress: string): Promise<number
       allowFailure: true,
       contracts: tokenIds.map((tokenId) => ({ address: collectionAddress, abi: collectionAbi, functionName: "ownerOf" as const, args: [BigInt(tokenId)] })),
     });
+    const failed = results.filter((result) => result.status === "failure").length;
+    if (failed) throw new Error(`Base RPC could not verify ${failed} minted token owner${failed === 1 ? "" : "s"}.`);
     results.forEach((result, index) => {
       if (result.status === "success" && String(result.result).toLowerCase() === wallet) owned.push(tokenIds[index]);
     });
   }
+  return owned;
+}
+
+export async function syncWalletOwnership(walletAddress: string): Promise<number[]> {
+  const wallet = walletAddress.toLowerCase();
+  const supabase = getSupabaseAdmin();
+  if (!supabase || collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
+  const owned = await readWalletOwnership(wallet);
 
   const { data: staleData } = await supabase.from("nft_ownership").select("token_id").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("owner_wallet_address", wallet);
   const staleIds = ((staleData ?? []) as OwnershipRow[]).map((row) => row.token_id).filter((tokenId) => !owned.includes(tokenId));

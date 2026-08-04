@@ -115,30 +115,16 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       return;
     }
     try {
-      const unavailableIds = tokens
-        .map((token) => token.token_id)
-        .filter((tokenId) => !availableIds.has(tokenId));
-      const owned = new Set<number>();
-      for (let offset = 0; offset < unavailableIds.length; offset += 100) {
-        const tokenIds = unavailableIds.slice(offset, offset + 100);
-        const results = await publicClient.multicall({
-          allowFailure: true,
-          contracts: tokenIds.map((tokenId) => ({
-            address: collectionAddress,
-            abi: collectionAbi,
-            functionName: "ownerOf" as const,
-            args: [BigInt(tokenId)],
-          })),
-        });
-        results.forEach((result, index) => {
-          if (result.status === "success" && String(result.result).toLowerCase() === normalizedAccount) owned.add(tokenIds[index]);
-        });
-      }
-      setDirectOwnedIds(owned);
+      const response = await fetch(`/api/ownership?wallet=${encodeURIComponent(normalizedAccount)}`, { cache: "no-store" });
+      const data = await response.json() as { tokenIds?: number[]; error?: string };
+      if (!response.ok || !Array.isArray(data.tokenIds)) throw new Error(data.error ?? "Ownership verification failed.");
+      setDirectOwnedIds(new Set(data.tokenIds));
     } catch {
-      setStatus("Connected wallet ownership is temporarily unavailable. Retrying…");
+      // Preserve the last confirmed ownership set. A transient RPC failure must
+      // never make owned Goons disappear or change the displayed count.
+      setStatus("Ownership refresh is temporarily unavailable. Keeping the last verified count.");
     }
-  }, [availableIds, normalizedAccount, tokens]);
+  }, [availableIds, normalizedAccount]);
 
   useEffect(() => {
     const initial = window.setTimeout(refreshConnectedOwnership, 0);
