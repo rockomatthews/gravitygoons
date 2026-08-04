@@ -42,14 +42,24 @@ export function ProfileSetup() {
       const verified = await verifyResponse.json();
       if (!verifyResponse.ok) throw new Error(verified.error);
       setAuthenticated(true);
+      let ownershipCount: number | null = null;
+      try {
+        const syncResponse = await fetch("/api/profile/sync", { method: "POST" });
+        const synced = await syncResponse.json();
+        if (syncResponse.ok) ownershipCount = synced.tokenIds.length;
+      } catch { /* The manual refresh remains available if the index is temporarily unavailable. */ }
       if (verified.profile) {
         setProfile(verified.profile);
         setUsername(verified.profile.username);
         setDisplayName(verified.profile.display_name);
         setBio(verified.profile.bio);
-        setStatus("Profile unlocked. You can edit it or refresh the NFTs owned by this wallet.");
+        setStatus(ownershipCount === null
+          ? "Profile unlocked. Use REFRESH MY GOONS if ownership is not visible yet."
+          : `Profile unlocked. Ownership refreshed: ${ownershipCount} Gravity Goon${ownershipCount === 1 ? "" : "s"} found.`);
       } else {
-        setStatus("Wallet verified. Choose the username that will appear after gravitygoons.com/.");
+        setStatus(ownershipCount === null
+          ? "Wallet verified. Choose your username, then use REFRESH MY GOONS if needed."
+          : `Wallet verified. ${ownershipCount} Gravity Goon${ownershipCount === 1 ? "" : "s"} found. Choose your profile username.`);
       }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet sign-in was cancelled.");

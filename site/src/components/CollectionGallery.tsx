@@ -64,12 +64,13 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const [rarity, setRarity] = useState("All");
   const [brand, setBrand] = useState("All");
   const [playStyle, setPlayStyle] = useState("All");
-  const [availabilityFilter, setAvailabilityFilter] = useState("Available");
+  const [availabilityFilter, setAvailabilityFilter] = useState("All");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<number[]>([]);
   const [status, setStatus] = useState("");
   const [availableIds, setAvailableIds] = useState<Set<number> | null>(null);
+  const [directOwnedIds, setDirectOwnedIds] = useState<Set<number>>(new Set());
   const [saleOpen, setSaleOpen] = useState(false);
   const [liveById, setLiveById] = useState<Map<number, AthleteLive>>(new Map());
   const [challengeTarget, setChallengeTarget] = useState<Token | null>(null);
@@ -108,6 +109,42 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     return () => { window.clearTimeout(initial); window.clearInterval(timer); };
   }, [refreshAvailability]);
 
+  const refreshConnectedOwnership = useCallback(async () => {
+    if (!normalizedAccount || collectionAddress === ZERO_ADDRESS || availableIds === null) {
+      setDirectOwnedIds(new Set());
+      return;
+    }
+    try {
+      const unavailableIds = tokens
+        .map((token) => token.token_id)
+        .filter((tokenId) => !availableIds.has(tokenId));
+      const owned = new Set<number>();
+      for (let offset = 0; offset < unavailableIds.length; offset += 100) {
+        const tokenIds = unavailableIds.slice(offset, offset + 100);
+        const results = await publicClient.multicall({
+          allowFailure: true,
+          contracts: tokenIds.map((tokenId) => ({
+            address: collectionAddress,
+            abi: collectionAbi,
+            functionName: "ownerOf" as const,
+            args: [BigInt(tokenId)],
+          })),
+        });
+        results.forEach((result, index) => {
+          if (result.status === "success" && String(result.result).toLowerCase() === normalizedAccount) owned.add(tokenIds[index]);
+        });
+      }
+      setDirectOwnedIds(owned);
+    } catch {
+      setStatus("Connected wallet ownership is temporarily unavailable. Retrying…");
+    }
+  }, [availableIds, normalizedAccount, tokens]);
+
+  useEffect(() => {
+    const initial = window.setTimeout(refreshConnectedOwnership, 0);
+    return () => window.clearTimeout(initial);
+  }, [refreshConnectedOwnership]);
+
   const refreshRoster = useCallback(async () => {
     try {
       const response = await fetch("/api/roster", { cache: "no-store" });
@@ -136,15 +173,15 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const tokensById = useMemo(() => new Map(tokens.map((token) => [token.token_id, token])), [tokens]);
   const selectedTotal = useMemo(() => selected.reduce((total, tokenId) => total + (RARITY_PRICE_WEI[tokensById.get(tokenId)?.rarity ?? ""] ?? 0n), 0n), [selected, tokensById]);
   const ordered = useMemo(() => [...filtered].sort((a, b) => {
-    const aMine = normalizedAccount && liveById.get(a.token_id)?.owner === normalizedAccount ? 1 : 0;
-    const bMine = normalizedAccount && liveById.get(b.token_id)?.owner === normalizedAccount ? 1 : 0;
+    const aMine = normalizedAccount && (directOwnedIds.has(a.token_id) || liveById.get(a.token_id)?.owner === normalizedAccount) ? 1 : 0;
+    const bMine = normalizedAccount && (directOwnedIds.has(b.token_id) || liveById.get(b.token_id)?.owner === normalizedAccount) ? 1 : 0;
     return bMine - aMine || a.token_id - b.token_id;
-  }), [filtered, liveById, normalizedAccount]);
-  const visible = ordered.slice(0, page * PAGE_SIZE);
+  }), [directOwnedIds, filtered, liveById, normalizedAccount]);
+  const visible = ordered.slice(0, normalizedAccount ? Math.max(page * PAGE_SIZE, PAGE_SIZE * 3) : page * PAGE_SIZE);
   const myGoons = useMemo(() => {
     if (!normalizedAccount) return [];
-    return tokens.filter((token) => liveById.get(token.token_id)?.owner === normalizedAccount);
-  }, [tokens, liveById, normalizedAccount]);
+    return tokens.filter((token) => directOwnedIds.has(token.token_id) || liveById.get(token.token_id)?.owner === normalizedAccount);
+  }, [directOwnedIds, tokens, liveById, normalizedAccount]);
 
   function toggle(tokenId: number) {
     if (availableIds?.has(tokenId) === false) return;
@@ -234,13 +271,13 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
         <span className={`result-count ${saleOpen ? "live" : ""}`}>{saleOpen ? "● MINT LIVE" : "MINT CLOSED"} · {availableIds?.size ?? "—"} LEFT</span>
       </div>
 
-      {account && myGoons.length > 0 && <div className="my-goons-strip"><b>MY GOONS</b><span>{myGoons.map((token) => `#${String(token.token_id).padStart(4, "0")}`).join(" · ")}</span></div>}
+      {account && myGoons.length > 0 && <div className="my-goons-strip"><b>MY GOONS · {myGoons.length} OWNED</b><span>{myGoons.map((token) => `#${String(token.token_id).padStart(4, "0")}`).join(" · ")}</span></div>}
       <div className="token-grid">
         {visible.map((token) => {
           const active = selected.includes(token.token_id);
           const available = availableIds?.has(token.token_id) !== false;
           const live = liveById.get(token.token_id);
-          const mine = normalizedAccount !== null && live?.owner === normalizedAccount;
+          const mine = normalizedAccount !== null && (directOwnedIds.has(token.token_id) || live?.owner === normalizedAccount);
           const eligible = !available && !mine && Boolean(live?.owner) && !live?.matchId && !live?.challengeId
             && myGoons.some((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
           const cardStatus = mine ? "Owned by you" : available ? "Available to mint" : live?.matchId ? "In match" : live?.challengeId ? "Challenge pending" : eligible ? "Challengeable" : "Held";
