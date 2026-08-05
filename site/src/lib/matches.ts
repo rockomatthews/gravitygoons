@@ -3,12 +3,13 @@ import collection from "@/data/collection.json";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import {
   DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, canSetTrick, matchIsOver,
-  resolveSkateTurn, unlockedTricks, type Athlete, type CallMode, type Discipline,
+  resolveSkateTurn, spendCallGrit, unlockedTricks, type Athlete, type CallMode, type Discipline,
   type SponsorProgression, type Trick, type TrickHistory,
 } from "@/lib/pvp";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { seedCommitment } from "@/lib/match-integrity";
 import { addMovePresentations } from "@/lib/match-move-media";
+import { goonImageUrl } from "@/lib/goon-images";
 
 type MatchState = {
   firstLosses: number;
@@ -27,6 +28,17 @@ function athlete(tokenId: number): Athlete {
     tokenId, name: token.name, discipline: token.discipline as Discipline,
     rarity: token.rarity as Athlete["rarity"], trickSpecialty: token.trick_specialty,
     stats: token.stats as Athlete["stats"],
+  };
+}
+
+function goonSummary(tokenId: number) {
+  const token = collection.tokens[tokenId - 1];
+  return {
+    tokenId,
+    name: token.name,
+    species: token.species,
+    parodyBrand: token.parody_brand,
+    image: goonImageUrl(tokenId),
   };
 }
 
@@ -67,6 +79,8 @@ export async function getMatch(wallet: string, matchId: string) {
   const legalTricks = availableTricks.filter((trick) => canSetTrick(trick, state.previousTrick));
   return {
     ...data,
+    first_goon: goonSummary(data.first_token_id),
+    second_goon: goonSummary(data.second_token_id),
     viewer_token_id: viewerTokenId,
     viewer_is_setter: viewerTokenId === state.setterTokenId,
     available_tricks: legalTricks.map(({ id, name, difficulty }) => ({ id, name, difficulty })),
@@ -107,7 +121,10 @@ export async function processMatchAction(wallet: string, matchId: string, input:
     if (state.pendingCall) throw new Error("The responder must answer the current call.");
     const trick = catalogue.find((candidate) => candidate.id === input.trickId);
     if (!trick) throw new Error("Unknown or locked trick.");
-    const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue, responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: state.previousTrick, callMode: input.callMode ?? "standard", letterlessTurns: state.letterlessTurns ?? 0 };
+    if (input.callMode !== undefined && input.callMode !== "standard" && input.callMode !== "send") throw new Error("Unknown call mode.");
+    const callMode = input.callMode ?? "standard";
+    nextState.grit[setter.tokenId] = spendCallGrit(state.grit[setter.tokenId] ?? 0, callMode);
+    const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue, responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: state.previousTrick, callMode, letterlessTurns: state.letterlessTurns ?? 0 };
     const turn = resolveSkateTurn(choice, seed);
     const attempt = turn.attempts[0];
     result = { action: "call_trick", attempt, automaticResponse: turn.attempts[1], turn, seedCommit: seedCommitment(seed), seedReveal: seed };

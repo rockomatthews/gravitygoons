@@ -61,6 +61,12 @@ export const PRESSURE_STARTS_AFTER = 4;
 export const PRESSURE_STEP = 2;
 export const PRESSURE_CAP = 10;
 
+export function spendCallGrit(currentGrit: number, callMode: CallMode): number {
+  if (callMode === "standard") return currentGrit;
+  if (currentGrit <= 0) throw new Error("SEND IT requires 1 Grit");
+  return currentGrit - 1;
+}
+
 export type SkateTurnChoice = {
   setter: Athlete;
   responder: Athlete;

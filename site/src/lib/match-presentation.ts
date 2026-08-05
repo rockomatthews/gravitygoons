@@ -3,6 +3,7 @@ export type MatchAttempt = {
   landed: boolean;
   chance: number;
   role: "setter" | "responder";
+  callMode?: "standard" | "send";
   trick: { id: number; name: string; difficulty: number };
 };
 

@@ -15,6 +15,7 @@ import {
   recordVerifiedRankedWin,
   resolveSkateTurn,
   resolveSetterAttempt,
+  spendCallGrit,
   trickIsInCatalogue,
   trickIsUnlocked,
   trickSimilarity,
@@ -164,6 +165,13 @@ test("SEND IT risks the setter while making the copied answer harder", () => {
   });
   assert.equal(sendSetter, standardSetter - 10);
   assert.equal(sendResponder, standardResponder - 15);
+});
+
+test("SEND IT spends exactly one setter Grit and cannot be used at zero", () => {
+  assert.equal(spendCallGrit(3, "standard"), 3);
+  assert.equal(spendCallGrit(3, "send"), 2);
+  assert.equal(spendCallGrit(1, "send"), 0);
+  assert.throws(() => spendCallGrit(0, "send"), /requires 1 Grit/);
 });
 
 test("a responder can spend grit to focus after seeing a landed call", () => {

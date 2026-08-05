@@ -302,17 +302,35 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .ranked-match h2 { margin: 28px 0; font: 950 clamp(38px, 6vw, 84px)/.9 var(--mono); text-align: center; }
 .ranked-match h2 i { color: var(--coral); font-style: normal; }
 .ranked-player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.ranked-player-card { display: grid; gap: 4px; padding: 16px; border: 1px solid #34414a; background: #030506; }
+.ranked-player-card { min-width: 0; display: grid; grid-template-columns: minmax(120px, .65fr) 1fr; align-items: stretch; border: 1px solid #34414a; background: #030506; overflow: hidden; }
+.ranked-player-card > img { width: 100%; height: 100%; min-height: 210px; object-fit: cover; }
+.ranked-player-card > div { display: grid; align-content: center; gap: 8px; padding: 18px; }
 .ranked-player-card span, .ranked-player-card small { color: var(--muted); font: 850 8px var(--mono); }
-.ranked-player-card strong { font: 950 22px var(--mono); }
+.ranked-player-card strong { font: 950 clamp(18px, 2.3vw, 30px)/.95 var(--mono); text-transform: uppercase; }
 .ranked-player-card.viewer { border-color: #18f1dc75; }
-.ranked-player-card.viewer > span { color: var(--teal); }
+.ranked-player-card.viewer span { color: var(--teal); }
 .ranked-player-card.active { border-color: var(--acid); background: linear-gradient(135deg, #dfff391a, #030506); box-shadow: inset 5px 0 0 var(--acid); }
 .ranked-player-card.active small { color: var(--acid); }
 .ranked-score { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: center; padding: 20px; background: #030506; text-align: center; }
-.ranked-score span { color: var(--coral); font: 950 34px var(--mono); letter-spacing: .15em; }
-.ranked-score span i { color: #38434b; font-style: normal; }
 .ranked-score b { color: var(--teal); font: 850 9px var(--mono); }
+.ranked-letter-track { display: flex; justify-content: center; gap: 6px; perspective: 500px; }
+.ranked-letter-track i { position: relative; width: 40px; height: 50px; display: grid; place-items: center; border: 2px solid #34414b; color: #46535c; background: #090d12; font: 950 21px var(--mono); font-style: normal; }
+.ranked-letter-track i.earned { z-index: 1; border-color: var(--coral); color: white; background: var(--coral); box-shadow: 0 8px 22px #ff4b3559; }
+.ranked-letter-track i.letter-slam { z-index: 5; animation: ranked-letter-slam 850ms cubic-bezier(.12,.86,.17,1.18) both; }
+@keyframes ranked-letter-slam {
+  0% { opacity: 0; transform: translateY(-180px) scale(4.5) rotate(-18deg); filter: blur(8px); }
+  58% { opacity: 1; transform: translateY(12px) scale(1.35) rotate(5deg); filter: blur(0); box-shadow: 0 0 70px #ff4b35; }
+  76% { transform: translateY(-7px) scale(.92) rotate(-2deg); }
+  100% { transform: translateY(0) scale(1) rotate(0); }
+}
+.ranked-strategy { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 1px; margin-bottom: 10px; border: 1px solid #26313a; background: #26313a; }
+.ranked-strategy > div { display: grid; align-content: center; gap: 8px; min-height: 105px; padding: 16px; background: #080c11; }
+.ranked-strategy span, .ranked-strategy small { color: var(--muted); font: 800 7px/1.45 var(--mono); text-transform: uppercase; }
+.ranked-strategy b { color: white; font: 900 10px var(--mono); }
+.ranked-mode-buttons { display: flex; gap: 7px; }
+.ranked-mode-buttons button { border: 1px solid #42505a; padding: 10px 12px; color: #aeb9bf; background: transparent; font: 900 8px var(--mono); cursor: pointer; }
+.ranked-mode-buttons button.active { border-color: var(--acid); color: var(--void); background: var(--acid); }
+.ranked-mode-buttons button:disabled { cursor: not-allowed; opacity: .42; }
 .ranked-result { margin-top: 18px; padding: 18px; border: 1px solid #ffffff21; background: #030506; }
 .ranked-result-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
 .ranked-result-heading span { color: var(--muted); font: 850 8px var(--mono); }
@@ -333,7 +351,11 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .attempt-outcome.landed { border-color: var(--acid); color: var(--acid); background: #dfff3912; }
 .attempt-outcome.fell { border-color: var(--coral); color: var(--coral); background: #ff4b3512; }
 .attempt-outcome.skipped { color: var(--muted); }
+.attempt-outcome.movie { border-color: var(--teal); color: var(--teal); box-shadow: 0 0 45px #18f1dc22; }
+.attempt-outcome.waiting { border-color: #303b43; color: #56636c; }
+.attempt-hidden-result { color: #59666e; font-size: clamp(17px, 3vw, 28px) !important; letter-spacing: .08em; filter: blur(3px); }
 .ranked-result > p { margin-bottom: 0; color: white; font-weight: 800; }
+.ranked-result > p.ranked-cinema-status { color: var(--teal); font: 850 8px/1.5 var(--mono); letter-spacing: .08em; }
 .ranked-turn-banner { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; margin-top: 18px; padding: 22px; border: 2px solid; }
 .ranked-turn-banner span { display: block; margin-bottom: 8px; font: 950 10px var(--mono); letter-spacing: .12em; }
 .ranked-turn-banner strong { display: block; font: 950 clamp(20px, 4vw, 34px)/1 var(--mono); text-transform: uppercase; }
@@ -383,7 +405,12 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .challenge-columns, .ranked-controls, .ranked-turn-banner { grid-template-columns: 1fr; }
   .ranked-match { padding: 18px; }
   .ranked-score { grid-template-columns: 1fr; }
-  .ranked-player-grid, .attempt-grid { grid-template-columns: 1fr; }
+  .ranked-player-grid, .attempt-grid, .ranked-strategy { grid-template-columns: 1fr; }
+  .ranked-player-card { grid-template-columns: 42% 1fr; }
+  .ranked-player-card > img { min-height: 170px; }
+  .ranked-score { gap: 7px; padding-inline: 8px; }
+  .ranked-letter-track { gap: 3px; }
+  .ranked-letter-track i { width: 27px; height: 35px; font-size: 13px; }
   .ranked-console-intro { grid-template-columns: 1fr; gap: 18px; }
   .ranked-console-intro h1, .ranked-console-intro > p:last-child { grid-column: 1; grid-row: auto; }
   .ranked-turn-banner time { justify-self: start; text-align: left; }
@@ -392,6 +419,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .ranked-letter-track i.letter-slam { animation: none; }
   .zero-g-plate, .zero-g-depth, .zero-g-tv, .zero-g-door { transition: none; transform: none; }
   .zero-g-tv video { display: none; }
 }
