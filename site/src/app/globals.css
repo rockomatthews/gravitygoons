@@ -314,12 +314,19 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .ranked-score span i { color: #38434b; font-style: normal; }
 .ranked-score b { color: var(--teal); font: 850 9px var(--mono); }
 .ranked-result { margin-top: 18px; padding: 18px; border: 1px solid #ffffff21; background: #030506; }
-.ranked-result-heading { display: flex; align-items: baseline; gap: 12px; }
+.ranked-result-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
 .ranked-result-heading span { color: var(--muted); font: 850 8px var(--mono); }
 .ranked-result-heading strong { color: white; font: 950 20px var(--mono); text-transform: uppercase; }
+.ranked-result-heading em { margin-left: auto; color: var(--teal); font: 800 7px var(--mono); font-style: normal; text-transform: uppercase; }
 .attempt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-.attempt-outcome { display: grid; gap: 5px; min-height: 118px; align-content: center; padding: 16px; border: 2px solid #46515a; text-align: center; }
+.attempt-outcome { display: grid; gap: 7px; min-height: 118px; align-content: center; padding: 16px; border: 2px solid #46515a; text-align: center; }
+.attempt-outcome header { display: flex; justify-content: space-between; gap: 10px; }
+.attempt-outcome header span, .attempt-outcome header em { color: white; font: 900 7px var(--mono); font-style: normal; }
+.attempt-outcome header em { color: var(--teal); }
 .attempt-outcome video { width: 100%; aspect-ratio: 1; margin-bottom: 8px; object-fit: cover; background: #000; }
+.attempt-movie-fallback { aspect-ratio: 1; display: grid; place-content: center; gap: 8px; padding: 24px; border: 1px solid #ffffff17; background: radial-gradient(circle, #18f1dc13, transparent 58%), #080d12; }
+.attempt-movie-fallback b { color: var(--muted); font: 950 18px var(--mono); }
+.attempt-movie-fallback small { max-width: 320px; color: #89959d; font: 750 8px/1.5 var(--mono); }
 .attempt-outcome span, .attempt-outcome small { font: 800 8px var(--mono); }
 .attempt-outcome small { color: #d0d6da; }
 .attempt-outcome strong { font: 950 clamp(30px, 6vw, 54px)/.9 var(--mono); }
@@ -337,9 +344,12 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .ranked-turn-banner.is-your-turn span, .ranked-turn-banner.is-your-turn time { color: var(--acid); }
 .ranked-turn-banner.is-waiting { border-color: var(--teal); background: linear-gradient(135deg, #18f1dc17, #070b10 55%); }
 .ranked-turn-banner.is-waiting span, .ranked-turn-banner.is-waiting time { color: var(--teal); }
+.ranked-turn-banner.is-expired { border-color: var(--coral); background: linear-gradient(135deg, #ff4b351a, #070b10 55%); }
+.ranked-turn-banner.is-expired span, .ranked-turn-banner.is-expired time { color: var(--coral); }
 .ranked-turn-banner.match-complete { border-color: var(--coral); color: var(--coral); }
 .ranked-controls { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 10px; margin-top: 8px; }
 .ranked-controls label { display: grid; gap: 8px; color: var(--muted); font: 850 8px var(--mono); }
+.ranked-controls label small { color: #97a3aa; font: 750 7px/1.4 var(--mono); }
 .ranked-controls select, .ranked-controls button { border: 1px solid #42505a; padding: 14px; color: white; background: #0d141b; }
 .ranked-controls button { min-width: 170px; color: var(--void); background: var(--acid); border-color: var(--acid); font: 950 12px var(--mono); cursor: pointer; }
 .ranked-controls button:disabled { cursor: wait; opacity: .55; }
@@ -348,6 +358,12 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .ranked-transcript summary { padding: 14px 0; color: var(--muted); font: 850 8px var(--mono); cursor: pointer; }
 .ranked-transcript div { display: flex; gap: 18px; padding: 10px 0; border-bottom: 1px solid #ffffff0d; font: 750 8px var(--mono); }
 .ranked-transcript div b { color: var(--teal); }
+.ranked-console-intro { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 40px; padding-block: 54px 34px; }
+.ranked-console-intro h1 { grid-row: 2; margin: 0; font-size: clamp(58px, 9vw, 128px); line-height: .78; letter-spacing: -.07em; }
+.ranked-console-intro h1 i { color: var(--teal); font-style: normal; }
+.ranked-console-intro > p:last-child { grid-column: 2; grid-row: 2; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+.ranked-console-footer { display: flex; justify-content: space-between; padding-bottom: 60px; }
+.ranked-console-footer a { color: var(--teal); font: 900 8px var(--mono); }
 
 @media (max-width: 680px) {
   .nav { height: 70px; grid-template-columns: auto 1fr auto; }
@@ -368,6 +384,8 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .ranked-match { padding: 18px; }
   .ranked-score { grid-template-columns: 1fr; }
   .ranked-player-grid, .attempt-grid { grid-template-columns: 1fr; }
+  .ranked-console-intro { grid-template-columns: 1fr; gap: 18px; }
+  .ranked-console-intro h1, .ranked-console-intro > p:last-child { grid-column: 1; grid-row: auto; }
   .ranked-turn-banner time { justify-self: start; text-align: left; }
   .ranked-controls button { width: 100%; min-width: 0; }
 }
@@ -635,6 +653,9 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .broadcast-turn-movies > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .broadcast-turn-movies article { position: relative; display: grid; gap: 5px; padding: 12px; border: 2px solid #46515a; background: #020304; }
 .broadcast-turn-movies article video { width: 100%; aspect-ratio: 1; object-fit: cover; background: #000; }
+.broadcast-movie-fallback { aspect-ratio: 1; display: grid; place-content: center; gap: 8px; padding: 24px; text-align: center; background: radial-gradient(circle, #18f1dc13, transparent 58%), #080d12; }
+.broadcast-movie-fallback b { color: var(--muted); font: 950 18px var(--mono); }
+.broadcast-movie-fallback small { max-width: 320px; color: #89959d; font: 750 8px/1.5 var(--mono); }
 .broadcast-turn-movies article span { color: #d0d6da; font: 850 8px var(--mono); }
 .broadcast-turn-movies article strong { font: 950 clamp(28px, 5vw, 52px)/.9 var(--mono); }
 .broadcast-turn-movies article.landed { border-color: var(--acid); color: var(--acid); }

@@ -15,15 +15,14 @@ type PartnerMarket = { provider: string; mode: string; collateral: string; notic
 function letters(word: string, losses: number) { return word.split("").map((letter, index) => <i key={index} className={index < losses ? "lost" : ""}>{letter}</i>); }
 
 function BroadcastTurnMovies({ turn, presentation }: { turn: MatchTurnResult; presentation: MatchActionPresentation }) {
-  if (!presentation.attempts.length) return null;
   return <section className="broadcast-turn-movies" aria-label={`Turn result: ${turn.trick.name}`}>
-    <header><span>TURN MOVIES</span><h2>{turn.trick.name}</h2><p>{turnExplanation(turn)}</p></header>
+    <header><span>RESOLVED TURN · MOVIES WHEN AVAILABLE</span><h2>{turn.trick.name}</h2><p>{turnExplanation(turn)}</p></header>
     <div>{turn.attempts.map((attempt, index) => {
       if (!attempt) return null;
       const visual = presentation.attempts.find((item) => item.tokenId === attempt.tokenId);
       return <article className={attempt.landed ? "landed" : "fell"} key={`${attempt.tokenId}-${index}`}>
-        {visual ? <video src={visual.videoUrl} poster={visual.posterUrl ?? undefined} autoPlay muted playsInline controls preload="metadata" /> : null}
-        <span>#{padToken(attempt.tokenId)} · {attempt.role.toUpperCase()}</span><strong>{attempt.landed ? "LANDED" : "FELL"}</strong>
+        {visual ? <video src={visual.videoUrl} poster={visual.posterUrl ?? undefined} muted playsInline controls preload="metadata" /> : <div className="broadcast-movie-fallback"><b>ENGINE RESULT</b><small>No approved custom movie exists for this exact Goon, trick, and outcome yet.</small></div>}
+        <span>{attempt.role === "setter" ? "STEP 1 · SETTER" : "STEP 2 · AUTOMATIC RESPONSE"} · GOON #{padToken(attempt.tokenId)}</span><strong>{attempt.landed ? "LANDED" : "FELL"}</strong>
       </article>;
     })}</div>
   </section>;

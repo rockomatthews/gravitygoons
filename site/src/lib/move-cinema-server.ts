@@ -259,7 +259,13 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   // An approved LAND draft remains private until its matching FALL draft is
   // also approved. This prevents public profiles from advertising an
   // incomplete gameplay pair.
-  await supabase.from("move_media_assets").update({ owner_decision: decision, status: decision, reviewed_at: reviewedAt, published_at: null }).eq("id", asset.id);
+  await supabase.from("move_media_assets").update({
+    owner_decision: decision,
+    status: decision,
+    moderation_status: decision === "approved" ? "passed" : "failed",
+    reviewed_at: reviewedAt,
+    published_at: null,
+  }).eq("id", asset.id);
   const { data: latestData } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").eq("pair_id", pair.id).order("version", { ascending: false });
   const latestByOutcome = new Map<string, AssetRow>();
   for (const row of (latestData ?? []) as AssetRow[]) if (!latestByOutcome.has(row.outcome)) latestByOutcome.set(row.outcome, row);

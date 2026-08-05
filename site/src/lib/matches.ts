@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import collection from "@/data/collection.json";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import {
-  DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, matchIsOver,
+  DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, canSetTrick, matchIsOver,
   resolveSkateTurn, unlockedTricks, type Athlete, type CallMode, type Discipline,
   type SponsorProgression, type Trick, type TrickHistory,
 } from "@/lib/pvp";
@@ -64,11 +64,12 @@ export async function getMatch(wallet: string, matchId: string) {
   const normalizedWallet = wallet.toLowerCase();
   const viewerTokenId = data.first_wallet_address === normalizedWallet ? data.first_token_id : data.second_token_id;
   const actions = await addMovePresentations(supabase, actionsResult.data ?? []);
+  const legalTricks = availableTricks.filter((trick) => canSetTrick(trick, state.previousTrick));
   return {
     ...data,
     viewer_token_id: viewerTokenId,
     viewer_is_setter: viewerTokenId === state.setterTokenId,
-    available_tricks: availableTricks.map(({ id, name, difficulty }) => ({ id, name, difficulty })),
+    available_tricks: legalTricks.map(({ id, name, difficulty }) => ({ id, name, difficulty })),
     state: { ...state, pendingCall: state.pendingCall ? { trickId: state.pendingCall.trickId, setterTokenId: state.pendingCall.setterTokenId } : undefined },
     actions,
   };
@@ -81,6 +82,7 @@ export async function processMatchAction(wallet: string, matchId: string, input:
   const { data: match, error } = await supabase.from("pvp_matches").select("*").eq("id", matchId).single();
   if (error || !match) throw new Error("Match not found.");
   if (match.status !== "matched") throw new Error("Match is not accepting actions.");
+  if (match.action_deadline && Date.parse(match.action_deadline) <= Date.now()) throw new Error("The 60-second turn clock expired. This turn can no longer be submitted.");
   if (match.next_turn_number !== input.turnNumber) throw new Error(`Stale turn. Expected ${match.next_turn_number}.`);
   const state = match.state as MatchState;
   const first = athlete(match.first_token_id);

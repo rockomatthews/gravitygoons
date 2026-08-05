@@ -11,6 +11,17 @@ const previewIds = [30, 31, 32, 33, 34, 35, 36, 38, 39, 40, 41, 42];
 
 export default async function GamePage({ searchParams }: { searchParams: Promise<{ match?: string }> }) {
   const { match } = await searchParams;
+  if (match) return <main className="game-lab ranked-console-page">
+    <header className="nav shell">
+      <Link className="brand" href="/"><Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority /></Link>
+      <nav><Link href="/arena">Arena</Link><Link href="/profile">Profile</Link></nav>
+      <WalletButton />
+    </header>
+    <section className="ranked-console-intro shell"><p className="eyebrow">SERVER-AUTHORITATIVE // RANKED 1V1</p><h1>PLAYER<br /><i>CONSOLE.</i></h1><p>Only the setter chooses a trick. A landed set triggers the opponent&apos;s exact response automatically. The 60-second clock applies only while selecting a legal trick.</p></section>
+    <section className="shell" id="ranked-match"><RankedMatch matchId={match} /></section>
+    <footer className="ranked-console-footer shell"><Link href={`/arena/matches/${match}`}>← PUBLIC SCOREBOARD</Link><Link href="/arena">ALL MATCHES →</Link></footer>
+  </main>;
+
   const goons = collection.tokens.filter((token) => previewIds.includes(token.token_id)).map((token) => ({
     tokenId: token.token_id,
     name: token.name,
@@ -30,7 +41,6 @@ export default async function GamePage({ searchParams }: { searchParams: Promise
       <WalletButton />
     </header>
     <section className="game-hero shell"><p className="eyebrow">{match ? "RANKED 1V1 // SERVER-AUTHORITATIVE" : "LOCAL 1V1 RULES LAB // V0.4"}</p><h1>CALL IT.<br /><i>LAND IT.</i><br />DON&apos;T SPELL OUT.</h1><p>This is turn-based SKATE, not a points contest. The setter gets 60 seconds to choose a trick and may spend scarce Grit to send a harder version. If it lands, the second Goon automatically attempts the exact same trick. Stats, catalogue breadth, practice, visible pressure, and resource timing all matter.</p></section>
-    {match && <section className="shell" id="ranked-match"><RankedMatch matchId={match} /></section>}
     <section id="outcomes" className="shell game-outcome-teaser"><TrickOutcomeTeaser /></section>
     <section id="cinema" className="shell game-cinema-teaser"><MoveCinemaTeaser compact /></section>
     <section id="arena" className="shell"><GameArena goons={goons} /></section>

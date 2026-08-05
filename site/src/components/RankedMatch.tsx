@@ -33,22 +33,23 @@ type MatchPayload = {
   actions: Array<{ turn_number: number; action_type: string; result_payload: Record<string, unknown>; presentation: MatchActionPresentation }>;
 };
 
-function AttemptOutcome({ attempt, tokenId, label, visual }: { attempt: MatchAttempt | null; tokenId: number; label: string; visual?: MoveOutcomeVisual }) {
+function AttemptOutcome({ attempt, tokenId, label, step, visual }: { attempt: MatchAttempt | null; tokenId: number; label: string; step: number; visual?: MoveOutcomeVisual }) {
   const outcome = attempt ? (attempt.landed ? "LANDED" : "FELL") : "NO ATTEMPT";
   return <article className={`attempt-outcome ${attempt ? (attempt.landed ? "landed" : "fell") : "skipped"}`}>
-    {visual ? <video key={visual.videoUrl} src={visual.videoUrl} poster={visual.posterUrl ?? undefined} autoPlay muted playsInline controls preload="metadata" /> : null}
-    <span>{label} · #{padToken(tokenId)}</span>
+    <header><span>STEP {step}</span><em>{visual ? "CUSTOM MOVIE" : "ENGINE RESULT"}</em></header>
+    {visual ? <video key={visual.videoUrl} src={visual.videoUrl} poster={visual.posterUrl ?? undefined} muted playsInline controls preload="metadata" /> : <div className="attempt-movie-fallback"><b>{attempt ? "NO CUSTOM MOVIE" : "RESPONSE SKIPPED"}</b><small>{attempt ? "The authoritative result still counts. This exact Goon + trick + outcome has no approved movie yet." : "The setter fell, so the opponent did not attempt this trick."}</small></div>}
+    <span>{label} · GOON #{padToken(tokenId)}</span>
     <strong>{outcome}</strong>
-    {attempt ? <small>{attempt.chance}% landing chance</small> : <small>The setter fell, so no replication was needed.</small>}
+    {attempt ? <small>{attempt.chance}% authoritative landing chance</small> : <small>No replication was needed.</small>}
   </article>;
 }
 
 function LastTurn({ turn, presentation }: { turn: MatchTurnResult; presentation: MatchActionPresentation }) {
   return <section className="ranked-result" aria-live="polite">
-    <div className="ranked-result-heading"><span>LAST TRICK</span><strong>{turn.trick.name}</strong></div>
+    <div className="ranked-result-heading"><span>RESOLVED TURN</span><strong>{turn.trick.name}</strong><em>Setter first · response automatic after a landed set</em></div>
     <div className="attempt-grid">
-      <AttemptOutcome attempt={turn.attempts[0]} tokenId={turn.setterTokenId} label="SETTER" visual={presentation.attempts.find((visual) => visual.tokenId === turn.setterTokenId)} />
-      <AttemptOutcome attempt={turn.attempts[1]} tokenId={turn.responderTokenId} label="RESPONSE" visual={presentation.attempts.find((visual) => visual.tokenId === turn.responderTokenId)} />
+      <AttemptOutcome attempt={turn.attempts[0]} tokenId={turn.setterTokenId} label="SETTER ATTEMPT" step={1} visual={presentation.attempts.find((visual) => visual.tokenId === turn.setterTokenId)} />
+      <AttemptOutcome attempt={turn.attempts[1]} tokenId={turn.responderTokenId} label="AUTOMATIC RESPONSE" step={2} visual={presentation.attempts.find((visual) => visual.tokenId === turn.responderTokenId)} />
     </div>
     <p>{turnExplanation(turn)}</p>
   </section>;
@@ -77,6 +78,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       return;
     }
     setMatch(data.match);
+    setSecondsLeft(remainingSeconds(data.match.action_deadline));
     setAuthRequired(false);
     setMessage("");
   }, [matchId]);
@@ -149,6 +151,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   const firstIsViewer = match.viewer_token_id === match.first_token_id;
   const secondIsViewer = match.viewer_token_id === match.second_token_id;
   const opponentTokenId = firstIsViewer ? match.second_token_id : match.first_token_id;
+  const turnExpired = isLive && secondsLeft <= 0;
   const selectedTrickId = trickId !== null && match.available_tricks.some((trick) => trick.id === trickId)
     ? trickId
     : match.available_tricks[0]?.id ?? "";
@@ -174,17 +177,17 @@ export function RankedMatch({ matchId }: { matchId: string }) {
 
     {lastTurn ? <LastTurn turn={lastTurn.turn} presentation={lastTurn.presentation} /> : null}
 
-    {isLive && match.viewer_is_setter ? <section className="ranked-turn-banner is-your-turn" aria-live="polite">
-      <div><span>YOUR TURN</span><strong>Choose a trick for #{padToken(match.viewer_token_id)}</strong><p>If you land it, #{padToken(opponentTokenId)} automatically tries the same trick.</p></div>
+    {isLive && match.viewer_is_setter ? <section className={`ranked-turn-banner ${turnExpired ? "is-expired" : "is-your-turn"}`} aria-live="polite">
+      <div><span>{turnExpired ? "TURN EXPIRED" : "YOUR TURN"}</span><strong>{turnExpired ? "Waiting for timeout resolution" : `Choose a trick for #${padToken(match.viewer_token_id)}`}</strong><p>{turnExpired ? "The 60-second selection window has closed. A late trick cannot be submitted." : `If you land it, #${padToken(opponentTokenId)} automatically tries the same trick.`}</p></div>
       <time aria-label={`${secondsLeft} seconds remaining`}>{secondsLeft}<small>SECONDS</small></time>
       <div className="ranked-controls">
-        <label>YOUR UNLOCKED TRICKS<select value={selectedTrickId} onChange={(event) => setTrickId(Number(event.target.value))} disabled={submitting}>{match.available_tricks.map((trick) => <option key={trick.id} value={trick.id}>{trick.name} · difficulty {trick.difficulty}</option>)}</select></label>
-        <button onClick={tryTrick} disabled={submitting || match.available_tricks.length === 0}>{submitting ? "TRYING…" : "TRY TRICK"}</button>
+        <label>CHOOSE ONE OF YOUR LEGAL UNLOCKED TRICKS<select value={selectedTrickId} onChange={(event) => setTrickId(Number(event.target.value))} disabled={submitting || turnExpired}>{match.available_tricks.map((trick) => <option key={trick.id} value={trick.id}>{trick.name} · difficulty {trick.difficulty}</option>)}</select><small>The last successfully set trick is removed automatically—no consecutive repeats.</small></label>
+        <button onClick={tryTrick} disabled={submitting || turnExpired || match.available_tricks.length === 0}>{turnExpired ? "TURN EXPIRED" : submitting ? "TRYING…" : "TRY TRICK"}</button>
       </div>
     </section> : null}
 
-    {isLive && !match.viewer_is_setter ? <section className="ranked-turn-banner is-waiting" aria-live="polite">
-      <div><span>OPPONENT&apos;S TURN</span><strong>Waiting for #{padToken(match.state.setterTokenId)} to try a trick</strong><p>If they land it, your Goon automatically attempts the exact same trick. You do not need to press anything.</p></div>
+    {isLive && !match.viewer_is_setter ? <section className={`ranked-turn-banner ${turnExpired ? "is-expired" : "is-waiting"}`} aria-live="polite">
+      <div><span>{turnExpired ? "TURN EXPIRED" : "OPPONENT'S TURN"}</span><strong>{turnExpired ? "Waiting for timeout resolution" : `Waiting for #${padToken(match.state.setterTokenId)} to try a trick`}</strong><p>{turnExpired ? "The opponent can no longer submit a late trick." : "If they land it, your Goon automatically attempts the exact same trick. You do not need to press anything."}</p></div>
       <time aria-label={`${secondsLeft} seconds remaining`}>{secondsLeft}<small>SECONDS</small></time>
     </section> : null}
 
