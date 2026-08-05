@@ -3,7 +3,8 @@ import collection from "@/data/collection.json";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import {
   DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, matchIsOver,
-  resolveSkateTurn, type Athlete, type CallMode, type Discipline, type TrickHistory,
+  resolveSkateTurn, unlockedTricks, type Athlete, type CallMode, type Discipline,
+  type SponsorProgression, type Trick, type TrickHistory,
 } from "@/lib/pvp";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { seedCommitment } from "@/lib/match-integrity";
@@ -28,15 +29,47 @@ function athlete(tokenId: number): Athlete {
   };
 }
 
+type AdminClient = NonNullable<ReturnType<typeof getSupabaseAdmin>>;
+
+async function unlockedCatalogue(supabase: AdminClient, tokenId: number, discipline: Discipline): Promise<Trick[]> {
+  const { data, error } = await supabase
+    .from("athlete_sponsors")
+    .select("sponsor_id,milestone_wins,accepted_at_wins")
+    .eq("token_id", tokenId);
+  if (error) throw new Error("Unable to load this Goon's unlocked tricks.");
+  const progression: SponsorProgression = {
+    verifiedRankedWins: 0,
+    sponsors: (data ?? []).map((row) => ({
+      sponsorId: row.sponsor_id,
+      milestone: row.milestone_wins,
+      acceptedAtWins: row.accepted_at_wins,
+    })),
+  };
+  return unlockedTricks(discipline, progression);
+}
+
 export async function getMatch(wallet: string, matchId: string) {
   const supabase = getSupabaseAdmin();
   if (!supabase) throw new Error("Match storage is not configured.");
   const { data, error } = await supabase.from("pvp_matches").select("id,status,discipline,match_word,first_token_id,second_token_id,first_wallet_address,second_wallet_address,winner_token_id,loser_token_id,next_turn_number,state,action_deadline,started_at,completed_at").eq("id", matchId).single();
   if (error || !data) throw new Error("Match not found.");
   if (![data.first_wallet_address, data.second_wallet_address].includes(wallet.toLowerCase())) throw new Error("This match belongs to different wallets.");
-  const { data: actions } = await supabase.from("pvp_match_actions").select("turn_number,action_type,result_payload,created_at").eq("match_id", matchId).order("turn_number");
   const state = data.state as MatchState;
-  return { ...data, state: { ...state, pendingCall: state.pendingCall ? { trickId: state.pendingCall.trickId, setterTokenId: state.pendingCall.setterTokenId } : undefined }, actions: actions ?? [] };
+  const setter = athlete(state.setterTokenId);
+  const [actionsResult, availableTricks] = await Promise.all([
+    supabase.from("pvp_match_actions").select("turn_number,action_type,result_payload,created_at").eq("match_id", matchId).order("turn_number"),
+    unlockedCatalogue(supabase, setter.tokenId, setter.discipline),
+  ]);
+  const normalizedWallet = wallet.toLowerCase();
+  const viewerTokenId = data.first_wallet_address === normalizedWallet ? data.first_token_id : data.second_token_id;
+  return {
+    ...data,
+    viewer_token_id: viewerTokenId,
+    viewer_is_setter: viewerTokenId === state.setterTokenId,
+    available_tricks: availableTricks.map(({ id, name, difficulty }) => ({ id, name, difficulty })),
+    state: { ...state, pendingCall: state.pendingCall ? { trickId: state.pendingCall.trickId, setterTokenId: state.pendingCall.setterTokenId } : undefined },
+    actions: actionsResult.data ?? [],
+  };
 }
 
 export async function processMatchAction(wallet: string, matchId: string, input: { turnNumber: number; idempotencyKey: string; action: "call_trick" | "answer_trick"; trickId?: number; callMode?: CallMode; useGrit?: boolean }) {
@@ -58,16 +91,19 @@ export async function processMatchAction(wallet: string, matchId: string, input:
   const expectedWallet = input.action === "call_trick" ? setterWallet : responderWallet;
   if (expectedWallet !== wallet.toLowerCase()) throw new Error("It is not your turn.");
   if (!await verifyTokenOwnership(wallet, actorTokenId)) throw new Error("Live ownership changed; match is paused.");
-  const catalogue = TRICK_CATALOG[setter.discipline];
+  const [catalogue, responderCatalogue] = await Promise.all([
+    unlockedCatalogue(supabase, setter.tokenId, setter.discipline),
+    unlockedCatalogue(supabase, responder.tokenId, responder.discipline),
+  ]);
   const seed = randomBytes(32).toString("hex");
   let result: Record<string, unknown>;
   const nextState: MatchState = structuredClone(state);
 
   if (input.action === "call_trick") {
     if (state.pendingCall) throw new Error("The responder must answer the current call.");
-    const trick = catalogue[input.trickId ?? -1];
-    if (!trick) throw new Error("Unknown trick.");
-    const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue: TRICK_CATALOG[responder.discipline], responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: state.previousTrick, callMode: input.callMode ?? "standard", letterlessTurns: state.letterlessTurns ?? 0 };
+    const trick = catalogue.find((candidate) => candidate.id === input.trickId);
+    if (!trick) throw new Error("Unknown or locked trick.");
+    const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue, responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: state.previousTrick, callMode: input.callMode ?? "standard", letterlessTurns: state.letterlessTurns ?? 0 };
     const turn = resolveSkateTurn(choice, seed);
     const attempt = turn.attempts[0];
     result = { action: "call_trick", attempt, automaticResponse: turn.attempts[1], turn, seedCommit: seedCommitment(seed), seedReveal: seed };
@@ -80,10 +116,11 @@ export async function processMatchAction(wallet: string, matchId: string, input:
     nextState.letterlessTurns = turn.letterRecipientTokenId ? 0 : (state.letterlessTurns ?? 0) + 1;
   } else {
     if (!state.pendingCall) throw new Error("There is no called trick to answer.");
-    const trick = catalogue[state.pendingCall.trickId];
+    const trick = TRICK_CATALOG[setter.discipline].find((candidate) => candidate.id === state.pendingCall?.trickId);
+    if (!trick) throw new Error("The called trick is no longer available.");
     const usesGrit = Boolean(input.useGrit && (state.grit[responder.tokenId] ?? 0) > 0);
     const turn = resolveSkateTurn({
-      setter, responder, trick, setterCatalogue: catalogue, responderCatalogue: TRICK_CATALOG[responder.discipline],
+      setter, responder, trick, setterCatalogue: catalogue, responderCatalogue,
       responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: null,
       callMode: input.callMode ?? "standard", responderUsesGrit: usesGrit, letterlessTurns: state.letterlessTurns ?? 0,
     }, state.pendingCall.seed);
