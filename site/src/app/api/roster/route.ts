@@ -15,6 +15,16 @@ export async function GET() {
     supabase.from("pvp_token_locks").select("token_id,match_id"),
     supabase.from("game_challenges").select("id,challenger_token_id,challenged_token_id,status").in("status", ["incoming", "accepted", "active"]),
   ]);
+  const ownerWallets = Array.from(new Set((ownership ?? []).map((row) => row.owner_wallet_address)));
+  const { data: profileWallets } = ownerWallets.length
+    ? await supabase.from("profile_wallets").select("wallet_address,profile_id").in("wallet_address", ownerWallets)
+    : { data: [] };
+  const profileIds = Array.from(new Set((profileWallets ?? []).map((row) => row.profile_id)));
+  const { data: profiles } = profileIds.length
+    ? await supabase.from("profiles").select("id,display_name,username").in("id", profileIds)
+    : { data: [] };
+  const profileNameById = new Map((profiles ?? []).map((profile) => [profile.id, profile.display_name || profile.username]));
+  const ownerNameByWallet = new Map((profileWallets ?? []).map((row) => [row.wallet_address, profileNameById.get(row.profile_id) ?? "Goon Holder"]));
   const byId = new Map<number, Record<string, unknown>>(
     collection.tokens.map((token) => [token.token_id, {
       matches_played: 0,
@@ -27,7 +37,12 @@ export async function GET() {
     }]),
   );
   for (const row of records ?? []) byId.set(row.token_id, { ...row });
-  for (const row of ownership ?? []) byId.set(row.token_id, { ...byId.get(row.token_id), owner: row.owner_wallet_address, ownershipVerifiedAt: row.verified_at });
+  for (const row of ownership ?? []) byId.set(row.token_id, {
+    ...byId.get(row.token_id),
+    owner: row.owner_wallet_address,
+    ownerName: ownerNameByWallet.get(row.owner_wallet_address) ?? "Goon Holder",
+    ownershipVerifiedAt: row.verified_at,
+  });
   for (const row of locks ?? []) byId.set(row.token_id, { ...byId.get(row.token_id), matchId: row.match_id });
   for (const row of challenges ?? []) {
     for (const tokenId of [row.challenger_token_id, row.challenged_token_id]) {

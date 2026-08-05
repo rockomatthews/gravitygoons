@@ -194,7 +194,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .token-card { position: relative; background: linear-gradient(145deg, #131922, #090d12); border: 1px solid var(--line); transform-style: preserve-3d; transition: transform .3s, border-color .3s, box-shadow .3s; }
 .token-card:hover { transform: translateY(-9px) rotateX(2deg) rotateY(-2deg); border-color: #60717d; box-shadow: 18px 24px 45px #0008; }
 .token-card.selected { border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal), 11px 11px 0 var(--coral), 0 0 45px #18f1dc2b; }
-.token-card.sold { filter: saturate(.1); opacity: .62; }
+.token-card.mine { filter: saturate(.1); opacity: .62; }
 .card-image { width: 100%; display: block; border: 0; padding: 0; background: #111821; position: relative; overflow: hidden; cursor: pointer; }
 .card-image:disabled { cursor: not-allowed; }
 .card-image img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; display: block; transition: transform .4s, filter .4s; }
@@ -269,6 +269,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .status-challengeable, .status-owned-by-you { color: var(--void); background: var(--acid); border-color: var(--acid); }
 .status-challenge-pending, .status-in-match { color: white; background: var(--coral); border-color: var(--coral); }
 .athlete-record { margin: 6px 0; color: #aab7be; font: 750 8px var(--mono); }
+.athlete-state { display: inline-flex; margin: 4px 0; padding: 6px 8px; border: 1px solid var(--coral); color: white; background: var(--coral); font: 850 8px var(--mono); }
 .challenge-button { width: 100%; margin-top: 12px; border: 0; padding: 12px; color: var(--void); background: var(--acid); font: 950 9px var(--mono); cursor: pointer; }
 .transfer-button { width: 100%; margin-top: 12px; border: 1px solid #18f1dc66; padding: 12px; color: var(--teal); background: #05080c; font: 950 9px var(--mono); cursor: pointer; }
 .transfer-button:hover, .transfer-button:focus-visible { border-color: var(--teal); background: #18f1dc16; }

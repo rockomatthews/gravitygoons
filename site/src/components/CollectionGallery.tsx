@@ -29,6 +29,7 @@ type Token = {
 type AthleteLive = {
   tokenId: number;
   owner?: string;
+  ownerName?: string;
   matches_played?: number;
   wins?: number;
   losses?: number;
@@ -296,13 +297,17 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
           const mine = normalizedAccount !== null && (directOwnedIds.has(token.token_id) || live?.owner === normalizedAccount);
           const eligible = !available && !mine && Boolean(live?.owner) && !live?.matchId && !live?.challengeId
             && myGoons.some((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
-          const cardStatus = mine ? "Owned by you" : available ? "Available to mint" : live?.matchId ? "In match" : live?.challengeId ? "Challenge pending" : eligible ? "Challengeable" : "Held";
+          const cardStatus = mine
+            ? "Owned by you"
+            : available
+              ? "Available to mint"
+              : `Owned by ${live?.ownerName ?? "Goon Holder"}`;
           return (
-            <article className={`token-card ${active ? "selected" : ""} ${available ? "" : "sold"}`} key={token.token_id}>
-              <button className="card-image" onClick={() => toggle(token.token_id)} aria-label={available ? `Select ${token.name}` : `${token.name} is sold`} disabled={!available}>
+            <article className={`token-card ${active ? "selected" : ""} ${mine ? "mine" : ""}`} key={token.token_id}>
+              <button className="card-image" onClick={() => toggle(token.token_id)} aria-label={available ? `Select ${token.name}` : `${token.name} is owned`} disabled={!available}>
                 <Image src={imageBaseUrl + "/" + String(token.token_id).padStart(4, "0") + ".png"} alt={token.name} width={1024} height={1024} />
                 <span className={`rarity rarity-${token.rarity.toLowerCase()}`}>{token.rarity}</span>
-                <span className="select-mark">{available ? active ? "SELECTED" : "+ SELECT" : "SOLD"}</span>
+                <span className="select-mark">{available ? active ? "SELECTED" : "+ SELECT" : mine ? "YOURS" : "OWNED"}</span>
               </button>
               <div className="card-copy">
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>
@@ -310,6 +315,8 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <p className="card-brand">{token.parody_brand} · {token.sport_equipment}</p>
                 <p className="card-price">MINT · {displayEth(RARITY_PRICE_WEI[token.rarity] ?? 0n)} ETH</p>
                 <p className={`athlete-status status-${cardStatus.toLowerCase().replaceAll(" ", "-")}`}>{cardStatus}</p>
+                {!available && !mine && live?.matchId && <p className="athlete-state">IN MATCH</p>}
+                {!available && !mine && !live?.matchId && live?.challengeId && <p className="athlete-state">CHALLENGE PENDING</p>}
                 <p className="athlete-record">{(live?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${live?.discipline_rank} ${token.discipline}`} · {live?.wins ?? 0}W–{live?.losses ?? 0}L · ELO {Math.round(live?.rating ?? 1500)}</p>
                 <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
