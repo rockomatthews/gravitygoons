@@ -270,12 +270,15 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .status-challenge-pending, .status-in-match { color: white; background: var(--coral); border-color: var(--coral); }
 .athlete-record { margin: 6px 0; color: #aab7be; font: 750 8px var(--mono); }
 .challenge-button { width: 100%; margin-top: 12px; border: 0; padding: 12px; color: var(--void); background: var(--acid); font: 950 9px var(--mono); cursor: pointer; }
+.transfer-button { width: 100%; margin-top: 12px; border: 1px solid #18f1dc66; padding: 12px; color: var(--teal); background: #05080c; font: 950 9px var(--mono); cursor: pointer; }
+.transfer-button:hover, .transfer-button:focus-visible { border-color: var(--teal); background: #18f1dc16; }
 .challenge-modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: #020304da; backdrop-filter: blur(13px); }
 .challenge-modal > div { width: min(620px, 100%); position: relative; padding: 32px; border: 1px solid #18f1dc69; background: linear-gradient(145deg, #131c25, #070a0e); box-shadow: 0 40px 100px #000; }
 .challenge-modal h2 { margin: 14px 0; font-size: 46px; text-transform: uppercase; }
 .challenge-modal p:not(.eyebrow) { color: var(--muted); line-height: 1.6; }
 .challenge-modal label { display: grid; gap: 8px; margin: 26px 0; color: var(--teal); font: 850 8px var(--mono); }
-.challenge-modal select { border: 1px solid #42505a; padding: 14px; color: white; background: #05080c; }
+.challenge-modal select, .challenge-modal input { min-width: 0; border: 1px solid #42505a; padding: 14px; color: white; background: #05080c; }
+.challenge-modal .transfer-status { padding: 12px; border: 1px solid #18f1dc44; color: var(--teal); background: #18f1dc0d; font: 800 8px var(--mono); overflow-wrap: anywhere; }
 .challenge-close { position: absolute; right: 14px; top: 12px; border: 0; color: white; background: transparent; font-size: 28px; cursor: pointer; }
 .challenge-comparison { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; margin-bottom: 26px; padding: 14px; background: #05080c; text-align: center; font: 850 8px var(--mono); }
 .challenge-comparison b { color: var(--acid); }

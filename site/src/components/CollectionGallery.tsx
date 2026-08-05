@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { createWalletClient, custom, formatEther } from "viem";
+import { createWalletClient, custom, formatEther, getAddress, isAddress } from "viem";
 import { base } from "viem/chains";
 import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { useWallet } from "@/components/WalletProvider";
@@ -78,6 +78,9 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const [challengeMode, setChallengeMode] = useState<MatchMode>("async_ranked");
   const [challengeStart, setChallengeStart] = useState("");
   const [challengeBounds, setChallengeBounds] = useState({ min: "", max: "" });
+  const [transferTarget, setTransferTarget] = useState<Token | null>(null);
+  const [transferRecipient, setTransferRecipient] = useState("");
+  const [transferStatus, setTransferStatus] = useState("");
 
   const refreshAvailability = useCallback(async () => {
     if (collectionAddress === ZERO_ADDRESS) {
@@ -208,6 +211,33 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     }
   }
 
+  async function transferGoon() {
+    if (!transferTarget) return;
+    if (!isAddress(transferRecipient)) return setTransferStatus("Enter a valid Base wallet address.");
+    try {
+      const connected = account ?? await connect();
+      if (!connected || !provider) throw new Error("Connect the wallet that owns this Goon, then try again.");
+      if (connected.toLowerCase() !== normalizedAccount) throw new Error("The connected account changed. Reopen the transfer.");
+      const recipient = getAddress(transferRecipient);
+      if (recipient.toLowerCase() === connected.toLowerCase()) throw new Error("Choose a different recipient wallet.");
+      const wallet = createWalletClient({ chain: base, transport: custom(provider) });
+      setTransferStatus("Confirm the NFT transfer in your wallet…");
+      const hash = await wallet.writeContract({
+        address: collectionAddress,
+        abi: collectionAbi,
+        functionName: "safeTransferFrom",
+        args: [connected, recipient, BigInt(transferTarget.token_id)],
+        account: connected,
+      });
+      setTransferStatus(`Transfer submitted ${hash.slice(0, 12)}… Waiting for Base confirmation.`);
+      await publicClient.waitForTransactionReceipt({ hash });
+      setTransferStatus(`Transfer confirmed. #${String(transferTarget.token_id).padStart(4, "0")} now belongs to ${recipient.slice(0, 6)}…${recipient.slice(-4)}.`);
+      await Promise.all([refreshAvailability(), refreshConnectedOwnership(), refreshRoster()]);
+    } catch (error) {
+      setTransferStatus(error instanceof Error ? error.message.split("\n")[0] : "Transfer cancelled.");
+    }
+  }
+
   async function submitChallenge() {
     if (!challengeTarget || !challengerTokenId) return;
     try {
@@ -283,6 +313,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <p className="athlete-record">{(live?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${live?.discipline_rank} ${token.discipline}`} · {live?.wins ?? 0}W–{live?.losses ?? 0}L · ELO {Math.round(live?.rating ?? 1500)}</p>
                 <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
+                {mine && <button className="transfer-button" onClick={() => { setTransferTarget(token); setTransferRecipient(""); setTransferStatus(""); }}>TRANSFER GOON</button>}
                 {eligible && <button className="challenge-button" onClick={() => {
                   const eligibleMine = myGoons.filter((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
                   setChallengerTokenId(eligibleMine[0]?.token_id ?? null);
@@ -317,6 +348,19 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
             <span>RANK {(liveById.get(challengeTarget.token_id)?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${liveById.get(challengeTarget.token_id)?.discipline_rank}`}</span>
           </div>
           <button className="button primary" onClick={submitChallenge}>SIGN + SEND CHALLENGE</button>
+        </div>
+      </div>}
+      {transferTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="transfer-title">
+        <div>
+          <button className="challenge-close" onClick={() => setTransferTarget(null)} aria-label="Close transfer">×</button>
+          <p className="eyebrow">BASE MAINNET · WALLET CONFIRMATION REQUIRED</p>
+          <h2 id="transfer-title">Transfer #{String(transferTarget.token_id).padStart(4, "0")}</h2>
+          <p>This moves the NFT to another wallet. Gravity Goons never receives custody and cannot reverse the transfer.</p>
+          <label>RECIPIENT BASE ADDRESS
+            <input value={transferRecipient} onChange={(event) => setTransferRecipient(event.target.value.trim())} placeholder="0x…" autoCapitalize="none" autoCorrect="off" spellCheck={false} />
+          </label>
+          {transferStatus && <p className="transfer-status" aria-live="polite">{transferStatus}</p>}
+          <button className="button primary" onClick={transferGoon}>REVIEW IN WALLET</button>
         </div>
       </div>}
       <aside className={`mint-dock ${selected.length ? "show" : ""}`}>

@@ -14,6 +14,7 @@ export const publicClient = createPublicClient({ chain: base, transport: http(ba
 
 export const collectionAbi = [
   { type: "function", name: "ownerOf", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "address" }] },
+  { type: "function", name: "safeTransferFrom", stateMutability: "nonpayable", inputs: [{ name: "from", type: "address" }, { name: "to", type: "address" }, { name: "tokenId", type: "uint256" }], outputs: [] },
   { type: "function", name: "mintOpen", stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
   { type: "function", name: "mintSelected", stateMutability: "payable", inputs: [{ name: "tokenIds", type: "uint16[]" }], outputs: [] },
   { type: "function", name: "rarityOf", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "uint8" }] },
