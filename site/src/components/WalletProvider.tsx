@@ -9,6 +9,7 @@ import {
   isWalletKind,
   type MobileWalletKind,
 } from "@/lib/wallet-links";
+import { personalSignParams } from "@/lib/wallet-signing";
 
 export type EthereumProvider = {
   request<T = unknown>(args: { method: string; params?: unknown[] }): Promise<T>;
@@ -64,7 +65,7 @@ const BASE_CHAIN_ID = 8453;
 const STORAGE_KEY = "gravity-goons-wallet-connector";
 
 function conciseError(error: unknown): string {
-  if (typeof error === "object" && error && "code" in error && Number(error.code) === 4001) return "Connection was rejected in the wallet.";
+  if (typeof error === "object" && error && "code" in error && Number(error.code) === 4001) return "The request was rejected in the wallet.";
   if (error instanceof Error) return error.message.split("\n")[0];
   return "The wallet connection did not complete.";
 }
@@ -224,7 +225,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const signMessage = useCallback(async (text: string, address?: string) => {
     const signer = normalizeAccount(address ?? account);
     if (!signer) throw new Error("Connect a wallet first.");
-    return request<`0x${string}`>({ method: "personal_sign", params: [text, signer] });
+    try {
+      return await withConnectionTimeout(request<`0x${string}`>({ method: "personal_sign", params: personalSignParams(text, signer) }));
+    } catch (error) {
+      throw new Error(conciseError(error));
+    }
   }, [account, request]);
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import {
   isMobileUserAgent,
   isWalletKind,
 } from "./wallet-links.ts";
+import { personalSignParams } from "./wallet-signing.ts";
 
 test("the Base App link preserves the complete Gravity Goons return URL", () => {
   const current = "https://gravitygoons.com/#collection";
@@ -48,4 +49,11 @@ test("wallet identities are matched using names and EIP-6963 reverse-DNS IDs", (
   assert.equal(isWalletKind("Rainbow", "me.rainbow", "rainbow"), true);
   assert.equal(isWalletKind("Coinbase Wallet", "com.coinbase.wallet", "base"), true);
   assert.equal(isWalletKind("Rainbow", "me.rainbow", "metamask"), false);
+});
+
+test("personal_sign encodes SIWE text as hex for Base App providers", () => {
+  const address = "0x8a0182c099a618583e9ef98716dacf739b3bd944" as const;
+  const [message, signer] = personalSignParams("Sign in to Gravity Goons.", address);
+  assert.equal(message, "0x5369676e20696e20746f204772617669747920476f6f6e732e");
+  assert.equal(signer, address);
 });

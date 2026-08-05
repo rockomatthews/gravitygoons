@@ -6,6 +6,19 @@ import { useWallet } from "@/components/WalletProvider";
 
 type ProfileRecord = { username: string; display_name: string; bio: string };
 
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit, timeoutMs = 20_000): Promise<Response> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error("The profile server did not respond. Check your connection and try again.");
+    throw error;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
 export function ProfileSetup() {
   const { account, connect, signMessage } = useWallet();
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
@@ -34,17 +47,20 @@ export function ProfileSetup() {
       const address = account ?? await connect();
       if (!address) throw new Error("Choose a wallet, then press CONNECT + SIGN again.");
       setStatus("Preparing a secure profile sign-in message…");
-      const challengeResponse = await fetch("/api/profile/session/nonce", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address }) });
+      const challengeResponse = await fetchWithTimeout("/api/profile/session/nonce", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address }) });
       const challenge = await challengeResponse.json();
       if (!challengeResponse.ok) throw new Error(challenge.error);
+      setStatus("Approve the free sign-in message in your wallet…");
       const signature = await signMessage(challenge.message, address);
-      const verifyResponse = await fetch("/api/profile/session/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address, signature }) });
+      setStatus("Signature received. Verifying your wallet…");
+      const verifyResponse = await fetchWithTimeout("/api/profile/session/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address, signature }) });
       const verified = await verifyResponse.json();
       if (!verifyResponse.ok) throw new Error(verified.error);
       setAuthenticated(true);
+      setStatus("Wallet verified. Refreshing your Goons…");
       let ownershipCount: number | null = null;
       try {
-        const syncResponse = await fetch("/api/profile/sync", { method: "POST" });
+        const syncResponse = await fetchWithTimeout("/api/profile/sync", { method: "POST" }, 30_000);
         const synced = await syncResponse.json();
         if (syncResponse.ok) ownershipCount = synced.tokenIds.length;
       } catch { /* The manual refresh remains available if the index is temporarily unavailable. */ }
@@ -71,7 +87,7 @@ export function ProfileSetup() {
   async function saveProfile() {
     setBusy(true);
     try {
-      const response = await fetch("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ username, displayName, bio }) });
+      const response = await fetchWithTimeout("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ username, displayName, bio }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setProfile(data.profile);
@@ -86,7 +102,7 @@ export function ProfileSetup() {
   async function syncCollection() {
     setBusy(true);
     try {
-      const response = await fetch("/api/profile/sync", { method: "POST" });
+      const response = await fetchWithTimeout("/api/profile/sync", { method: "POST" }, 30_000);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setStatus(`Ownership refreshed: ${data.tokenIds.length} Gravity Goon${data.tokenIds.length === 1 ? "" : "s"} found.`);
