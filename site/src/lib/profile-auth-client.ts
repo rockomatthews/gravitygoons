@@ -47,3 +47,18 @@ export async function authenticateProfileSession({
   if (!verifyResponse.ok) throw new Error(verified.error);
   return verified;
 }
+
+export async function ensureProfileSession({
+  address,
+  signMessage,
+  onStatus,
+}: {
+  address: `0x${string}`;
+  signMessage: SignWalletMessage;
+  onStatus: (status: string) => void;
+}) {
+  const currentResponse = await fetchWithTimeout("/api/profile/me", { method: "GET", cache: "no-store" });
+  const current = await currentResponse.json();
+  if (currentResponse.ok && current.authenticated && current.address?.toLowerCase() === address.toLowerCase()) return current;
+  return authenticateProfileSession({ account: address, connect: async () => address, signMessage, onStatus });
+}

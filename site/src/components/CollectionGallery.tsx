@@ -8,6 +8,7 @@ import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/
 import { useWallet } from "@/components/WalletProvider";
 import { signatureEdgeForRarity } from "@/lib/gameplay";
 import { ACTIVE_RULESET_HASH, type MatchMode } from "@/lib/match-terms";
+import { ensureProfileSession } from "@/lib/profile-auth-client";
 
 type Token = {
   token_id: number;
@@ -244,6 +245,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     try {
       const wallet = account ?? await connect();
       if (!wallet) throw new Error("Choose a wallet, then send the challenge again.");
+      await ensureProfileSession({ address: wallet, signMessage, onStatus: setStatus });
       const issuedAt = new Date().toISOString();
       if (challengeMode === "live_ranked" && !challengeStart) throw new Error("Choose a scheduled start time.");
       const proposedStartAt = challengeMode === "live_ranked" ? new Date(challengeStart).toISOString() : null;
