@@ -16,6 +16,11 @@ type SignedPayload = {
 };
 
 const PROFILE_SIGN_IN_TYPES = {
+  EIP712Domain: [
+    { name: "name", type: "string" },
+    { name: "version", type: "string" },
+    { name: "chainId", type: "uint256" },
+  ],
   SignIn: [
     { name: "wallet", type: "address" },
     { name: "nonce", type: "string" },
@@ -84,7 +89,7 @@ export function createSignInChallenge(address: string): { message: string; nonce
 
 function profileTypedData(payload: SignedPayload) {
   return {
-    domain: { name: "Gravity Goons", version: "1", chainId: payload.chainId ?? 8453 },
+    domain: { name: "Gravity Goons", version: "1", chainId: BigInt(payload.chainId ?? 8453) },
     types: PROFILE_SIGN_IN_TYPES,
     primaryType: "SignIn" as const,
     message: {

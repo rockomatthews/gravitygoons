@@ -11,6 +11,10 @@ export async function POST(request: Request) {
       nonce: challenge.nonce,
       typedData: {
         ...challenge.typedData,
+        domain: {
+          ...challenge.typedData.domain,
+          chainId: Number(challenge.typedData.domain.chainId),
+        },
         message: {
           ...challenge.typedData.message,
           issuedAt: challenge.typedData.message.issuedAt.toString(),
