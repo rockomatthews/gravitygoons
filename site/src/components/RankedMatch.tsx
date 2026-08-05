@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import { authenticateProfileSession } from "@/lib/profile-auth-client";
 import {
   padToken, turnExplanation, turnFromPayload,
-  type MatchAttempt, type MatchTurnResult,
+  type MatchActionPresentation, type MatchAttempt, type MatchTurnResult, type MoveOutcomeVisual,
 } from "@/lib/match-presentation";
 
 type AvailableTrick = { id: number; name: string; difficulty: number };
@@ -30,24 +30,25 @@ type MatchPayload = {
     setterTokenId: number;
     grit: Record<string, number>;
   };
-  actions: Array<{ turn_number: number; action_type: string; result_payload: Record<string, unknown> }>;
+  actions: Array<{ turn_number: number; action_type: string; result_payload: Record<string, unknown>; presentation: MatchActionPresentation }>;
 };
 
-function AttemptOutcome({ attempt, tokenId, label }: { attempt: MatchAttempt | null; tokenId: number; label: string }) {
+function AttemptOutcome({ attempt, tokenId, label, visual }: { attempt: MatchAttempt | null; tokenId: number; label: string; visual?: MoveOutcomeVisual }) {
   const outcome = attempt ? (attempt.landed ? "LANDED" : "FELL") : "NO ATTEMPT";
   return <article className={`attempt-outcome ${attempt ? (attempt.landed ? "landed" : "fell") : "skipped"}`}>
+    {visual ? <video key={visual.videoUrl} src={visual.videoUrl} poster={visual.posterUrl ?? undefined} autoPlay muted playsInline controls preload="metadata" /> : null}
     <span>{label} · #{padToken(tokenId)}</span>
     <strong>{outcome}</strong>
     {attempt ? <small>{attempt.chance}% landing chance</small> : <small>The setter fell, so no replication was needed.</small>}
   </article>;
 }
 
-function LastTurn({ turn }: { turn: MatchTurnResult }) {
+function LastTurn({ turn, presentation }: { turn: MatchTurnResult; presentation: MatchActionPresentation }) {
   return <section className="ranked-result" aria-live="polite">
     <div className="ranked-result-heading"><span>LAST TRICK</span><strong>{turn.trick.name}</strong></div>
     <div className="attempt-grid">
-      <AttemptOutcome attempt={turn.attempts[0]} tokenId={turn.setterTokenId} label="SETTER" />
-      <AttemptOutcome attempt={turn.attempts[1]} tokenId={turn.responderTokenId} label="RESPONSE" />
+      <AttemptOutcome attempt={turn.attempts[0]} tokenId={turn.setterTokenId} label="SETTER" visual={presentation.attempts.find((visual) => visual.tokenId === turn.setterTokenId)} />
+      <AttemptOutcome attempt={turn.attempts[1]} tokenId={turn.responderTokenId} label="RESPONSE" visual={presentation.attempts.find((visual) => visual.tokenId === turn.responderTokenId)} />
     </div>
     <p>{turnExplanation(turn)}</p>
   </section>;
@@ -94,14 +95,14 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     return () => window.clearInterval(timer);
   }, [match]);
 
-  const lastTurn = useMemo(() => {
+  const lastTurn = (() => {
     if (!match) return null;
     for (let index = match.actions.length - 1; index >= 0; index -= 1) {
       const turn = turnFromPayload(match.actions[index].result_payload);
-      if (turn) return turn;
+      if (turn) return { turn, presentation: match.actions[index].presentation ?? { attempts: [] } };
     }
     return null;
-  }, [match]);
+  })();
 
   async function authenticatePlayer() {
     setAuthenticating(true);
@@ -171,7 +172,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       <span>{match.match_word.slice(0, match.state.secondLosses)}<i>{match.match_word.slice(match.state.secondLosses)}</i></span>
     </div>
 
-    {lastTurn ? <LastTurn turn={lastTurn} /> : null}
+    {lastTurn ? <LastTurn turn={lastTurn.turn} presentation={lastTurn.presentation} /> : null}
 
     {isLive && match.viewer_is_setter ? <section className="ranked-turn-banner is-your-turn" aria-live="polite">
       <div><span>YOUR TURN</span><strong>Choose a trick for #{padToken(match.viewer_token_id)}</strong><p>If you land it, #{padToken(opponentTokenId)} automatically tries the same trick.</p></div>

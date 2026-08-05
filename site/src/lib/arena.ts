@@ -3,6 +3,7 @@ import "server-only";
 import collection from "@/data/collection.json";
 import { goonImageUrl } from "@/lib/goon-images";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { addMovePresentations } from "@/lib/match-move-media";
 
 const DISCIPLINES = ["Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
 const TERMINAL = new Set(["completed", "cancelled", "expired", "voided", "disputed"]);
@@ -145,9 +146,10 @@ export async function getArenaMatch(matchId: string) {
     supabase.from("pvp_match_actions").select("turn_number,action_type,result_payload,created_at").eq("match_id", matchId).order("turn_number"),
     supabase.from("match_wager_references").select("state,stake_minor,house_fee_bps").eq("match_id", matchId).maybeSingle(),
   ]);
-  const transcript = (actions.data ?? []).map((action) => ({
+  const actionsWithPresentation = await addMovePresentations(supabase, actions.data ?? []);
+  const transcript = actionsWithPresentation.map((action) => ({
     turn: action.turn_number, action: action.action_type, createdAt: action.created_at,
-    result: action.result_payload,
+    result: action.result_payload, presentation: action.presentation,
   }));
   return {
     match: sanitize(row, names, battle), events: events.data ?? [], transcript,

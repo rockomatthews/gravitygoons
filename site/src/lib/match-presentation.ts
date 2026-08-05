@@ -16,6 +16,16 @@ export type MatchTurnResult = {
   reason: "setter-missed" | "responder-landed" | "responder-missed";
 };
 
+export type MoveOutcomeVisual = {
+  tokenId: number;
+  trickId: number;
+  outcome: "land" | "fall";
+  videoUrl: string;
+  posterUrl: string | null;
+};
+
+export type MatchActionPresentation = { attempts: MoveOutcomeVisual[] };
+
 export function turnFromPayload(payload: Record<string, unknown>): MatchTurnResult | null {
   const turn = payload.turn;
   if (!turn || typeof turn !== "object") return null;

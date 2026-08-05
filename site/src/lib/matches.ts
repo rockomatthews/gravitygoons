@@ -8,6 +8,7 @@ import {
 } from "@/lib/pvp";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { seedCommitment } from "@/lib/match-integrity";
+import { addMovePresentations } from "@/lib/match-move-media";
 
 type MatchState = {
   firstLosses: number;
@@ -62,13 +63,14 @@ export async function getMatch(wallet: string, matchId: string) {
   ]);
   const normalizedWallet = wallet.toLowerCase();
   const viewerTokenId = data.first_wallet_address === normalizedWallet ? data.first_token_id : data.second_token_id;
+  const actions = await addMovePresentations(supabase, actionsResult.data ?? []);
   return {
     ...data,
     viewer_token_id: viewerTokenId,
     viewer_is_setter: viewerTokenId === state.setterTokenId,
     available_tricks: availableTricks.map(({ id, name, difficulty }) => ({ id, name, difficulty })),
     state: { ...state, pendingCall: state.pendingCall ? { trickId: state.pendingCall.trickId, setterTokenId: state.pendingCall.setterTokenId } : undefined },
-    actions: actionsResult.data ?? [],
+    actions,
   };
 }
 

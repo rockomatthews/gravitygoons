@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { WalletProfileLink } from "@/components/WalletProfileLink";
 
 const tvs = [
   { className: "zero-g-tv tv-one", label: "Watch SKATE in Game Mode" },
@@ -51,9 +52,9 @@ export function ZeroGBar() {
           <span>GAME MODE ↗</span>
         </Link>
       ))}
-      <Link href="/profile" className="zero-g-door" aria-label="Open your Gravity Goons profile">
+      <WalletProfileLink className="zero-g-door" ariaLabel="Open your Gravity Goons profile">
         <span>PROFILE ↗</span>
-      </Link>
+      </WalletProfileLink>
 
       <div className="zero-g-sign" aria-label="ZERO-G ENERGY">
         <Image src="/collection/zero-g-bar/zero-g-energy.svg" alt="ZERO-G ENERGY" width={320} height={112} />

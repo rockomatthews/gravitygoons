@@ -6,11 +6,28 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import type { ArenaMatch } from "@/lib/arena";
 import { authenticateProfileSession, fetchWithTimeout } from "@/lib/profile-auth-client";
+import { padToken, turnExplanation, turnFromPayload, type MatchActionPresentation, type MatchTurnResult } from "@/lib/match-presentation";
 
-type Detail = { match: ArenaMatch; events: Array<{ sequence: number; event_type: string; public_payload: Record<string, unknown>; created_at: string }>; transcript: Array<{ turn: number; action: string; createdAt: string; result: Record<string, unknown> }>; wager: { enabled: boolean; state: string; stakeMinor: number | null; houseFeeBps: number; notice: string } };
+type TranscriptTurn = { turn: number; action: string; createdAt: string; result: Record<string, unknown>; presentation: MatchActionPresentation };
+type Detail = { match: ArenaMatch; events: Array<{ sequence: number; event_type: string; public_payload: Record<string, unknown>; created_at: string }>; transcript: TranscriptTurn[]; wager: { enabled: boolean; state: string; stakeMinor: number | null; houseFeeBps: number; notice: string } };
 type PartnerMarket = { provider: string; mode: string; collateral: string; notice: string; tradingEnabled: boolean; tradeUrl: string | null; outcomes: Array<{ athleteName: string; price: number }> };
 
 function letters(word: string, losses: number) { return word.split("").map((letter, index) => <i key={index} className={index < losses ? "lost" : ""}>{letter}</i>); }
+
+function BroadcastTurnMovies({ turn, presentation }: { turn: MatchTurnResult; presentation: MatchActionPresentation }) {
+  if (!presentation.attempts.length) return null;
+  return <section className="broadcast-turn-movies" aria-label={`Turn result: ${turn.trick.name}`}>
+    <header><span>TURN MOVIES</span><h2>{turn.trick.name}</h2><p>{turnExplanation(turn)}</p></header>
+    <div>{turn.attempts.map((attempt, index) => {
+      if (!attempt) return null;
+      const visual = presentation.attempts.find((item) => item.tokenId === attempt.tokenId);
+      return <article className={attempt.landed ? "landed" : "fell"} key={`${attempt.tokenId}-${index}`}>
+        {visual ? <video src={visual.videoUrl} poster={visual.posterUrl ?? undefined} autoPlay muted playsInline controls preload="metadata" /> : null}
+        <span>#{padToken(attempt.tokenId)} · {attempt.role.toUpperCase()}</span><strong>{attempt.landed ? "LANDED" : "FELL"}</strong>
+      </article>;
+    })}</div>
+  </section>;
+}
 
 export function ArenaMatchView({ matchId }: { matchId: string }) {
   const { account, connect, signMessage, signProfileChallenge } = useWallet();
@@ -34,6 +51,14 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
   }, [matchId]);
   useEffect(() => { const initial = window.setTimeout(refresh, 0); const timer = window.setInterval(refresh, 5_000); return () => { window.clearTimeout(initial); window.clearInterval(timer); }; }, [refresh]);
   const total = useMemo(() => predictions.reduce((sum, row) => sum + row.points, 0), [predictions]);
+  const latestTurn = (() => {
+    if (!detail) return null;
+    for (let index = detail.transcript.length - 1; index >= 0; index -= 1) {
+      const turn = turnFromPayload(detail.transcript[index].result);
+      if (turn) return { turn, presentation: detail.transcript[index].presentation ?? { attempts: [] } };
+    }
+    return null;
+  })();
 
   async function predict(tokenId: number) {
     const response = await fetch(`/api/matches/${matchId}/predictions`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tokenId }) });
@@ -83,6 +108,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
       </div>
       <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span><span className="checkin-state">#{String(match.athletes[0].tokenId).padStart(4, "0")} {match.firstCheckedIn ? "READY" : "NOT CHECKED IN"} · #{String(match.athletes[1].tokenId).padStart(4, "0")} {match.secondCheckedIn ? "READY" : "NOT CHECKED IN"}</span><span className="checkin-feedback" aria-live="polite">{status}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn} disabled={checkingIn || !checkInOpen || (bothCheckedIn && !scheduledStartReached)}>{checkingIn ? "CHECKING IN…" : checkInLabel}</button>}{(match.status === "live" || match.status === "active") && <Link href={`/game?match=${matchId}`}>ENTER PLAYER CONSOLE</Link>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
     </section>
+    {latestTurn ? <BroadcastTurnMovies turn={latestTurn.turn} presentation={latestTurn.presentation} /> : null}
     <section className="broadcast-panels">
       <article><span>FREE PREDICTION</span><h2>Who takes it?</h2><p>No NFT is required. Sign in once to make one valueless PLAY pick before the first action.</p>{match.athletes.map((athlete) => { const points = predictions.find((row) => row.tokenId === athlete.tokenId)?.points ?? 0; return <button key={athlete.tokenId} onClick={() => predict(athlete.tokenId)}><b>{athlete.name}</b><span>{total ? Math.round(points / total * 100) : 50}% · {points} PLAY</span></button>; })}</article>
       <article><span>USDC + PARTNER MARKET STATUS</span><h2>{detail.wager.enabled ? detail.wager.state : "LOCKED"}</h2><p>{detail.wager.notice}</p><dl><div><dt>PLAYER STAKE</dt><dd>{detail.wager.stakeMinor ? `$${detail.wager.stakeMinor / 1_000_000}` : "NONE"}</dd></div><div><dt>HOUSE FEE</dt><dd>{(detail.wager.houseFeeBps / 100).toFixed(2)}%</dd></div><div><dt>SPECTATORS</dt><dd>{market?.collateral ?? "PLAY"}</dd></div></dl>{market && <div className="partner-market-preview"><b>{market.provider} · {market.mode.toUpperCase()}</b>{market.outcomes.map((outcome) => <span key={outcome.athleteName}>{outcome.athleteName} <strong>{Math.round(outcome.price * 100)}%</strong></span>)}<small>{market.notice}</small>{market.tradeUrl && market.tradingEnabled && <a href={market.tradeUrl} target="_blank" rel="noreferrer">OPEN APPROVED PARTNER →</a>}</div>}</article>

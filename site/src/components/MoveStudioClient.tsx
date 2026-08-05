@@ -7,6 +7,7 @@ import { createWalletClient, custom } from "viem";
 import { base } from "viem/chains";
 import type { ProfileGoon, StudioMove } from "@/lib/profile-types";
 import { useWallet } from "@/components/WalletProvider";
+import { authenticateProfileSession } from "@/lib/profile-auth-client";
 
 const USDC_ADDRESS = (process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913") as `0x${string}`;
 const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_MOVE_TREASURY_ADDRESS as `0x${string}` | undefined;
@@ -16,7 +17,7 @@ type StudioPayload = { goon: ProfileGoon; moves: StudioMove[]; demo: boolean };
 type Quote = { orderId: string; pairId: string; amountMinorUnits: number; displayPrice: string; expiresAt: string; demo: boolean };
 
 export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username: string; tokenId: number; fallbackGoon: ProfileGoon }) {
-  const { account, connect, provider } = useWallet();
+  const { account, connect, provider, signMessage, signProfileChallenge } = useWallet();
   const [studio, setStudio] = useState<StudioPayload | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [selectedMove, setSelectedMove] = useState<StudioMove | null>(null);
@@ -59,6 +60,19 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       setStatus(`${data.displayPrice} buys both outcomes: one clean LAND, one game-only FALL, and one included reroll of each. Quote expires ${new Date(data.expiresAt).toLocaleTimeString()}.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Unable to quote this move.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function unlockOwnerStudio() {
+    setBusy(true);
+    try {
+      await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setStatus });
+      setStatus("Owner wallet verified. Loading purchasable moves…");
+      await refresh();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Unable to verify the owner wallet.");
     } finally {
       setBusy(false);
     }
@@ -116,7 +130,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         <div><p className="eyebrow">#{String(tokenId).padStart(4, "0")}{" // "}{goon.discipline}</p><h1>{goon.species}<br /><i>Move Studio</i></h1><p>{goon.rarity} · {goon.playStyle} · Signature move: {goon.trickSpecialty}</p><Link href={`/${username}`}>← BACK TO {username.toUpperCase()}&apos;S COLLECTION</Link></div>
       </section>
 
-      <aside className="studio-live-status"><b>OWNER WORKFLOW</b><p>{status}</p><Link href="/profile">SIGN IN / MANAGE PROFILE</Link></aside>
+      <aside className="studio-live-status" aria-live="polite"><b>OWNER WORKFLOW</b><p>{status}</p>{studio ? <Link href="/profile">MANAGE PROFILE</Link> : <button onClick={unlockOwnerStudio} disabled={busy}>{busy ? "VERIFYING…" : "CONNECT + VERIFY OWNER"}</button>}</aside>
 
       <section className="studio-move-grid">
         {moves.map((move) => (
@@ -135,7 +149,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
                 );
               })}
             </div>
-            <footer><b>{move.quotedPriceUsdc}</b><span>INCLUDES LAND + FALL</span><button onClick={() => requestQuote(move)} disabled={!studio || busy || !move.unlocked || move.pairStatus !== "no_movie"}>{move.unlocked ? move.pairStatus === "no_movie" ? "MAKE BOTH MOVIES" : "WORKFLOW STARTED" : "LOCKED MOVE"}</button></footer>
+            <footer><b>{move.quotedPriceUsdc}</b><span>INCLUDES LAND + FALL</span><button onClick={() => studio ? requestQuote(move) : unlockOwnerStudio()} disabled={busy || !move.unlocked || (Boolean(studio) && move.pairStatus !== "no_movie")}>{move.unlocked ? studio ? move.pairStatus === "no_movie" ? "MAKE BOTH MOVIES" : "WORKFLOW STARTED" : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
           </article>
         ))}
       </section>
