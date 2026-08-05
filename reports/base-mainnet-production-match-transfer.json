@@ -1,0 +1,23 @@
+{
+  "schema": "gravity-goons-production-match-transfer-v1",
+  "chain_id": 8453,
+  "collection": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+  "token_id": 52,
+  "discipline": "Skateboarding",
+  "from": "0x8A0182c099A618583e9EF98716DAcF739b3BD944",
+  "to": "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
+  "transaction_hash": "0x641d78ecf2bd74925affe274ec545b7fd2b9e46a6649a760ad44bf7dbfe9e8ac",
+  "block_number": 49549594,
+  "verification": {
+    "token_owner": "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
+    "sender_balance": 49,
+    "recipient_balance": 1,
+    "combined_creator_balance": 50,
+    "creator_minted": 50,
+    "public_minted": 0,
+    "remaining_unminted": 950,
+    "public_mint_open": false
+  },
+  "purpose": "Two-wallet, same-discipline, no-money production match launch gate",
+  "verified_onchain": true
+}
