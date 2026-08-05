@@ -13,7 +13,7 @@ type PartnerMarket = { provider: string; mode: string; collateral: string; notic
 function letters(word: string, losses: number) { return word.split("").map((letter, index) => <i key={index} className={index < losses ? "lost" : ""}>{letter}</i>); }
 
 export function ArenaMatchView({ matchId }: { matchId: string }) {
-  const { account, connect, signMessage, signInWithEthereum } = useWallet();
+  const { account, connect, signMessage, signProfileChallenge } = useWallet();
   const [detail, setDetail] = useState<Detail | null>(null);
   const [predictions, setPredictions] = useState<Array<{ tokenId: number; points: number }>>([]);
   const [market, setMarket] = useState<PartnerMarket | null>(null);
@@ -47,7 +47,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
       setStatus("Confirming your player session…");
       let response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, { method: "POST" });
       if (response.status === 401) {
-        await authenticateProfileSession({ account, connect, signMessage, signInWithEthereum, onStatus: setStatus });
+        await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setStatus });
         setStatus("Wallet verified. Completing player check-in…");
         response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, { method: "POST" });
       }

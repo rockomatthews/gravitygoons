@@ -8,7 +8,7 @@ import { authenticateProfileSession, fetchWithTimeout, prepareProfileSignIn, typ
 type ProfileRecord = { username: string; display_name: string; bio: string };
 
 export function ProfileSetup() {
-  const { account, connect, signMessage, signInWithEthereum } = useWallet();
+  const { account, connect, signMessage, signProfileChallenge } = useWallet();
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -55,7 +55,7 @@ export function ProfileSetup() {
   async function signIn() {
     setBusy(true);
     try {
-      const verified = await authenticateProfileSession({ account, connect, signMessage, signInWithEthereum, onStatus: setStatus, preparedChallenge });
+      const verified = await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setStatus, preparedChallenge });
       setAuthenticated(true);
       setPreparedChallenge(null);
       setStatus("Wallet verified. Refreshing your Goons…");

@@ -1,6 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { getAddress, verifyMessage } from "viem";
-import { parseSiweMessage, validateSiweMessage } from "viem/siwe";
+import { getAddress, verifyMessage, verifyTypedData } from "viem";
 import { publicClient } from "./contracts.ts";
 
 export const NONCE_COOKIE = "gg_profile_nonce";
@@ -15,6 +14,19 @@ type SignedPayload = {
   issuedAt: number;
   expiresAt: number;
 };
+
+const PROFILE_SIGN_IN_TYPES = {
+  SignIn: [
+    { name: "wallet", type: "address" },
+    { name: "nonce", type: "string" },
+    { name: "domain", type: "string" },
+    { name: "uri", type: "string" },
+    { name: "issuedAt", type: "uint256" },
+    { name: "expirationTime", type: "uint256" },
+  ],
+} as const;
+
+export type ProfileSignInTypedData = ReturnType<typeof profileTypedData>;
 
 function sessionSecret(): string {
   const configured = process.env.PROFILE_SESSION_SECRET;
@@ -53,7 +65,7 @@ export function normalizeWallet(address: string): `0x${string}` {
   return getAddress(address).toLowerCase() as `0x${string}`;
 }
 
-export function createSignInChallenge(address: string): { message: string; nonce: string; token: string; expiresAt: number } {
+export function createSignInChallenge(address: string): { message: string; nonce: string; typedData: ProfileSignInTypedData; token: string; expiresAt: number } {
   const normalized = normalizeWallet(address);
   const issuedAt = Date.now();
   const expiresAt = issuedAt + 10 * 60 * 1000;
@@ -67,7 +79,23 @@ export function createSignInChallenge(address: string): { message: string; nonce
     issuedAt,
     expiresAt,
   };
-  return { message: challengeMessage(payload), nonce: payload.nonce!, token: encode(payload), expiresAt };
+  return { message: challengeMessage(payload), nonce: payload.nonce!, typedData: profileTypedData(payload), token: encode(payload), expiresAt };
+}
+
+function profileTypedData(payload: SignedPayload) {
+  return {
+    domain: { name: "Gravity Goons", version: "1", chainId: payload.chainId ?? 8453 },
+    types: PROFILE_SIGN_IN_TYPES,
+    primaryType: "SignIn" as const,
+    message: {
+      wallet: getAddress(payload.address),
+      nonce: payload.nonce ?? "",
+      domain: payload.domain ?? "gravitygoons.com",
+      uri: payload.uri ?? "https://gravitygoons.com",
+      issuedAt: BigInt(payload.issuedAt),
+      expirationTime: BigInt(payload.expiresAt),
+    },
+  };
 }
 
 function challengeMessage(payload: SignedPayload): string {
@@ -86,25 +114,20 @@ function challengeMessage(payload: SignedPayload): string {
   ].join("\n");
 }
 
-export async function verifyChallenge(token: string | undefined, address: string, signature: `0x${string}`, signedMessage?: string): Promise<string | null> {
+export async function verifyChallenge(token: string | undefined, address: string, signature: `0x${string}`, method: "message" | "typed_data" = "message"): Promise<string | null> {
   const payload = decode(token);
   if (!payload?.nonce) return null;
   const normalized = normalizeWallet(address);
   if (payload.address !== normalized) return null;
-  const message = signedMessage ?? challengeMessage(payload);
-  if (signedMessage) {
-    const parsed = parseSiweMessage(signedMessage);
-    const siweMatchesChallenge = validateSiweMessage({
-      address: getAddress(address),
-      domain: payload.domain,
-      message: parsed,
-      nonce: payload.nonce,
-    }) && parsed.chainId === payload.chainId && parsed.uri === payload.uri && parsed.version === "1";
-    if (!siweMatchesChallenge) return null;
-  }
-  let valid = await verifyMessage({ address: getAddress(address), message, signature });
-  if (!valid) {
-    valid = await publicClient.verifyMessage({ address: getAddress(address), message, signature }).catch(() => false);
+  let valid: boolean;
+  if (method === "typed_data") {
+    const typedData = profileTypedData(payload);
+    valid = await verifyTypedData({ address: getAddress(address), ...typedData, signature });
+    if (!valid) valid = await publicClient.verifyTypedData({ address: getAddress(address), ...typedData, signature }).catch(() => false);
+  } else {
+    const message = challengeMessage(payload);
+    valid = await verifyMessage({ address: getAddress(address), message, signature });
+    if (!valid) valid = await publicClient.verifyMessage({ address: getAddress(address), message, signature }).catch(() => false);
   }
   return valid ? normalized : null;
 }

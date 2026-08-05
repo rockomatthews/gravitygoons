@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { privateKeyToAccount } from "viem/accounts";
-import { createSiweMessage } from "viem/siwe";
 import { createSessionToken, createSignInChallenge, readSessionAddress, verifyChallenge } from "./profile-session.ts";
 
 const account = privateKeyToAccount("0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
@@ -15,29 +14,12 @@ test("wallet challenge accepts only the matching wallet signature", async () => 
   assert.equal(await verifyChallenge(challenge.token, "0x0000000000000000000000000000000000000001", signature), null);
 });
 
-test("Base capability SIWE accepts the issued nonce and rejects altered fields", async () => {
+test("Base typed-data login accepts the issued challenge and rejects the wrong method", async () => {
   const challenge = createSignInChallenge(account.address);
-  const message = createSiweMessage({
-    address: account.address,
-    chainId: 8453,
-    domain: "localhost:3000",
-    nonce: challenge.nonce,
-    uri: "http://localhost:3000",
-    version: "1",
-  });
-  const signature = await account.signMessage({ message });
+  const signature = await account.signTypedData(challenge.typedData);
 
-  assert.equal(await verifyChallenge(challenge.token, account.address, signature, message), account.address.toLowerCase());
-  const wrongChainMessage = createSiweMessage({
-    address: account.address,
-    chainId: 1,
-    domain: "localhost:3000",
-    nonce: challenge.nonce,
-    uri: "http://localhost:3000",
-    version: "1",
-  });
-  const wrongChainSignature = await account.signMessage({ message: wrongChainMessage });
-  assert.equal(await verifyChallenge(challenge.token, account.address, wrongChainSignature, wrongChainMessage), null);
+  assert.equal(await verifyChallenge(challenge.token, account.address, signature, "typed_data"), account.address.toLowerCase());
+  assert.equal(await verifyChallenge(challenge.token, account.address, signature, "message"), null);
 });
 
 test("profile sessions are signed and reject tampering", () => {

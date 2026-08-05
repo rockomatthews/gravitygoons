@@ -57,10 +57,8 @@ type WalletState = {
   closeModal: () => void;
   request: <T = unknown>(args: { method: string; params?: unknown[] }) => Promise<T>;
   signMessage: (message: string, address?: string) => Promise<`0x${string}`>;
-  signInWithEthereum: (nonce: string) => Promise<BaseSiweResult | null>;
+  signProfileChallenge: (typedData: object, address?: string) => Promise<`0x${string}` | null>;
 };
-
-export type BaseSiweResult = { address: `0x${string}`; message: string; signature: `0x${string}` };
 
 const WalletContext = createContext<WalletState | null>(null);
 const BASE_CHAIN_HEX = "0x2105";
@@ -238,34 +236,23 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   }, [account, request]);
 
-  const signInWithEthereum = useCallback(async (nonce: string): Promise<BaseSiweResult | null> => {
+  const signProfileChallenge = useCallback(async (typedData: object, address?: string): Promise<`0x${string}` | null> => {
     const nextProvider = providerRef.current;
     const isBaseConnector = connectorIdRef.current?.startsWith("base") || nextProvider?.isCoinbaseWallet;
     if (!nextProvider || !isBaseConnector) return null;
+    const signer = normalizeAccount(address ?? account);
+    if (!signer) throw new Error("Connect a wallet first.");
     try {
-      const result = await withConnectionTimeout(nextProvider.request<{
-        accounts?: Array<{
-          address?: string;
-          capabilities?: { signInWithEthereum?: { message?: string; signature?: string } };
-        }>;
-      }>({
-        method: "wallet_connect",
-        params: [{ version: "1", capabilities: { signInWithEthereum: { nonce, chainId: BASE_CHAIN_HEX } } }],
+      return await withConnectionTimeout(nextProvider.request<`0x${string}`>({
+        method: "eth_signTypedData_v4",
+        params: [signer, JSON.stringify(typedData)],
       }));
-      const signed = result.accounts?.[0];
-      const address = normalizeAccount(signed?.address);
-      const message = signed?.capabilities?.signInWithEthereum?.message;
-      const signature = signed?.capabilities?.signInWithEthereum?.signature;
-      if (!address || typeof message !== "string" || typeof signature !== "string" || !/^0x[0-9a-fA-F]+$/.test(signature)) {
-        throw new Error("Base App did not return a completed sign-in. Reopen the app and retry.");
-      }
-      return { address, message, signature: signature as `0x${string}` };
     } catch (error) {
       const code = typeof error === "object" && error && "code" in error ? Number(error.code) : 0;
       if (code === 4100 || code === 4200 || code === -32601) return null;
       throw new Error(conciseError(error));
     }
-  }, []);
+  }, [account]);
 
   useEffect(() => {
     const announced = new Map<string, InjectedWallet>();
@@ -326,8 +313,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<WalletState>(() => ({
     account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect,
-    connectInjected, disconnect, openModal: () => setModalOpen(true), closeModal: () => setModalOpen(false), request, signMessage, signInWithEthereum,
-  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect, connectInjected, disconnect, request, signMessage, signInWithEthereum]);
+    connectInjected, disconnect, openModal: () => setModalOpen(true), closeModal: () => setModalOpen(false), request, signMessage, signProfileChallenge,
+  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect, connectInjected, disconnect, request, signMessage, signProfileChallenge]);
 
   return <WalletContext.Provider value={value}>
     {children}

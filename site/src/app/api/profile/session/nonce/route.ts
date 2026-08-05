@@ -6,7 +6,19 @@ export async function POST(request: Request) {
     const body = await request.json() as { address?: string };
     if (!body.address) return NextResponse.json({ error: "Wallet address is required." }, { status: 400 });
     const challenge = createSignInChallenge(body.address);
-    const response = NextResponse.json({ message: challenge.message, nonce: challenge.nonce, expiresAt: challenge.expiresAt });
+    const response = NextResponse.json({
+      message: challenge.message,
+      nonce: challenge.nonce,
+      typedData: {
+        ...challenge.typedData,
+        message: {
+          ...challenge.typedData.message,
+          issuedAt: challenge.typedData.message.issuedAt.toString(),
+          expirationTime: challenge.typedData.message.expirationTime.toString(),
+        },
+      },
+      expiresAt: challenge.expiresAt,
+    });
     response.cookies.set(NONCE_COOKIE, challenge.token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 600, path: "/" });
     return response;
   } catch (error) {
