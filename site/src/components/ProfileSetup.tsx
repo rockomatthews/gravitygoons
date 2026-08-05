@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
-import { authenticateProfileSession, fetchWithTimeout } from "@/lib/profile-auth-client";
+import { authenticateProfileSession, fetchWithTimeout, prepareProfileSignIn, type ProfileSignInChallenge } from "@/lib/profile-auth-client";
 
 type ProfileRecord = { username: string; display_name: string; bio: string };
 
@@ -16,6 +16,7 @@ export function ProfileSetup() {
   const [bio, setBio] = useState("");
   const [status, setStatus] = useState("Connect and sign once. The signature is free and cannot spend funds.");
   const [busy, setBusy] = useState(false);
+  const [preparedChallenge, setPreparedChallenge] = useState<ProfileSignInChallenge | null>(null);
 
   useEffect(() => {
     fetch("/api/profile/me").then((response) => response.json()).then((data) => {
@@ -29,11 +30,34 @@ export function ProfileSetup() {
     }).catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    if (!account || authenticated) return;
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (active) setStatus("Preparing mobile wallet sign-in…");
+      return prepareProfileSignIn(account);
+    }).then((challenge) => {
+      if (!active) return;
+      setPreparedChallenge(challenge);
+      setStatus("Sign-in ready. Press CONNECT + SIGN to approve it in your wallet.");
+    }).catch((error) => {
+      if (active) setStatus(error instanceof Error ? error.message : "Unable to prepare wallet sign-in.");
+    });
+    return () => { active = false; };
+  }, [account, authenticated]);
+
+  const preparedChallengeReady = Boolean(
+    account
+    && preparedChallenge
+    && preparedChallenge.address.toLowerCase() === account.toLowerCase(),
+  );
+
   async function signIn() {
     setBusy(true);
     try {
-      const verified = await authenticateProfileSession({ account, connect, signMessage, onStatus: setStatus });
+      const verified = await authenticateProfileSession({ account, connect, signMessage, onStatus: setStatus, preparedChallenge });
       setAuthenticated(true);
+      setPreparedChallenge(null);
       setStatus("Wallet verified. Refreshing your Goons…");
       let ownershipCount: number | null = null;
       try {
@@ -96,7 +120,7 @@ export function ProfileSetup() {
         <span>01 // VERIFY OWNER</span>
         <h2>{authenticated ? "Wallet verified." : "Sign in with your wallet."}</h2>
         <p>Gravity Goons uses a short wallet signature for profile access. It creates no transaction, costs no gas, and is checked again before any owner-only movie action.</p>
-        {!authenticated && <button className="button primary" onClick={signIn} disabled={busy}>{busy ? "WAITING…" : "CONNECT + SIGN"}</button>}
+        {!authenticated && <button className="button primary" onClick={signIn} disabled={busy || Boolean(account && !preparedChallengeReady)}>{busy ? "WAITING…" : account && !preparedChallengeReady ? "PREPARING SIGN-IN…" : "CONNECT + SIGN"}</button>}
         {authenticated && <button className="button" onClick={syncCollection} disabled={busy}>{busy ? "SYNCING…" : "REFRESH MY GOONS"}</button>}
       </section>
 
