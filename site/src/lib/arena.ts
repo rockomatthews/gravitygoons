@@ -1,6 +1,7 @@
 import "server-only";
 
 import collection from "@/data/collection.json";
+import { goonImageUrl } from "@/lib/goon-images";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 const DISCIPLINES = ["Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
@@ -79,7 +80,7 @@ function athlete(tokenId: number, wallet: string, names: Map<string, string>, ba
   const record = battle.get(tokenId) ?? {};
   return {
     tokenId, name: token.name, discipline: token.discipline, rarity: token.rarity, species: token.species,
-    image: `/collection/production-preview/${String(tokenId).padStart(4, "0")}.png`,
+    image: goonImageUrl(tokenId),
     ownerName: names.get(wallet.toLowerCase()) ?? "Goon Holder",
     matchesPlayed: Number(record.matches_played ?? 0), wins: Number(record.wins ?? 0), losses: Number(record.losses ?? 0), draws: Number(record.draws ?? 0),
     rating: Number(record.rating ?? 1500), rank: record.discipline_rank == null ? null : Number(record.discipline_rank),

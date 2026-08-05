@@ -15,6 +15,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
   const [predictions, setPredictions] = useState<Array<{ tokenId: number; points: number }>>([]);
   const [market, setMarket] = useState<PartnerMarket | null>(null);
   const [status, setStatus] = useState("Loading public match state…");
+  const [clock, setClock] = useState(0);
   const refresh = useCallback(async () => {
     const [matchResponse, predictionResponse] = await Promise.all([fetch(`/api/arena/matches/${matchId}`, { cache: "no-store" }), fetch(`/api/matches/${matchId}/predictions`, { cache: "no-store" })]);
     const matchData = await matchResponse.json();
@@ -24,6 +25,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
     const athletes = matchData.match.athletes as ArenaMatch["athletes"];
     const marketResponse = await fetch(`/api/limitless/markets/match?leftTokenId=${athletes[0].tokenId}&rightTokenId=${athletes[1].tokenId}`, { cache: "no-store" });
     if (marketResponse.ok) setMarket(await marketResponse.json());
+    setClock(Date.now());
     setStatus("Public transcript current.");
   }, [matchId]);
   useEffect(() => { const initial = window.setTimeout(refresh, 0); const timer = window.setInterval(refresh, 5_000); return () => { window.clearTimeout(initial); window.clearInterval(timer); }; }, [refresh]);
@@ -44,6 +46,13 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
 
   if (!detail) return <div className="arena-empty"><b>{status}</b></div>;
   const { match } = detail;
+  const checkInOpen = !match.checkInOpensAt || clock >= Date.parse(match.checkInOpensAt);
+  const scheduledStartReached = Boolean(match.scheduledStartAt && clock >= Date.parse(match.scheduledStartAt));
+  const bothCheckedIn = match.firstCheckedIn && match.secondCheckedIn;
+  const checkInLabel = !checkInOpen && match.checkInOpensAt
+    ? `CHECK-IN OPENS ${new Date(match.checkInOpensAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+    : bothCheckedIn && scheduledStartReached ? "START MATCH"
+      : bothCheckedIn ? "BOTH PLAYERS READY" : "PLAYER CHECK-IN";
   return <>
     <section className="broadcast-scoreboard">
       <header><span>{match.status.toUpperCase()} · {match.discipline}</span><b>{match.mode.replace("_", " ").toUpperCase()}</b><em>{match.actionDeadline ? `TURN CLOCK: ${new Date(match.actionDeadline).toLocaleTimeString()}` : "WAITING FOR START"}</em></header>
@@ -54,7 +63,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
         </article>)}
         <strong>VS</strong>
       </div>
-      <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn}>PLAYER CHECK-IN</button>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
+      <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span><span className="checkin-state">#{String(match.athletes[0].tokenId).padStart(4, "0")} {match.firstCheckedIn ? "READY" : "NOT CHECKED IN"} · #{String(match.athletes[1].tokenId).padStart(4, "0")} {match.secondCheckedIn ? "READY" : "NOT CHECKED IN"}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn} disabled={!checkInOpen || (bothCheckedIn && !scheduledStartReached)}>{checkInLabel}</button>}{(match.status === "live" || match.status === "active") && <Link href={`/game?match=${matchId}`}>ENTER PLAYER CONSOLE</Link>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
     </section>
     <section className="broadcast-panels">
       <article><span>FREE PREDICTION</span><h2>Who takes it?</h2><p>No NFT is required. Sign in once to make one valueless PLAY pick before the first action.</p>{match.athletes.map((athlete) => { const points = predictions.find((row) => row.tokenId === athlete.tokenId)?.points ?? 0; return <button key={athlete.tokenId} onClick={() => predict(athlete.tokenId)}><b>{athlete.name}</b><span>{total ? Math.round(points / total * 100) : 50}% · {points} PLAY</span></button>; })}</article>
