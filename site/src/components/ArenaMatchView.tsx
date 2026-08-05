@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useWallet } from "@/components/WalletProvider";
 import type { ArenaMatch } from "@/lib/arena";
+import { authenticateProfileSession, fetchWithTimeout } from "@/lib/profile-auth-client";
 
 type Detail = { match: ArenaMatch; events: Array<{ sequence: number; event_type: string; public_payload: Record<string, unknown>; created_at: string }>; transcript: Array<{ turn: number; action: string; createdAt: string; result: Record<string, unknown> }>; wager: { enabled: boolean; state: string; stakeMinor: number | null; houseFeeBps: number; notice: string } };
 type PartnerMarket = { provider: string; mode: string; collateral: string; notice: string; tradingEnabled: boolean; tradeUrl: string | null; outcomes: Array<{ athleteName: string; price: number }> };
@@ -11,10 +13,12 @@ type PartnerMarket = { provider: string; mode: string; collateral: string; notic
 function letters(word: string, losses: number) { return word.split("").map((letter, index) => <i key={index} className={index < losses ? "lost" : ""}>{letter}</i>); }
 
 export function ArenaMatchView({ matchId }: { matchId: string }) {
+  const { account, connect, signMessage } = useWallet();
   const [detail, setDetail] = useState<Detail | null>(null);
   const [predictions, setPredictions] = useState<Array<{ tokenId: number; points: number }>>([]);
   const [market, setMarket] = useState<PartnerMarket | null>(null);
   const [status, setStatus] = useState("Loading public match state…");
+  const [checkingIn, setCheckingIn] = useState(false);
   const [clock, setClock] = useState(0);
   const refresh = useCallback(async () => {
     const [matchResponse, predictionResponse] = await Promise.all([fetch(`/api/arena/matches/${matchId}`, { cache: "no-store" }), fetch(`/api/matches/${matchId}/predictions`, { cache: "no-store" })]);
@@ -38,10 +42,24 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
     setPredictions(data.predictions); setStatus("Free prediction saved. PLAY points have no cash value.");
   }
   async function checkIn() {
-    const response = await fetch(`/api/matches/${matchId}/check-in`, { method: "POST" });
-    const data = await response.json();
-    setStatus(response.ok ? "Check-in confirmed." : response.status === 401 ? "Sign in on Profile before checking in." : data.error);
-    if (response.ok) await refresh();
+    setCheckingIn(true);
+    try {
+      setStatus("Confirming your player session…");
+      let response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, { method: "POST" });
+      if (response.status === 401) {
+        await authenticateProfileSession({ account, connect, signMessage, onStatus: setStatus });
+        setStatus("Wallet verified. Completing player check-in…");
+        response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, { method: "POST" });
+      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Unable to check in.");
+      await refresh();
+      setStatus("Check-in confirmed. You are ready.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Unable to check in.");
+    } finally {
+      setCheckingIn(false);
+    }
   }
 
   if (!detail) return <div className="arena-empty"><b>{status}</b></div>;
@@ -63,7 +81,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
         </article>)}
         <strong>VS</strong>
       </div>
-      <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span><span className="checkin-state">#{String(match.athletes[0].tokenId).padStart(4, "0")} {match.firstCheckedIn ? "READY" : "NOT CHECKED IN"} · #{String(match.athletes[1].tokenId).padStart(4, "0")} {match.secondCheckedIn ? "READY" : "NOT CHECKED IN"}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn} disabled={!checkInOpen || (bothCheckedIn && !scheduledStartReached)}>{checkInLabel}</button>}{(match.status === "live" || match.status === "active") && <Link href={`/game?match=${matchId}`}>ENTER PLAYER CONSOLE</Link>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
+      <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span><span className="checkin-state">#{String(match.athletes[0].tokenId).padStart(4, "0")} {match.firstCheckedIn ? "READY" : "NOT CHECKED IN"} · #{String(match.athletes[1].tokenId).padStart(4, "0")} {match.secondCheckedIn ? "READY" : "NOT CHECKED IN"}</span><span className="checkin-feedback" aria-live="polite">{status}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn} disabled={checkingIn || !checkInOpen || (bothCheckedIn && !scheduledStartReached)}>{checkingIn ? "CHECKING IN…" : checkInLabel}</button>}{(match.status === "live" || match.status === "active") && <Link href={`/game?match=${matchId}`}>ENTER PLAYER CONSOLE</Link>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
     </section>
     <section className="broadcast-panels">
       <article><span>FREE PREDICTION</span><h2>Who takes it?</h2><p>No NFT is required. Sign in once to make one valueless PLAY pick before the first action.</p>{match.athletes.map((athlete) => { const points = predictions.find((row) => row.tokenId === athlete.tokenId)?.points ?? 0; return <button key={athlete.tokenId} onClick={() => predict(athlete.tokenId)}><b>{athlete.name}</b><span>{total ? Math.round(points / total * 100) : 50}% · {points} PLAY</span></button>; })}</article>
