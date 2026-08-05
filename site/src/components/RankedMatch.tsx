@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useWallet } from "@/components/WalletProvider";
 import collection from "@/data/collection.json";
+import { authenticateProfileSession } from "@/lib/profile-auth-client";
 import { TRICK_CATALOG, type Discipline } from "@/lib/pvp";
 
 type MatchPayload = {
@@ -15,14 +17,22 @@ type MatchPayload = {
 };
 
 export function RankedMatch({ matchId }: { matchId: string }) {
+  const { account, connect, signMessage } = useWallet();
   const [match, setMatch] = useState<MatchPayload | null>(null);
   const [status, setStatus] = useState("Loading authoritative match…");
+  const [authRequired, setAuthRequired] = useState(false);
+  const [authenticating, setAuthenticating] = useState(false);
   const [trickId, setTrickId] = useState(0);
   const refresh = useCallback(async () => {
     const response = await fetch(`/api/matches/${matchId}`, { cache: "no-store" });
     const data = await response.json();
-    if (!response.ok) return setStatus(data.error);
+    if (!response.ok) {
+      setAuthRequired(response.status === 401);
+      setStatus(response.status === 401 ? "Authenticate the player wallet to enter this match." : data.error);
+      return;
+    }
     setMatch(data.match);
+    setAuthRequired(false);
     setStatus("Server transcript current.");
   }, [matchId]);
   useEffect(() => {
@@ -32,6 +42,19 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   }, [refresh]);
   const discipline = useMemo(() => match ? collection.tokens[match.first_token_id - 1].discipline as Discipline : "Skateboarding", [match]);
   const tricks = TRICK_CATALOG[discipline];
+
+  async function authenticatePlayer() {
+    setAuthenticating(true);
+    try {
+      await authenticateProfileSession({ account, connect, signMessage, onStatus: setStatus });
+      setStatus("Wallet verified. Loading the player console…");
+      await refresh();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Unable to authenticate the player wallet.");
+    } finally {
+      setAuthenticating(false);
+    }
+  }
 
   async function act() {
     if (!match) return;
@@ -45,7 +68,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     await refresh();
   }
 
-  if (!match) return <section className="ranked-match"><p>{status}</p></section>;
+  if (!match) return <section className="ranked-match"><p>{status}</p>{authRequired && <button className="button primary" onClick={authenticatePlayer} disabled={authenticating}>{authenticating ? "AUTHENTICATING…" : "AUTHENTICATE PLAYER"}</button>}</section>;
   const pending = Boolean(match.state.pendingCall);
   return <section className="ranked-match">
     <div className="ranked-match-top"><p className="eyebrow">AUTHORITATIVE RANKED 1V1 · NO WAGER</p><b>{match.status.toUpperCase()}</b></div>
