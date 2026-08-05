@@ -9,13 +9,13 @@
     "test:limitless": "node --test --experimental-strip-types src/lib/limitless/core.test.ts",
     "test:profile": "node --test --experimental-strip-types src/lib/profile-session.test.ts",
     "test:wallet-links": "node --test --experimental-strip-types src/lib/wallet-links.test.ts",
-    "test": "npm run test:game && npm run test:limitless && npm run test:profile && npm run test:wallet-links",
+    "test:move-provider": "node --test --experimental-strip-types src/lib/seevio-server.test.ts",
+    "test": "npm run test:game && npm run test:limitless && npm run test:profile && npm run test:wallet-links && npm run test:move-provider",
     "analyze:game-balance": "node --experimental-strip-types scripts/simulate-pvp-balance.mjs ../reports/pvp-balance-v04.json",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
-    "@fal-ai/client": "1.10.1",
     "@limitless-exchange/sdk": "^1.0.11",
     "@supabase/supabase-js": "2.110.7",
     "@types/three": "^0.185.1",

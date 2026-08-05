@@ -18,7 +18,7 @@ export function CharacterMoveLibrary({
           <h2>Build this Goon&apos;s reel.</h2>
         </div>
         <p>
-          The current NFT holder can create a five-second Seedance movie for
+          The current NFT holder can create a five-second Seevio movie for
           any unlocked move that still lacks one. Drafts return here for
           approval or rejection before they can appear in a match broadcast.
         </p>
@@ -45,7 +45,7 @@ export function CharacterMoveLibrary({
       <div className="character-move-approval">
         <div><span>REQUEST</span><b>Choose an unlocked move and approve a USDC or future game-credit quote.</b></div>
         <i>→</i>
-        <div><span>SEEDANCE JOB</span><b>Generate asynchronously from the NFT image and remembered move template.</b></div>
+        <div><span>SEEVIO JOB</span><b>Generate asynchronously from the NFT image and reviewed trick recipe.</b></div>
         <i>→</i>
         <div><span>OWNER REVIEW</span><b>Approve, reject, or use an included reroll before publishing.</b></div>
       </div>

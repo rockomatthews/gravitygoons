@@ -21,6 +21,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
   const [studio, setStudio] = useState<StudioPayload | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [selectedMove, setSelectedMove] = useState<StudioMove | null>(null);
+  const [selectedTrickId, setSelectedTrickId] = useState<number | null>(null);
+  const [actionError, setActionError] = useState("");
   const [status, setStatus] = useState("Sign in from My Profile with the current owner wallet to unlock movie controls.");
   const [busy, setBusy] = useState(false);
 
@@ -32,6 +34,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       return;
     }
     setStudio(data);
+    const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && move.pairStatus === "no_movie");
+    setSelectedTrickId((current) => current ?? firstPurchasable?.trickId ?? null);
     setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
   }, [tokenId]);
 
@@ -43,6 +47,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         if (!active) return;
         if (!ok) return setStatus(data.error);
         setStudio(data);
+        const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && move.pairStatus === "no_movie");
+        setSelectedTrickId((current) => current ?? firstPurchasable?.trickId ?? null);
         setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
       })
       .catch(() => { if (active) setStatus("Unable to load the owner studio."); });
@@ -51,6 +57,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
 
   async function requestQuote(move: StudioMove) {
     setBusy(true);
+    setActionError("");
     try {
       const response = await fetch("/api/moves/quote", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tokenId, trickId: move.trickId }) });
       const data = await response.json();
@@ -59,7 +66,9 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       setQuote(data);
       setStatus(`${data.displayPrice} buys both outcomes: one clean LAND, one game-only FALL, and one included reroll of each. Quote expires ${new Date(data.expiresAt).toLocaleTimeString()}.`);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Unable to quote this move.");
+      const message = error instanceof Error ? error.message : "Unable to quote this move.";
+      setStatus(message);
+      setActionError(message);
     } finally {
       setBusy(false);
     }
@@ -81,6 +90,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
   async function payAndGenerate() {
     if (!quote) return;
     setBusy(true);
+    setActionError("");
     try {
       let txHash = `0x${"0".repeat(64)}` as `0x${string}`;
       if (!quote.demo) {
@@ -91,15 +101,17 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         setStatus("Confirm the one-time Base USDC payment in your wallet…");
         txHash = await wallet.writeContract({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "transfer", args: [TREASURY_ADDRESS, BigInt(quote.amountMinorUnits)], account: address });
       }
-      setStatus("Payment submitted. Verifying it server-side before either Seedance job is created…");
+      setStatus("Payment submitted. Verifying it server-side before either Seevio job is created…");
       const response = await fetch("/api/moves/payment/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ orderId: quote.orderId, txHash }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      setStatus(quote.demo ? "Demo payment confirmed. In production this starts two asynchronous Seedance jobs." : "Payment confirmed. LAND and FALL jobs are now queued; you can leave this page and return later.");
+      setStatus(quote.demo ? "Demo payment confirmed. In production this starts two asynchronous Seevio jobs." : "Payment confirmed. LAND and FALL jobs are now queued with Seevio; you can leave this page and return later.");
       setQuote(null);
       await refresh();
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Payment was not completed.");
+      const message = error instanceof Error ? error.message : "Payment was not completed.";
+      setStatus(message);
+      setActionError(message);
     } finally {
       setBusy(false);
     }
@@ -122,6 +134,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
 
   const goon = studio?.goon ?? fallbackGoon;
   const moves = studio?.moves ?? fallbackGoon.moves.map((move) => ({ ...move, outcomes: [], quotedPriceUsdc: "$12.00 USDC" }));
+  const purchasableMoves = moves.filter((move) => move.unlocked && move.pairStatus === "no_movie");
+  const selectedPurchasableMove = purchasableMoves.find((move) => move.trickId === selectedTrickId) ?? purchasableMoves[0] ?? null;
 
   return (
     <div className="owner-move-studio">
@@ -132,9 +146,22 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
 
       <aside className="studio-live-status" aria-live="polite"><b>OWNER WORKFLOW</b><p>{status}</p>{studio ? <Link href="/profile">MANAGE PROFILE</Link> : <button onClick={unlockOwnerStudio} disabled={busy}>{busy ? "VERIFYING…" : "CONNECT + VERIFY OWNER"}</button>}</aside>
 
+      <section className="studio-trick-picker" aria-labelledby="studio-trick-picker-title">
+        <div><span>01 // SELECT A TRICK</span><h2 id="studio-trick-picker-title">Which trick gets movies?</h2><p>Choose one unlocked trick. The $12 purchase creates both a clean LAND movie and a FALL movie for that exact trick.</p></div>
+        {studio ? purchasableMoves.length > 0 ? <div className="studio-trick-control">
+          <label htmlFor="studio-trick-select">YOUR UNLOCKED TRICKS</label>
+          <select id="studio-trick-select" value={selectedPurchasableMove?.trickId ?? ""} onChange={(event) => { setSelectedTrickId(Number(event.target.value)); setQuote(null); setActionError(""); }} disabled={busy}>
+            {purchasableMoves.map((move) => <option key={move.trickId} value={move.trickId}>{move.name} · difficulty {move.difficulty}</option>)}
+          </select>
+          <div><b>{selectedPurchasableMove?.quotedPriceUsdc ?? "$12.00 USDC"}</b><span>LAND + FALL · ONE REROLL EACH</span></div>
+          <button onClick={() => selectedPurchasableMove && requestQuote(selectedPurchasableMove)} disabled={busy || !selectedPurchasableMove}>{busy ? "LOADING…" : "REVIEW PURCHASE"}</button>
+          {actionError && <p className="studio-action-error" role="alert">{actionError}</p>}
+        </div> : <p className="studio-picker-empty">Every currently unlocked trick already has a movie workflow.</p> : <button className="studio-picker-signin" onClick={unlockOwnerStudio} disabled={busy}>{busy ? "VERIFYING OWNER…" : "CONNECT + VERIFY OWNER TO SELECT A TRICK"}</button>}
+      </section>
+
       <section className="studio-move-grid">
         {moves.map((move) => (
-          <article className={`studio-move-card state-${move.pairStatus}`} key={move.trickId}>
+          <article className={`studio-move-card state-${move.pairStatus}${selectedPurchasableMove?.trickId === move.trickId ? " is-selected" : ""}`} key={move.trickId}>
             <div className="studio-move-title"><span>DIFFICULTY {move.difficulty}</span><i>{move.pairStatus.replaceAll("_", " ")}</i><h2>{move.name}</h2></div>
             <div className="outcome-pair">
               {(["land", "fall"] as const).map((outcome) => {
@@ -142,19 +169,19 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
                 return (
                   <div className={`outcome-slot outcome-${outcome}`} key={outcome}>
                     <span>{outcome.toUpperCase()}{" // "}{asset?.status.replaceAll("_", " ") ?? "NOT MADE"}</span>
-                    {asset?.videoUrl ? <video src={asset.videoUrl} poster={asset.posterUrl ?? undefined} controls playsInline preload="metadata" /> : <div className="outcome-placeholder"><b>{outcome === "land" ? "STICK IT" : "BAIL IT"}</b><small>5 SEC · 720P · SEEDANCE</small></div>}
+                    {asset?.videoUrl ? <video src={asset.videoUrl} poster={asset.posterUrl ?? undefined} controls playsInline preload="metadata" /> : <div className="outcome-placeholder"><b>{outcome === "land" ? "STICK IT" : "BAIL IT"}</b><small>5 SEC · 720P · SEEVIO</small></div>}
                     {asset?.status === "owner_review" && <div className="outcome-review-buttons"><button onClick={() => review(asset.id, "approved")} disabled={busy}>APPROVE</button><button onClick={() => review(asset.id, "reroll")} disabled={busy}>REROLL</button><button onClick={() => review(asset.id, "rejected")} disabled={busy}>REJECT</button></div>}
                     {outcome === "fall" && <small>PRIVATE · GAME OUTCOMES ONLY</small>}
                   </div>
                 );
               })}
             </div>
-            <footer><b>{move.quotedPriceUsdc}</b><span>INCLUDES LAND + FALL</span><button onClick={() => studio ? requestQuote(move) : unlockOwnerStudio()} disabled={busy || !move.unlocked || (Boolean(studio) && move.pairStatus !== "no_movie")}>{move.unlocked ? studio ? move.pairStatus === "no_movie" ? "MAKE BOTH MOVIES" : "WORKFLOW STARTED" : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
+            <footer><b>{move.quotedPriceUsdc}</b><span>INCLUDES LAND + FALL</span><button onClick={() => { if (!studio) return unlockOwnerStudio(); setSelectedTrickId(move.trickId); setQuote(null); setActionError(""); document.getElementById("studio-trick-picker-title")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} disabled={busy || !move.unlocked || (Boolean(studio) && move.pairStatus !== "no_movie")}>{move.unlocked ? studio ? move.pairStatus === "no_movie" ? selectedPurchasableMove?.trickId === move.trickId ? "SELECTED" : "SELECT THIS TRICK" : "WORKFLOW STARTED" : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
           </article>
         ))}
       </section>
 
-      {quote && selectedMove && <div className="move-quote-dock"><div><span>MOVE FILM PAIR</span><b>{selectedMove.name} · LAND + FALL</b><small>{quote.displayPrice} · INCLUDES ONE REROLL EACH</small></div><button onClick={payAndGenerate} disabled={busy}>{busy ? "PROCESSING…" : quote.demo ? "SIMULATE PAYMENT" : "PAY USDC + GENERATE"}</button><button className="quote-cancel" onClick={() => setQuote(null)}>CANCEL</button></div>}
+      {quote && selectedMove && <div className="move-quote-dock"><div><span>02 // CONFIRM THIS EXACT TRICK</span><b>{selectedMove.name} · LAND + FALL</b><small>{quote.displayPrice} · INCLUDES ONE REROLL EACH</small>{actionError && <em role="alert">{actionError}</em>}</div><button onClick={payAndGenerate} disabled={busy}>{busy ? "PROCESSING…" : quote.demo ? "SIMULATE PAYMENT" : `PAY ${quote.displayPrice} + GENERATE`}</button><button className="quote-cancel" onClick={() => { setQuote(null); setActionError(""); }}>CHANGE TRICK</button></div>}
     </div>
   );
 }

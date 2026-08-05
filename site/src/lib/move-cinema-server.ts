@@ -3,7 +3,7 @@ import { collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { goonImageUrl } from "@/lib/goon-images";
 import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { seedanceConfigured, submitSeedanceJob } from "@/lib/seedance-server";
+import { seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
 
 const CHAIN_ID = 8453;
 const BASE_USDC = (process.env.BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913").toLowerCase();
@@ -43,6 +43,14 @@ function includedRerollsPerOutcome(): number {
   return value;
 }
 
+function assertProductionMovePurchaseReady(): void {
+  if (process.env.MOVE_PAYMENT_MODE !== "live") throw new Error("Movie purchases are temporarily closed while the Seevio production connection is being verified. No payment was requested.");
+  if (!seevioConfigured()) throw new Error("Movie purchases are temporarily closed until the Seevio API key and secure callback are configured. No payment was requested.");
+  const treasury = process.env.MOVE_TREASURY_ADDRESS?.toLowerCase();
+  const publicTreasury = process.env.NEXT_PUBLIC_MOVE_TREASURY_ADDRESS?.toLowerCase();
+  if (!treasury || !publicTreasury || treasury !== publicTreasury) throw new Error("Movie purchases are temporarily closed because the Base USDC treasury configuration is incomplete. No payment was requested.");
+}
+
 export async function createMoveQuote(walletAddress: string, tokenId: number, trickId: number) {
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const { trick } = tokenMove(tokenId, trickId);
@@ -51,6 +59,7 @@ export async function createMoveQuote(walletAddress: string, tokenId: number, tr
   const amount = quoteAmount();
   const supabase = getSupabaseAdmin();
   if (!supabase || collectionAddress === ZERO_ADDRESS) return { demo: true, orderId: "demo-order", pairId: "demo-pair", amountMinorUnits: amount, displayPrice: formatUsdc(amount), expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() };
+  assertProductionMovePurchaseReady();
 
   const wallet = walletAddress.toLowerCase();
   const profile = await getProfileForWallet(wallet);
@@ -152,8 +161,8 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
   let submitted = 0;
   for (const asset of assets) {
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${asset.version}`;
-    const requestPayload = { model: "bytedance/seedance-2.0/fast/image-to-video", prompt: asset.prompt, image_url: asset.source_image_url, resolution: "720p", duration: 5 };
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
+    const requestPayload = { model: "seedance-2-0-fast", generation_type: "image-to-video", prompt: asset.prompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 };
+    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
     let job = jobData as JobRow | null;
     if (!job) {
@@ -161,14 +170,14 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
       if (existingJobError) throw new Error(existingJobError.message);
       job = existingJob as JobRow;
     }
-    if (job.provider_job_id || job.status !== "queued" || !seedanceConfigured()) continue;
+    if (job.provider_job_id || job.status !== "queued" || !seevioConfigured()) continue;
     const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing" }).eq("id", job.id).eq("status", "queued").select("id").maybeSingle();
     if (!claimedJob) continue;
     let providerJobId: string | null;
     try {
-      providerJobId = await submitSeedanceJob({ prompt: asset.prompt, imageUrl: asset.source_image_url, idempotencyKey });
+      providerJobId = await submitSeevioJob({ prompt: asset.prompt, imageUrl: asset.source_image_url, idempotencyKey });
     } catch (error) {
-      await supabase.from("move_generation_jobs").update({ status: "queued", error_message: error instanceof Error ? error.message : "Seedance submission failed." }).eq("id", job.id);
+      await supabase.from("move_generation_jobs").update({ status: "queued", error_message: error instanceof Error ? error.message : "Seevio submission failed." }).eq("id", job.id);
       throw error;
     }
     if (!providerJobId) {
@@ -182,7 +191,7 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
     submitted += 1;
   }
   await supabase.from("move_media_pairs").update({ status: submitted ? "generating" : "queued" }).eq("id", pair.id);
-  return { submitted, configured: seedanceConfigured() };
+  return { submitted, configured: seevioConfigured() };
 }
 
 export async function confirmMovePayment(walletAddress: string, orderId: string, txHash: `0x${string}`) {
@@ -233,10 +242,10 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
     if (error) throw new Error(error.message);
     const nextAsset = nextData as AssetRow;
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${nextVersion}`;
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, status: "queued", attempt: nextVersion, request_payload: { prompt: rerollPrompt, image_url: asset.source_image_url, resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
+    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: { model: "seedance-2-0-fast", generation_type: "image-to-video", prompt: rerollPrompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError) throw new Error(jobError.message);
     const job = jobData as JobRow;
-    const providerJobId = await submitSeedanceJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
+    const providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
     if (providerJobId) {
       await Promise.all([
         supabase.from("move_generation_jobs").update({ provider_job_id: providerJobId, status: "submitted", submitted_at: reviewedAt }).eq("id", job.id),
