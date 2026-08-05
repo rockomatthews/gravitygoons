@@ -17,7 +17,7 @@ type MatchPayload = {
 };
 
 export function RankedMatch({ matchId }: { matchId: string }) {
-  const { account, connect, signMessage } = useWallet();
+  const { account, connect, signMessage, signInWithEthereum } = useWallet();
   const [match, setMatch] = useState<MatchPayload | null>(null);
   const [status, setStatus] = useState("Loading authoritative match…");
   const [authRequired, setAuthRequired] = useState(false);
@@ -46,7 +46,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   async function authenticatePlayer() {
     setAuthenticating(true);
     try {
-      await authenticateProfileSession({ account, connect, signMessage, onStatus: setStatus });
+      await authenticateProfileSession({ account, connect, signMessage, signInWithEthereum, onStatus: setStatus });
       setStatus("Wallet verified. Loading the player console…");
       await refresh();
     } catch (error) {

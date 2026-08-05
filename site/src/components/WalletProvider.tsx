@@ -57,7 +57,10 @@ type WalletState = {
   closeModal: () => void;
   request: <T = unknown>(args: { method: string; params?: unknown[] }) => Promise<T>;
   signMessage: (message: string, address?: string) => Promise<`0x${string}`>;
+  signInWithEthereum: (nonce: string) => Promise<BaseSiweResult | null>;
 };
+
+export type BaseSiweResult = { address: `0x${string}`; message: string; signature: `0x${string}` };
 
 const WalletContext = createContext<WalletState | null>(null);
 const BASE_CHAIN_HEX = "0x2105";
@@ -95,9 +98,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [wallets, setWallets] = useState<InjectedWallet[]>([]);
   const providerRef = useRef<EthereumProvider | null>(null);
+  const connectorIdRef = useRef<string | null>(null);
 
   const bindProvider = useCallback((nextProvider: EthereumProvider, connectorId: string, nextAccount: `0x${string}`) => {
     providerRef.current = nextProvider;
+    connectorIdRef.current = connectorId;
     setProvider(nextProvider);
     setAccount(nextAccount);
     window.localStorage.setItem(STORAGE_KEY, connectorId);
@@ -210,6 +215,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const disconnect = useCallback(async () => {
     try { await providerRef.current?.disconnect?.(); } catch { /* local disconnect still clears the session */ }
     providerRef.current = null;
+    connectorIdRef.current = null;
     setProvider(null);
     setAccount(null);
     setMessage("Wallet disconnected.");
@@ -231,6 +237,35 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       throw new Error(conciseError(error));
     }
   }, [account, request]);
+
+  const signInWithEthereum = useCallback(async (nonce: string): Promise<BaseSiweResult | null> => {
+    const nextProvider = providerRef.current;
+    const isBaseConnector = connectorIdRef.current?.startsWith("base") || nextProvider?.isCoinbaseWallet;
+    if (!nextProvider || !isBaseConnector) return null;
+    try {
+      const result = await withConnectionTimeout(nextProvider.request<{
+        accounts?: Array<{
+          address?: string;
+          capabilities?: { signInWithEthereum?: { message?: string; signature?: string } };
+        }>;
+      }>({
+        method: "wallet_connect",
+        params: [{ version: "1", capabilities: { signInWithEthereum: { nonce, chainId: BASE_CHAIN_HEX } } }],
+      }));
+      const signed = result.accounts?.[0];
+      const address = normalizeAccount(signed?.address);
+      const message = signed?.capabilities?.signInWithEthereum?.message;
+      const signature = signed?.capabilities?.signInWithEthereum?.signature;
+      if (!address || typeof message !== "string" || typeof signature !== "string" || !/^0x[0-9a-fA-F]+$/.test(signature)) {
+        throw new Error("Base App did not return a completed sign-in. Reopen the app and retry.");
+      }
+      return { address, message, signature: signature as `0x${string}` };
+    } catch (error) {
+      const code = typeof error === "object" && error && "code" in error ? Number(error.code) : 0;
+      if (code === 4100 || code === 4200 || code === -32601) return null;
+      throw new Error(conciseError(error));
+    }
+  }, []);
 
   useEffect(() => {
     const announced = new Map<string, InjectedWallet>();
@@ -291,8 +326,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<WalletState>(() => ({
     account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect,
-    connectInjected, disconnect, openModal: () => setModalOpen(true), closeModal: () => setModalOpen(false), request, signMessage,
-  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect, connectInjected, disconnect, request, signMessage]);
+    connectInjected, disconnect, openModal: () => setModalOpen(true), closeModal: () => setModalOpen(false), request, signMessage, signInWithEthereum,
+  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect, connectInjected, disconnect, request, signMessage, signInWithEthereum]);
 
   return <WalletContext.Provider value={value}>
     {children}

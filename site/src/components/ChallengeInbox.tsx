@@ -34,7 +34,7 @@ function message(wallet: string, action: string, challengeId: string, issuedAt: 
 }
 
 export function ChallengeInbox() {
-  const { account, connect, signMessage } = useWallet();
+  const { account, connect, signMessage, signInWithEthereum } = useWallet();
   const [inbox, setInbox] = useState<Inbox>({ incoming: [], sent: [], active: [], history: [] });
   const [status, setStatus] = useState("Challenge updates poll every 15 seconds; private realtime can take over when production auth is configured.");
   const [rescheduleTimes, setRescheduleTimes] = useState<Record<string, string>>({});
@@ -72,7 +72,7 @@ export function ChallengeInbox() {
     try {
       const wallet = account ?? await connect();
       if (!wallet) throw new Error("Choose a wallet, then try the challenge action again.");
-      await ensureProfileSession({ address: wallet, signMessage, onStatus: setStatus });
+      await ensureProfileSession({ address: wallet, signMessage, signInWithEthereum, onStatus: setStatus });
       const issuedAt = new Date().toISOString();
       const signature = await signMessage(message(wallet, action, challengeId, issuedAt), wallet);
       const response = await fetch(`/api/challenges/${challengeId}/${action}`, {
@@ -89,7 +89,7 @@ export function ChallengeInbox() {
     try {
       const wallet = account ?? await connect();
       if (!wallet || !row.match_id) throw new Error("Choose a wallet, then try again.");
-      await ensureProfileSession({ address: wallet, signMessage, onStatus: setStatus });
+      await ensureProfileSession({ address: wallet, signMessage, signInWithEthereum, onStatus: setStatus });
       const pending = row.reschedule_request;
       if (pending?.proposer_wallet === wallet.toLowerCase()) throw new Error("Waiting for the other player to approve your proposed time.");
       const proposedStartAt = pending?.proposed_start_at ?? (rescheduleTimes[row.id] ? new Date(rescheduleTimes[row.id]).toISOString() : "");

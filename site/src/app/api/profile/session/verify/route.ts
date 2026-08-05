@@ -5,10 +5,10 @@ import { getProfileForWallet } from "@/lib/profile-data";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as { address?: string; signature?: `0x${string}` };
+    const body = await request.json() as { address?: string; signature?: `0x${string}`; message?: string };
     if (!body.address || !body.signature) return NextResponse.json({ error: "Wallet address and signature are required." }, { status: 400 });
     const cookieStore = await cookies();
-    const address = await verifyChallenge(cookieStore.get(NONCE_COOKIE)?.value, body.address, body.signature);
+    const address = await verifyChallenge(cookieStore.get(NONCE_COOKIE)?.value, body.address, body.signature, body.message);
     if (!address) return NextResponse.json({ error: "The wallet signature is invalid or expired." }, { status: 401 });
     const profile = await getProfileForWallet(address);
     const response = NextResponse.json({ address, profile, needsProfile: !profile });
@@ -19,4 +19,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to verify wallet." }, { status: 400 });
   }
 }
-

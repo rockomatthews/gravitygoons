@@ -58,7 +58,7 @@ function displayEth(wei: bigint): string {
 }
 
 export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; imageBaseUrl: string }) {
-  const { account, connect, provider, signMessage, message: walletMessage } = useWallet();
+  const { account, connect, provider, signMessage, signInWithEthereum, message: walletMessage } = useWallet();
   const normalizedAccount = account?.toLowerCase() ?? null;
   const [discipline, setDiscipline] = useState("All");
   const [cast, setCast] = useState("All");
@@ -245,7 +245,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     try {
       const wallet = account ?? await connect();
       if (!wallet) throw new Error("Choose a wallet, then send the challenge again.");
-      await ensureProfileSession({ address: wallet, signMessage, onStatus: setStatus });
+      await ensureProfileSession({ address: wallet, signMessage, signInWithEthereum, onStatus: setStatus });
       const issuedAt = new Date().toISOString();
       if (challengeMode === "live_ranked" && !challengeStart) throw new Error("Choose a scheduled start time.");
       const proposedStartAt = challengeMode === "live_ranked" ? new Date(challengeStart).toISOString() : null;

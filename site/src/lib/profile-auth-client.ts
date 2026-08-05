@@ -1,6 +1,7 @@
 type ConnectWallet = () => Promise<`0x${string}` | null>;
 type SignWalletMessage = (message: string, address?: string) => Promise<`0x${string}`>;
-export type ProfileSignInChallenge = { address: `0x${string}`; message: string; expiresAt: number };
+type SignInWithEthereum = (nonce: string) => Promise<{ address: `0x${string}`; message: string; signature: `0x${string}` } | null>;
+export type ProfileSignInChallenge = { address: `0x${string}`; message: string; nonce: string; expiresAt: number };
 
 export async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit, timeoutMs = 20_000): Promise<Response> {
   const controller = new AbortController();
@@ -23,7 +24,7 @@ export async function prepareProfileSignIn(address: `0x${string}`): Promise<Prof
   });
   const challenge = await challengeResponse.json();
   if (!challengeResponse.ok) throw new Error(challenge.error);
-  return { address, message: challenge.message, expiresAt: challenge.expiresAt };
+  return { address, message: challenge.message, nonce: challenge.nonce, expiresAt: challenge.expiresAt };
 }
 
 export async function authenticateProfileSession({
@@ -32,12 +33,14 @@ export async function authenticateProfileSession({
   signMessage,
   onStatus,
   preparedChallenge,
+  signInWithEthereum,
 }: {
   account: `0x${string}` | null;
   connect: ConnectWallet;
   signMessage: SignWalletMessage;
   onStatus: (status: string) => void;
   preparedChallenge?: ProfileSignInChallenge | null;
+  signInWithEthereum?: SignInWithEthereum;
 }) {
   const address = account ?? await connect();
   if (!address) throw new Error("Choose the player wallet, then press PLAYER CHECK-IN again.");
@@ -47,12 +50,15 @@ export async function authenticateProfileSession({
   if (!preparedIsValid) onStatus("Preparing a secure wallet sign-in…");
   const challenge = preparedIsValid ? preparedChallenge : await prepareProfileSignIn(address);
   onStatus("Approve the free sign-in message in your wallet…");
-  const signature = await signMessage(challenge.message, address);
+  const baseSignIn = await signInWithEthereum?.(challenge.nonce);
+  if (baseSignIn && baseSignIn.address.toLowerCase() !== address.toLowerCase()) throw new Error("Base App returned a different wallet account.");
+  const signature = baseSignIn?.signature ?? await signMessage(challenge.message, address);
+  const signedMessage = baseSignIn?.message;
   onStatus("Signature received. Verifying your wallet…");
   const verifyResponse = await fetchWithTimeout("/api/profile/session/verify", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ address, signature }),
+    body: JSON.stringify({ address, signature, message: signedMessage }),
   });
   const verified = await verifyResponse.json();
   if (!verifyResponse.ok) throw new Error(verified.error);
@@ -63,13 +69,15 @@ export async function ensureProfileSession({
   address,
   signMessage,
   onStatus,
+  signInWithEthereum,
 }: {
   address: `0x${string}`;
   signMessage: SignWalletMessage;
   onStatus: (status: string) => void;
+  signInWithEthereum?: SignInWithEthereum;
 }) {
   const currentResponse = await fetchWithTimeout("/api/profile/me", { method: "GET", cache: "no-store" });
   const current = await currentResponse.json();
   if (currentResponse.ok && current.authenticated && current.address?.toLowerCase() === address.toLowerCase()) return current;
-  return authenticateProfileSession({ account: address, connect: async () => address, signMessage, onStatus });
+  return authenticateProfileSession({ account: address, connect: async () => address, signMessage, signInWithEthereum, onStatus });
 }

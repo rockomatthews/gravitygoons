@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getAddress, verifyMessage } from "viem";
+import { parseSiweMessage, validateSiweMessage } from "viem/siwe";
 import { publicClient } from "./contracts.ts";
 
 export const NONCE_COOKIE = "gg_profile_nonce";
@@ -52,7 +53,7 @@ export function normalizeWallet(address: string): `0x${string}` {
   return getAddress(address).toLowerCase() as `0x${string}`;
 }
 
-export function createSignInChallenge(address: string): { message: string; token: string; expiresAt: number } {
+export function createSignInChallenge(address: string): { message: string; nonce: string; token: string; expiresAt: number } {
   const normalized = normalizeWallet(address);
   const issuedAt = Date.now();
   const expiresAt = issuedAt + 10 * 60 * 1000;
@@ -66,7 +67,7 @@ export function createSignInChallenge(address: string): { message: string; token
     issuedAt,
     expiresAt,
   };
-  return { message: challengeMessage(payload), token: encode(payload), expiresAt };
+  return { message: challengeMessage(payload), nonce: payload.nonce!, token: encode(payload), expiresAt };
 }
 
 function challengeMessage(payload: SignedPayload): string {
@@ -85,12 +86,22 @@ function challengeMessage(payload: SignedPayload): string {
   ].join("\n");
 }
 
-export async function verifyChallenge(token: string | undefined, address: string, signature: `0x${string}`): Promise<string | null> {
+export async function verifyChallenge(token: string | undefined, address: string, signature: `0x${string}`, signedMessage?: string): Promise<string | null> {
   const payload = decode(token);
   if (!payload?.nonce) return null;
   const normalized = normalizeWallet(address);
   if (payload.address !== normalized) return null;
-  const message = challengeMessage(payload);
+  const message = signedMessage ?? challengeMessage(payload);
+  if (signedMessage) {
+    const parsed = parseSiweMessage(signedMessage);
+    const siweMatchesChallenge = validateSiweMessage({
+      address: getAddress(address),
+      domain: payload.domain,
+      message: parsed,
+      nonce: payload.nonce,
+    }) && parsed.chainId === payload.chainId && parsed.uri === payload.uri && parsed.version === "1";
+    if (!siweMatchesChallenge) return null;
+  }
   let valid = await verifyMessage({ address: getAddress(address), message, signature });
   if (!valid) {
     valid = await publicClient.verifyMessage({ address: getAddress(address), message, signature }).catch(() => false);
