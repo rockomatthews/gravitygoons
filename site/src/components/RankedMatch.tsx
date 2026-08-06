@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
-import { authenticateProfileSession } from "@/lib/profile-auth-client";
+import { ensureProfileSession } from "@/lib/profile-auth-client";
 import {
   padToken, turnExplanation, turnFromPayload,
   type MatchActionPresentation, type MatchAttempt, type MatchTurnResult, type MoveOutcomeVisual,
@@ -119,7 +119,10 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   const [revealedTurnNumber, setRevealedTurnNumber] = useState(0);
 
   const refresh = useCallback(async () => {
-    const response = await fetch(`/api/matches/${matchId}`, { cache: "no-store" });
+    const response = await fetch(`/api/matches/${matchId}`, {
+      cache: "no-store",
+      headers: account ? { "x-gravity-wallet": account } : {},
+    });
     const data = await response.json();
     if (!response.ok) {
       setAuthRequired(response.status === 401);
@@ -130,7 +133,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     setSecondsLeft(remainingSeconds(data.match.action_deadline));
     setAuthRequired(false);
     setMessage("");
-  }, [matchId]);
+  }, [account, matchId]);
 
   useEffect(() => {
     const initial = window.setTimeout(refresh, 0);
@@ -150,7 +153,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     if (!match) return null;
     for (let index = match.actions.length - 1; index >= 0; index -= 1) {
       const turn = turnFromPayload(match.actions[index].result_payload);
-      if (turn) return { turn, presentation: match.actions[index].presentation ?? { attempts: [] } };
+      if (turn) return { turn, turnNumber: match.actions[index].turn_number, presentation: match.actions[index].presentation ?? { attempts: [] } };
     }
     return null;
   })();
@@ -161,7 +164,9 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   async function authenticatePlayer() {
     setAuthenticating(true);
     try {
-      await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setMessage });
+      const connectedWallet = account ?? await connect();
+      if (!connectedWallet) throw new Error("Choose the player wallet, then press CONNECT + SIGN again.");
+      await ensureProfileSession({ address: connectedWallet, signMessage, signProfileChallenge, onStatus: setMessage });
       setMessage("Wallet verified. Loading match…");
       await refresh();
     } catch (error) {
@@ -184,10 +189,13 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       const response = await fetch(`/api/matches/${matchId}/actions`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ turnNumber: match.next_turn_number, idempotencyKey: crypto.randomUUID(), action: "call_trick", trickId: effectiveTrickId, callMode }),
+        body: JSON.stringify({ expectedWallet: account, turnNumber: match.next_turn_number, idempotencyKey: crypto.randomUUID(), action: "call_trick", trickId: effectiveTrickId, callMode }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "The trick could not be resolved.");
+      if (!response.ok) {
+        if (response.status === 401) setAuthRequired(true);
+        throw new Error(response.status === 401 ? "The connected wallet and player session no longer match. Reconnect below, then try the trick again." : data.error ?? "The trick could not be resolved.");
+      }
       setCallMode("standard");
       await refresh();
     } catch (error) {
@@ -207,7 +215,9 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   const turnExpired = isLive && secondsLeft <= 0;
   const setterGrit = match.state.grit[String(match.state.setterTokenId)] ?? 0;
   const lastLetterTokenId = lastTurn?.turn.letterRecipientTokenId ?? null;
-  const lastTurnNumber = match.actions.at(-1)?.turn_number ?? 0;
+  const lastTurnNumber = lastTurn?.turnNumber ?? 0;
+  const latestAction = match.actions.at(-1);
+  const latestTimeout = latestAction?.action_type === "timeout" ? latestAction.result_payload : null;
   const letterRevealComplete = revealedTurnNumber >= lastTurnNumber;
   const hiddenFirstLetter = !letterRevealComplete && lastLetterTokenId === match.first_token_id ? 1 : 0;
   const hiddenSecondLetter = !letterRevealComplete && lastLetterTokenId === match.second_token_id ? 1 : 0;
@@ -243,9 +253,18 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       <LetterTrack word={match.match_word} losses={Math.max(0, match.state.secondLosses - hiddenSecondLetter)} tokenId={match.second_token_id} awardedTokenId={letterRevealComplete ? lastLetterTokenId : null} turnNumber={lastTurnNumber} />
     </div>
 
+    {authRequired ? <section className="ranked-turn-banner is-your-turn" aria-live="assertive">
+      <div><span>PLAYER SESSION REQUIRED</span><strong>Connect the wallet that owns this Goon</strong><p>The turn is waiting, but this browser is not signed in as either player. Connect and sign to reveal the correct player controls.</p></div>
+      <button className="button primary" onClick={authenticatePlayer} disabled={authenticating}>{authenticating ? "SIGNING IN…" : "CONNECT + SIGN"}</button>
+    </section> : null}
+
+    {latestTimeout ? <section className="ranked-turn-banner is-waiting" aria-live="polite">
+      <div><span>SETTER CLOCK EXPIRED</span><strong>Set passed to #{padToken(Number(latestTimeout.nextSetterTokenId))}</strong><p>#{padToken(Number(latestTimeout.timedOutTokenId))} missed the selection window. The match continues with a fresh 60-second clock.</p></div>
+    </section> : null}
+
     {lastTurn ? <LastTurn key={lastTurnNumber} turn={lastTurn.turn} presentation={lastTurn.presentation} turnNumber={lastTurnNumber} onSequenceComplete={completeTurnCinema} /> : null}
 
-    {isLive && match.viewer_is_setter ? <section className={`ranked-turn-banner ${turnExpired ? "is-expired" : "is-your-turn"}`} aria-live="polite">
+    {isLive && !authRequired && match.viewer_is_setter ? <section className={`ranked-turn-banner ${turnExpired ? "is-expired" : "is-your-turn"}`} aria-live="polite">
       <div><span>{turnExpired ? "TURN EXPIRED" : "YOUR TURN"}</span><strong>{turnExpired ? "Waiting for timeout resolution" : `Choose a trick for #${padToken(match.viewer_token_id)}`}</strong><p>{turnExpired ? "The 60-second selection window has closed. A late trick cannot be submitted." : `If you land it, #${padToken(opponentTokenId)} automatically tries the same trick.`}</p></div>
       <time aria-label={`${secondsLeft} seconds remaining`}>{secondsLeft}<small>SECONDS</small></time>
       <div className="ranked-controls">
@@ -254,7 +273,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       </div>
     </section> : null}
 
-    {isLive && !match.viewer_is_setter ? <section className={`ranked-turn-banner ${turnExpired ? "is-expired" : "is-waiting"}`} aria-live="polite">
+    {isLive && !authRequired && !match.viewer_is_setter ? <section className={`ranked-turn-banner ${turnExpired ? "is-expired" : "is-waiting"}`} aria-live="polite">
       <div><span>{turnExpired ? "TURN EXPIRED" : "OPPONENT'S TURN"}</span><strong>{turnExpired ? "Waiting for timeout resolution" : `Waiting for #${padToken(match.state.setterTokenId)} to try a trick`}</strong><p>{turnExpired ? "The opponent can no longer submit a late trick." : "If they land it, your Goon automatically attempts the exact same trick. You do not need to press anything."}</p></div>
       <time aria-label={`${secondsLeft} seconds remaining`}>{secondsLeft}<small>SECONDS</small></time>
     </section> : null}
