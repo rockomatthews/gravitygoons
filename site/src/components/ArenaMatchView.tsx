@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import type { ArenaMatch } from "@/lib/arena";
-import { authenticateProfileSession, fetchWithTimeout } from "@/lib/profile-auth-client";
+import { ensureProfileSession, fetchWithTimeout } from "@/lib/profile-auth-client";
 import { padToken, turnExplanation, turnFromPayload, type MatchActionPresentation, type MatchTurnResult } from "@/lib/match-presentation";
 
 type TranscriptTurn = { turn: number; action: string; createdAt: string; result: Record<string, unknown>; presentation: MatchActionPresentation };
@@ -35,6 +35,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
   const [market, setMarket] = useState<PartnerMarket | null>(null);
   const [status, setStatus] = useState("Loading public match state…");
   const [checkingIn, setCheckingIn] = useState(false);
+  const [viewerCheckIn, setViewerCheckIn] = useState<{ account: string; tokenId: number; checkedIn: boolean } | null>(null);
   const [clock, setClock] = useState(0);
   const refresh = useCallback(async () => {
     const [matchResponse, predictionResponse] = await Promise.all([fetch(`/api/arena/matches/${matchId}`, { cache: "no-store" }), fetch(`/api/matches/${matchId}/predictions`, { cache: "no-store" })]);
@@ -49,6 +50,16 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
     setStatus("Public transcript current.");
   }, [matchId]);
   useEffect(() => { const initial = window.setTimeout(refresh, 0); const timer = window.setInterval(refresh, 5_000); return () => { window.clearTimeout(initial); window.clearInterval(timer); }; }, [refresh]);
+  useEffect(() => {
+    if (!account) return;
+    const load = async () => {
+      const response = await fetch(`/api/matches/${matchId}/check-in`, { cache: "no-store", headers: { "x-gravity-wallet": account } });
+      if (!response.ok) return;
+      const data = await response.json();
+      setViewerCheckIn({ account, tokenId: data.viewerTokenId, checkedIn: Boolean(data.viewerCheckedIn) });
+    };
+    void load();
+  }, [account, matchId, detail?.match.publicSequence]);
   const total = useMemo(() => predictions.reduce((sum, row) => sum + row.points, 0), [predictions]);
   const latestTurn = (() => {
     if (!detail) return null;
@@ -68,15 +79,19 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
   async function checkIn() {
     setCheckingIn(true);
     try {
-      setStatus("Confirming your player session…");
-      let response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, { method: "POST" });
-      if (response.status === 401) {
-        await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setStatus });
-        setStatus("Wallet verified. Completing player check-in…");
-        response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, { method: "POST" });
-      }
+      const connectedWallet = account ?? await connect();
+      if (!connectedWallet) throw new Error("Choose the player wallet, then press PLAYER CHECK-IN again.");
+      setStatus("Matching the connected wallet to its signed player session…");
+      await ensureProfileSession({ address: connectedWallet, signMessage, signProfileChallenge, onStatus: setStatus });
+      setStatus("Wallet verified. Completing player check-in…");
+      const response = await fetchWithTimeout(`/api/matches/${matchId}/check-in`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ expectedWallet: connectedWallet }),
+      });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Unable to check in.");
+      setViewerCheckIn({ account: connectedWallet, tokenId: data.viewerTokenId, checkedIn: Boolean(data.viewerCheckedIn) });
       await refresh();
       setStatus("Check-in confirmed. You are ready.");
     } catch (error) {
@@ -91,9 +106,11 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
   const checkInOpen = !match.checkInOpensAt || clock >= Date.parse(match.checkInOpensAt);
   const scheduledStartReached = Boolean(match.scheduledStartAt && clock >= Date.parse(match.scheduledStartAt));
   const bothCheckedIn = match.firstCheckedIn && match.secondCheckedIn;
+  const viewerCheckedIn = Boolean(account && viewerCheckIn?.account.toLowerCase() === account.toLowerCase() && viewerCheckIn.checkedIn);
   const checkInLabel = !checkInOpen && match.checkInOpensAt
     ? `CHECK-IN OPENS ${new Date(match.checkInOpensAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
-    : bothCheckedIn && scheduledStartReached ? "START MATCH"
+    : viewerCheckedIn ? "CHECKED IN"
+      : bothCheckedIn && scheduledStartReached ? "START MATCH"
       : bothCheckedIn ? "BOTH PLAYERS READY" : "PLAYER CHECK-IN";
   return <>
     <section className="broadcast-scoreboard">
@@ -105,7 +122,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
         </article>)}
         <strong>VS</strong>
       </div>
-      <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span><span className="checkin-state">#{String(match.athletes[0].tokenId).padStart(4, "0")} {match.firstCheckedIn ? "READY" : "NOT CHECKED IN"} · #{String(match.athletes[1].tokenId).padStart(4, "0")} {match.secondCheckedIn ? "READY" : "NOT CHECKED IN"}</span><span className="checkin-feedback" aria-live="polite">{status}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn} disabled={checkingIn || !checkInOpen || (bothCheckedIn && !scheduledStartReached)}>{checkingIn ? "CHECKING IN…" : checkInLabel}</button>}{(match.status === "live" || match.status === "active") && <Link href={`/game?match=${matchId}`}>ENTER PLAYER CONSOLE</Link>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
+      <footer><div><b>{match.scheduledStartAt ? new Date(match.scheduledStartAt).toLocaleString() : "ASYNC MATCH"}</b><span>All times shown in your timezone · Public sequence {match.publicSequence}</span><span className="checkin-state">#{String(match.athletes[0].tokenId).padStart(4, "0")} {match.firstCheckedIn ? "READY" : "NOT CHECKED IN"} · #{String(match.athletes[1].tokenId).padStart(4, "0")} {match.secondCheckedIn ? "READY" : "NOT CHECKED IN"}</span><span className="checkin-feedback" aria-live="polite">{status}</span></div>{match.mode === "live_ranked" && match.status === "upcoming" && <button onClick={checkIn} disabled={checkingIn || viewerCheckedIn || !checkInOpen || (bothCheckedIn && !scheduledStartReached)}>{checkingIn ? "CHECKING IN…" : checkInLabel}</button>}{((match.status === "live" || match.status === "active") || viewerCheckedIn) && <Link href={`/game?match=${matchId}`}>ENTER PLAYER CONSOLE</Link>}<a href={`/api/arena/matches/${matchId}/calendar`}>ADD TO CALENDAR</a></footer>
     </section>
     {latestTurn ? <BroadcastTurnMovies turn={latestTurn.turn} presentation={latestTurn.presentation} /> : null}
     <section className="broadcast-panels">
