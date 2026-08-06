@@ -3,7 +3,7 @@ import collection from "@/data/collection.json";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import {
   DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, canSetTrick, matchIsOver,
-  resolveSkateTurn, spendCallGrit, unlockedTricks, type Athlete, type CallMode, type Discipline,
+  resolveSkateTurn, setterTrickCooldown, spendCallGrit, unlockedTricks, updateSetterTrickCooldown, type Athlete, type CallMode, type Discipline,
   type SponsorProgression, type Trick, type TrickHistory,
 } from "@/lib/pvp";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -16,6 +16,7 @@ type MatchState = {
   secondLosses: number;
   setterTokenId: number;
   previousTrick: string | null;
+  lastLandedSetByToken?: Record<string, string>;
   practice: Record<string, TrickHistory>;
   grit: Record<string, number>;
   pendingCall?: { trickId: number; seed: string; setterTokenId: number };
@@ -76,7 +77,8 @@ export async function getMatch(wallet: string, matchId: string) {
   const normalizedWallet = wallet.toLowerCase();
   const viewerTokenId = data.first_wallet_address === normalizedWallet ? data.first_token_id : data.second_token_id;
   const actions = await addMovePresentations(supabase, actionsResult.data ?? []);
-  const legalTricks = availableTricks.filter((trick) => canSetTrick(trick, state.previousTrick));
+  const cooldown = setterTrickCooldown(state.lastLandedSetByToken, setter.tokenId);
+  const legalTricks = availableTricks.filter((trick) => canSetTrick(trick, cooldown));
   return {
     ...data,
     first_goon: goonSummary(data.first_token_id),
@@ -124,11 +126,12 @@ export async function processMatchAction(wallet: string, matchId: string, input:
     if (input.callMode !== undefined && input.callMode !== "standard" && input.callMode !== "send") throw new Error("Unknown call mode.");
     const callMode = input.callMode ?? "standard";
     nextState.grit[setter.tokenId] = spendCallGrit(state.grit[setter.tokenId] ?? 0, callMode);
-    const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue, responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: state.previousTrick, callMode, letterlessTurns: state.letterlessTurns ?? 0 };
+    const choice = { setter, responder, trick, setterCatalogue: catalogue, responderCatalogue, responderPractice: state.practice[responder.tokenId] ?? {}, previousSetTrickName: setterTrickCooldown(state.lastLandedSetByToken, setter.tokenId), callMode, letterlessTurns: state.letterlessTurns ?? 0 };
     const turn = resolveSkateTurn(choice, seed);
     const attempt = turn.attempts[0];
     result = { action: "call_trick", attempt, automaticResponse: turn.attempts[1], turn, seedCommit: seedCommitment(seed), seedReveal: seed };
-    nextState.previousTrick = attempt.landed ? trick.name : null;
+    nextState.previousTrick = null;
+    nextState.lastLandedSetByToken = updateSetterTrickCooldown(state.lastLandedSetByToken, setter.tokenId, trick.name, attempt.landed);
     nextState.pendingCall = undefined;
     nextState.setterTokenId = turn.nextSetterTokenId;
     if (turn.attempts[1]) nextState.practice[responder.tokenId] = addTrickUse(state.practice[responder.tokenId] ?? {}, trick.name);

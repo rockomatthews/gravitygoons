@@ -15,7 +15,7 @@ type Challenge = {
   status: string;
   expires_at: string;
   match_id: string | null;
-  match_mode?: "async_ranked" | "live_ranked";
+  match_mode?: "live_ranked";
   proposed_start_at?: string | null;
   wager_requested?: boolean;
   reschedule_request?: { id: string; proposer_wallet: string; proposed_start_at: string; expires_at: string } | null;
@@ -116,11 +116,11 @@ export function ChallengeInbox() {
           {!rows.length && <p>Nothing here yet.</p>}
           {rows.map((row) => <div className="challenge-row" key={row.id}>
             <b>#{String(row.challenger_token_id).padStart(4, "0")} vs #{String(row.challenged_token_id).padStart(4, "0")}</b>
-            <span>{(row.match_mode ?? "async_ranked").replace("_", " ").toUpperCase()} · {row.proposed_start_at ? new Date(row.proposed_start_at).toLocaleString() : `EXPIRES ${new Date(row.expires_at).toLocaleString()}`}</span>
+            <span>LIVE RANKED · {row.proposed_start_at ? new Date(row.proposed_start_at).toLocaleString() : `EXPIRES ${new Date(row.expires_at).toLocaleString()}`}</span>
             {title === "Incoming" && <div><button onClick={() => act(row.id, "accept")}>ACCEPT</button><button onClick={() => act(row.id, "decline")}>DECLINE</button></div>}
             {title === "Sent" && <button onClick={() => act(row.id, "cancel")}>CANCEL</button>}
-            {title === "Active matches" && row.match_id && <Link href={row.match_mode === "live_ranked" ? `/arena/matches/${row.match_id}` : `/game?match=${row.match_id}`}>OPEN MATCH →</Link>}
-            {title === "Active matches" && row.match_mode === "live_ranked" && <div className="challenge-reschedule">
+            {title === "Active matches" && row.match_id && <Link href={`/arena/matches/${row.match_id}`}>OPEN MATCH →</Link>}
+            {title === "Active matches" && <div className="challenge-reschedule">
               {!row.reschedule_request && <input type="datetime-local" value={rescheduleTimes[row.id] ?? ""} onChange={(event) => setRescheduleTimes((current) => ({ ...current, [row.id]: event.target.value }))} />}
               <button onClick={() => reschedule(row)}>{row.reschedule_request ? row.reschedule_request.proposer_wallet === account?.toLowerCase() ? "AWAITING APPROVAL" : "APPROVE NEW TIME" : "PROPOSE NEW TIME"}</button>
             </div>}

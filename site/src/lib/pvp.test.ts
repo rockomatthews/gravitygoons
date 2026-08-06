@@ -16,9 +16,11 @@ import {
   resolveSkateTurn,
   resolveSetterAttempt,
   spendCallGrit,
+  setterTrickCooldown,
   trickIsInCatalogue,
   trickIsUnlocked,
   trickSimilarity,
+  updateSetterTrickCooldown,
   unlockedTricks,
   type Athlete,
   type SkateTurnChoice,
@@ -91,14 +93,30 @@ test("the setter can only call an unlocked catalogue trick", () => {
   );
 });
 
-test("the same trick cannot be set twice consecutively but can return later", () => {
+test("a Goon cannot repeat its own last landed set on its next setter turn", () => {
   const kickflip = TRICK_CATALOG.Skateboarding[1];
   assert.equal(canSetTrick(kickflip, "Kickflip"), false);
   assert.equal(canSetTrick(kickflip, "Ollie"), true);
   assert.throws(
     () => resolveSkateTurn(baseChoice({ trick: kickflip, previousSetTrickName: "KICKFLIP" }), "seed"),
-    /twice in a row/,
+    /own last landed set/,
   );
+});
+
+test("a responder may immediately set the trick it just replicated", () => {
+  const kickflip = TRICK_CATALOG.Skateboarding[1];
+  const joeCooldowns = updateSetterTrickCooldown({}, 1, kickflip.name, true);
+  assert.equal(setterTrickCooldown(joeCooldowns, 1), "Kickflip");
+  assert.equal(setterTrickCooldown(joeCooldowns, 2), null);
+  assert.equal(canSetTrick(kickflip, setterTrickCooldown(joeCooldowns, 2)), true);
+});
+
+test("a setter cooldown is consumed and replaced only by that Goon's own set", () => {
+  const afterJoeLands = updateSetterTrickCooldown({}, 1, "Kickflip", true);
+  const afterJoeFallsNextSet = updateSetterTrickCooldown(afterJoeLands, 1, "Boardslide", false);
+  assert.equal(setterTrickCooldown(afterJoeFallsNextSet, 1), null);
+  const afterJoeLandsBoardslide = updateSetterTrickCooldown(afterJoeLands, 1, "Boardslide", true);
+  assert.equal(setterTrickCooldown(afterJoeLandsBoardslide, 1), "Boardslide");
 });
 
 test("a responder may temporarily attempt a called trick outside its catalogue", () => {

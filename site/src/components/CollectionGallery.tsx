@@ -7,7 +7,7 @@ import { base } from "viem/chains";
 import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { useWallet } from "@/components/WalletProvider";
 import { signatureEdgeForRarity } from "@/lib/gameplay";
-import { ACTIVE_RULESET_HASH, type MatchMode } from "@/lib/match-terms";
+import { ACTIVE_RULESET_HASH } from "@/lib/match-terms";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 
 type Token = {
@@ -77,7 +77,6 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const [liveById, setLiveById] = useState<Map<number, AthleteLive>>(new Map());
   const [challengeTarget, setChallengeTarget] = useState<Token | null>(null);
   const [challengerTokenId, setChallengerTokenId] = useState<number | null>(null);
-  const [challengeMode, setChallengeMode] = useState<MatchMode>("async_ranked");
   const [challengeStart, setChallengeStart] = useState("");
   const [challengeBounds, setChallengeBounds] = useState({ min: "", max: "" });
   const [transferTarget, setTransferTarget] = useState<Token | null>(null);
@@ -247,15 +246,15 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       if (!wallet) throw new Error("Choose a wallet, then send the challenge again.");
       await ensureProfileSession({ address: wallet, signMessage, signProfileChallenge, onStatus: setStatus });
       const issuedAt = new Date().toISOString();
-      if (challengeMode === "live_ranked" && !challengeStart) throw new Error("Choose a scheduled start time.");
-      const proposedStartAt = challengeMode === "live_ranked" ? new Date(challengeStart).toISOString() : null;
+      if (!challengeStart) throw new Error("Choose a scheduled start time.");
+      const proposedStartAt = new Date(challengeStart).toISOString();
       const lines = [
         "Gravity Goons ranked challenge",
         "Action: create",
         `Wallet: ${wallet.toLowerCase()}`,
         `Your Goon: #${String(challengerTokenId).padStart(4, "0")}`,
         `Opponent Goon: #${String(challengeTarget.token_id).padStart(4, "0")}`,
-        `Mode: ${challengeMode}`,
+        "Mode: live_ranked",
         proposedStartAt ? `Scheduled: ${proposedStartAt}` : "",
         `Ruleset: ${ACTIVE_RULESET_HASH}`,
         "USDC wager requested: no",
@@ -266,7 +265,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       const signature = await signMessage(lines, wallet);
       const response = await fetch("/api/challenges", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ challengerTokenId, challengedTokenId: challengeTarget.token_id, matchMode: challengeMode, proposedStartAt, wagerRequested: false, issuedAt, signature }),
+        body: JSON.stringify({ challengerTokenId, challengedTokenId: challengeTarget.token_id, matchMode: "live_ranked", proposedStartAt, wagerRequested: false, issuedAt, signature }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
@@ -328,6 +327,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                   setChallengerTokenId(eligibleMine[0]?.token_id ?? null);
                   const now = Date.now();
                   setChallengeBounds({ min: new Date(now + 30 * 60_000).toISOString().slice(0, 16), max: new Date(now + 7 * 24 * 60 * 60_000).toISOString().slice(0, 16) });
+                  setChallengeStart("");
                   setChallengeTarget(token);
                 }}>CHALLENGE</button>}
               </div>
@@ -348,8 +348,8 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
               {myGoons.filter((token) => token.discipline === challengeTarget.discipline).map((token) => <option value={token.token_id} key={token.token_id}>#{String(token.token_id).padStart(4, "0")} · {token.species} · {token.rarity}</option>)}
             </select>
           </label>
-          <label>MATCH FORMAT<select value={challengeMode} onChange={(event) => setChallengeMode(event.target.value as MatchMode)}><option value="async_ranked">ASYNC RANKED · 24H TURNS</option><option value="live_ranked">SCHEDULED LIVE · PUBLIC SCOREBOARD</option></select></label>
-          {challengeMode === "live_ranked" && <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onChange={(event) => setChallengeStart(event.target.value)} /></label>}
+          <p className="challenge-live-lock">LIVE RANKED · BOTH PLAYERS CHECK IN · PUBLIC SCOREBOARD</p>
+          <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onChange={(event) => setChallengeStart(event.target.value)} /></label>
           <p className="challenge-money-lock">USDC PLAYER STAKES: LOCKED · HOUSE FEE: 0% · FREE SPECTATOR PICKS ONLY</p>
           <div className="challenge-comparison">
             <span>RANK {(liveById.get(challengerTokenId ?? 0)?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${liveById.get(challengerTokenId ?? 0)?.discipline_rank}`}</span>

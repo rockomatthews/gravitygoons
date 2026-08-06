@@ -328,9 +328,16 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .ranked-strategy span, .ranked-strategy small { color: var(--muted); font: 800 7px/1.45 var(--mono); text-transform: uppercase; }
 .ranked-strategy b { color: white; font: 900 10px var(--mono); }
 .ranked-mode-buttons { display: flex; gap: 7px; }
-.ranked-mode-buttons button { border: 1px solid #42505a; padding: 10px 12px; color: #aeb9bf; background: transparent; font: 900 8px var(--mono); cursor: pointer; }
+.ranked-mode-buttons button { display: grid; flex: 1; gap: 4px; min-height: 55px; border: 1px solid #42505a; padding: 10px 12px; color: #aeb9bf; background: transparent; cursor: pointer; }
+.ranked-mode-buttons button b { font: 900 10px var(--mono); }
+.ranked-mode-buttons button small { font: 900 7px var(--mono); letter-spacing: .1em; }
 .ranked-mode-buttons button.active { border-color: var(--acid); color: var(--void); background: var(--acid); }
+.ranked-mode-buttons button.send-grit { border-color: #ff553d; color: #ff8a78; background: rgba(255, 75, 53, .08); }
+.ranked-mode-buttons button.send-grit.active { border-color: #ff553d; color: white; background: #d72f20; box-shadow: 0 0 0 3px rgba(255, 75, 53, .2), 0 0 22px rgba(255, 75, 53, .35); }
 .ranked-mode-buttons button:disabled { cursor: not-allowed; opacity: .42; }
+.grit-arm-state { margin: 0; border: 1px solid #42505a; padding: 7px 9px; color: #9eabb2; background: #06090c; font: 900 7px var(--mono); letter-spacing: .07em; }
+.grit-arm-state.armed { border-color: #ff553d; color: white; background: #8c2018; animation: grit-armed-pulse 1.2s ease-in-out infinite alternate; }
+@keyframes grit-armed-pulse { to { box-shadow: inset 0 0 16px rgba(255, 85, 61, .3), 0 0 12px rgba(255, 85, 61, .25); } }
 .ranked-result { margin-top: 18px; padding: 18px; border: 1px solid #ffffff21; background: #030506; }
 .ranked-result-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
 .ranked-result-heading span { color: var(--muted); font: 850 8px var(--mono); }
@@ -858,9 +865,18 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .arena-strategy span, .arena-strategy small { color: var(--muted); font: 800 7px var(--mono); letter-spacing: .08em; }
 .arena-strategy b { color: white; font: 900 11px var(--mono); }
 .arena-strategy > div > div { display: flex; gap: 6px; }
-.arena-strategy button { border: 1px solid #33414b; padding: 9px 11px; color: #9cabb3; background: transparent; font: 900 8px var(--mono); cursor: pointer; }
+.arena-strategy button { display: grid; gap: 3px; border: 1px solid #33414b; padding: 9px 11px; color: #9cabb3; background: transparent; cursor: pointer; }
+.arena-strategy button b { font: 900 9px var(--mono); }
+.arena-strategy button small { font: 900 7px var(--mono); }
 .arena-strategy button.active { border-color: var(--acid); color: var(--void); background: var(--acid); }
+.arena-strategy button.send-grit { border-color: #ff553d; color: #ff8a78; background: rgba(255, 75, 53, .08); }
+.arena-strategy button.send-grit.active { border-color: #ff553d; color: white; background: #d72f20; box-shadow: 0 0 0 3px rgba(255, 75, 53, .2), 0 0 22px rgba(255, 75, 53, .35); }
 .arena-strategy button:disabled { opacity: .45; cursor: not-allowed; }
+.challenge-live-lock { border: 1px solid var(--acid); padding: 11px 12px; color: var(--acid); background: rgba(187, 255, 0, .06); font: 900 8px var(--mono); letter-spacing: .08em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grit-arm-state.armed { animation: none; }
+}
 .fighter-card.is-setter { box-shadow: inset 0 0 0 2px var(--acid); }
 .fighter-role { position: absolute; top: 13px; right: 13px; z-index: 2; border: 1px solid currentColor; padding: 7px 9px; color: var(--acid); background: #05080be8; font: 950 8px var(--mono); letter-spacing: .1em; }
 .fighter-card.is-responder .fighter-role { color: var(--coral); }

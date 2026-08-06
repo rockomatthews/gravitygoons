@@ -65,13 +65,11 @@ export async function createChallenge(wallet: string, input: { challengerTokenId
   if (!first || !second) throw new Error("Unknown Goon.");
   if (first.discipline !== second.discipline) throw new Error("Challenges require the same discipline.");
   if (input.challengerTokenId === input.challengedTokenId) throw new Error("A Goon cannot challenge itself.");
-  const matchMode = input.matchMode ?? "async_ranked";
+  const matchMode = input.matchMode ?? "live_ranked";
   if (!MATCH_MODES.includes(matchMode)) throw new Error("Unknown match mode.");
-  const proposedStartAt = matchMode === "live_ranked" ? input.proposedStartAt ?? null : null;
-  if (matchMode === "live_ranked") {
-    const start = Date.parse(proposedStartAt ?? "");
-    if (!Number.isFinite(start) || start < Date.now() + 30 * 60_000 || start > Date.now() + 7 * 24 * 60 * 60_000) throw new Error("Live matches must be scheduled 30 minutes to 7 days ahead.");
-  }
+  const proposedStartAt = input.proposedStartAt ?? null;
+  const start = Date.parse(proposedStartAt ?? "");
+  if (!Number.isFinite(start) || start < Date.now() + 30 * 60_000 || start > Date.now() + 7 * 24 * 60 * 60_000) throw new Error("Live matches must be scheduled 30 minutes to 7 days ahead.");
   const wagerRequested = Boolean(input.wagerRequested);
   if (wagerRequested && process.env.WAGERING_ENABLED !== "true") throw new Error("Real-USDC match wagering is not enabled.");
   const stakeMinor = wagerRequested && STAKE_TIERS_MINOR.includes(Number(input.stakeMinor) as typeof STAKE_TIERS_MINOR[number]) ? Number(input.stakeMinor) : null;
@@ -134,6 +132,7 @@ export async function transitionChallenge(wallet: string, challengeId: string, a
   if (!challenge) throw new Error("Challenge not found.");
   if (challenge.status !== "incoming") throw new Error("Challenge is no longer pending.");
   if (action === "accept") {
+    if (challenge.match_mode !== "live_ranked" || !challenge.proposed_start_at) throw new Error("Gravity Goons ranked matches are live-only. Create a new scheduled challenge.");
     const ownership = await Promise.all([
       verifyTokenOwnership(challenge.challenger_wallet, challenge.challenger_token_id),
       verifyTokenOwnership(challenge.challenged_wallet, challenge.challenged_token_id),

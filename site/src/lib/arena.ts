@@ -22,7 +22,7 @@ export type ArenaMatch = {
   id: string;
   status: "upcoming" | "live" | "active" | "completed" | "voided" | "cancelled" | "disputed";
   rawStatus: string;
-  mode: "live_ranked" | "async_ranked";
+  mode: "live_ranked";
   discipline: string;
   matchWord: string;
   scheduledStartAt: string | null;
@@ -51,8 +51,7 @@ function displayStatus(row: MatchRow): ArenaMatch["status"] {
   if (row.status === "voided" || row.status === "expired") return "voided";
   if (row.status === "cancelled") return "cancelled";
   if (row.status === "disputed") return "disputed";
-  if ((row.match_mode ?? "async_ranked") === "live_ranked") return row.status === "matched" ? "live" : "upcoming";
-  return "active";
+  return row.status === "matched" ? "live" : "upcoming";
 }
 
 async function ownerNames(wallets: string[]): Promise<Map<string, string>> {
@@ -92,7 +91,7 @@ function sanitize(row: MatchRow, names: Map<string, string>, battle: Map<number,
   const state = row.state ?? {};
   const pending = state.pendingCall as { trickId?: number } | undefined;
   return {
-    id: row.id, status: displayStatus(row), rawStatus: row.status, mode: (row.match_mode ?? "async_ranked") as ArenaMatch["mode"],
+    id: row.id, status: displayStatus(row), rawStatus: row.status, mode: "live_ranked",
     discipline: DISCIPLINES[row.discipline] ?? "Unknown", matchWord: row.match_word,
     scheduledStartAt: row.scheduled_start_at ?? null, checkInOpensAt: row.check_in_opens_at ?? null,
     bettingClosesAt: row.betting_closes_at ?? null, actionDeadline: row.action_deadline,
@@ -114,7 +113,7 @@ export async function listArenaMatches(input: { status?: string; discipline?: st
   const supabase = getSupabaseAdmin();
   if (!supabase) return { matches: [] as ArenaMatch[], nextCursor: null };
   const limit = Math.min(Math.max(input.limit ?? 30, 1), 60);
-  let query = supabase.from("pvp_matches").select(MATCH_SELECT).order("created_at", { ascending: false }).limit(limit + 1);
+  let query = supabase.from("pvp_matches").select(MATCH_SELECT).eq("match_mode", "live_ranked").order("created_at", { ascending: false }).limit(limit + 1);
   if (input.cursor) query = query.lt("created_at", input.cursor);
   if (input.status === "live") query = query.eq("match_mode", "live_ranked").eq("status", "matched");
   if (input.status === "upcoming") query = query.eq("match_mode", "live_ranked").eq("status", "queued");

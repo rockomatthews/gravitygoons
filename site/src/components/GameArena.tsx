@@ -19,9 +19,11 @@ import {
   recordVerifiedRankedWin,
   repeatCount,
   resolveSkateTurn,
+  setterTrickCooldown,
   sponsorById,
   trickIsInCatalogue,
   trickSimilarity,
+  updateSetterTrickCooldown,
   unlockedTricks,
   type Athlete,
   type CallMode,
@@ -46,7 +48,7 @@ type MatchState = {
   letterlessTurns: number;
   turns: number;
   setterTokenId: number;
-  previousSetTrickName: string | null;
+  lastLandedSetByToken: Record<string, string>;
 };
 
 const emptyMatch = (first: ArenaGoon, second: ArenaGoon): MatchState => ({
@@ -56,7 +58,7 @@ const emptyMatch = (first: ArenaGoon, second: ArenaGoon): MatchState => ({
   letterlessTurns: 0,
   turns: 0,
   setterTokenId: first.tokenId,
-  previousSetTrickName: null,
+  lastLandedSetByToken: {},
 });
 
 function randomSeed(turn: number): string {
@@ -107,9 +109,10 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
   const responder = setter.tokenId === first.tokenId ? second : first;
   const setterCatalogue = setter.tokenId === first.tokenId ? firstAvailableTricks : secondAvailableTricks;
   const responderCatalogue = responder.tokenId === first.tokenId ? firstAvailableTricks : secondAvailableTricks;
-  const legalSetterTricks = setterCatalogue.filter((trick) => canSetTrick(trick, match.previousSetTrickName));
+  const setterCooldown = setterTrickCooldown(match.lastLandedSetByToken, setter.tokenId);
+  const legalSetterTricks = setterCatalogue.filter((trick) => canSetTrick(trick, setterCooldown));
   const selectedTrick = legalSetterTricks.find((trick) => trick.id === selectedTrickId)
-    ?? firstLegalTrick(setterCatalogue, match.previousSetTrickName);
+    ?? firstLegalTrick(setterCatalogue, setterCooldown);
   const ended = matchIsOver(discipline, match.losses[first.tokenId] ?? 0)
     || matchIsOver(discipline, match.losses[second.tokenId] ?? 0);
   const marketLocked = match.turns > 0;
@@ -181,10 +184,16 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       setPrediction(null);
     }
 
+    const nextCooldowns = updateSetterTrickCooldown(
+      match.lastLandedSetByToken,
+      next.setterTokenId,
+      next.trick.name,
+      next.attempts[0].landed,
+    );
     const nextSetterCatalogue = next.nextSetterTokenId === first.tokenId
       ? firstAvailableTricks
       : secondAvailableTricks;
-    const nextLegalTrick = firstLegalTrick(nextSetterCatalogue, next.trick.name);
+    const nextLegalTrick = firstLegalTrick(nextSetterCatalogue, setterTrickCooldown(nextCooldowns, next.nextSetterTokenId));
     setSelectedTrickId(nextLegalTrick.id);
     setMatch({
       losses,
@@ -193,7 +202,7 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       letterlessTurns: next.letterRecipientTokenId === null ? match.letterlessTurns + 1 : 0,
       turns: match.turns + 1,
       setterTokenId: next.nextSetterTokenId,
-      previousSetTrickName: next.attempts[0].landed ? next.trick.name : null,
+      lastLandedSetByToken: nextCooldowns,
     });
     setCallMode("standard");
     setResult(next);
@@ -210,7 +219,7 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       setterCatalogue,
       responderCatalogue,
       responderPractice: match.forcedPractice[responder.tokenId] ?? {},
-      previousSetTrickName: match.previousSetTrickName,
+      previousSetTrickName: setterCooldown,
       callMode,
       letterlessTurns: match.letterlessTurns,
     };
@@ -248,7 +257,7 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       </div>
 
       <div className="arena-strategy" aria-label="Turn strategy">
-        <div><span>CALL MODE</span><div><button className={callMode === "standard" ? "active" : ""} disabled={ended} onClick={() => setCallMode("standard")}>STANDARD</button><button className={callMode === "send" ? "active" : ""} disabled={ended || (match.grit[setter.tokenId] ?? 0) === 0} onClick={() => setCallMode("send")}>SEND IT · 1 GRIT</button></div><small>SEND IT: SETTER −10% · RESPONDER −15%</small></div>
+        <div><span>CALL MODE</span><div><button className={callMode === "standard" ? "active" : ""} disabled={ended} onClick={() => setCallMode("standard")}><b>STANDARD</b><small>FREE</small></button><button className={`send-grit ${callMode === "send" ? "active" : ""}`} disabled={ended || (match.grit[setter.tokenId] ?? 0) === 0} onClick={() => setCallMode("send")}><b>SEND IT</b><small>SPEND 1 GRIT</small></button></div><small className={`grit-arm-state ${callMode === "send" ? "armed" : ""}`}>{callMode === "send" ? `GRIT ARMED · ${match.grit[setter.tokenId] ?? 0} LEFT` : `TAP SEND IT TO SPEND GRIT · ${match.grit[setter.tokenId] ?? 0} AVAILABLE`}</small></div>
         <div><span>GRIT</span><b>{first.name} {match.grit[first.tokenId] ?? 0}/{GRIT_PER_MATCH} · {second.name} {match.grit[second.tokenId] ?? 0}/{GRIT_PER_MATCH}</b><small>SPEND IT OFFENSIVELY WHEN YOU CALL; REQUIRED REPLICATIONS RUN AUTOMATICALLY</small></div>
         <div><span>CROWD PRESSURE</span><b>{pressurePenalty > 0 ? `RESPONDER −${pressurePenalty}%` : "COOL"}</b><small>{match.letterlessTurns} LETTERLESS TURNS · PRESSURE RESETS WHEN A LETTER LANDS</small></div>
       </div>

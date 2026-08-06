@@ -134,7 +134,7 @@ export function ProfileSetup() {
 
       <aside className="profile-system-status">
         <b>SYSTEM STATUS</b><p>{status}</p>
-        {profile ? <Link href={`/${profile.username}`}>OPEN PUBLIC PROFILE →</Link> : <Link href="/founder">VIEW FOUNDER PROFILE DEMO →</Link>}
+        {profile ? <Link href={`/${profile.username}`}>VIEW SHOWCASE →</Link> : <Link href="/founder">VIEW FOUNDER PROFILE DEMO →</Link>}
       </aside>
     </div>
   );

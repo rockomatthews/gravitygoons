@@ -237,6 +237,24 @@ export function canSetTrick(trick: Trick, previousSetTrickName: string | null): 
   return previousSetTrickName === null || normalizedName(trick.name) !== normalizedName(previousSetTrickName);
 }
 
+export type SetterTrickCooldowns = Record<string, string>;
+
+export function setterTrickCooldown(cooldowns: SetterTrickCooldowns | undefined, tokenId: number): string | null {
+  return cooldowns?.[String(tokenId)] ?? null;
+}
+
+export function updateSetterTrickCooldown(
+  cooldowns: SetterTrickCooldowns | undefined,
+  tokenId: number,
+  attemptedTrickName: string,
+  landed: boolean,
+): SetterTrickCooldowns {
+  const next = { ...(cooldowns ?? {}) };
+  if (landed) next[String(tokenId)] = attemptedTrickName;
+  else delete next[String(tokenId)];
+  return next;
+}
+
 export function landingChance(
   athlete: Athlete,
   trick: Trick,
@@ -362,7 +380,7 @@ function validateTurnChoice(choice: SkateTurnChoice, seed: string): void {
   if (setter.discipline !== responder.discipline) throw new Error("Opponents must share a discipline");
   if (!seed.trim()) throw new Error("A committed round seed is required");
   if (!trickIsInCatalogue(trick, setterCatalogue)) throw new Error("The setter can only call a trick from its unlocked catalogue");
-  if (!canSetTrick(trick, previousSetTrickName)) throw new Error("The same trick cannot be set twice in a row");
+  if (!canSetTrick(trick, previousSetTrickName)) throw new Error("This Goon cannot repeat its own last landed set on this setter turn");
 }
 
 export function resolveSetterAttempt(choice: SkateTurnChoice, seed: string): AttemptResult {
