@@ -81,8 +81,9 @@ Static-analysis evidence is stored in:
 
 ## Explicitly out of scope
 
-`src/GoonMatchEscrow.sol`, the website, Supabase match settlement, spectator
-markets, third-party market contracts, Safe implementation, and hosted IPFS
-providers remain outside this launch-contract review. Legal classification is
-also separate. USDC wagering and real-money spectator markets remain disabled
-until the escrow receives its own independent security and legal reviews.
+`src/GoonMatchEscrow.sol`, `src/GoonPinkSlipEscrow.sol`, the website, Supabase
+match settlement, spectator markets, third-party market contracts, Safe
+implementation, and hosted IPFS providers remain outside this launch-contract
+review. Legal classification is also separate. USDC wagering, Pink Slip NFT
+custody, and real-money spectator markets remain disabled until each escrow
+receives its own independent security and legal reviews.

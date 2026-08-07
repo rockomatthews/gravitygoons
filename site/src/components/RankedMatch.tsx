@@ -34,6 +34,7 @@ type MatchPayload = {
     secondLosses: number;
     setterTokenId: number;
     grit: Record<string, number>;
+    timeoutStrikes?: Record<string, number>;
     letterlessTurns?: number;
   };
   actions: Array<{ turn_number: number; action_type: string; result_payload: Record<string, unknown>; presentation: MatchActionPresentation }>;
@@ -258,8 +259,8 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       <button className="button primary" onClick={authenticatePlayer} disabled={authenticating}>{authenticating ? "SIGNING IN…" : "CONNECT + SIGN"}</button>
     </section> : null}
 
-    {latestTimeout ? <section className="ranked-turn-banner is-waiting" aria-live="polite">
-      <div><span>SETTER CLOCK EXPIRED</span><strong>Set passed to #{padToken(Number(latestTimeout.nextSetterTokenId))}</strong><p>#{padToken(Number(latestTimeout.timedOutTokenId))} missed the selection window. The match continues with a fresh 60-second clock.</p></div>
+    {latestTimeout ? <section className={`ranked-turn-banner ${latestTimeout.matchForfeit === true ? "match-complete" : "is-waiting"}`} aria-live="polite">
+      <div><span>{latestTimeout.matchForfeit === true ? "THIRD SETTER TIMEOUT · MATCH FORFEIT" : `SETTER TIMEOUT ${Number(latestTimeout.timeoutStrike ?? 1)}/3`}</span><strong>{latestTimeout.matchForfeit === true ? `#${padToken(Number(latestTimeout.winnerTokenId))} wins` : `Set passed to #${padToken(Number(latestTimeout.nextSetterTokenId))}`}</strong><p>#{padToken(Number(latestTimeout.timedOutTokenId))} missed the selection window. {latestTimeout.matchForfeit === true ? "The authoritative result and ratings have been settled." : "The match continues with a fresh 60-second clock."}</p></div>
     </section> : null}
 
     {lastTurn ? <LastTurn key={lastTurnNumber} turn={lastTurn.turn} presentation={lastTurn.presentation} turnNumber={lastTurnNumber} onSequenceComplete={completeTurnCinema} /> : null}

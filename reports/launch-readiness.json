@@ -7,16 +7,19 @@
   },
   "reserve_valid": true,
   "ipfs_verified": true,
-  "premint_site_verified": false,
+  "premint_site_verified": true,
+  "authoritative_live_match_verified": true,
   "contract_security_verified": true,
   "production_safe_verified": true,
   "base_mainnet_deployment_recorded": true,
   "creator_reserve_minted": true,
   "creator_reserve_verified": true,
   "creator_reserve_mint_report": "reports/base-mainnet-creator-reserve-mint.json",
-  "ready_for_base_sale": false,
+  "ready_for_base_sale": true,
   "mint_gate_should_be_open": false,
-  "blockers": [
-    "full ownership-backed authoritative 1v1 production E2E is pending"
+  "blockers": [],
+  "notes": [
+    "The collection is ready for a separately authorized public-mint opening transaction.",
+    "USDC player staking, Pink Slip NFT custody, and spectator money markets remain separate disabled products and are not launch blockers for the NFT sale."
   ]
 }

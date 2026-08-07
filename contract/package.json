@@ -7,6 +7,7 @@
     "compile": "node scripts/compile.mjs",
     "test": "npm run compile && mocha --timeout 30000 test/*.test.mjs",
     "test:escrow": "npm run compile && mocha --timeout 30000 test/GoonMatchEscrow.test.mjs",
+    "test:pink-slip": "npm run compile && mocha --timeout 30000 test/GoonPinkSlipEscrow.test.mjs",
     "deploy": "npm run compile && node scripts/deploy.mjs",
     "deploy:runtime": "node scripts/deploy.mjs",
     "verify:runtime-isolation": "node scripts/verify-runtime-isolation.mjs",

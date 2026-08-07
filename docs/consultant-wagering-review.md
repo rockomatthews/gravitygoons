@@ -13,7 +13,7 @@ Two separate products are proposed:
 1. NFT holders may voluntarily lock equal fixed stakes of 1, 5, 10, or 25 native Base USDC. The winner receives the pool after a 24-hour dispute window. A Safe-controlled fee is initialized at 0% and technically capped at 2.5%.
 2. Spectators may make free valueless predictions. Any future real-money spectator market must be operated by an approved third party that handles custody, customer eligibility, geofencing, identity, sanctions, and withdrawals. Gravity Goons will not run a spectator pool.
 
-A third product concept, **PINK SLIP — WINNER TAKES BOTH GOONS**, is explicitly deferred. It would require a separate NFT escrow contract, two unmistakable custody confirmations, Safe-controlled pause and disputes, a dispute window, and independent legal and contract reviews. It is not part of normal ranked play, is not enabled by the public NFT mint, and cannot be activated through a feature flag alone.
+A third product concept, **PINK SLIP — WINNER TAKES BOTH GOONS**, is explicitly deferred. An isolated escrow source and test suite now exist for technical review, including two signed custody commitments, Safe-controlled pause and disputes, and a 24-hour dispute window. The escrow is not deployed, configured, or approved. It is not part of normal ranked play, is not enabled by the public NFT mint, and cannot be activated through a feature flag alone.
 
 Scheduled-live matches are public. Predictions and partner positions close at the scheduled start or first authoritative action, whichever occurs first. A no-show voids the game, returns both player stakes, and changes no rating.
 
@@ -21,7 +21,7 @@ Scheduled-live matches are public. Predictions and partner positions close at th
 
 - `WAGERING_ENABLED=false` and `NEXT_PUBLIC_WAGERING_ENABLED=false`.
 - No escrow address is configured or deployed.
-- No Pink Slip escrow contract is implemented, deployed, or configured.
+- Pink Slip escrow source exists only as locked review material; it is not deployed or configured.
 - The public site labels player USDC and partner trading as locked.
 - Limitless is mock/read-only; embedded order submission returns HTTP 503.
 - Public minting remains closed.
@@ -45,6 +45,8 @@ Scheduled-live matches are public. Predictions and partner positions close at th
 - Gameplay and market architecture: `docs/strategic-1v1-usdc-wagering.md`
 - Escrow source: `contract/src/GoonMatchEscrow.sol`
 - Escrow tests: `contract/test/GoonMatchEscrow.test.mjs`
+- Pink Slip escrow source: `contract/src/GoonPinkSlipEscrow.sol`
+- Pink Slip escrow tests: `contract/test/GoonPinkSlipEscrow.test.mjs`
 - Public schedule and broadcast schema: `supabase/migrations/20260731223637_arena_scheduling_and_predictions.sql`
 - Public Arena routes: `/arena` and `/arena/matches/:id`
 - Active ruleset commitment for new challenges: `keccak256("gravity-goons-pvp-ruleset-v2-live-setter-cooldowns")` = `0x6ff5df2e176ac0646e245f82314a47a2288c236b24d5ef6002cf22a91bc57ae3`

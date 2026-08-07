@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { ArenaMatch } from "@/lib/arena";
+import { athleteRankLabel } from "@/lib/rank-display";
 
 const tabs = [{ id: "live", label: "LIVE NOW" }, { id: "upcoming", label: "UPCOMING" }, { id: "results", label: "RESULTS" }, { id: "rankings", label: "RANKINGS" }];
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
@@ -23,7 +24,7 @@ function MatchCard({ match }: { match: ArenaMatch }) {
         <Image src={athlete.image} alt={athlete.name} width={1024} height={1024} />
         <small>#{String(athlete.tokenId).padStart(4, "0")} · {athlete.rarity}</small>
         <h2>{athlete.name}</h2>
-        <p>{athlete.ownerName} · {athlete.rank ? `#${athlete.rank}` : "UNRANKED"} · {athlete.rating}</p>
+        <p>{athlete.ownerName} · {athleteRankLabel(athlete.rank, athlete.matchesPlayed)} · {athlete.rating}</p>
         {match.status !== "upcoming" && <strong>{match.matchWord.slice(0, index ? match.score.secondLosses : match.score.firstLosses) || "—"}</strong>}
       </div>)}
       <i>VS</i>
@@ -81,8 +82,8 @@ export function ArenaLobby() {
     </div>}
     {tab === "rankings" && <div className="arena-rank-table">
       <header><span>RANK</span><span>GOON</span><span>DISCIPLINE</span><span>RECORD</span><span>RATING</span></header>
-      {rankings.map((row) => <Link href={`/character/${row.tokenId}`} key={row.tokenId}><b>{row.rank ? `#${row.rank}` : "—"}</b><span>#{String(row.tokenId).padStart(4, "0")} · {row.name}</span><span>{row.discipline}</span><span>{row.wins}-{row.losses}</span><strong>{row.rating}</strong></Link>)}
-      {!rankings.length && <div className="arena-empty"><b>RANKINGS BEGIN AFTER FIVE MATCHES</b><p>Every authoritative result updates the athlete table exactly once.</p></div>}
+      {rankings.map((row) => <Link href={`/character/${row.tokenId}`} key={row.tokenId}><b>{athleteRankLabel(row.rank, row.matchesPlayed, true)}</b><span>#{String(row.tokenId).padStart(4, "0")} · {row.name}</span><span>{row.discipline}</span><span>{row.wins}-{row.losses}</span><strong>{row.rating}</strong></Link>)}
+      {!rankings.length && <div className="arena-empty"><b>NO PLACEMENT RESULTS YET</b><p>Every authoritative result updates the athlete table exactly once. Official discipline ranks begin after five matches.</p></div>}
     </div>}
   </>;
 }

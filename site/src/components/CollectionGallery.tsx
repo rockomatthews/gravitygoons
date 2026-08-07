@@ -9,6 +9,7 @@ import { useWallet } from "@/components/WalletProvider";
 import { signatureEdgeForRarity } from "@/lib/gameplay";
 import { ACTIVE_RULESET_HASH } from "@/lib/match-terms";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
+import { athleteRankLabel } from "@/lib/rank-display";
 
 type Token = {
   token_id: number;
@@ -42,6 +43,7 @@ type AthleteLive = {
   challengeId?: string;
   challengeStatus?: string;
 };
+type CompetitionProduct = "ranked" | "usdc" | "pink_slip";
 
 const PAGE_SIZE = 24;
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
@@ -79,6 +81,8 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const [challengerTokenId, setChallengerTokenId] = useState<number | null>(null);
   const [challengeStart, setChallengeStart] = useState("");
   const [challengeBounds, setChallengeBounds] = useState({ min: "", max: "" });
+  const [competitionProduct, setCompetitionProduct] = useState<CompetitionProduct>("ranked");
+  const [stakeMinor, setStakeMinor] = useState(1_000_000);
   const [transferTarget, setTransferTarget] = useState<Token | null>(null);
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferStatus, setTransferStatus] = useState("");
@@ -242,6 +246,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   async function submitChallenge() {
     if (!challengeTarget || !challengerTokenId) return;
     try {
+      if (competitionProduct !== "ranked") throw new Error(`${competitionProduct === "usdc" ? "USDC player stakes" : "Pink Slip custody"} remain locked pending their separate legal and independent contract reviews.`);
       const wallet = account ?? await connect();
       if (!wallet) throw new Error("Choose a wallet, then send the challenge again.");
       await ensureProfileSession({ address: wallet, signMessage, signProfileChallenge, onStatus: setStatus });
@@ -318,7 +323,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <p className={`athlete-status status-${cardStatus.toLowerCase().replaceAll(" ", "-")}`}>{cardStatus}</p>
                 {!available && !mine && live?.matchId && <p className="athlete-state">IN MATCH</p>}
                 {!available && !mine && !live?.matchId && live?.challengeId && <p className="athlete-state">CHALLENGE PENDING</p>}
-                <p className="athlete-record">{(live?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${live?.discipline_rank} ${token.discipline}`} · {live?.wins ?? 0}W–{live?.losses ?? 0}L · ELO {Math.round(live?.rating ?? 1500)}</p>
+                <p className="athlete-record">{athleteRankLabel(live?.discipline_rank, live?.matches_played ?? 0)} · {live?.wins ?? 0}W–{live?.losses ?? 0}L · ELO {Math.round(live?.rating ?? 1500)}</p>
                 <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
                 {mine && <button className="transfer-button" onClick={() => { setTransferTarget(token); setTransferRecipient(""); setTransferStatus(""); }}>TRANSFER GOON</button>}
@@ -328,6 +333,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                   const now = Date.now();
                   setChallengeBounds({ min: new Date(now + 30 * 60_000).toISOString().slice(0, 16), max: new Date(now + 7 * 24 * 60 * 60_000).toISOString().slice(0, 16) });
                   setChallengeStart("");
+                  setCompetitionProduct("ranked");
                   setChallengeTarget(token);
                 }}>CHALLENGE</button>}
               </div>
@@ -340,7 +346,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       {challengeTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="challenge-title">
         <div>
           <button className="challenge-close" onClick={() => setChallengeTarget(null)} aria-label="Close challenge">×</button>
-          <p className="eyebrow">SIGNED 1V1 · NO WAGER</p>
+          <p className="eyebrow">SIGNED LIVE 1V1</p>
           <h2 id="challenge-title">Challenge #{String(challengeTarget.token_id).padStart(4, "0")}</h2>
           <p>Both Goons are rechecked on Base when the challenge is accepted. They must remain owned, unlocked, and in the same discipline.</p>
           <label>YOUR {challengeTarget.discipline.toUpperCase()} GOON
@@ -349,14 +355,21 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
             </select>
           </label>
           <p className="challenge-live-lock">LIVE RANKED · BOTH PLAYERS CHECK IN · PUBLIC SCOREBOARD</p>
-          <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onChange={(event) => setChallengeStart(event.target.value)} /></label>
-          <p className="challenge-money-lock">USDC PLAYER STAKES: LOCKED · HOUSE FEE: 0% · FREE SPECTATOR PICKS ONLY</p>
-          <div className="challenge-comparison">
-            <span>RANK {(liveById.get(challengerTokenId ?? 0)?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${liveById.get(challengerTokenId ?? 0)?.discipline_rank}`}</span>
-            <b>{challengeTarget.discipline.toUpperCase()}</b>
-            <span>RANK {(liveById.get(challengeTarget.token_id)?.matches_played ?? 0) < 5 ? "UNRANKED" : `#${liveById.get(challengeTarget.token_id)?.discipline_rank}`}</span>
+          <div className="competition-products" aria-label="Competition type">
+            <button className={competitionProduct === "ranked" ? "active" : ""} onClick={() => setCompetitionProduct("ranked")}><span>RANKED</span><b>NO WAGER</b><small>AVAILABLE NOW</small></button>
+            <button className={competitionProduct === "usdc" ? "active locked" : "locked"} onClick={() => setCompetitionProduct("usdc")}><span>USDC STAKE</span><b>1 · 5 · 10 · 25 USDC</b><small>LOCKED · AUDIT + LEGAL GATE</small></button>
+            <button className={competitionProduct === "pink_slip" ? "active pink-slip locked" : "pink-slip locked"} onClick={() => setCompetitionProduct("pink_slip")}><span>PINK SLIP</span><b>WINNER TAKES BOTH GOONS</b><small>LOCKED · SEPARATE NFT ESCROW REQUIRED</small></button>
           </div>
-          <button className="button primary" onClick={submitChallenge}>SIGN + SEND CHALLENGE</button>
+          {competitionProduct === "usdc" && <label>PLAYER STAKE · EACH PLAYER<select value={stakeMinor} onChange={(event) => setStakeMinor(Number(event.target.value))}><option value={1_000_000}>1 USDC</option><option value={5_000_000}>5 USDC</option><option value={10_000_000}>10 USDC</option><option value={25_000_000}>25 USDC</option></select></label>}
+          {competitionProduct === "pink_slip" && <p className="pink-slip-warning"><b>PINK SLIP — WINNER TAKES BOTH GOONS</b><span>This will require two explicit custody confirmations from each player, Safe-controlled disputes, and a separately audited NFT escrow. It cannot be enabled by opening the mint.</span></p>}
+          <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onChange={(event) => setChallengeStart(event.target.value)} /></label>
+          <p className="challenge-money-lock">PLAYER USDC: LOCKED · PINK SLIP: LOCKED · FREE SPECTATOR PICKS: LIVE</p>
+          <div className="challenge-comparison">
+            <span>{athleteRankLabel(liveById.get(challengerTokenId ?? 0)?.discipline_rank, liveById.get(challengerTokenId ?? 0)?.matches_played ?? 0)}</span>
+            <b>{challengeTarget.discipline.toUpperCase()}</b>
+            <span>{athleteRankLabel(liveById.get(challengeTarget.token_id)?.discipline_rank, liveById.get(challengeTarget.token_id)?.matches_played ?? 0)}</span>
+          </div>
+          <button className="button primary" disabled={competitionProduct !== "ranked"} onClick={submitChallenge}>{competitionProduct === "ranked" ? "SIGN + SEND RANKED CHALLENGE" : competitionProduct === "usdc" ? "USDC STAKES LOCKED" : "PINK SLIP LOCKED"}</button>
         </div>
       </div>}
       {transferTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="transfer-title">

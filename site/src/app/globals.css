@@ -592,6 +592,20 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .wallet-diagnostic-copy:hover, .wallet-diagnostic-copy:focus-visible { color: var(--acid); outline: none; }
 .wallet-modal > small { display: block; margin-top: 15px; color: #77858e; line-height: 1.5; }
 .challenge-money-lock { padding: 11px; border: 1px solid #ffca3850; color: #ffca38 !important; background: #ffca380d; font: 800 7px var(--mono); }
+.competition-products { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0; }
+.competition-products button { display: grid; align-content: center; gap: 5px; min-height: 104px; border: 1px solid #3a4650; padding: 12px; color: #aeb9bf; text-align: left; background: #05080c; cursor: pointer; }
+.competition-products button span { color: var(--teal); font: 900 8px var(--mono); letter-spacing: .09em; }
+.competition-products button b { color: white; font: 950 9px var(--mono); line-height: 1.35; }
+.competition-products button small { color: #7d8b93; font: 850 6px var(--mono); line-height: 1.4; }
+.competition-products button.active { border-color: var(--acid); box-shadow: inset 0 0 0 1px var(--acid); }
+.competition-products button.locked { border-color: #ffca3850; }
+.competition-products button.locked span { color: #ffca38; }
+.competition-products button.pink-slip { border-color: #ff4fa360; background: linear-gradient(145deg, #270919, #090509); }
+.competition-products button.pink-slip span, .competition-products button.pink-slip b { color: #ff74b6; }
+.competition-products button.pink-slip.active { border-color: #ff4fa3; box-shadow: inset 0 0 0 1px #ff4fa3, 0 0 24px #ff4fa322; }
+.pink-slip-warning, .pink-slip-broadcast-lock { display: grid; gap: 7px; border: 2px solid #ff4fa3; padding: 13px; color: #ff9ac9 !important; background: #250817; }
+.pink-slip-warning b, .pink-slip-broadcast-lock b { color: white; font: 950 10px var(--mono); }
+.pink-slip-warning span, .pink-slip-broadcast-lock span { font: 750 7px var(--mono); line-height: 1.55; }
 .challenge-reschedule { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-top: 8px; }
 .challenge-reschedule input { min-width: 0; border: 1px solid #35414b; padding: 8px; color: white; background: #070b10; font: 750 7px var(--mono); }
 
@@ -728,6 +742,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .broadcast-fighters article > img { height: 320px; }
 }
 @media (max-width: 680px) {
+  .competition-products { grid-template-columns: 1fr; }
   .arena-public-hero { min-height: 520px; padding-top: 45px; }
   .arena-public-hero h1 { font-size: clamp(80px, 25vw, 120px); }
   .arena-public-hero > div, .arena-tabs { grid-template-columns: 1fr 1fr; }
