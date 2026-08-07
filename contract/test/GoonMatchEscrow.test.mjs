@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import ganache from "ganache";
-import { BrowserProvider, ContractFactory, Wallet, ZeroAddress, keccak256, toUtf8Bytes } from "ethers";
+import { BrowserProvider, ContractFactory, Wallet, ZeroAddress, ZeroHash, keccak256, toUtf8Bytes } from "ethers";
 
 const root = path.resolve(import.meta.dirname, "..");
 const artifact = (name) => JSON.parse(fs.readFileSync(path.join(root, "artifacts", `${name}.json`)));
@@ -54,9 +54,9 @@ describe("GoonMatchEscrow", function () {
 
   async function fundBoth(terms) {
     const [signatureA, signatureB] = await Promise.all([playerATypedSigner.signTypedData(domain, termsTypes, terms), playerBTypedSigner.signTypedData(domain, termsTypes, terms)]);
-    await (await escrow.fund(terms, playerA.address, signatureA)).wait();
+    await (await escrow.connect(playerA).fund(terms, playerA.address, signatureA)).wait();
     assert.equal((await escrow.matchOf(terms.matchId)).state, 2n);
-    await (await escrow.connect(outsider).fund(terms, playerB.address, signatureB)).wait();
+    await (await escrow.connect(playerB).fund(terms, playerB.address, signatureB)).wait();
     assert.equal((await escrow.matchOf(terms.matchId)).state, 3n);
   }
 
@@ -101,11 +101,67 @@ describe("GoonMatchEscrow", function () {
     assert.equal(await escrow.houseFeeBps(), 250n);
   });
 
+  it("accounts exactly for the maximum fee and never charges it on a refund", async function () {
+    await (await escrow.setFeeConfiguration(owner.address, 250)).wait();
+    const terms = await wagerTerms(25_000_000, 250);
+    await fundBoth(terms);
+    await chain.request({ method: "evm_increaseTime", params: [3800] }); await chain.request({ method: "evm_mine", params: [] });
+    const stored = await escrow.matchOf(terms.matchId);
+    const resultHash = keccak256(toUtf8Bytes("fee transcript"));
+    const deadline = terms.scheduledStart + 3600n;
+    const signature = await settlementTypedSigner.signTypedData(domain, resultTypes, { matchId: terms.matchId, termsHash: stored.termsHash, winner: playerB.address, resultHash, deadline });
+    await (await escrow.proposeResult(terms.matchId, playerB.address, resultHash, deadline, signature)).wait();
+    await chain.request({ method: "evm_increaseTime", params: [86401] }); await chain.request({ method: "evm_mine", params: [] });
+    const winnerBefore = await usdc.balanceOf(playerB.address);
+    const feeBefore = await usdc.balanceOf(owner.address);
+    await (await escrow.finalize(terms.matchId)).wait();
+    assert.equal((await usdc.balanceOf(playerB.address)) - winnerBefore, 48_750_000n);
+    assert.equal((await usdc.balanceOf(owner.address)) - feeBefore, 1_250_000n);
+
+    const refundTerms = await wagerTerms(1_000_000, 250);
+    const signatureA = await playerATypedSigner.signTypedData(domain, termsTypes, refundTerms);
+    const balanceBefore = await usdc.balanceOf(playerA.address);
+    await (await escrow.connect(playerA).fund(refundTerms, playerA.address, signatureA)).wait();
+    await chain.request({ method: "evm_increaseTime", params: [601] }); await chain.request({ method: "evm_mine", params: [] });
+    await (await escrow.refundExpired(refundTerms.matchId)).wait();
+    assert.equal(await usdc.balanceOf(playerA.address), balanceBefore);
+  });
+
+  it("rejects replayed funding and result signatures for altered outcomes", async function () {
+    const terms = await wagerTerms(10_000_000);
+    const signatureA = await playerATypedSigner.signTypedData(domain, termsTypes, terms);
+    await assert.rejects(escrow.connect(outsider).fund(terms, playerA.address, signatureA));
+    await (await escrow.connect(playerA).fund(terms, playerA.address, signatureA)).wait();
+    await assert.rejects(async () => (await escrow.connect(playerA).fund(terms, playerA.address, signatureA)).wait());
+    const signatureB = await playerBTypedSigner.signTypedData(domain, termsTypes, terms);
+    await (await escrow.connect(playerB).fund(terms, playerB.address, signatureB)).wait();
+    await chain.request({ method: "evm_increaseTime", params: [3800] }); await chain.request({ method: "evm_mine", params: [] });
+    const stored = await escrow.matchOf(terms.matchId);
+    const resultHash = keccak256(toUtf8Bytes("signed result"));
+    const deadline = terms.scheduledStart + 3600n;
+    const signature = await settlementTypedSigner.signTypedData(domain, resultTypes, { matchId: terms.matchId, termsHash: stored.termsHash, winner: playerA.address, resultHash, deadline });
+    await assert.rejects(escrow.proposeResult(terms.matchId, playerB.address, resultHash, deadline, signature));
+    await assert.rejects(escrow.proposeResult(terms.matchId, playerA.address, ZeroHash, deadline, signature));
+    await (await escrow.proposeResult(terms.matchId, playerA.address, resultHash, deadline, signature)).wait();
+    await assert.rejects(async () => (await escrow.proposeResult(terms.matchId, playerA.address, resultHash, deadline, signature)).wait());
+  });
+
+  it("enforces same-discipline ownership and Safe-only emergency controls", async function () {
+    await (await collection.setDiscipline(35, 1)).wait();
+    const terms = await wagerTerms();
+    const signatureA = await playerATypedSigner.signTypedData(domain, termsTypes, terms);
+    await assert.rejects(escrow.connect(playerA).fund(terms, playerA.address, signatureA));
+    await assert.rejects(escrow.connect(outsider).pause());
+    await (await escrow.pause()).wait();
+    await assert.rejects(escrow.connect(playerA).fund(terms, playerA.address, signatureA));
+    await (await escrow.unpause()).wait();
+  });
+
   it("rejects unsupported stake tiers and signatures for a different player", async function () {
     const badTier = await wagerTerms(2_000_000);
     const signature = await playerATypedSigner.signTypedData(domain, termsTypes, badTier);
-    await assert.rejects(escrow.fund(badTier, playerA.address, signature));
+    await assert.rejects(escrow.connect(playerA).fund(badTier, playerA.address, signature));
     const terms = await wagerTerms();
-    await assert.rejects(escrow.fund(terms, playerB.address, await playerATypedSigner.signTypedData(domain, termsTypes, terms)));
+    await assert.rejects(escrow.connect(playerB).fund(terms, playerB.address, await playerATypedSigner.signTypedData(domain, termsTypes, terms)));
   });
 });

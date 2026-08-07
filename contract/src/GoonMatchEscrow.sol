@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.30;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -11,6 +11,10 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
+
+interface IGravityGoonsCollection is IERC721 {
+    function disciplineOf(uint256 tokenId) external view returns (uint8);
+}
 
 /// @title Gravity Goons Match Escrow
 /// @notice Equal-stake Base USDC escrow. Deployment and activation remain gated by legal and independent security review.
@@ -62,7 +66,7 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
     }
 
     IERC20 public immutable usdc;
-    IERC721 public immutable collection;
+    IGravityGoonsCollection public immutable collection;
     address public settlementSigner;
     address public feeRecipient;
     uint16 public houseFeeBps;
@@ -75,6 +79,7 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
     error InvalidState();
     error NotPlayer();
     error NotTokenOwner();
+    error DisciplineMismatch();
     error FundingExpired();
     error TooEarly();
     error FeeTooHigh();
@@ -93,7 +98,7 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
     {
         if (initialOwner == address(0) || usdcAddress == address(0) || collectionAddress == address(0) || initialSettlementSigner == address(0) || initialFeeRecipient == address(0)) revert InvalidAddress();
         usdc = IERC20(usdcAddress);
-        collection = IERC721(collectionAddress);
+        collection = IGravityGoonsCollection(collectionAddress);
         settlementSigner = initialSettlementSigner;
         feeRecipient = initialFeeRecipient;
         houseFeeBps = 0;
@@ -113,10 +118,12 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
         _validateTerms(terms);
         if (block.timestamp > terms.fundingDeadline) revert FundingExpired();
         if (player != terms.playerA && player != terms.playerB) revert NotPlayer();
+        if (msg.sender != player) revert NotPlayer();
         bytes32 termsHash = hashTerms(terms);
         if (!_validSignature(player, termsHash, signature)) revert InvalidSignature();
         uint256 tokenId = player == terms.playerA ? terms.tokenA : terms.tokenB;
         if (collection.ownerOf(tokenId) != player) revert NotTokenOwner();
+        if (collection.disciplineOf(terms.tokenA) != collection.disciplineOf(terms.tokenB)) revert DisciplineMismatch();
 
         EscrowMatch storage wager = _matches[terms.matchId];
         if (wager.state == State.None) {
@@ -143,15 +150,16 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
             if (wager.fundedB) revert InvalidState();
             wager.fundedB = true;
         }
-        usdc.safeTransferFrom(player, address(this), terms.stake);
         bool fullyFunded = wager.fundedA && wager.fundedB;
         wager.state = fullyFunded ? State.Locked : State.PartiallyFunded;
+        usdc.safeTransferFrom(msg.sender, address(this), terms.stake);
         emit MatchFunded(terms.matchId, player, fullyFunded);
     }
 
     function proposeResult(bytes32 matchId, address winner, bytes32 resultHash, uint64 deadline, bytes calldata signature) external whenNotPaused {
         EscrowMatch storage wager = _matches[matchId];
         if (wager.state != State.Locked) revert InvalidState();
+        if (resultHash == bytes32(0)) revert InvalidTerms();
         if (block.timestamp < wager.scheduledStart || block.timestamp > deadline) revert TooEarly();
         if (winner != wager.playerA && winner != wager.playerB) revert NotPlayer();
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(RESULT_TYPEHASH, matchId, wager.termsHash, winner, resultHash, deadline)));
@@ -230,8 +238,8 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
     }
 
     function _validSignature(address signer, bytes32 digest, bytes calldata signature) private view returns (bool) {
-        (address recovered, ECDSA.RecoverError error,) = ECDSA.tryRecover(digest, signature);
-        if (error == ECDSA.RecoverError.NoError && recovered == signer) return true;
+        (address recovered, ECDSA.RecoverError error, bytes32 errorArgument) = ECDSA.tryRecover(digest, signature);
+        if (error == ECDSA.RecoverError.NoError && errorArgument == bytes32(0) && recovered == signer) return true;
         if (signer.code.length == 0) return false;
         try IERC1271(signer).isValidSignature(digest, signature) returns (bytes4 magicValue) {
             return magicValue == IERC1271.isValidSignature.selector;

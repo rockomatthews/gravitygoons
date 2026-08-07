@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.30;
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -10,6 +10,10 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
+
+interface IGravityGoonsPinkSlipCollection is IERC721 {
+    function disciplineOf(uint256 tokenId) external view returns (uint8);
+}
 
 /// @title Gravity Goons Pink Slip Escrow
 /// @notice Winner-takes-both NFT custody. Never deploy or enable without separate legal and independent security approval.
@@ -55,7 +59,7 @@ contract GoonPinkSlipEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712, 
         bytes32 disciplineHash;
     }
 
-    IERC721 public immutable collection;
+    IGravityGoonsPinkSlipCollection public immutable collection;
     address public settlementSigner;
     mapping(bytes32 => PinkSlipMatch) private _matches;
 
@@ -65,6 +69,7 @@ contract GoonPinkSlipEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712, 
     error InvalidState();
     error NotPlayer();
     error NotTokenOwner();
+    error DisciplineMismatch();
     error DepositExpired();
     error TooEarly();
     error UnexpectedNFT();
@@ -81,7 +86,7 @@ contract GoonPinkSlipEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712, 
         Ownable(initialOwner) EIP712("Gravity Goons Pink Slip Escrow", "1")
     {
         if (initialOwner == address(0) || collectionAddress == address(0) || initialSettlementSigner == address(0)) revert InvalidAddress();
-        collection = IERC721(collectionAddress);
+        collection = IGravityGoonsPinkSlipCollection(collectionAddress);
         settlementSigner = initialSettlementSigner;
     }
 
@@ -98,10 +103,12 @@ contract GoonPinkSlipEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712, 
         _validateTerms(terms);
         if (block.timestamp > terms.depositDeadline) revert DepositExpired();
         if (player != terms.playerA && player != terms.playerB) revert NotPlayer();
+        if (msg.sender != player) revert NotPlayer();
         bytes32 termsHash = hashTerms(terms);
         if (!_validSignature(player, termsHash, signature)) revert InvalidSignature();
         uint256 tokenId = player == terms.playerA ? terms.tokenA : terms.tokenB;
         if (collection.ownerOf(tokenId) != player) revert NotTokenOwner();
+        if (collection.disciplineOf(terms.tokenA) != collection.disciplineOf(terms.tokenB)) revert DisciplineMismatch();
 
         PinkSlipMatch storage pinkSlip = _matches[terms.matchId];
         if (pinkSlip.state == State.None) {
@@ -127,15 +134,16 @@ contract GoonPinkSlipEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712, 
             if (pinkSlip.depositedB) revert InvalidState();
             pinkSlip.depositedB = true;
         }
-        collection.safeTransferFrom(player, address(this), tokenId);
         bool fullyDeposited = pinkSlip.depositedA && pinkSlip.depositedB;
         pinkSlip.state = fullyDeposited ? State.Locked : State.PartiallyDeposited;
+        collection.safeTransferFrom(msg.sender, address(this), tokenId);
         emit GoonDeposited(terms.matchId, player, tokenId, fullyDeposited);
     }
 
     function proposeResult(bytes32 matchId, address winner, bytes32 resultHash, uint64 deadline, bytes calldata signature) external whenNotPaused {
         PinkSlipMatch storage pinkSlip = _matches[matchId];
         if (pinkSlip.state != State.Locked) revert InvalidState();
+        if (resultHash == bytes32(0)) revert InvalidTerms();
         if (block.timestamp < pinkSlip.scheduledStart || block.timestamp > deadline) revert TooEarly();
         if (winner != pinkSlip.playerA && winner != pinkSlip.playerB) revert NotPlayer();
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(RESULT_TYPEHASH, matchId, pinkSlip.termsHash, winner, resultHash, deadline)));
@@ -205,7 +213,9 @@ contract GoonPinkSlipEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712, 
     }
 
     function _validSignature(address signer, bytes32 digest, bytes calldata signature) private view returns (bool) {
-        if (signer.code.length == 0) return ECDSA.recover(digest, signature) == signer;
+        (address recovered, ECDSA.RecoverError error, bytes32 errorArgument) = ECDSA.tryRecover(digest, signature);
+        if (error == ECDSA.RecoverError.NoError && errorArgument == bytes32(0) && recovered == signer) return true;
+        if (signer.code.length == 0) return false;
         try IERC1271(signer).isValidSignature(digest, signature) returns (bytes4 magic) {
             return magic == IERC1271.isValidSignature.selector;
         } catch { return false; }

@@ -1,0 +1,40 @@
+{
+  "schema": "gravity-goons-mainnet-open-public-mint-request-v1",
+  "prepared_at": "2026-08-07T00:42:18.552Z",
+  "authorization": "OPEN PUBLIC MINT",
+  "chain_id": 8453,
+  "safe": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "collection": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+  "method": "setMintOpen(bool)",
+  "arguments": {
+    "open": true
+  },
+  "value_wei": "0",
+  "calldata": "0xf8004d310000000000000000000000000000000000000000000000000000000000000001",
+  "transaction_builder_file": "reports/base-mainnet-open-public-mint-safe.json",
+  "preflight": {
+    "collection_owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "registry": "0x1DDbe6163cEd907135B827cf2E2Be697b5DEeA04",
+    "safe_owners": [
+      "0xAb58253C563313feE54C397f6aA877C715d8aa2c",
+      "0x10944aed9cA4f39F4578f2C4538B38Acd0D7f2b5",
+      "0x8A0182c099A618583e9EF98716DAcF739b3BD944"
+    ],
+    "safe_threshold": 2,
+    "mint_open": false,
+    "creator_minted": 50,
+    "public_minted": 0,
+    "total_minted": 50,
+    "available_public_ids": 950,
+    "metadata_base_url": "ipfs://bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe/",
+    "direct_rpc_simulation": "success"
+  },
+  "expected_post_state": {
+    "mint_open": true,
+    "creator_minted": 50,
+    "public_minted": 0,
+    "total_minted": 50,
+    "available_public_ids": 950
+  },
+  "status": "awaiting_safe_approvals_and_execution"
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "gravity-goons-escrow-preaudit-testing-v1",
+  "checked_at": "2026-08-07T00:54:18Z",
+  "status": "local_testing_only_not_deployed_not_enabled",
+  "compiler": "solc 0.8.30",
+  "openzeppelin_contracts": "5.4.0",
+  "automated_tests": {
+    "command": "cd contract && npm test",
+    "total_passing": 28,
+    "escrow_tests_passing": 14,
+    "failures": 0,
+    "coverage": [
+      "equal player deposits and approved fixed USDC tiers",
+      "exact settlement and maximum 2.5 percent fee accounting",
+      "full refunds with no fee",
+      "same-discipline and live token-ownership enforcement",
+      "EIP-712 signature binding and altered-result rejection",
+      "signature and deposit replay rejection",
+      "Safe-only pause, signer rotation, void, and dispute resolution",
+      "24-hour dispute-window settlement",
+      "Pink Slip exact-NFT custody, refund, void, and winner settlement",
+      "unsolicited NFT and third-party deposit-trigger rejection"
+    ]
+  },
+  "static_analysis": {
+    "tool": "Slither",
+    "version": "0.11.6",
+    "reports": [
+      "reports/slither-goon-match-escrow-preaudit.json",
+      "reports/slither-goon-pink-slip-escrow-preaudit.json"
+    ],
+    "first_party_critical": 0,
+    "first_party_high": 0,
+    "first_party_medium": 0,
+    "accepted_low": [
+      "Block timestamps implement funding, scheduled-start, result-submission, dispute, finalization, and refund deadlines. They are not used for randomness or winner selection."
+    ],
+    "informational": [
+      "Deposit/funding entry points have intentionally explicit validation and therefore exceed Slither's cyclomatic-complexity threshold.",
+      "Dependency pragma findings arise from pinned OpenZeppelin 5.4.0 sources; both first-party escrow contracts pin compiler 0.8.30."
+    ]
+  },
+  "source_hashes_sha256": {
+    "contract/src/GoonMatchEscrow.sol": "4a6a1920aa553e8d8c2cf3cab5cbd5217d8cb1203ae2f797708fa9b9e097c5d9",
+    "contract/src/GoonPinkSlipEscrow.sol": "8b17c2ec5cce7feb4adb79f08254b728092758e376f6ca3a6132ef3e1e0d6929",
+    "contract/test/GoonMatchEscrow.test.mjs": "1e3fe544cefe4f603bea2d663e4b40e9928831eb47f8a11cf5fc13627c4a7411",
+    "contract/test/GoonPinkSlipEscrow.test.mjs": "3c7603b6a74198f7ba705309f94ebe985b949defdf9f7c254233b1d7fc682129"
+  },
+  "remaining_activation_gates": [
+    "two-wallet browser integration using mock assets",
+    "Base mainnet-fork rehearsal against native USDC and the deployed collection",
+    "independent security review and fix review for each escrow",
+    "written legal clearance defining permitted jurisdictions and controls",
+    "Safe deployment and ownership verification with both escrows initially paused",
+    "explicit production activation authorization"
+  ],
+  "disclaimer": "This is first-party pre-audit evidence, not an independent security review or legal approval. Neither escrow is deployed or enabled."
+}

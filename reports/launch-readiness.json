@@ -16,7 +16,9 @@
   "creator_reserve_verified": true,
   "creator_reserve_mint_report": "reports/base-mainnet-creator-reserve-mint.json",
   "ready_for_base_sale": true,
-  "mint_gate_should_be_open": false,
+  "mint_gate_should_be_open": true,
+  "public_mint_authorization": "OPEN PUBLIC MINT",
+  "public_mint_transaction_status": "awaiting_safe_approvals_and_execution",
   "blockers": [],
   "notes": [
     "The collection is ready for a separately authorized public-mint opening transaction.",

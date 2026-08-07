@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import ganache from "ganache";
-import { BrowserProvider, ContractFactory, Wallet, ZeroAddress, keccak256, toUtf8Bytes } from "ethers";
+import { BrowserProvider, ContractFactory, Wallet, ZeroAddress, ZeroHash, keccak256, toUtf8Bytes } from "ethers";
 
 const root = path.resolve(import.meta.dirname, "..");
 const artifact = (name) => JSON.parse(fs.readFileSync(path.join(root, "artifacts", `${name}.json`)));
@@ -60,9 +60,10 @@ describe("GoonPinkSlipEscrow", function () {
       playerATypedSigner.signTypedData(domain, termsTypes, terms),
       playerBTypedSigner.signTypedData(domain, termsTypes, terms),
     ]);
-    await (await escrow.connect(outsider).deposit(terms, playerA.address, signatureA)).wait();
+    await assert.rejects(escrow.connect(outsider).deposit(terms, playerA.address, signatureA));
+    await (await escrow.connect(playerA).deposit(terms, playerA.address, signatureA)).wait();
     assert.equal((await escrow.matchOf(terms.matchId)).state, 1n);
-    await (await escrow.connect(outsider).deposit(terms, playerB.address, signatureB)).wait();
+    await (await escrow.connect(playerB).deposit(terms, playerB.address, signatureB)).wait();
     assert.equal((await escrow.matchOf(terms.matchId)).state, 2n);
   }
 
@@ -90,7 +91,7 @@ describe("GoonPinkSlipEscrow", function () {
   it("returns a lone deposit after the funding deadline", async function () {
     const terms = await pinkSlipTerms("partial");
     const signatureA = await playerATypedSigner.signTypedData(domain, termsTypes, terms);
-    await (await escrow.deposit(terms, playerA.address, signatureA)).wait();
+    await (await escrow.connect(playerA).deposit(terms, playerA.address, signatureA)).wait();
     await chain.request({ method: "evm_increaseTime", params: [601] });
     await chain.request({ method: "evm_mine", params: [] });
     await (await escrow.connect(outsider).refundExpired(terms.matchId)).wait();
@@ -119,8 +120,44 @@ describe("GoonPinkSlipEscrow", function () {
   it("rejects an unauthorized signature and unsolicited NFT custody", async function () {
     const terms = await pinkSlipTerms("invalid");
     const wrongSignature = await playerBTypedSigner.signTypedData(domain, termsTypes, terms);
-    await assert.rejects(escrow.deposit(terms, playerA.address, wrongSignature));
+    await assert.rejects(escrow.connect(playerA).deposit(terms, playerA.address, wrongSignature));
     await assert.rejects(collection.connect(playerA)["safeTransferFrom(address,address,uint256)"](playerA.address, await escrow.getAddress(), 34));
+  });
+
+  it("rejects different disciplines, duplicate deposits, and altered results", async function () {
+    await (await collection.setDiscipline(35, 1)).wait();
+    const mismatch = await pinkSlipTerms("discipline");
+    const mismatchSignature = await playerATypedSigner.signTypedData(domain, termsTypes, mismatch);
+    await assert.rejects(escrow.connect(playerA).deposit(mismatch, playerA.address, mismatchSignature));
+    await (await collection.setDiscipline(35, 0)).wait();
+
+    const terms = await pinkSlipTerms("replay");
+    const [signatureA, signatureB] = await Promise.all([
+      playerATypedSigner.signTypedData(domain, termsTypes, terms),
+      playerBTypedSigner.signTypedData(domain, termsTypes, terms),
+    ]);
+    await (await escrow.connect(playerA).deposit(terms, playerA.address, signatureA)).wait();
+    await assert.rejects(async () => (await escrow.connect(playerA).deposit(terms, playerA.address, signatureA)).wait());
+    await (await escrow.connect(playerB).deposit(terms, playerB.address, signatureB)).wait();
+    await chain.request({ method: "evm_increaseTime", params: [3800] }); await chain.request({ method: "evm_mine", params: [] });
+    const stored = await escrow.matchOf(terms.matchId);
+    const resultHash = keccak256(toUtf8Bytes("pink result"));
+    const deadline = terms.scheduledStart + 3600n;
+    const resultSignature = await settlementTypedSigner.signTypedData(domain, resultTypes, { matchId: terms.matchId, termsHash: stored.termsHash, winner: playerA.address, resultHash, deadline });
+    await assert.rejects(escrow.proposeResult(terms.matchId, playerB.address, resultHash, deadline, resultSignature));
+    await assert.rejects(escrow.proposeResult(terms.matchId, playerA.address, ZeroHash, deadline, resultSignature));
+    await (await escrow.proposeResult(terms.matchId, playerA.address, resultHash, deadline, resultSignature)).wait();
+    await assert.rejects(async () => (await escrow.proposeResult(terms.matchId, playerA.address, resultHash, deadline, resultSignature)).wait());
+  });
+
+  it("lets the Safe void a locked match and returns each exact Goon", async function () {
+    const terms = await pinkSlipTerms("void");
+    await depositBoth(terms);
+    await assert.rejects(escrow.connect(outsider).voidAndRefund(terms.matchId));
+    await (await escrow.voidAndRefund(terms.matchId)).wait();
+    assert.equal((await escrow.matchOf(terms.matchId)).state, 6n);
+    assert.equal(await collection.ownerOf(34), playerA.address);
+    assert.equal(await collection.ownerOf(35), playerB.address);
   });
 
   it("lets only the Safe pause custody and rotate the settlement signer", async function () {
@@ -128,7 +165,7 @@ describe("GoonPinkSlipEscrow", function () {
     await (await escrow.pause()).wait();
     const terms = await pinkSlipTerms("paused");
     const signatureA = await playerATypedSigner.signTypedData(domain, termsTypes, terms);
-    await assert.rejects(escrow.deposit(terms, playerA.address, signatureA));
+    await assert.rejects(escrow.connect(playerA).deposit(terms, playerA.address, signatureA));
     await (await escrow.unpause()).wait();
     await assert.rejects(escrow.setSettlementSigner(ZeroAddress));
     await (await escrow.setSettlementSigner(outsider.address)).wait();

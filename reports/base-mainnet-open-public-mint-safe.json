@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786063338552,
+  "meta": {
+    "name": "Gravity Goons - Open Public Mint",
+    "description": "Safe-authorized setMintOpen(true) after all pre-mint gates passed.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+      "value": "0",
+      "data": "0xf8004d310000000000000000000000000000000000000000000000000000000000000001",
+      "contractMethod": {
+        "inputs": [
+          {
+            "internalType": "bool",
+            "name": "open",
+            "type": "bool"
+          }
+        ],
+        "name": "setMintOpen",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "open": "true"
+      }
+    }
+  ]
+}

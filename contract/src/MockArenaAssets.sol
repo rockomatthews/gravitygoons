@@ -11,6 +11,8 @@ contract MockUSDC is ERC20 {
 }
 
 contract MockGoonCollection is ERC721 {
+    mapping(uint256 => uint8) public disciplineOf;
     constructor() ERC721("Mock Goons", "MGOON") {}
     function mint(address recipient, uint256 tokenId) external { _mint(recipient, tokenId); }
+    function setDiscipline(uint256 tokenId, uint8 discipline) external { disciplineOf[tokenId] = discipline; }
 }
