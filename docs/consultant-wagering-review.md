@@ -4,12 +4,16 @@ Status: implementation-ready design with every real-money feature disabled. This
 
 ## Product being reviewed
 
-Gravity Goons is a turn-based, server-authoritative 1v1 action-sports game on Base. Each ranked competitor must control an eligible NFT in the same discipline. The game uses player choices, fixed NFT statistics, limited Grit, known trick catalogues, deterministic rules, committed server randomness, and an auditable public transcript.
+Gravity Goons is a live-only, server-authoritative 1v1 action-sports game on Base. Each ranked competitor must control an eligible NFT in the same discipline. Both players schedule and check in before entering the Arena. The setter has 60 seconds to select a trick; a landed call forces an immediate automatic replication. Missing one setter clock forfeits the set to the opponent. The game uses player choices, fixed NFT statistics, limited Grit, known trick catalogues, deterministic rules, committed server randomness, and an auditable public transcript.
+
+A trick cooldown belongs to the individual setter. After a Goon lands its own set, that Goon cannot call that trick on its next setter turn. A responder who lands the forced replication may immediately call the same trick when it becomes the setter. Replication never creates a cooldown.
 
 Two separate products are proposed:
 
 1. NFT holders may voluntarily lock equal fixed stakes of 1, 5, 10, or 25 native Base USDC. The winner receives the pool after a 24-hour dispute window. A Safe-controlled fee is initialized at 0% and technically capped at 2.5%.
 2. Spectators may make free valueless predictions. Any future real-money spectator market must be operated by an approved third party that handles custody, customer eligibility, geofencing, identity, sanctions, and withdrawals. Gravity Goons will not run a spectator pool.
+
+A third product concept, **PINK SLIP — WINNER TAKES BOTH GOONS**, is explicitly deferred. It would require a separate NFT escrow contract, two unmistakable custody confirmations, Safe-controlled pause and disputes, a dispute window, and independent legal and contract reviews. It is not part of normal ranked play, is not enabled by the public NFT mint, and cannot be activated through a feature flag alone.
 
 Scheduled-live matches are public. Predictions and partner positions close at the scheduled start or first authoritative action, whichever occurs first. A no-show voids the game, returns both player stakes, and changes no rating.
 
@@ -17,6 +21,7 @@ Scheduled-live matches are public. Predictions and partner positions close at th
 
 - `WAGERING_ENABLED=false` and `NEXT_PUBLIC_WAGERING_ENABLED=false`.
 - No escrow address is configured or deployed.
+- No Pink Slip escrow contract is implemented, deployed, or configured.
 - The public site labels player USDC and partner trading as locked.
 - Limitless is mock/read-only; embedded order submission returns HTTP 503.
 - Public minting remains closed.
@@ -42,8 +47,8 @@ Scheduled-live matches are public. Predictions and partner positions close at th
 - Escrow tests: `contract/test/GoonMatchEscrow.test.mjs`
 - Public schedule and broadcast schema: `supabase/migrations/20260731223637_arena_scheduling_and_predictions.sql`
 - Public Arena routes: `/arena` and `/arena/matches/:id`
-- Fixed ruleset commitment: `keccak256("gravity-goons-pvp-ruleset-v1")`
+- Active ruleset commitment for new challenges: `keccak256("gravity-goons-pvp-ruleset-v2-live-setter-cooldowns")` = `0x6ff5df2e176ac0646e245f82314a47a2288c236b24d5ef6002cf22a91bc57ae3`
 
 ## Activation decision required
 
-Written advice must identify permitted jurisdictions, required controls, required contractual language, whether a player fee is allowed, and whether the proposed partner allocation of responsibilities is sufficient. Ambiguous advice keeps wagering disabled. Security approval and Rob’s explicit authorization are separate required gates after legal approval.
+Written advice must identify permitted jurisdictions, required controls, required contractual language, whether a player fee is allowed, and whether the proposed partner allocation of responsibilities is sufficient. Pink Slip custody and NFT-value transfer require a separate written analysis. Ambiguous advice keeps wagering disabled. Security approval and Rob’s explicit authorization are separate required gates after legal approval. Unlocking the public NFT mint does not satisfy or bypass any wagering gate.
