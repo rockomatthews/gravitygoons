@@ -3,7 +3,7 @@ import { collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { goonImageUrl } from "@/lib/goon-images";
 import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { publicSeevioFailureMessage, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
+import { publicSeevioFailureMessage, SEEVIO_VIDEO_MODEL, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
 import { movePromptFor } from "@/lib/move-prompts";
 
 const CHAIN_ID = 8453;
@@ -179,7 +179,7 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
   let active = 0;
   for (const asset of assets) {
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${asset.version}`;
-    const requestPayload = { model: "seedance-2-0-fast", generation_type: "image-to-video", prompt: asset.prompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 };
+    const requestPayload = { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: asset.prompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 };
     const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
     let job = jobData as JobRow | null;
@@ -297,7 +297,7 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
     if (error) throw new Error(error.message);
     const nextAsset = nextData as AssetRow;
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${nextVersion}`;
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: { model: "seedance-2-0-fast", generation_type: "image-to-video", prompt: rerollPrompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
+    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: rerollPrompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError) throw new Error(jobError.message);
     const job = jobData as JobRow;
     const providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });

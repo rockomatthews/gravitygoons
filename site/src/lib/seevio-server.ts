@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
 const API_BASE_URL = "https://api.seevio.ai";
-const MODEL = "seedance-2-0-fast";
+export const SEEVIO_VIDEO_MODEL = "seedance-2-0";
 
 function callbackUrl(): string | null {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
@@ -45,7 +45,7 @@ export async function submitSeevioJob(input: { prompt: string; imageUrl: string;
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: SEEVIO_VIDEO_MODEL,
       callback_url: webhookUrl,
       input: {
         prompt: input.prompt,

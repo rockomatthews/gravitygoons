@@ -35,7 +35,7 @@ test("submits the documented Seevio image-to-video request with a protected call
     assert.equal(captured?.url, "https://api.seevio.ai/v1/videos/generations");
     assert.equal(captured?.authorization, "Bearer sk_test_gravity_goons");
     const body = captured?.body as { model: string; callback_url: string; input: { generation_type: string; image_urls: string[]; aspect_ratio: string; resolution: string; duration: number } };
-    assert.equal(body.model, "seedance-2-0-fast");
+    assert.equal(body.model, "seedance-2-0");
     assert.match(body.callback_url, /^https:\/\/gravitygoons\.com\/api\/moves\/webhooks\/seevio\?token=/);
     assert.deepEqual(body.input.image_urls, ["https://gravitygoons.com/goon.png"]);
     assert.equal(body.input.generation_type, "image-to-video");
