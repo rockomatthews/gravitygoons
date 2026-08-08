@@ -18,10 +18,11 @@
   "ready_for_base_sale": true,
   "mint_gate_should_be_open": true,
   "public_mint_authorization": "OPEN PUBLIC MINT",
-  "public_mint_transaction_status": "awaiting_safe_approvals_and_execution",
+  "public_mint_transaction_status": "executed_and_verified",
+  "public_mint_transaction_hash": "0xa17bacbfc4372315deef6828356d50bd2248480ed4a6b4348d1d2e8ffc8c7727",
   "blockers": [],
   "notes": [
-    "The collection is ready for a separately authorized public-mint opening transaction.",
+    "The Safe-authorized public mint opened successfully on Base mainnet at block 49705385; 950 exact-ID public allocation slots were available at verification.",
     "USDC player staking, Pink Slip NFT custody, and spectator money markets remain separate disabled products and are not launch blockers for the NFT sale."
   ]
 }
