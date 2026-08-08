@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786228185000,
+  "meta": {
+    "name": "Gravity Goons - Propose Replacement Game Signer",
+    "description": "Safe-authorized proposal of 0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad. This starts the mandatory two-day delay; it does not activate the signer.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x1DDbe6163cEd907135B827cf2E2Be697b5DEeA04",
+      "value": "0",
+      "data": "0x3e54d204000000000000000000000000272d06f095c0deaf99a5fa790b38d20ca98631ad",
+      "contractMethod": {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "signer",
+            "type": "address"
+          }
+        ],
+        "name": "proposeGameSigner",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "signer": "0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad"
+      }
+    }
+  ]
+}
