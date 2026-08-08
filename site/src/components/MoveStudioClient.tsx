@@ -32,6 +32,7 @@ function outcomeStage(move: StudioMove, outcome: "land" | "fall"): string {
 
 function MoveProgress({ move, now, lastCheckedAt }: { move: StudioMove; now: number; lastCheckedAt: number | null }) {
   const progress = moveWorkflowProgress(move);
+  const elapsedThrough = progress.active ? now : move.workflowUpdatedAt ? new Date(move.workflowUpdatedAt).getTime() : now;
   return (
     <section className={`studio-workflow-progress${progress.paused ? " is-paused" : ""}${progress.percent === 100 ? " is-complete" : ""}`} aria-label={`${move.name} generation progress`}>
       <div className="studio-progress-heading"><span>WORKFLOW PROGRESS · NOT A RENDER ETA</span><b>{progress.percent}%</b></div>
@@ -39,7 +40,7 @@ function MoveProgress({ move, now, lastCheckedAt }: { move: StudioMove; now: num
       <div className="studio-progress-outcomes"><span>LAND <b>{outcomeStage(move, "land")}</b></span><span>FALL <b>{outcomeStage(move, "fall")}</b></span></div>
       <div className="studio-progress-copy"><b>{progress.label}</b><p>{progress.detail}</p></div>
       <p className="studio-progress-leave"><b>YOU CAN LEAVE THIS PAGE.</b> Generation runs on the server. Return here anytime; this panel refreshes automatically while open.</p>
-      <small>{elapsedLabel(move.workflowStartedAt, now)} · Last checked {lastCheckedAt ? new Date(lastCheckedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }) : "just now"}</small>
+      <small>{elapsedLabel(move.workflowStartedAt, elapsedThrough)} · Last checked {lastCheckedAt ? new Date(lastCheckedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }) : "just now"}</small>
     </section>
   );
 }
