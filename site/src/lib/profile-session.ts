@@ -33,6 +33,28 @@ const PROFILE_SIGN_IN_TYPES = {
 
 export type ProfileSignInTypedData = ReturnType<typeof profileTypedData>;
 
+export function signatureByteLength(signature: unknown): number | null {
+  if (typeof signature !== "string" || !/^0x(?:[0-9a-fA-F]{2})+$/.test(signature)) return null;
+  return (signature.length - 2) / 2;
+}
+
+export async function verifyWithSmartAccountFallback(input: {
+  signature: unknown;
+  verifyEoa: () => Promise<boolean>;
+  verifySmartAccount: () => Promise<boolean>;
+}): Promise<boolean> {
+  const byteLength = signatureByteLength(input.signature);
+  if (byteLength === null) return false;
+  // Viem's utility verifier is EOA-only and expects a standard 65-byte
+  // signature. Base smart accounts may return ERC-6492-wrapped signatures of
+  // a different length, which must go directly to the Public Client action.
+  if (byteLength === 65) {
+    const eoaValid = await input.verifyEoa().catch(() => false);
+    if (eoaValid) return true;
+  }
+  return input.verifySmartAccount().catch(() => false);
+}
+
 function sessionSecret(): string {
   const configured = process.env.PROFILE_SESSION_SECRET;
   if (configured) return configured;
@@ -127,12 +149,18 @@ export async function verifyChallenge(token: string | undefined, address: string
   let valid: boolean;
   if (method === "typed_data") {
     const typedData = profileTypedData(payload);
-    valid = await verifyTypedData({ address: getAddress(address), ...typedData, signature });
-    if (!valid) valid = await publicClient.verifyTypedData({ address: getAddress(address), ...typedData, signature }).catch(() => false);
+    valid = await verifyWithSmartAccountFallback({
+      signature,
+      verifyEoa: () => verifyTypedData({ address: getAddress(address), ...typedData, signature }),
+      verifySmartAccount: () => publicClient.verifyTypedData({ address: getAddress(address), ...typedData, signature }),
+    });
   } else {
     const message = challengeMessage(payload);
-    valid = await verifyMessage({ address: getAddress(address), message, signature });
-    if (!valid) valid = await publicClient.verifyMessage({ address: getAddress(address), message, signature }).catch(() => false);
+    valid = await verifyWithSmartAccountFallback({
+      signature,
+      verifyEoa: () => verifyMessage({ address: getAddress(address), message, signature }),
+      verifySmartAccount: () => publicClient.verifyMessage({ address: getAddress(address), message, signature }),
+    });
   }
   return valid ? normalized : null;
 }
