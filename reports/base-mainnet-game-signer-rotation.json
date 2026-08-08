@@ -1,0 +1,15 @@
+{
+  "schema": "gravity-goons-game-signer-rotation-v1",
+  "chain_id": 8453,
+  "registry": "0x1DDbe6163cEd907135B827cf2E2Be697b5DEeA04",
+  "safe": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "previous_game_signer": "0x75097B28ca0B0E1110Ff40381992dB6624353407",
+  "pending_game_signer": "0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad",
+  "proposal_transaction": "0xb53ea03a231c881c527af81a2884858cf75692d156c29e1aebf800d88e84233d",
+  "activation_after_unix": 1786401339,
+  "activation_after_utc": "2026-08-10T22:35:39.000Z",
+  "activation_after_mountain": "2026-08-10T16:35:39-06:00",
+  "status": "PENDING_DELAY",
+  "private_key_storage": "User attested that the replacement private key is stored in macOS Keychain.",
+  "next_action": "After the activation timestamp, the Safe must execute GravityGoonsProgressRegistry.activateGameSigner()."
+}
