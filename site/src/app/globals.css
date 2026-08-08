@@ -1124,6 +1124,27 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .studio-move-title span, .studio-move-title i { color: var(--muted); font: 800 7px var(--mono); font-style: normal; }
 .studio-move-title i { color: var(--coral); text-transform: uppercase; }
 .studio-move-title h2 { grid-column: 1 / -1; margin: 28px 0 0; font-size: 34px; text-transform: uppercase; }
+.studio-workflow-progress { display: grid; gap: 11px; padding: 18px 22px 20px; border-bottom: 1px solid var(--line); background: linear-gradient(135deg, #18f1dc10, transparent 55%), #070d12; }
+.studio-progress-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.studio-progress-heading span { color: var(--teal); font: 900 7px var(--mono); letter-spacing: .1em; }
+.studio-progress-heading > b { color: white; font: 950 20px var(--mono); }
+.studio-progress-track { height: 12px; position: relative; overflow: hidden; border: 1px solid #3c4b55; background: #020609; }
+.studio-progress-track::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 24px, #02060980 24px 27px); }
+.studio-progress-track i { height: 100%; display: block; background: linear-gradient(90deg, var(--teal), var(--acid)); box-shadow: 0 0 18px #18f1dca8; transition: width .65s ease; }
+.studio-progress-outcomes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.studio-progress-outcomes span { display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid #ffffff18; color: #829099; font: 850 6px var(--mono); }
+.studio-progress-outcomes span:last-child { border-color: #ff4b3538; }
+.studio-progress-outcomes b { color: white; text-align: right; }
+.studio-progress-copy { display: grid; gap: 4px; }
+.studio-progress-copy > b { color: white; font: 950 12px var(--mono); text-transform: uppercase; }
+.studio-progress-copy p { margin: 0; color: #a7b3ba; font-size: 12px; line-height: 1.5; }
+.studio-progress-leave { margin: 0; padding: 10px 12px; border-left: 3px solid var(--acid); color: #aeb9bf; background: #c6ff3210; font-size: 11px; line-height: 1.5; }
+.studio-progress-leave b { color: var(--acid); font: 900 7px var(--mono); }
+.studio-workflow-progress > small { color: #73818a; font: 750 6px var(--mono); }
+.studio-workflow-progress.is-paused { background: linear-gradient(135deg, #ff4b3512, transparent 55%), #0d090a; }
+.studio-workflow-progress.is-paused .studio-progress-heading span, .studio-workflow-progress.is-paused .studio-progress-copy > b { color: var(--coral); }
+.studio-workflow-progress.is-paused .studio-progress-track i { background: var(--coral); box-shadow: 0 0 18px #ff4b3570; }
+.studio-workflow-progress.is-complete .studio-progress-heading span, .studio-workflow-progress.is-complete .studio-progress-copy > b { color: var(--acid); }
 .outcome-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
 .outcome-slot { min-width: 0; padding: 12px; background: #080c11; }
 .outcome-slot > span, .outcome-slot > small { display: block; margin-bottom: 8px; color: var(--teal); font: 800 7px var(--mono); }
@@ -1136,6 +1157,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .outcome-review-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 8px; }
 .outcome-review-buttons button { border: 1px solid #35414b; padding: 9px 3px; color: white; background: #111820; font: 850 6px var(--mono); cursor: pointer; }
 .outcome-review-buttons button:first-child { color: var(--void); background: var(--acid); }
+.outcome-rejected-reroll { width: 100%; margin-top: 8px; border: 1px solid var(--coral); padding: 11px 8px; color: white; background: #ff4b3520; font: 900 7px var(--mono); cursor: pointer; }
 .studio-move-card footer { display: grid; grid-template-columns: 1fr auto; gap: 5px; align-items: center; padding: 17px; }
 .studio-move-card footer b { color: var(--acid); font: 950 16px var(--mono); }
 .studio-move-card footer span { color: var(--muted); font: 750 6px var(--mono); }
@@ -1222,6 +1244,7 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .profile-goon-copy { min-height: 390px; }
   .profile-move-list { grid-column: auto; grid-template-columns: 1fr; }
   .outcome-pair { grid-template-columns: 1fr; }
+  .studio-progress-outcomes { grid-template-columns: 1fr; }
   .move-quote-dock { grid-template-columns: 1fr; }
   .move-quote-dock button { width: 100%; }
 }

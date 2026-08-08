@@ -8,7 +8,7 @@ import { base } from "viem/chains";
 import type { ProfileGoon, StudioMove } from "@/lib/profile-types";
 import { useWallet } from "@/components/WalletProvider";
 import { authenticateProfileSession } from "@/lib/profile-auth-client";
-import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, moveWorkflowLabel } from "@/lib/move-studio-ui";
+import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveWorkflowLabel, moveWorkflowProgress } from "@/lib/move-studio-ui";
 
 const USDC_ADDRESS = (process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913") as `0x${string}`;
 const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_MOVE_TREASURY_ADDRESS as `0x${string}` | undefined;
@@ -16,6 +16,33 @@ const erc20Abi = [{ type: "function", name: "transfer", stateMutability: "nonpay
 
 type StudioPayload = { goon: ProfileGoon; moves: StudioMove[]; demo: boolean };
 type Quote = { orderId: string; pairId: string; amountMinorUnits: number; displayPrice: string; expiresAt: string; demo: boolean };
+
+function elapsedLabel(startedAt: string | null, now: number): string {
+  if (!startedAt) return "Starting now";
+  const seconds = Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000));
+  if (seconds < 60) return `${seconds}s elapsed`;
+  const minutes = Math.floor(seconds / 60);
+  return minutes < 60 ? `${minutes}m ${seconds % 60}s elapsed` : `${Math.floor(minutes / 60)}h ${minutes % 60}m elapsed`;
+}
+
+function outcomeStage(move: StudioMove, outcome: "land" | "fall"): string {
+  const asset = move.outcomes.filter((item) => item.outcome === outcome).sort((a, b) => b.version - a.version)[0];
+  return asset?.status.replaceAll("_", " ").toUpperCase() ?? (isMoveWorkflowActive(move.pairStatus) ? "PREPARING" : "NOT STARTED");
+}
+
+function MoveProgress({ move, now, lastCheckedAt }: { move: StudioMove; now: number; lastCheckedAt: number | null }) {
+  const progress = moveWorkflowProgress(move);
+  return (
+    <section className={`studio-workflow-progress${progress.paused ? " is-paused" : ""}${progress.percent === 100 ? " is-complete" : ""}`} aria-label={`${move.name} generation progress`}>
+      <div className="studio-progress-heading"><span>WORKFLOW PROGRESS · NOT A RENDER ETA</span><b>{progress.percent}%</b></div>
+      <div className="studio-progress-track" role="progressbar" aria-label={`${move.name} workflow stage`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}><i style={{ width: `${progress.percent}%` }} /></div>
+      <div className="studio-progress-outcomes"><span>LAND <b>{outcomeStage(move, "land")}</b></span><span>FALL <b>{outcomeStage(move, "fall")}</b></span></div>
+      <div className="studio-progress-copy"><b>{progress.label}</b><p>{progress.detail}</p></div>
+      <p className="studio-progress-leave"><b>YOU CAN LEAVE THIS PAGE.</b> Generation runs on the server. Return here anytime; this panel refreshes automatically while open.</p>
+      <small>{elapsedLabel(move.workflowStartedAt, now)} · Last checked {lastCheckedAt ? new Date(lastCheckedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }) : "just now"}</small>
+    </section>
+  );
+}
 
 export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username: string; tokenId: number; fallbackGoon: ProfileGoon }) {
   const { account, connect, provider, signMessage, signProfileChallenge } = useWallet();
@@ -26,6 +53,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
   const [actionError, setActionError] = useState("");
   const [status, setStatus] = useState("Sign in from My Profile with the current owner wallet to unlock movie controls.");
   const [busy, setBusy] = useState(false);
+  const [lastCheckedAt, setLastCheckedAt] = useState<number | null>(null);
+  const [clockNow, setClockNow] = useState(() => Date.now());
 
   const refresh = useCallback(async (preserveStatus = false) => {
     const response = await fetch(`/api/moves/studio/${tokenId}`, { cache: "no-store" });
@@ -35,26 +64,30 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       return;
     }
     setStudio(data);
+    setLastCheckedAt(Date.now());
     const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && isMovePurchasable(move.pairStatus));
     setSelectedTrickId((current) => current ?? firstPurchasable?.trickId ?? null);
     if (!preserveStatus) setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
   }, [tokenId]);
 
   useEffect(() => {
-    let active = true;
-    fetch(`/api/moves/studio/${tokenId}`, { cache: "no-store" })
-      .then(async (response) => ({ ok: response.ok, data: await response.json() }))
-      .then(({ ok, data }) => {
-        if (!active) return;
-        if (!ok) return setStatus(data.error);
-        setStudio(data);
-        const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && isMovePurchasable(move.pairStatus));
-        setSelectedTrickId((current) => current ?? firstPurchasable?.trickId ?? null);
-        setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
-      })
-      .catch(() => { if (active) setStatus("Unable to load the owner studio."); });
-    return () => { active = false; };
-  }, [tokenId]);
+    const timer = window.setTimeout(() => refresh().catch(() => setStatus("Unable to load the owner studio.")), 0);
+    return () => window.clearTimeout(timer);
+  }, [refresh]);
+
+  useEffect(() => {
+    const hasActiveWorkflow = studio?.moves.some((move) => isMoveWorkflowActive(move.pairStatus)) ?? false;
+    if (!hasActiveWorkflow) return;
+    const tick = () => {
+      setClockNow(Date.now());
+      if (document.visibilityState === "visible") refresh(true).catch(() => undefined);
+    };
+    const poll = window.setInterval(tick, 10_000);
+    const clock = window.setInterval(() => setClockNow(Date.now()), 1_000);
+    const onVisibility = () => { if (document.visibilityState === "visible") tick(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { window.clearInterval(poll); window.clearInterval(clock); document.removeEventListener("visibilitychange", onVisibility); };
+  }, [refresh, studio]);
 
   async function requestQuote(move: StudioMove) {
     setBusy(true);
@@ -166,7 +199,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
   }
 
   const goon = studio?.goon ?? fallbackGoon;
-  const moves = studio?.moves ?? fallbackGoon.moves.map((move) => ({ ...move, outcomes: [], quotedPriceUsdc: "$12.00 USDC" }));
+  const moves = studio?.moves ?? fallbackGoon.moves.map((move) => ({ ...move, outcomes: [], quotedPriceUsdc: "$12.00 USDC", workflowStartedAt: null, workflowUpdatedAt: null }));
   const purchasableMoves = moves.filter((move) => move.unlocked && isMovePurchasable(move.pairStatus));
   const selectedPurchasableMove = purchasableMoves.find((move) => move.trickId === selectedTrickId) ?? purchasableMoves[0] ?? null;
 
@@ -196,6 +229,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         {moves.map((move) => (
           <article className={`studio-move-card state-${move.pairStatus}${selectedPurchasableMove?.trickId === move.trickId ? " is-selected" : ""}`} key={move.trickId}>
             <div className="studio-move-title"><span>DIFFICULTY {move.difficulty}</span><i>{moveWorkflowLabel(move.pairStatus)}</i><h2>{move.name}</h2></div>
+            {(["paid", "queued", "generating", "rerolling", "owner_review", "approved", "unpublished", "failed"] as const).includes(move.pairStatus as never) && <MoveProgress move={move} now={clockNow} lastCheckedAt={lastCheckedAt} />}
             <div className="outcome-pair">
               {(["land", "fall"] as const).map((outcome) => {
                 const asset = move.outcomes.filter((item) => item.outcome === outcome).sort((a, b) => b.version - a.version)[0];
@@ -204,6 +238,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
                     <span>{outcome.toUpperCase()}{" // "}{asset?.status.replaceAll("_", " ") ?? "NOT MADE"}</span>
                     {asset?.videoUrl ? <video src={asset.videoUrl} poster={asset.posterUrl ?? undefined} controls playsInline preload="metadata" /> : <div className="outcome-placeholder"><b>{outcome === "land" ? "STICK IT" : "BAIL IT"}</b><small>5 SEC · 720P · SEEVIO</small></div>}
                     {asset?.status === "owner_review" && <div className="outcome-review-buttons"><button onClick={() => review(asset.id, "approved")} disabled={busy}>APPROVE</button><button onClick={() => review(asset.id, "reroll")} disabled={busy}>REROLL</button><button onClick={() => review(asset.id, "rejected")} disabled={busy}>REJECT</button></div>}
+                    {asset?.status === "rejected" && asset.version === 1 && <button className="outcome-rejected-reroll" onClick={() => review(asset.id, "reroll")} disabled={busy}>REGENERATE · INCLUDED REROLL</button>}
                     {outcome === "fall" && <small>PRIVATE · GAME OUTCOMES ONLY</small>}
                   </div>
                 );

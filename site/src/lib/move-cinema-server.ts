@@ -4,6 +4,7 @@ import { goonImageUrl } from "@/lib/goon-images";
 import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { publicSeevioFailureMessage, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
+import { movePromptFor } from "@/lib/move-prompts";
 
 const CHAIN_ID = 8453;
 const BASE_USDC = (process.env.BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913").toLowerCase();
@@ -25,10 +26,7 @@ function promptFor(tokenId: number, trickId: number, outcome: "land" | "fall"): 
   const result = tokenMove(tokenId, trickId);
   if (!result.trick) throw new Error("Move not found in this discipline catalog.");
   const token = result.token;
-  const action = outcome === "land"
-    ? `performs a ${result.trick.name} and lands it cleanly, riding away under full control`
-    : `performs a ${result.trick.name}, loses control during the landing, falls safely, and does not land the trick`;
-  return `Five-second square action-sports broadcast clip. Preserve the exact identity, species, face, body, clothing, fictional sponsor marks, stance, and ${token.sport_equipment} from the source image. The ${token.species} ${result.discipline} rider ${action}. Show one coherent rider and one complete set of discipline-correct equipment. Keep anatomy, pedals, bindings, boards, skis, wheels, handlebars, fins, and tail attachment physically correct. No extra limbs, duplicate equipment, real trademarks, text mutation, camera cuts, or outcome ambiguity.`;
+  return movePromptFor({ token, discipline: result.discipline, trickName: result.trick.name, outcome });
 }
 
 function quoteAmount(): number {
@@ -285,14 +283,16 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("id", asset.pair_id).single();
   const pair = pairData as PairRow;
   if (!(await verifyTokenOwnership(walletAddress, pair.token_id))) throw new Error("Only the current NFT owner can review this movie.");
-  if (asset.status !== "owner_review") throw new Error("This outcome is not currently awaiting owner review.");
+  const canReview = asset.status === "owner_review" || (decision === "reroll" && asset.status === "rejected");
+  if (!canReview) throw new Error("This outcome is not currently awaiting owner review or an included rejected-draft reroll.");
   const reviewedAt = new Date().toISOString();
   await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
 
   if (decision === "reroll") {
     if (asset.version > includedRerollsPerOutcome()) throw new Error("This movie pair has used its included reroll for this outcome. Reject this draft or purchase an additional reroll when paid rerolls launch.");
     const nextVersion = asset.version + 1;
-    const rerollPrompt = note.trim() ? `${asset.prompt} Owner revision note: ${note.trim()}` : asset.prompt;
+    const correctedBasePrompt = promptFor(pair.token_id, pair.trick_id, asset.outcome);
+    const rerollPrompt = note.trim() ? `${correctedBasePrompt} Owner revision note: ${note.trim()}` : correctedBasePrompt;
     const { data: nextData, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome: asset.outcome, version: nextVersion, status: "queued", source_image_url: asset.source_image_url, prompt: rerollPrompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();
     if (error) throw new Error(error.message);
     const nextAsset = nextData as AssetRow;

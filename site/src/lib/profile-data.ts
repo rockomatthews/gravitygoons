@@ -22,7 +22,7 @@ const DISCIPLINE_INDEX: Record<Discipline, number> = {
 type ProfileRow = { id: string; username: string; display_name: string; bio: string; avatar_url: string | null };
 type WalletRow = { wallet_address: string };
 type OwnershipRow = { token_id: number };
-type PairRow = { id: string; token_id: number; trick_id: number; status: string };
+type PairRow = { id: string; token_id: number; trick_id: number; status: string; created_at?: string | null; updated_at?: string | null };
 type AssetRow = {
   id: string;
   pair_id: string;
@@ -32,6 +32,8 @@ type AssetRow = {
   video_url: string | null;
   poster_url: string | null;
   owner_decision: "pending" | "approved" | "rejected";
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 function normalizeStatus(value: string | undefined): MovePairStatus {
@@ -276,26 +278,33 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
   if (!supabase || collectionAddress === ZERO_ADDRESS) {
     const { pairs, assets } = demoPairs();
     const goon = buildGoon(tokenId, pairs, assets, true);
-    const outcomesByPair = (pairId: string | null): StudioOutcome[] => pairId ? assets.filter((asset) => asset.pair_id === pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision })) : [];
-    return { goon, moves: goon.moves.map((move) => ({ ...move, outcomes: outcomesByPair(move.pairId), quotedPriceUsdc: quote })), demo: true };
+    const outcomesByPair = (pairId: string | null): StudioOutcome[] => pairId ? assets.filter((asset) => asset.pair_id === pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })) : [];
+    return { goon, moves: goon.moves.map((move) => ({ ...move, outcomes: outcomesByPair(move.pairId), quotedPriceUsdc: quote, workflowStartedAt: null, workflowUpdatedAt: null })), demo: true };
   }
 
-  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId);
+  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,created_at,updated_at").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId);
   const pairs = (pairData ?? []) as PairRow[];
   const pairIds = pairs.map((pair) => pair.id);
   let assets: AssetRow[] = [];
   if (pairIds.length) {
-    const { data } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,video_url,poster_url,owner_decision").in("pair_id", pairIds);
+    const { data } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,video_url,poster_url,owner_decision,created_at,updated_at").in("pair_id", pairIds);
     assets = (data ?? []) as AssetRow[];
   }
   const goon = buildGoon(tokenId, pairs, assets, true);
   return {
     goon,
-    moves: goon.moves.map((move) => ({
-      ...move,
-      outcomes: move.pairId ? assets.filter((asset) => asset.pair_id === move.pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision })) : [],
-      quotedPriceUsdc: quote,
-    })),
+    moves: goon.moves.map((move) => {
+      const pair = pairs.find((candidate) => candidate.id === move.pairId);
+      const pairAssets = move.pairId ? assets.filter((asset) => asset.pair_id === move.pairId) : [];
+      const assetDates = pairAssets.flatMap((asset) => [asset.created_at, asset.updated_at]).filter((value): value is string => Boolean(value));
+      return {
+        ...move,
+        outcomes: pairAssets.map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })),
+        quotedPriceUsdc: quote,
+        workflowStartedAt: pairAssets.map((asset) => asset.created_at).filter((value): value is string => Boolean(value)).sort()[0] ?? pair?.updated_at ?? pair?.created_at ?? null,
+        workflowUpdatedAt: [...assetDates, pair?.updated_at].filter((value): value is string => Boolean(value)).sort().at(-1) ?? null,
+      };
+    }),
     demo: false,
   };
 }

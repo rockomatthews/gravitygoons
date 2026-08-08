@@ -1,4 +1,45 @@
-import type { MovePairStatus } from "@/lib/profile-types";
+import type { MovePairStatus, OutcomeStatus, StudioMove } from "@/lib/profile-types";
+
+export type MoveWorkflowProgress = {
+  percent: number;
+  label: string;
+  detail: string;
+  active: boolean;
+  paused: boolean;
+};
+
+export function isMoveWorkflowActive(status: MovePairStatus): boolean {
+  return status === "paid" || status === "queued" || status === "generating" || status === "rerolling";
+}
+
+function outcomeProgress(status: OutcomeStatus): number {
+  switch (status) {
+    case "queued": return 25;
+    case "generating": return 55;
+    case "failed": return 40;
+    case "owner_review":
+    case "rejected": return 90;
+    case "approved":
+    case "unpublished": return 100;
+    default: return 0;
+  }
+}
+
+export function moveWorkflowProgress(move: Pick<StudioMove, "pairStatus" | "outcomes">): MoveWorkflowProgress {
+  const latest = (["land", "fall"] as const).map((outcome) =>
+    move.outcomes.filter((asset) => asset.outcome === outcome).sort((a, b) => b.version - a.version)[0],
+  );
+  if (move.pairStatus === "approved" || move.pairStatus === "unpublished") return { percent: 100, label: "Movies complete", detail: "The LAND and FALL pair is complete.", active: false, paused: false };
+  if (move.pairStatus === "owner_review" || latest.every((asset) => asset?.status === "owner_review" || asset?.status === "approved")) return { percent: 90, label: "Ready for your review", detail: "Generation is finished. Review both outcomes below.", active: false, paused: false };
+  if (move.pairStatus === "failed") return { percent: Math.max(30, Math.round(latest.reduce((sum, asset) => sum + outcomeProgress(asset?.status ?? "missing"), 0) / 2)), label: "Generation paused", detail: "Your payment is recorded. Retry generation without paying again.", active: false, paused: true };
+  if (move.pairStatus === "paid") return { percent: 15, label: "Payment confirmed", detail: "The server is preparing the LAND and FALL jobs.", active: true, paused: false };
+  if (move.pairStatus === "queued") return { percent: 25, label: "Jobs queued", detail: "The LAND and FALL jobs are waiting for Seevio.", active: true, paused: false };
+  if (move.pairStatus === "generating" || move.pairStatus === "rerolling") {
+    const percent = Math.max(35, Math.min(85, Math.round(latest.reduce((sum, asset) => sum + outcomeProgress(asset?.status ?? "missing"), 0) / 2)));
+    return { percent, label: move.pairStatus === "rerolling" ? "Reroll rendering" : "Movies rendering", detail: "Seevio is processing the LAND and FALL outcomes independently.", active: true, paused: false };
+  }
+  return { percent: 0, label: "Not started", detail: "No paid movie workflow is running.", active: false, paused: false };
+}
 
 export function isMovePurchasable(status: MovePairStatus): boolean {
   return status === "no_movie" || status === "quoted";
@@ -34,4 +75,3 @@ export function friendlyWalletPaymentError(error: unknown): string {
   }
   return "The wallet did not complete the payment. No movie workflow was started. Reopen your wallet and try again.";
 }
-
