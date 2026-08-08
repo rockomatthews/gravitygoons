@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { createWalletClient, custom, formatEther, getAddress, isAddress } from "viem";
+import { createWalletClient, custom, formatEther, formatUnits, getAddress, isAddress, parseEther, parseUnits } from "viem";
 import { base } from "viem/chains";
+import { Seaport } from "@opensea/seaport-js";
+import { ItemType, NO_CONDUIT } from "@opensea/seaport-js/lib/constants";
+import { BrowserProvider } from "ethers";
 import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { useWallet } from "@/components/WalletProvider";
 import { signatureEdgeForRarity } from "@/lib/gameplay";
@@ -44,8 +47,10 @@ type AthleteLive = {
   challengeStatus?: string;
 };
 type CompetitionProduct = "ranked" | "usdc" | "pink_slip";
+type Listing = { id: string; order_hash: string; token_id: number; offerer_wallet: string; currency: "ETH" | "USDC"; price_minor: string; status: string; expires_at: string; order_payload?: { parameters: Record<string, unknown>; signature: string } };
 
 const PAGE_SIZE = 24;
+const SEAPORT_16_ADDRESS = "0x0000000000000068F116a894984e2DB1123eB395";
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
 const RARITY_PRICE_WEI: Record<string, bigint> = {
   Common: 15_000_000_000_000_000n,
@@ -86,6 +91,13 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const [transferTarget, setTransferTarget] = useState<Token | null>(null);
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferStatus, setTransferStatus] = useState("");
+  const [listingTarget, setListingTarget] = useState<Token | null>(null);
+  const [listingPrice, setListingPrice] = useState("");
+  const [listingCurrency, setListingCurrency] = useState<"ETH" | "USDC">("ETH");
+  const [listingDays, setListingDays] = useState(7);
+  const [listingStatus, setListingStatus] = useState("");
+  const [listingsById, setListingsById] = useState<Map<number, Listing>>(new Map());
+  const [seaportEnabled, setSeaportEnabled] = useState(false);
   const challengeLinkHandled = useRef(false);
 
   const refreshAvailability = useCallback(async () => {
@@ -152,6 +164,22 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     const timer = window.setInterval(refreshRoster, 15_000);
     return () => { window.clearTimeout(initial); window.clearInterval(timer); };
   }, [refreshRoster]);
+
+  const refreshListings = useCallback(async () => {
+    try {
+      const response = await fetch("/api/listings", { cache: "no-store" });
+      const data = await response.json() as { protocol?: { enabled?: boolean }; listings?: Listing[] };
+      if (response.ok) {
+        setSeaportEnabled(Boolean(data.protocol?.enabled));
+        setListingsById(new Map((data.listings ?? []).map((listing) => [listing.token_id, listing])));
+      }
+    } catch { /* primary mint and roster remain usable */ }
+  }, []);
+  useEffect(() => {
+    const initial = window.setTimeout(refreshListings, 0);
+    const timer = window.setInterval(refreshListings, 20_000);
+    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+  }, [refreshListings]);
 
   const filtered = useMemo(() => tokens.filter((token) => {
     const search = `${token.name} ${token.species} ${token.body_build} ${token.discipline} ${token.parody_brand} ${token.play_style} ${token.trick_specialty}`.toLowerCase();
@@ -271,7 +299,9 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   async function submitChallenge() {
     if (!challengeTarget || !challengerTokenId) return;
     try {
-      if (competitionProduct !== "ranked") throw new Error(`${competitionProduct === "usdc" ? "USDC player stakes" : "Pink Slip custody"} remain locked pending their separate legal and independent contract reviews.`);
+      if (competitionProduct === "pink_slip") throw new Error("Pink Slip custody is a separate contract and is not active.");
+      const wagerRequested = competitionProduct === "usdc";
+      if (wagerRequested && process.env.NEXT_PUBLIC_WAGERING_ENABLED !== "true") throw new Error("USDC challenge creation is not active on this deployment yet.");
       const wallet = account ?? await connect();
       if (!wallet) throw new Error("Choose a wallet, then send the challenge again.");
       await ensureProfileSession({ address: wallet, signMessage, signProfileChallenge, onStatus: setStatus });
@@ -287,15 +317,16 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
         "Mode: live_ranked",
         proposedStartAt ? `Scheduled: ${proposedStartAt}` : "",
         `Ruleset: ${ACTIVE_RULESET_HASH}`,
-        "USDC wager requested: no",
+        `USDC wager requested: ${wagerRequested ? "yes" : "no"}`,
+        wagerRequested ? `Stake minor units: ${stakeMinor}` : "",
         "House fee bps: 0",
         `Issued: ${issuedAt}`,
-        "Ranked play only. No wager or token transfer.",
+        wagerRequested ? "Equal player stakes are held by the non-custodial Gravity Goons escrow on Base." : "Ranked play only. No wager or token transfer.",
       ].filter(Boolean).join("\n");
       const signature = await signMessage(lines, wallet);
       const response = await fetch("/api/challenges", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ challengerTokenId, challengedTokenId: challengeTarget.token_id, matchMode: "live_ranked", proposedStartAt, wagerRequested: false, issuedAt, signature }),
+        body: JSON.stringify({ challengerTokenId, challengedTokenId: challengeTarget.token_id, matchMode: "live_ranked", proposedStartAt, wagerRequested, stakeMinor: wagerRequested ? stakeMinor : null, issuedAt, signature }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
@@ -303,6 +334,93 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       setChallengeTarget(null);
       await refreshRoster();
     } catch (error) { setStatus(error instanceof Error ? error.message : "Unable to send challenge."); }
+  }
+
+  function seaportForConnectedWallet() {
+    if (!provider) throw new Error("Connect a wallet first.");
+    const ethersProvider = new BrowserProvider(provider as never);
+    return ethersProvider.getSigner().then((signer) => new Seaport(signer as never, { overrides: {
+      seaportVersion: "1.6", contractAddress: SEAPORT_16_ADDRESS, defaultConduitKey: NO_CONDUIT,
+    } }));
+  }
+
+  async function createListing() {
+    if (!listingTarget) return;
+    setListingStatus("");
+    try {
+      if (!seaportEnabled) throw new Error("Seaport listing creation is not active yet.");
+      const connected = account ?? await connect();
+      if (!connected || !provider) throw new Error("Connect the owner wallet, then try again.");
+      await ensureProfileSession({ address: connected, signMessage, signProfileChallenge, onStatus: setListingStatus });
+      const currentOwner = await publicClient.readContract({ address: collectionAddress, abi: collectionAbi, functionName: "ownerOf", args: [BigInt(listingTarget.token_id)] });
+      if (currentOwner.toLowerCase() !== connected.toLowerCase()) throw new Error("The connected wallet no longer owns this Goon.");
+      const priceMinor = listingCurrency === "ETH" ? parseEther(listingPrice) : parseUnits(listingPrice, 6);
+      if (priceMinor <= 0n) throw new Error("Enter a price greater than zero.");
+      const royaltyRecipient = process.env.NEXT_PUBLIC_ROYALTY_RECIPIENT_ADDRESS;
+      if (!royaltyRecipient || !isAddress(royaltyRecipient) || royaltyRecipient === ZERO_ADDRESS) throw new Error("The royalty recipient is not configured.");
+      const usdc = process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS;
+      if (listingCurrency === "USDC" && (!usdc || !isAddress(usdc))) throw new Error("Base USDC is not configured.");
+      const now = Math.floor(Date.now() / 1000);
+      const seaport = await seaportForConnectedWallet();
+      setListingStatus("Preparing exact Seaport 1.6 approval and listing signature…");
+      const useCase = await seaport.createOrder({
+        conduitKey: NO_CONDUIT, startTime: String(now - 60), endTime: String(now + listingDays * 24 * 60 * 60),
+        offer: [{ itemType: ItemType.ERC721, token: collectionAddress, identifier: String(listingTarget.token_id) }],
+        consideration: [{ amount: priceMinor.toString(), recipient: connected, ...(listingCurrency === "USDC" ? { token: usdc! } : {}) }],
+        fees: [{ recipient: royaltyRecipient, basisPoints: 500 }], allowPartialFills: false, restrictedByZone: false,
+      }, connected, true);
+      setListingStatus(useCase.actions.some((action) => action.type === "approval") ? "Approve only this Goon, then sign the fixed-price listing." : "Sign the fixed-price listing in your wallet.");
+      const order = await useCase.executeAllActions();
+      if (!("parameters" in order) || !("signature" in order)) throw new Error("Seaport did not return a signed order.");
+      const response = await fetch("/api/listings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
+        tokenId: listingTarget.token_id, currency: listingCurrency, priceMinor: priceMinor.toString(), order,
+      }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setListingStatus("Listing is live. The Goon stays in your wallet until a buyer fulfills it.");
+      await refreshListings();
+    } catch (error) { setListingStatus(error instanceof Error ? error.message.split("\n")[0] : "Unable to create listing."); }
+  }
+
+  async function buyListing(listing: Listing) {
+    try {
+      const connected = account ?? await connect();
+      if (!connected || !provider) throw new Error("Connect the buying wallet, then press BUY again.");
+      await ensureProfileSession({ address: connected, signMessage, signProfileChallenge, onStatus: setStatus });
+      const response = await fetch(`/api/listings/${listing.id}`, { cache: "no-store" });
+      const data = await response.json() as { listing?: Listing; error?: string };
+      if (!response.ok || !data.listing?.order_payload) throw new Error(data.error ?? "Listing is no longer available.");
+      if (data.listing.offerer_wallet === connected.toLowerCase()) throw new Error("Use CANCEL LISTING from the owner wallet.");
+      const seaport = await seaportForConnectedWallet();
+      setStatus(`Review the ${listing.currency} purchase and 5% creator royalty in your wallet…`);
+      const useCase = await seaport.fulfillOrder({ order: data.listing.order_payload as never, accountAddress: connected, exactApproval: true });
+      const result = await useCase.executeAllActions();
+      if (!("wait" in result) || typeof result.wait !== "function") throw new Error("Seaport did not return a fulfillment transaction.");
+      const transaction = result as unknown as { hash: string; wait: () => Promise<{ hash?: string } | null> };
+      const receipt = await transaction.wait();
+      const sync = await fetch(`/api/listings/${listing.id}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ txHash: receipt?.hash ?? transaction.hash }) });
+      if (!sync.ok) throw new Error((await sync.json()).error ?? "Purchase confirmed, but listing sync failed.");
+      setStatus("Purchase confirmed on Base. Ownership and the collection wall are refreshing.");
+      await Promise.all([refreshListings(), refreshConnectedOwnership(), refreshRoster()]);
+    } catch (error) { setStatus(error instanceof Error ? error.message.split("\n")[0] : "Purchase cancelled."); }
+  }
+
+  async function cancelListing(listing: Listing) {
+    try {
+      const connected = account ?? await connect();
+      if (!connected || !provider || listing.offerer_wallet !== connected.toLowerCase()) throw new Error("Connect the wallet that created this listing.");
+      await ensureProfileSession({ address: connected, signMessage, signProfileChallenge, onStatus: setStatus });
+      const response = await fetch(`/api/listings/${listing.id}`, { cache: "no-store" });
+      const data = await response.json() as { listing?: Listing; error?: string };
+      if (!response.ok || !data.listing?.order_payload) throw new Error(data.error ?? "Listing not found.");
+      const seaport = await seaportForConnectedWallet();
+      setStatus("Confirm the Seaport cancellation on Base…");
+      const transaction = await seaport.cancelOrders([data.listing.order_payload.parameters as never], connected).transact();
+      const receipt = await transaction.wait();
+      await fetch(`/api/listings/${listing.id}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ txHash: receipt?.hash ?? transaction.hash }) });
+      setStatus("Listing cancelled on Base.");
+      await refreshListings();
+    } catch (error) { setStatus(error instanceof Error ? error.message.split("\n")[0] : "Cancellation failed."); }
   }
 
   return (
@@ -325,6 +443,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
           const active = selected.includes(token.token_id);
           const available = availableIds?.has(token.token_id) !== false;
           const live = liveById.get(token.token_id);
+          const listing = listingsById.get(token.token_id);
           const mine = normalizedAccount !== null && (directOwnedIds.has(token.token_id) || live?.owner === normalizedAccount);
           const eligible = !available && !mine && Boolean(live?.owner) && !live?.matchId && !live?.challengeId
             && myGoons.some((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
@@ -344,7 +463,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>
                 <h3>{token.species} · {token.body_build}</h3>
                 <p className="card-brand">{token.parody_brand} · {token.sport_equipment}</p>
-                <p className="card-price">MINT · {displayEth(RARITY_PRICE_WEI[token.rarity] ?? 0n)} ETH</p>
+                <p className="card-price">{listing ? `FOR SALE · ${listing.currency === "ETH" ? formatUnits(BigInt(listing.price_minor), 18) : formatUnits(BigInt(listing.price_minor), 6)} ${listing.currency}` : available ? `MINT · ${displayEth(RARITY_PRICE_WEI[token.rarity] ?? 0n)} ETH` : "HELD · NOT LISTED"}</p>
                 <p className={`athlete-status status-${cardStatus.toLowerCase().replaceAll(" ", "-")}`}>{cardStatus}</p>
                 {!available && !mine && live?.matchId && <p className="athlete-state">IN MATCH</p>}
                 {!available && !mine && !live?.matchId && live?.challengeId && <p className="athlete-state">CHALLENGE PENDING</p>}
@@ -352,6 +471,9 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
                 {mine && <button className="transfer-button" onClick={() => { setTransferTarget(token); setTransferRecipient(""); setTransferStatus(""); }}>TRANSFER GOON</button>}
+                {mine && !listing && <button className="challenge-button" onClick={() => { setListingTarget(token); setListingPrice(""); setListingCurrency("ETH"); setListingDays(7); setListingStatus(""); }}>LIST FOR SALE</button>}
+                {mine && listing && <button className="challenge-button" onClick={() => cancelListing(listing)}>CANCEL LISTING</button>}
+                {!mine && listing && <button className="challenge-button" onClick={() => buyListing(listing)}>BUY NOW · {listing.currency}</button>}
                 {eligible && <button className="challenge-button" onClick={() => {
                   const eligibleMine = myGoons.filter((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
                   setChallengerTokenId(eligibleMine[0]?.token_id ?? null);
@@ -382,19 +504,38 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
           <p className="challenge-live-lock">LIVE RANKED · BOTH PLAYERS CHECK IN · PUBLIC SCOREBOARD</p>
           <div className="competition-products" aria-label="Competition type">
             <button className={competitionProduct === "ranked" ? "active" : ""} onClick={() => setCompetitionProduct("ranked")}><span>RANKED</span><b>NO WAGER</b><small>AVAILABLE NOW</small></button>
-            <button className={competitionProduct === "usdc" ? "active locked" : "locked"} onClick={() => setCompetitionProduct("usdc")}><span>USDC STAKE</span><b>1 · 5 · 10 · 25 USDC</b><small>LOCKED · AUDIT + LEGAL GATE</small></button>
+            <button className={competitionProduct === "usdc" ? "active" : ""} onClick={() => setCompetitionProduct("usdc")}><span>USDC STAKE</span><b>1 · 5 · 10 · 25 USDC</b><small>{process.env.NEXT_PUBLIC_WAGERING_ENABLED === "true" ? "EQUAL STAKES · BASE USDC" : "ESCROW SETUP IN PROGRESS"}</small></button>
             <button className={competitionProduct === "pink_slip" ? "active pink-slip locked" : "pink-slip locked"} onClick={() => setCompetitionProduct("pink_slip")}><span>PINK SLIP</span><b>WINNER TAKES BOTH GOONS</b><small>LOCKED · SEPARATE NFT ESCROW REQUIRED</small></button>
           </div>
           {competitionProduct === "usdc" && <label>PLAYER STAKE · EACH PLAYER<select value={stakeMinor} onChange={(event) => setStakeMinor(Number(event.target.value))}><option value={1_000_000}>1 USDC</option><option value={5_000_000}>5 USDC</option><option value={10_000_000}>10 USDC</option><option value={25_000_000}>25 USDC</option></select></label>}
           {competitionProduct === "pink_slip" && <p className="pink-slip-warning"><b>PINK SLIP — WINNER TAKES BOTH GOONS</b><span>This will require two explicit custody confirmations from each player, Safe-controlled disputes, and a separately audited NFT escrow. It cannot be enabled by opening the mint.</span></p>}
           <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onChange={(event) => setChallengeStart(event.target.value)} /></label>
-          <p className="challenge-money-lock">PLAYER USDC: LOCKED · PINK SLIP: LOCKED · FREE SPECTATOR PICKS: LIVE</p>
+          <p className="challenge-money-lock">PLAYER USDC: {process.env.NEXT_PUBLIC_WAGERING_ENABLED === "true" ? "LIVE" : "SETUP"} · PINK SLIP: LOCKED · FREE SPECTATOR PICKS: LIVE</p>
           <div className="challenge-comparison">
             <span>{athleteRankLabel(liveById.get(challengerTokenId ?? 0)?.discipline_rank, liveById.get(challengerTokenId ?? 0)?.matches_played ?? 0)}</span>
             <b>{challengeTarget.discipline.toUpperCase()}</b>
             <span>{athleteRankLabel(liveById.get(challengeTarget.token_id)?.discipline_rank, liveById.get(challengeTarget.token_id)?.matches_played ?? 0)}</span>
           </div>
-          <button className="button primary" disabled={competitionProduct !== "ranked"} onClick={submitChallenge}>{competitionProduct === "ranked" ? "SIGN + SEND RANKED CHALLENGE" : competitionProduct === "usdc" ? "USDC STAKES LOCKED" : "PINK SLIP LOCKED"}</button>
+          <button className="button primary" disabled={competitionProduct === "pink_slip" || (competitionProduct === "usdc" && process.env.NEXT_PUBLIC_WAGERING_ENABLED !== "true")} onClick={submitChallenge}>{competitionProduct === "ranked" ? "SIGN + SEND RANKED CHALLENGE" : competitionProduct === "usdc" ? "SIGN + SEND USDC CHALLENGE" : "PINK SLIP LOCKED"}</button>
+        </div>
+      </div>}
+      {listingTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="listing-title">
+        <div>
+          <button className="challenge-close" onClick={() => setListingTarget(null)} aria-label="Close listing">×</button>
+          <p className="eyebrow">SEAPORT 1.6 · BASE · NON-CUSTODIAL</p>
+          <h2 id="listing-title">List #{String(listingTarget.token_id).padStart(4, "0")}</h2>
+          <p>Your Goon stays in your wallet until a buyer fulfills the signed order. Gravity Goons charges no marketplace fee; the immutable 5% creator royalty is included.</p>
+          <label>FIXED PRICE
+            <input inputMode="decimal" value={listingPrice} onChange={(event) => setListingPrice(event.target.value.replace(/[^0-9.]/g, ""))} placeholder={listingCurrency === "ETH" ? "0.05" : "100"} />
+          </label>
+          <label>CURRENCY
+            <select value={listingCurrency} onChange={(event) => setListingCurrency(event.target.value as "ETH" | "USDC")}><option value="ETH">ETH</option><option value="USDC">USDC</option></select>
+          </label>
+          <label>DURATION
+            <select value={listingDays} onChange={(event) => setListingDays(Number(event.target.value))}><option value={1}>1 day</option><option value={3}>3 days</option><option value={7}>7 days</option><option value={30}>30 days</option></select>
+          </label>
+          {listingStatus && <p className="transfer-status" aria-live="polite">{listingStatus}</p>}
+          <button className="button primary" onClick={createListing} disabled={!listingPrice || !seaportEnabled}>{seaportEnabled ? "APPROVE + SIGN LISTING" : "SEAPORT SETUP IN PROGRESS"}</button>
         </div>
       </div>}
       {transferTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="transfer-title">

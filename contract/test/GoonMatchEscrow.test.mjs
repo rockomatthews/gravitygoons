@@ -8,7 +8,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const artifact = (name) => JSON.parse(fs.readFileSync(path.join(root, "artifacts", `${name}.json`)));
 
 describe("GoonMatchEscrow", function () {
-  let chain, provider, owner, settlementSigner, playerA, playerB, outsider, settlementTypedSigner, playerATypedSigner, playerBTypedSigner, usdc, collection, escrow, domain, termsTypes, resultTypes;
+  let chain, provider, owner, settlementSigner, playerA, playerB, outsider, settlementTypedSigner, playerATypedSigner, playerBTypedSigner, usdc, collection, escrow, domain, termsTypes, resultTypes, voidTypes, deployedPaused;
 
   beforeEach(async function () {
     chain = ganache.provider({ logging: { quiet: true }, wallet: { totalAccounts: 7 }, chain: { chainId: 8453 } });
@@ -23,6 +23,8 @@ describe("GoonMatchEscrow", function () {
     await Promise.all([usdc.waitForDeployment(), collection.waitForDeployment()]);
     escrow = await new ContractFactory(artifact("GoonMatchEscrow").abi, artifact("GoonMatchEscrow").bytecode, owner).deploy(owner.address, await usdc.getAddress(), await collection.getAddress(), settlementSigner.address, owner.address);
     await escrow.waitForDeployment();
+    deployedPaused = await escrow.paused();
+    await (await escrow.unpause()).wait();
     await Promise.all([
       (await collection.mint(playerA.address, 34)).wait(), (await collection.mint(playerB.address, 35)).wait(),
       (await usdc.mint(playerA.address, 100_000_000)).wait(), (await usdc.mint(playerB.address, 100_000_000)).wait(),
@@ -39,9 +41,19 @@ describe("GoonMatchEscrow", function () {
       { name: "matchId", type: "bytes32" }, { name: "termsHash", type: "bytes32" }, { name: "winner", type: "address" },
       { name: "resultHash", type: "bytes32" }, { name: "deadline", type: "uint64" },
     ] };
+    voidTypes = { MatchVoid: [
+      { name: "matchId", type: "bytes32" }, { name: "termsHash", type: "bytes32" },
+      { name: "reasonHash", type: "bytes32" }, { name: "deadline", type: "uint64" },
+    ] };
   });
 
   afterEach(async function () { await chain.disconnect(); });
+
+  it("deploys paused and requires the Safe owner to activate funding", async function () {
+    assert.equal(deployedPaused, true);
+    assert.equal(await escrow.paused(), false);
+    await assert.rejects(escrow.connect(outsider).pause());
+  });
 
   async function wagerTerms(stake = 5_000_000, feeBps = 0) {
     const block = await provider.getBlock("latest");
@@ -93,6 +105,25 @@ describe("GoonMatchEscrow", function () {
     await (await escrow.resolveDispute(terms.matchId, ZeroAddress, true)).wait();
     assert.equal((await escrow.matchOf(terms.matchId)).state, 7n);
     assert.equal(await usdc.balanceOf(await escrow.getAddress()), 0n);
+  });
+
+  it("refunds a verified no-show without requiring a Safe transaction", async function () {
+    const terms = await wagerTerms(5_000_000);
+    await fundBoth(terms);
+    await chain.request({ method: "evm_increaseTime", params: [3800] });
+    await chain.request({ method: "evm_mine", params: [] });
+    const stored = await escrow.matchOf(terms.matchId);
+    const reasonHash = keccak256(toUtf8Bytes("gravity-goons:no-show:v1"));
+    const deadline = terms.scheduledStart + 3600n;
+    const signature = await settlementTypedSigner.signTypedData(domain, voidTypes, {
+      matchId: terms.matchId, termsHash: stored.termsHash, reasonHash, deadline,
+    });
+    await assert.rejects(escrow.voidWithSignature(terms.matchId, keccak256(toUtf8Bytes("different reason")), deadline, signature));
+    const [beforeA, beforeB] = await Promise.all([usdc.balanceOf(playerA.address), usdc.balanceOf(playerB.address)]);
+    await (await escrow.connect(outsider).voidWithSignature(terms.matchId, reasonHash, deadline, signature)).wait();
+    assert.equal((await escrow.matchOf(terms.matchId)).state, 7n);
+    assert.equal((await usdc.balanceOf(playerA.address)) - beforeA, 5_000_000n);
+    assert.equal((await usdc.balanceOf(playerB.address)) - beforeB, 5_000_000n);
   });
 
   it("caps the Safe-controlled house fee at 2.5 percent", async function () {

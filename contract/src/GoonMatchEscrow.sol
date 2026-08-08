@@ -29,6 +29,9 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
     bytes32 public constant RESULT_TYPEHASH = keccak256(
         "MatchResult(bytes32 matchId,bytes32 termsHash,address winner,bytes32 resultHash,uint64 deadline)"
     );
+    bytes32 public constant VOID_TYPEHASH = keccak256(
+        "MatchVoid(bytes32 matchId,bytes32 termsHash,bytes32 reasonHash,uint64 deadline)"
+    );
 
     enum State { None, Created, PartiallyFunded, Locked, ResultProposed, Settled, Refunded, Voided, Disputed }
 
@@ -88,6 +91,7 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
     event MatchFunded(bytes32 indexed matchId, address indexed player, bool fullyFunded);
     event ResultProposed(bytes32 indexed matchId, address indexed winner, bytes32 indexed resultHash, uint64 disputeDeadline);
     event MatchDisputed(bytes32 indexed matchId, address indexed player);
+    event MatchVoided(bytes32 indexed matchId, bytes32 indexed reasonHash);
     event MatchSettled(bytes32 indexed matchId, address indexed winner, uint256 payout, uint256 fee);
     event MatchRefunded(bytes32 indexed matchId, bool voided);
     event SettlementSignerChanged(address indexed signer);
@@ -102,6 +106,7 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
         settlementSigner = initialSettlementSigner;
         feeRecipient = initialFeeRecipient;
         houseFeeBps = 0;
+        _pause();
     }
 
     function matchOf(bytes32 matchId) external view returns (EscrowMatch memory) { return _matches[matchId]; }
@@ -177,6 +182,20 @@ contract GoonMatchEscrow is Ownable2Step, Pausable, ReentrancyGuard, EIP712 {
         if (msg.sender != wager.playerA && msg.sender != wager.playerB) revert NotPlayer();
         wager.state = State.Disputed;
         emit MatchDisputed(matchId, msg.sender);
+    }
+
+    /// @notice Refunds a locked match after the authoritative server signs a void reason
+    /// (for example, a verified player no-show). This avoids making players wait for a
+    /// Safe transaction while keeping arbitrary callers unable to cancel live matches.
+    function voidWithSignature(bytes32 matchId, bytes32 reasonHash, uint64 deadline, bytes calldata signature) external nonReentrant {
+        EscrowMatch storage wager = _matches[matchId];
+        if (wager.state != State.Locked) revert InvalidState();
+        if (reasonHash == bytes32(0) || block.timestamp < wager.scheduledStart || block.timestamp > deadline) revert InvalidTerms();
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(VOID_TYPEHASH, matchId, wager.termsHash, reasonHash, deadline)));
+        if (!_validSignature(wager.matchSettlementSigner, digest, signature)) revert InvalidSignature();
+        wager.resultHash = reasonHash;
+        emit MatchVoided(matchId, reasonHash);
+        _refund(matchId, wager, true);
     }
 
     function finalize(bytes32 matchId) external nonReentrant {

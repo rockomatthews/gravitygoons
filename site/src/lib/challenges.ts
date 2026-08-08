@@ -38,7 +38,7 @@ export function challengeConfirmationMessage(wallet: string, input: ChallengeCon
     input.stakeMinor ? `Stake minor units: ${input.stakeMinor}` : "",
     input.houseFeeBps != null ? `House fee bps: ${input.houseFeeBps}` : "",
     `Issued: ${input.issuedAt}`,
-    "Ranked play only. No wager or token transfer.",
+    input.wagerRequested ? "Equal player stakes are held by the non-custodial Gravity Goons escrow on Base." : "Ranked play only. No wager or token transfer.",
   ].filter(Boolean).join("\n");
 }
 
