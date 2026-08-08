@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { WalletProvider } from "@/components/WalletProvider";
+import { ChatDock } from "@/components/ChatDock";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body><WalletProvider>{children}</WalletProvider></body>
+      <body><WalletProvider>{children}<ChatDock /></WalletProvider></body>
     </html>
   );
 }

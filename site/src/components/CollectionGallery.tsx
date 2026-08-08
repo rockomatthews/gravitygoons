@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { createWalletClient, custom, formatEther, getAddress, isAddress } from "viem";
 import { base } from "viem/chains";
@@ -86,6 +86,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
   const [transferTarget, setTransferTarget] = useState<Token | null>(null);
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferStatus, setTransferStatus] = useState("");
+  const challengeLinkHandled = useRef(false);
 
   const refreshAvailability = useCallback(async () => {
     if (collectionAddress === ZERO_ADDRESS) {
@@ -176,6 +177,30 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     if (!normalizedAccount) return [];
     return tokens.filter((token) => directOwnedIds.has(token.token_id) || liveById.get(token.token_id)?.owner === normalizedAccount);
   }, [directOwnedIds, tokens, liveById, normalizedAccount]);
+
+  useEffect(() => {
+    if (challengeLinkHandled.current || !normalizedAccount || availableIds === null || !myGoons.length) return;
+    const params = new URLSearchParams(window.location.search);
+    const targetId = Number(params.get("challengeToken"));
+    if (!Number.isInteger(targetId) || targetId < 1 || targetId > 1000) return;
+    const target = tokensById.get(targetId);
+    const live = liveById.get(targetId);
+    if (!target || availableIds.has(targetId) || live?.owner === normalizedAccount || !live?.owner || live.matchId || live.challengeId) return;
+    const eligibleMine = myGoons.filter((candidate) => candidate.discipline === target.discipline && !liveById.get(candidate.token_id)?.matchId);
+    if (!eligibleMine.length) return;
+    challengeLinkHandled.current = true;
+    const timer = window.setTimeout(() => {
+      setChallengerTokenId(eligibleMine[0].token_id);
+      const now = Date.now();
+      setChallengeBounds({ min: new Date(now + 30 * 60_000).toISOString().slice(0, 16), max: new Date(now + 7 * 24 * 60 * 60_000).toISOString().slice(0, 16) });
+      setChallengeStart("");
+      setCompetitionProduct("ranked");
+      setChallengeTarget(target);
+      params.delete("challengeToken");
+      window.history.replaceState({}, "", `${window.location.pathname}${params.size ? `?${params}` : ""}#collection`);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [availableIds, liveById, myGoons, normalizedAccount, tokensById]);
 
   function toggle(tokenId: number) {
     if (availableIds?.has(tokenId) === false) return;
