@@ -8,6 +8,7 @@ import { base } from "viem/chains";
 import type { ProfileGoon, StudioMove } from "@/lib/profile-types";
 import { useWallet } from "@/components/WalletProvider";
 import { authenticateProfileSession } from "@/lib/profile-auth-client";
+import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, moveWorkflowLabel } from "@/lib/move-studio-ui";
 
 const USDC_ADDRESS = (process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913") as `0x${string}`;
 const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_MOVE_TREASURY_ADDRESS as `0x${string}` | undefined;
@@ -26,7 +27,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
   const [status, setStatus] = useState("Sign in from My Profile with the current owner wallet to unlock movie controls.");
   const [busy, setBusy] = useState(false);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (preserveStatus = false) => {
     const response = await fetch(`/api/moves/studio/${tokenId}`, { cache: "no-store" });
     const data = await response.json();
     if (!response.ok) {
@@ -34,9 +35,9 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       return;
     }
     setStudio(data);
-    const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && move.pairStatus === "no_movie");
+    const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && isMovePurchasable(move.pairStatus));
     setSelectedTrickId((current) => current ?? firstPurchasable?.trickId ?? null);
-    setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
+    if (!preserveStatus) setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
   }, [tokenId]);
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         if (!active) return;
         if (!ok) return setStatus(data.error);
         setStudio(data);
-        const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && move.pairStatus === "no_movie");
+        const firstPurchasable = data.moves.find((move: StudioMove) => move.unlocked && isMovePurchasable(move.pairStatus));
         setSelectedTrickId((current) => current ?? firstPurchasable?.trickId ?? null);
         setStatus(data.demo ? "Demo studio active. Database writes, payments, and paid generation remain safely simulated." : "Owner verified. Choose any unlocked move that lacks a completed movie pair.");
       })
@@ -99,17 +100,49 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
         if (!address || !provider) throw new Error("Choose the paying wallet, then confirm the quote again.");
         const wallet = createWalletClient({ chain: base, transport: custom(provider) });
         setStatus("Confirm the one-time Base USDC payment in your wallet…");
-        txHash = await wallet.writeContract({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "transfer", args: [TREASURY_ADDRESS, BigInt(quote.amountMinorUnits)], account: address });
+        try {
+          txHash = await wallet.writeContract({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "transfer", args: [TREASURY_ADDRESS, BigInt(quote.amountMinorUnits)], account: address });
+        } catch (error) {
+          throw new Error(friendlyWalletPaymentError(error));
+        }
       }
       setStatus("Payment submitted. Verifying it server-side before either Seevio job is created…");
       const response = await fetch("/api/moves/payment/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ orderId: quote.orderId, txHash }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      setStatus(quote.demo ? "Demo payment confirmed. In production this starts two asynchronous Seevio jobs." : "Payment confirmed. LAND and FALL jobs are now queued with Seevio; you can leave this page and return later.");
+      const finalMessage = data.generation?.retryRequired
+        ? data.generation.message
+        : quote.demo
+          ? "Demo payment confirmed. In production this starts two asynchronous Seevio jobs."
+          : "Payment confirmed. LAND and FALL jobs are now queued with Seevio; you can leave this page and return later.";
+      if (data.generation?.retryRequired) setActionError(finalMessage);
       setQuote(null);
-      await refresh();
+      await refresh(true);
+      setStatus(finalMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Payment was not completed.";
+      setStatus(message);
+      setActionError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function retryGeneration(move: StudioMove) {
+    if (!move.pairId) return;
+    setBusy(true);
+    setActionError("");
+    setStatus(`Retrying ${move.name} LAND and FALL generation. No wallet payment is required…`);
+    try {
+      const response = await fetch("/api/moves/generation/retry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pairId: move.pairId }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      const finalMessage = data.generation?.retryRequired ? data.generation.message : `${move.name} LAND and FALL jobs are queued. No additional USDC was charged.`;
+      if (data.generation?.retryRequired) setActionError(finalMessage);
+      await refresh(true);
+      setStatus(finalMessage);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Generation could not be retried yet. Your confirmed payment remains recorded.";
       setStatus(message);
       setActionError(message);
     } finally {
@@ -134,7 +167,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
 
   const goon = studio?.goon ?? fallbackGoon;
   const moves = studio?.moves ?? fallbackGoon.moves.map((move) => ({ ...move, outcomes: [], quotedPriceUsdc: "$12.00 USDC" }));
-  const purchasableMoves = moves.filter((move) => move.unlocked && move.pairStatus === "no_movie");
+  const purchasableMoves = moves.filter((move) => move.unlocked && isMovePurchasable(move.pairStatus));
   const selectedPurchasableMove = purchasableMoves.find((move) => move.trickId === selectedTrickId) ?? purchasableMoves[0] ?? null;
 
   return (
@@ -162,7 +195,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
       <section className="studio-move-grid">
         {moves.map((move) => (
           <article className={`studio-move-card state-${move.pairStatus}${selectedPurchasableMove?.trickId === move.trickId ? " is-selected" : ""}`} key={move.trickId}>
-            <div className="studio-move-title"><span>DIFFICULTY {move.difficulty}</span><i>{move.pairStatus.replaceAll("_", " ")}</i><h2>{move.name}</h2></div>
+            <div className="studio-move-title"><span>DIFFICULTY {move.difficulty}</span><i>{moveWorkflowLabel(move.pairStatus)}</i><h2>{move.name}</h2></div>
             <div className="outcome-pair">
               {(["land", "fall"] as const).map((outcome) => {
                 const asset = move.outcomes.filter((item) => item.outcome === outcome).sort((a, b) => b.version - a.version)[0];
@@ -176,7 +209,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
                 );
               })}
             </div>
-            <footer><b>{move.quotedPriceUsdc}</b><span>INCLUDES LAND + FALL</span><button onClick={() => { if (!studio) return unlockOwnerStudio(); setSelectedTrickId(move.trickId); setQuote(null); setActionError(""); document.getElementById("studio-trick-picker-title")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} disabled={busy || !move.unlocked || (Boolean(studio) && move.pairStatus !== "no_movie")}>{move.unlocked ? studio ? move.pairStatus === "no_movie" ? selectedPurchasableMove?.trickId === move.trickId ? "SELECTED" : "SELECT THIS TRICK" : "WORKFLOW STARTED" : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
+            <footer><b>{move.quotedPriceUsdc}</b><span>{isMoveGenerationRetryable(move.pairStatus) ? "PAYMENT ALREADY CONFIRMED" : "INCLUDES LAND + FALL"}</span><button onClick={() => { if (!studio) return unlockOwnerStudio(); if (isMoveGenerationRetryable(move.pairStatus)) return retryGeneration(move); setSelectedTrickId(move.trickId); setQuote(null); setActionError(""); document.getElementById("studio-trick-picker-title")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} disabled={busy || !move.unlocked || (Boolean(studio) && !isMovePurchasable(move.pairStatus) && !isMoveGenerationRetryable(move.pairStatus))}>{move.unlocked ? studio ? isMoveGenerationRetryable(move.pairStatus) ? "RETRY GENERATION — NO CHARGE" : isMovePurchasable(move.pairStatus) ? selectedPurchasableMove?.trickId === move.trickId ? move.pairStatus === "quoted" ? "REVIEW / PAY" : "SELECTED" : move.pairStatus === "quoted" ? "REVIEW / PAY" : "SELECT THIS TRICK" : "WORKFLOW IN PROGRESS" : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
           </article>
         ))}
       </section>

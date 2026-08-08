@@ -25,6 +25,14 @@ type SeevioCreateResponse = {
   error?: { code?: string; message?: string };
 };
 
+export function publicSeevioFailureMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.toLowerCase().includes("insufficient credits")) {
+    return "Your $12 USDC payment is confirmed and recorded. Seevio needs more generation credits before LAND and FALL can start. Add Seevio credits, then press RETRY GENERATION — NO CHARGE.";
+  }
+  return "Your $12 USDC payment is confirmed and recorded, but Seevio could not start the movies. Press RETRY GENERATION — NO CHARGE after the provider is available.";
+}
+
 export async function submitSeevioJob(input: { prompt: string; imageUrl: string; idempotencyKey: string }): Promise<string | null> {
   const apiKey = process.env.SEEVIO_API_KEY;
   const webhookUrl = callbackUrl();

@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { seevioConfigured, submitSeevioJob, verifySeevioWebhookToken } from "./seevio-server.ts";
+import { publicSeevioFailureMessage, seevioConfigured, submitSeevioJob, verifySeevioWebhookToken } from "./seevio-server.ts";
+
+test("distinguishes provider credits from the owner's wallet payment", () => {
+  const message = publicSeevioFailureMessage(new Error("Insufficient credits to accept this task."));
+  assert.match(message, /payment is confirmed and recorded/i);
+  assert.match(message, /Seevio needs more generation credits/i);
+  assert.match(message, /NO CHARGE/);
+});
 
 test("submits the documented Seevio image-to-video request with a protected callback", async () => {
   const originalFetch = globalThis.fetch;
