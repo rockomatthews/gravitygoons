@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     description: "Choose your Goon. Call the trick. Play the odds.",
     images: ["/og.png"],
   },
+  other: {
+    "base:app_id": "6a78436c85896ee8433316e6",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
