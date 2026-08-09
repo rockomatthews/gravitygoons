@@ -471,7 +471,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
                 <p className="signature-edge">{token.trick_specialty} · SIGNATURE EDGE +{signatureEdgeForRarity(token.rarity)}%</p>
                 <div className="mini-stats"><span>SPD {token.stats.Speed}</span><span>AIR {token.stats.Air}</span><span>CTL {token.stats.Control}</span><span>STY {token.stats.Style}</span><span>TGH {token.stats.Toughness}</span></div>
                 {mine && <button className="transfer-button" onClick={() => { setTransferTarget(token); setTransferRecipient(""); setTransferStatus(""); }}>TRANSFER GOON</button>}
-                {mine && !listing && <button className="challenge-button" onClick={() => { setListingTarget(token); setListingPrice(""); setListingCurrency("ETH"); setListingDays(7); setListingStatus(""); }}>LIST FOR SALE</button>}
+                {mine && !listing && <button className="challenge-button list-for-sale-button" onClick={() => { setListingTarget(token); setListingPrice(""); setListingCurrency("ETH"); setListingDays(7); setListingStatus(""); }}>LIST FOR SALE</button>}
                 {mine && listing && <button className="challenge-button" onClick={() => cancelListing(listing)}>CANCEL LISTING</button>}
                 {!mine && listing && <button className="challenge-button" onClick={() => buyListing(listing)}>BUY NOW · {listing.currency}</button>}
                 {eligible && <button className="challenge-button" onClick={() => {
