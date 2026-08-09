@@ -64,9 +64,9 @@ export function ZeroGBar() {
 
       <div className="zero-g-copy">
         <p className="eyebrow">WELCOME TO THE ZERO-G BAR</p>
-        <h1>Pick a Goon.<br /><i>Call the trick.</i></h1>
-        <p>Every screen leads to the game. The bathroom door leads to your profile. The roster below is where rivals meet.</p>
-        <a className="button primary" href="#collection">ENTER THE ROSTER</a>
+        <h1>Pick a Goon.<br /><i>Call the trick.</i><br />Take the letters.</h1>
+        <p>Most NFTs sit in wallets. Gravity Goons compete live across six action-sports disciplines on Base.</p>
+        <Link className="button primary" href="/collection">ENTER THE ROSTER</Link>
       </div>
       <button className="zero-g-sound" onClick={() => setMuted((value) => !value)} aria-pressed={!muted}>
         {muted ? "SOUND OFF" : "SOUND ON"}

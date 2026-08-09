@@ -13,6 +13,7 @@ import { signatureEdgeForRarity } from "@/lib/gameplay";
 import { ACTIVE_RULESET_HASH } from "@/lib/match-terms";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import { athleteRankLabel } from "@/lib/rank-display";
+import { trackMarketingEvent } from "@/lib/analytics";
 
 type Token = {
   token_id: number;
@@ -64,10 +65,10 @@ function displayEth(wei: bigint): string {
   return Number(formatEther(wei)).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
 }
 
-export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; imageBaseUrl: string }) {
+export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "All" }: { tokens: Token[]; imageBaseUrl: string; initialDiscipline?: string }) {
   const { account, connect, provider, signMessage, signProfileChallenge, message: walletMessage } = useWallet();
   const normalizedAccount = account?.toLowerCase() ?? null;
-  const [discipline, setDiscipline] = useState("All");
+  const [discipline, setDiscipline] = useState(disciplines.includes(initialDiscipline) ? initialDiscipline : "All");
   const [cast, setCast] = useState("All");
   const [bodyBuild, setBodyBuild] = useState("All");
   const [rarity, setRarity] = useState("All");
@@ -235,6 +236,8 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     setSelected((current) => {
       if (current.includes(tokenId)) return current.filter((id) => id !== tokenId);
       if (current.length === 5) return current;
+      const token = tokensById.get(tokenId);
+      trackMarketingEvent("mint_selected", { token_id: tokenId, discipline: token?.discipline, rarity: token?.rarity, selection_size: current.length + 1 });
       return [...current, tokenId];
     });
   }
@@ -249,6 +252,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       const wallet = createWalletClient({ chain: base, transport: custom(provider) });
       const authoritativePrice = await publicClient.readContract({ address: collectionAddress, abi: collectionAbi, functionName: "mintPriceFor", args: [selected] });
       if (authoritativePrice !== selectedTotal) throw new Error("The on-chain rarity price changed. Refresh the collection before minting.");
+      trackMarketingEvent("mint_started", { token_count: selected.length, total_eth: displayEth(authoritativePrice), token_ids: selected.join(",") });
       setStatus("Confirm the exact-token mint in your wallet…");
       const hash = await wallet.writeContract({
         address: collectionAddress,
@@ -260,6 +264,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       });
       setStatus(`Mint submitted ${hash.slice(0, 12)}… Waiting for Base confirmation.`);
       await publicClient.waitForTransactionReceipt({ hash });
+      trackMarketingEvent("mint_succeeded", { token_count: selected.length, total_eth: displayEth(authoritativePrice), token_ids: selected.join(","), transaction_hash: hash });
       setStatus("Mint confirmed. Your Gravity Goons are now in your wallet.");
       setSelected([]);
       await refreshAvailability();
@@ -330,6 +335,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
+      trackMarketingEvent("challenge_created", { challenger_token_id: challengerTokenId, challenged_token_id: challengeTarget.token_id, discipline: challengeTarget.discipline, product: competitionProduct, stake_minor: wagerRequested ? stakeMinor : null });
       setStatus(`Challenge sent for #${String(challengeTarget.token_id).padStart(4, "0")}. It expires in 72 hours.`);
       setChallengeTarget(null);
       await refreshRoster();
@@ -377,6 +383,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
       }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
+      trackMarketingEvent("listing_created", { token_id: listingTarget.token_id, currency: listingCurrency, price_minor: priceMinor.toString(), listing_days: listingDays });
       setListingStatus("Listing is live. The Goon stays in your wallet until a buyer fulfills it.");
       await refreshListings();
     } catch (error) { setListingStatus(error instanceof Error ? error.message.split("\n")[0] : "Unable to create listing."); }
@@ -427,13 +434,13 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
     <div>
       <div className="filter-bar">
         <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Search token, species, sport…" />
-        <select value={discipline} onChange={(event) => { setDiscipline(event.target.value); setPage(1); }}>{disciplines.map((item) => <option key={item}>{item}</option>)}</select>
+        <select value={discipline} onChange={(event) => { setDiscipline(event.target.value); setPage(1); trackMarketingEvent("roster_filter_used", { filter: "discipline", value: event.target.value }); }}>{disciplines.map((item) => <option key={item}>{item}</option>)}</select>
         <select value={cast} onChange={(event) => { setCast(event.target.value); setPage(1); }}>{["All", "Animal", "Human"].map((item) => <option key={item}>{item}</option>)}</select>
         <select value={bodyBuild} onChange={(event) => { setBodyBuild(event.target.value); setPage(1); }}>{["All", "Lean", "Athletic", "Power", "Compact"].map((item) => <option key={item}>{item}</option>)}</select>
-        <select value={rarity} onChange={(event) => { setRarity(event.target.value); setPage(1); }}>{["All", "Common", "Uncommon", "Rare", "Epic", "Legendary"].map((item) => <option key={item}>{item}</option>)}</select>
+        <select value={rarity} onChange={(event) => { setRarity(event.target.value); setPage(1); trackMarketingEvent("roster_filter_used", { filter: "rarity", value: event.target.value }); }}>{["All", "Common", "Uncommon", "Rare", "Epic", "Legendary"].map((item) => <option key={item}>{item}</option>)}</select>
         <select value={brand} onChange={(event) => { setBrand(event.target.value); setPage(1); }}>{brands.map((item) => <option key={item}>{item}</option>)}</select>
         <select value={playStyle} onChange={(event) => { setPlayStyle(event.target.value); setPage(1); }}>{["All", "Speed", "Air", "Control", "Style", "Toughness"].map((item) => <option key={item}>{item}</option>)}</select>
-        <select value={availabilityFilter} onChange={(event) => { setAvailabilityFilter(event.target.value); setPage(1); }}>{["Available", "Sold", "All"].map((item) => <option key={item}>{item}</option>)}</select>
+        <select value={availabilityFilter} onChange={(event) => { setAvailabilityFilter(event.target.value); setPage(1); trackMarketingEvent("roster_filter_used", { filter: "availability", value: event.target.value }); }}>{["Available", "Sold", "All"].map((item) => <option key={item}>{item}</option>)}</select>
         <span className={`result-count ${saleOpen ? "live" : ""}`}>{saleOpen ? "● MINT LIVE" : "MINT CLOSED"} · {availableIds?.size ?? "—"} LEFT</span>
       </div>
 
@@ -454,7 +461,7 @@ export function CollectionGallery({ tokens, imageBaseUrl }: { tokens: Token[]; i
               : `Owned by ${live?.ownerName ?? "Goon Holder"}`;
           return (
             <article className={`token-card ${active ? "selected" : ""} ${mine ? "mine" : ""}`} key={token.token_id}>
-              <button className="card-image" onClick={() => toggle(token.token_id)} aria-label={available ? `Select ${token.name}` : `${token.name} is owned`} disabled={!available}>
+              <button className="card-image" onClick={() => { trackMarketingEvent("goon_viewed", { token_id: token.token_id, discipline: token.discipline, rarity: token.rarity, availability: available ? "available" : "owned" }); toggle(token.token_id); }} aria-label={available ? `Select ${token.name}` : `${token.name} is owned`} disabled={!available}>
                 <Image src={imageBaseUrl + "/" + String(token.token_id).padStart(4, "0") + ".png"} alt={token.name} width={1024} height={1024} />
                 <span className={`rarity rarity-${token.rarity.toLowerCase()}`}>{token.rarity}</span>
                 <span className="select-mark">{available ? active ? "SELECTED" : "+ SELECT" : mine ? "YOURS" : "OWNED"}</span>

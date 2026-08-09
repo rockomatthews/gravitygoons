@@ -1,0 +1,52 @@
+priority,target,category,channel,reason,status,next_action
+1,Base,Base ecosystem,X/Base.dev,Primary chain and app-discovery ecosystem,verified,Complete Base.dev profile and submit product proof
+2,Base App,Base ecosystem,X/App,Mobile wallet and app-discovery surface,verified,Provide mobile screenshots and exact roster URL
+3,Base Builders,Base ecosystem,Community,Builder visibility and funding programs,research,Find current submission form and showcase cadence
+4,Base Grants,Base ecosystem,Application,Retroactive builder funding for shipped products,verified,Apply after first measured usage report
+5,r/BASE,Base community,Reddit,Current founder AMA and onchain gaming discussions,verified,Pitch a product-led founder AMA
+6,B3,Onchain gaming,X/Community,Base-connected gaming ecosystem,verified,Offer a six-sport live exhibition
+7,OpenSea,NFT marketplace,Collection page,Collection storytelling and secondary discovery,verified,Claim and complete collection overview
+8,DappRadar,Dapp directory,Submission,Dapp and NFT discovery,research,Confirm current Base collection submission support
+9,Defiprime,Web3 directory,Application,Editorial discovery for crypto users,in_progress,Complete existing listing application
+10,NFT Calendar,NFT directory,Submission,Live mint calendar discovery,research,Confirm already-live mint eligibility
+11,GAM3S.GG,Web3 gaming,Editorial/X,Web3 game discovery and awards audience,research,Pitch playable NFT league demo
+12,Blockchain Game Alliance,Web3 gaming,Community,Industry membership and event network,research,Ask about indie project showcase
+13,Onchain Gaming Alliance,Web3 gaming,Community,Onchain-native game audience,research,Find current community contact
+14,PlayToEarn,Web3 gaming,Editorial,Game directory and content audience,research,Submit game profile after analytics are live
+15,NFT Plazas,NFT media,Editorial,Collector and NFT gaming coverage,research,Pitch exact-ID versus random reveal story
+16,nft now,NFT media,Editorial/X,NFT culture and product coverage,research,Pitch playable utility case study
+17,Edge of NFT,Web3 media,Podcast,Web3 gaming and creator-economy interviews,verified,Offer written Q&A or branded demo
+18,DIXO OnChain,Base media,Podcast platform,Base-connected podcast discovery,verified,Approach relevant listed shows
+19,OnchainCreator,Creator marketplace,Marketplace,Verified Web3 creator campaign marketplace,verified,Evaluate creators within $75 pilot ceiling
+20,Layer3,Web3 acquisition,Partnership,Quest and onchain user acquisition,research,Explore no-spend community collaboration first
+21,Galxe,Web3 acquisition,Partnership,Base services hub growth option,research,Request pricing only after baseline conversion exists
+22,Zora,Onchain creator ecosystem,X/Community,Creator and collectible audience,research,Join utility and creator discussions
+23,Highlight,NFT infrastructure,X/Community,NFT creator and launch audience,research,Pitch post-mint gameplay story
+24,Manifold,NFT creator ecosystem,X/Community,Established NFT creator audience,research,Contribute to utility discussions
+25,Nouns,Onchain community,Community,Strong public-goods and experimental brand culture,research,Seek feedback rather than sponsorship
+26,The Berrics,Skate media,Editorial/social,Large skate media and trick audience,research,Start with relevant trick-format engagement
+27,Jenkem,Skate media,Editorial,Distinctive skate culture and editorial voice,research,Pitch only after skate proof clips are strong
+28,Thrasher,Skate media,Social/editorial,Core skate audience,research,Organic sport contribution only
+29,Skateboarding.com,Skate media,Editorial,Skate news and culture audience,research,Pitch game-mechanics story
+30,Woodward,Action sports,Community/social,Multi-discipline action-sports training audience,research,Explore digital exhibition collaboration
+31,X Games,Action sports,Social,Shared skate BMX moto ski snow audience,research,Engage event and trick conversations without mass tagging
+32,Edge Action Sports,Action sports,Partnership,Online BMX skate moto coaching platform,verified,Propose educational trick collaboration
+33,Extreme International,Action sports,Creator network,Multi-sport creator and media network,verified,Request small-project creator recommendations
+34,Our BMX,BMX media,Editorial/social,Dedicated BMX video audience,research,Pitch BMX week only after clip review
+35,DIG BMX,BMX media,Editorial/social,Established BMX culture audience,research,Participate in relevant trick discussions
+36,Vital BMX,BMX media,Editorial/social,BMX news and gear audience,research,Pitch interactive athlete comparison
+37,Scotty Cranmer,BMX creator,YouTube/social,BMX creator and competition credibility,research,Do not cold-pitch until smaller BMX pilots convert
+38,Racer X,Motocross media,Editorial/social,Motocross news audience,research,Pitch Moto week product demo
+39,Vital MX,Motocross media,Editorial/social,Motocross enthusiast audience,research,Contribute mechanics-aware replies
+40,MX Vice,Motocross media,Editorial/social,Motocross news and commentary audience,research,Find appropriate indie/digital culture contact
+41,Surfer,Surf media,Editorial/social,Surf culture audience,research,Pitch Surf week only with accurate motion assets
+42,Stab,Surf media,Editorial/social,Surf culture and strong editorial voice,research,Lead with game format not NFT language
+43,Surfline,Surf media,Social/editorial,Large surf participation audience,research,Organic discussion only until proof exists
+44,SNOWBOARDER,Snow media,Editorial/social,Snowboard culture and trick audience,research,Pitch SHRED exhibition format
+45,Method Mag,Snow media,Editorial/social,Snowboard culture audience,research,Engage trick and style discussions
+46,SLUSH,Snow media,Editorial/social,Snowboarding editorial and video audience,research,Offer branded product walkthrough
+47,FREESKIER,Ski media,Editorial/social,Freeski culture and trick audience,research,Pitch SLOPE exhibition
+48,Newschoolers,Ski community,Community/editorial,Core freeski community and forums,research,Ask for community feedback before promotion
+49,Red Bull Bike,Action-sports media,Social,BMX and bike trick audience,research,Organic trick-education engagement only
+50,Red Bull Skateboarding,Action-sports media,Social,Skateboarding trick and athlete audience,research,Organic trick-education engagement only
+

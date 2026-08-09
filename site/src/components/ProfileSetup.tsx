@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import { authenticateProfileSession, fetchWithTimeout, prepareProfileSignIn, type ProfileSignInChallenge } from "@/lib/profile-auth-client";
+import { trackMarketingEvent } from "@/lib/analytics";
 
 type ProfileRecord = { username: string; display_name: string; bio: string };
 
@@ -88,10 +89,12 @@ export function ProfileSetup() {
   async function saveProfile() {
     setBusy(true);
     try {
+      const creatingProfile = !profile;
       const response = await fetchWithTimeout("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ username, displayName, bio }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setProfile(data.profile);
+      if (creatingProfile) trackMarketingEvent("profile_created", { username: data.profile.username });
       setStatus(`Profile saved. gravitygoons.com/${data.profile.username} is ready.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Unable to save profile.");

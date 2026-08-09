@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import {
@@ -9,6 +9,7 @@ import {
   type MatchActionPresentation, type MatchAttempt, type MatchTurnResult, type MoveOutcomeVisual,
 } from "@/lib/match-presentation";
 import type { CallMode } from "@/lib/pvp";
+import { trackMarketingEvent } from "@/lib/analytics";
 
 type AvailableTrick = { id: number; name: string; difficulty: number };
 type RankedGoon = { tokenId: number; name: string; species: string; parodyBrand: string; image: string };
@@ -118,6 +119,8 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   const [callMode, setCallMode] = useState<CallMode>("standard");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [revealedTurnNumber, setRevealedTurnNumber] = useState(0);
+  const trackedStarted = useRef(false);
+  const trackedCompleted = useRef(false);
 
   const refresh = useCallback(async () => {
     const response = await fetch(`/api/matches/${matchId}`, {
@@ -148,6 +151,18 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     updateClock();
     const timer = window.setInterval(updateClock, 1_000);
     return () => window.clearInterval(timer);
+  }, [match]);
+
+  useEffect(() => {
+    if (!match) return;
+    if (match.status === "matched" && !trackedStarted.current) {
+      trackedStarted.current = true;
+      trackMarketingEvent("match_started", { match_id: match.id, first_token_id: match.first_token_id, second_token_id: match.second_token_id, match_word: match.match_word });
+    }
+    if (match.status !== "matched" && match.winner_token_id && !trackedCompleted.current) {
+      trackedCompleted.current = true;
+      trackMarketingEvent("match_completed", { match_id: match.id, winner_token_id: match.winner_token_id, first_token_id: match.first_token_id, second_token_id: match.second_token_id, turns: match.actions.length });
+    }
   }, [match]);
 
   const lastTurn = (() => {
@@ -204,6 +219,19 @@ export function RankedMatch({ matchId }: { matchId: string }) {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function shareResult() {
+    if (!match?.winner_token_id) return;
+    const text = `Goon #${padToken(match.winner_token_id)} just won a live Gravity Goons match. Pick your Goon. Call your trick. Take the letters.`;
+    const url = `${window.location.origin}/arena/matches/${matchId}?utm_source=match_result&utm_medium=share&utm_campaign=goon_league_launch`;
+    const canShareNatively = typeof navigator.share === "function";
+    trackMarketingEvent("result_shared", { match_id: matchId, winner_token_id: match.winner_token_id, method: canShareNatively ? "native" : "x" });
+    if (canShareNatively) {
+      await navigator.share({ title: "Gravity Goons match result", text, url }).catch(() => undefined);
+      return;
+    }
+    window.open(`https://x.com/intent/post?text=${encodeURIComponent(`${text}\n${url}`)}`, "_blank", "noopener,noreferrer");
   }
 
   if (!match) return <section className="ranked-match ranked-loading"><p>{message}</p>{authRequired ? <button className="button primary" onClick={authenticatePlayer} disabled={authenticating}>{authenticating ? "SIGNING IN…" : "CONNECT + SIGN"}</button> : null}</section>;
@@ -279,7 +307,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
       <time aria-label={`${secondsLeft} seconds remaining`}>{secondsLeft}<small>SECONDS</small></time>
     </section> : null}
 
-    {!isLive && match.winner_token_id ? <section className="ranked-turn-banner match-complete"><div><span>MATCH COMPLETE</span><strong>#{padToken(match.winner_token_id)} WINS</strong></div></section> : null}
+    {!isLive && match.winner_token_id ? <section className="ranked-turn-banner match-complete"><div><span>MATCH COMPLETE</span><strong>#{padToken(match.winner_token_id)} WINS</strong></div><button className="button primary" onClick={shareResult}>SHARE RESULT</button></section> : null}
     {message ? <p className="ranked-status" role="status">{message}</p> : null}
 
     <details className="ranked-transcript"><summary>Match transcript · {match.actions.length} turns</summary>{match.actions.map((item) => {

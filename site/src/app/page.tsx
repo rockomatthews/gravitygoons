@@ -16,7 +16,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Gravity Goons home">
           <Image className="brand-logo" src="/collection/gravity-goons-logo.png" alt="Gravity Goons" width={160} height={160} priority />
         </a>
-        <nav><Link href="/arena">Live Arena</Link><a href="#collection">Enter the Roster</a><Link className="roadmap-link" href="/roadmap">Roadmap</Link></nav>
+        <nav><Link href="/arena">Live Arena</Link><Link href="/collection">Enter the Roster</Link><Link className="roadmap-link" href="/roadmap">Roadmap</Link></nav>
         <WalletButton />
       </header>
 

@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import { useWallet } from "@/components/WalletProvider";
+import { trackMarketingEvent } from "@/lib/analytics";
 
 type Goon = { tokenId: number; discipline: string; species: string; rarity: string };
 type Person = { id: string; username: string; displayName: string; isNftHolder: boolean; goons: Goon[] };
@@ -37,7 +38,7 @@ export function ChatDock() {
   function chooseTarget(username: string) { setTargetUsername(username); const person = holders.find((item) => item.username === username); const mine = room?.self?.goons.find((goon) => person?.goons.some((theirs) => theirs.discipline === goon.discipline)); const theirs = person?.goons.find((goon) => goon.discipline === mine?.discipline); setMyToken(mine?.tokenId ?? null); setTheirToken(theirs?.tokenId ?? null); }
 
   return <aside className={`chat-dock ${open ? "open" : "closed"}`} aria-label="Goon Chat Room">
-    {!open ? <button className="chat-launcher" onClick={() => setOpen(true)}><span>◉</span><b>GOON CHAT</b><i>LIVE</i></button> : <div className="chat-panel chat-room-panel">
+    {!open ? <button className="chat-launcher" onClick={() => { setOpen(true); trackMarketingEvent("chat_joined", { access: account ? "wallet_connected" : "visitor" }); }}><span>◉</span><b>GOON CHAT</b><i>LIVE</i></button> : <div className="chat-panel chat-room-panel">
       <header className="chat-header"><div><span>PUBLIC ROOM · EVERYONE CAN READ</span><b>GOON CHAT</b></div><button onClick={() => setOpen(false)} aria-label="Hide chat">⌄</button></header>
       <div className="chat-room-strip"><span className="chat-live-dot">● LIVE</span><b>{room?.people.filter((person) => person.isNftHolder).length ?? 0} NFT PLAYERS</b><small>Wallet addresses hidden</small></div>
       <div className="chat-messages chat-room-messages" ref={scrollRef}>{!room?.messages.length && <p className="chat-empty">The room is open. Talk tricks, find a rival, or call out another NFT holder.</p>}{room?.messages.map((message) => <article className={`${message.isMine ? "mine" : "theirs"} ${message.kind === "match_request" ? "match" : ""}`} key={message.id}><div className="chat-message-name"><b>{message.sender.displayName}</b>{badge(message.sender)}<time>{new Date(message.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time></div><p>{message.body}</p>{message.kind === "match_request" && <button onClick={() => { const challengeToken = message.isMine ? message.metadata.challenged_token_id : message.metadata.challenger_token_id; window.location.href = `/?challengeToken=${challengeToken}#collection`; }}>BUILD SIGNED CHALLENGE →</button>}{!message.isMine && authState === "ready" && <button className="chat-report" onClick={() => report(message.id)}>REPORT</button>}</article>)}</div>

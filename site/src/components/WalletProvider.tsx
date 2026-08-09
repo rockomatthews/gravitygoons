@@ -10,6 +10,7 @@ import {
   type MobileWalletKind,
 } from "@/lib/wallet-links";
 import { personalSignParams } from "@/lib/wallet-signing";
+import { identifyMarketingWallet, trackMarketingEvent } from "@/lib/analytics";
 
 export type EthereumProvider = {
   request<T = unknown>(args: { method: string; params?: unknown[] }): Promise<T>;
@@ -105,6 +106,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     setAccount(nextAccount);
     window.localStorage.setItem(STORAGE_KEY, connectorId);
     setMessage("Connected to Base.");
+    identifyMarketingWallet(nextAccount);
+    trackMarketingEvent("wallet_connect_succeeded", { connector: connectorId });
     setModalOpen(false);
   }, []);
 
@@ -139,6 +142,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     label: string,
     createDappUrl: (url: string) => string,
   ) => {
+    trackMarketingEvent("wallet_connect_started", { connector: kind, surface: "mobile_or_injected" });
     const injected = findWallet(kind);
     if (injected) {
       setConnecting(true);
@@ -161,6 +165,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const connectRainbow = useCallback(async () => connectMobileWallet("rainbow", "Rainbow", createRainbowDappUrl), [connectMobileWallet]);
 
   const connectWalletConnect = useCallback(async () => {
+    trackMarketingEvent("wallet_connect_started", { connector: "walletconnect", surface: "wallet_selector" });
     const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID?.trim();
     if (!projectId) {
       setMessage("WalletConnect is awaiting a Reown project ID. Use Sign in with Base or a detected browser wallet for now.");
@@ -191,6 +196,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, [finishConnection]);
 
   const connectInjected = useCallback(async (walletId?: string) => {
+    trackMarketingEvent("wallet_connect_started", { connector: walletId ? "eip6963" : "injected", surface: "browser" });
     const selected = walletId ? wallets.find((wallet) => wallet.id === walletId)?.provider : wallets[0]?.provider ?? window.ethereum;
     if (!selected) {
       setMessage("No browser wallet was detected. Use Sign in with Base or WalletConnect.");
