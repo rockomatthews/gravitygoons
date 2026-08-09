@@ -81,7 +81,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
   const [status, setStatus] = useState("");
   const [availableIds, setAvailableIds] = useState<Set<number> | null>(null);
   const [directOwnedIds, setDirectOwnedIds] = useState<Set<number>>(new Set());
-  const [saleOpen, setSaleOpen] = useState(false);
+  const [saleOpen, setSaleOpen] = useState<boolean | null>(null);
   const [liveById, setLiveById] = useState<Map<number, AthleteLive>>(new Map());
   const [challengeTarget, setChallengeTarget] = useState<Token | null>(null);
   const [challengerTokenId, setChallengerTokenId] = useState<number | null>(null);
@@ -441,7 +441,13 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
         <select value={brand} onChange={(event) => { setBrand(event.target.value); setPage(1); }}>{brands.map((item) => <option key={item}>{item}</option>)}</select>
         <select value={playStyle} onChange={(event) => { setPlayStyle(event.target.value); setPage(1); }}>{["All", "Speed", "Air", "Control", "Style", "Toughness"].map((item) => <option key={item}>{item}</option>)}</select>
         <select value={availabilityFilter} onChange={(event) => { setAvailabilityFilter(event.target.value); setPage(1); trackMarketingEvent("roster_filter_used", { filter: "availability", value: event.target.value }); }}>{["Available", "Sold", "All"].map((item) => <option key={item}>{item}</option>)}</select>
-        <span className={`result-count ${saleOpen ? "live" : ""}`}>{saleOpen ? "● MINT LIVE" : "MINT CLOSED"} · {availableIds?.size ?? "—"} LEFT</span>
+        <span className={`result-count ${saleOpen === true ? "live" : ""}`}>
+          {saleOpen === true
+            ? `● MINT LIVE · ${availableIds?.size ?? "—"} LEFT`
+            : saleOpen === false
+              ? `MINT CLOSED · ${availableIds?.size ?? "—"} LEFT`
+              : "CHECKING BASE…"}
+        </span>
       </div>
 
       {account && myGoons.length > 0 && <div className="my-goons-strip"><b>MY GOONS · {myGoons.length} OWNED</b><span>{myGoons.map((token) => `#${String(token.token_id).padStart(4, "0")}`).join(" · ")}</span></div>}
