@@ -186,14 +186,17 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
 
   async function review(assetId: string, decision: "approved" | "rejected" | "reroll") {
     setBusy(true);
+    setActionError("");
     try {
       const response = await fetch("/api/moves/review", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ assetId, decision }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setStatus(decision === "approved" ? "Outcome approved. LAND publishes only when the pair is complete; FALL remains private for matches." : decision === "reroll" ? "A new version of this outcome has been queued without discarding the other approved outcome." : "Draft rejected and kept private.");
-      await refresh();
+      await refresh(true);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Unable to review this draft.");
+      const message = error instanceof Error ? error.message : "Unable to review this draft.";
+      setStatus(message);
+      setActionError(message);
     } finally {
       setBusy(false);
     }
@@ -238,8 +241,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
                   <div className={`outcome-slot outcome-${outcome}`} key={outcome}>
                     <span>{outcome.toUpperCase()}{" // "}{asset?.status.replaceAll("_", " ") ?? "NOT MADE"}</span>
                     {asset?.videoUrl ? <video src={asset.videoUrl} poster={asset.posterUrl ?? undefined} controls playsInline preload="metadata" /> : <div className="outcome-placeholder"><b>{outcome === "land" ? "STICK IT" : "BAIL IT"}</b><small>5 SEC · 720P · SEEVIO</small></div>}
-                    {asset?.status === "owner_review" && <div className="outcome-review-buttons"><button onClick={() => review(asset.id, "approved")} disabled={busy}>APPROVE</button><button onClick={() => review(asset.id, "reroll")} disabled={busy}>REROLL</button><button onClick={() => review(asset.id, "rejected")} disabled={busy}>REJECT</button></div>}
-                    {asset?.status === "rejected" && asset.version === 1 && <button className="outcome-rejected-reroll" onClick={() => review(asset.id, "reroll")} disabled={busy}>REGENERATE · INCLUDED REROLL</button>}
+                    {asset?.status === "owner_review" && <div className="outcome-review-buttons"><button onClick={() => review(asset.id, "approved")} disabled={busy}>APPROVE</button>{asset.rerollsRemaining > 0 ? <button onClick={() => review(asset.id, "reroll")} disabled={busy}>{busy ? "WORKING…" : `REROLL · ${asset.rerollsRemaining} LEFT`}</button> : <span className="outcome-reroll-used">INCLUDED REROLL USED</span>}<button onClick={() => review(asset.id, "rejected")} disabled={busy}>REJECT</button></div>}
+                    {asset?.status === "rejected" && asset.rerollsRemaining > 0 && <button className="outcome-rejected-reroll" onClick={() => review(asset.id, "reroll")} disabled={busy}>REGENERATE · {asset.rerollsRemaining} INCLUDED REROLL LEFT</button>}
                     {outcome === "fall" && <small>PRIVATE · GAME OUTCOMES ONLY</small>}
                   </div>
                 );

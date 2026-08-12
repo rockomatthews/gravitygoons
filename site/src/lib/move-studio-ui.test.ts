@@ -25,8 +25,8 @@ test("workflow progress is stage-based and identifies active server work", () =>
   assert.equal(isMoveWorkflowActive("generating"), true);
   assert.equal(isMoveWorkflowActive("owner_review"), false);
   const progress = moveWorkflowProgress({ pairStatus: "generating", outcomes: [
-    { id: "land", outcome: "land", version: 1, status: "owner_review", videoUrl: null, posterUrl: null, ownerDecision: "pending", createdAt: null, updatedAt: null },
-    { id: "fall", outcome: "fall", version: 1, status: "generating", videoUrl: null, posterUrl: null, ownerDecision: "pending", createdAt: null, updatedAt: null },
+    { id: "land", outcome: "land", version: 1, status: "owner_review", videoUrl: null, posterUrl: null, ownerDecision: "pending", rerollsRemaining: 1, createdAt: null, updatedAt: null },
+    { id: "fall", outcome: "fall", version: 1, status: "generating", videoUrl: null, posterUrl: null, ownerDecision: "pending", rerollsRemaining: 1, createdAt: null, updatedAt: null },
   ] });
   assert.equal(progress.percent, 73);
   assert.equal(progress.active, true);

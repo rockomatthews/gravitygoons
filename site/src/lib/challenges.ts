@@ -8,6 +8,7 @@ import { ACTIVE_RULESET_HASH, MATCH_MODES, type MatchMode, STAKE_TIERS_MINOR } f
 
 export const CHALLENGE_TTL_HOURS = 72;
 const DISCIPLINES = ["Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"] as const;
+const MATCH_ESCROW_FEE_BPS = Math.min(250, Math.max(0, Number(process.env.MATCH_ESCROW_FEE_BPS ?? process.env.NEXT_PUBLIC_MATCH_ESCROW_FEE_BPS ?? "0")));
 
 export type ChallengeConfirmation = {
   action: "create" | "accept" | "decline" | "cancel";
@@ -76,7 +77,7 @@ export async function createChallenge(wallet: string, input: { challengerTokenId
   if (wagerRequested && !stakeMinor) throw new Error("Choose an approved USDC stake tier.");
   const confirmationHash = await verifyChallengeConfirmation(wallet, {
     action: "create", challengerTokenId: input.challengerTokenId, challengedTokenId: input.challengedTokenId,
-    matchMode, proposedStartAt, rulesetHash: ACTIVE_RULESET_HASH, wagerRequested, stakeMinor, houseFeeBps: 0, issuedAt: input.issuedAt,
+    matchMode, proposedStartAt, rulesetHash: ACTIVE_RULESET_HASH, wagerRequested, stakeMinor, houseFeeBps: MATCH_ESCROW_FEE_BPS, issuedAt: input.issuedAt,
   }, input.signature);
   if (!await verifyTokenOwnership(wallet, input.challengerTokenId)) throw new Error("You no longer own the challenging Goon.");
   const challengedWallet = await onchainOwner(input.challengedTokenId);
@@ -96,7 +97,7 @@ export async function createChallenge(wallet: string, input: { challengerTokenId
     ruleset_hash: ACTIVE_RULESET_HASH,
     wager_requested: wagerRequested,
     stake_minor: stakeMinor,
-    house_fee_bps: 0,
+    house_fee_bps: MATCH_ESCROW_FEE_BPS,
   }).select("*").single();
   if (error) throw new Error(error.code === "23505" ? "A challenge between these Goons is already pending." : error.message);
   await supabase.from("challenge_events").insert({ challenge_id: data.id, actor_wallet: wallet.toLowerCase(), event_type: "created" });

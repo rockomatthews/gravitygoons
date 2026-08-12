@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { requireSessionAddress } from "@/lib/request-auth";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { syncMatchWager } from "@/lib/match-escrow";
+import { reconcileWagerBeforeCheckIn } from "@/lib/match-check-in";
 
 function normalizeExpectedWallet(value: unknown) {
   return typeof value === "string" && /^0x[0-9a-fA-F]{40}$/.test(value) ? value.toLowerCase() : null;
@@ -62,10 +64,15 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       : normalized === match.second_wallet_address.toLowerCase() ? match.second_token_id : null;
     if (!tokenId) throw new Error("Only match players can check in.");
     if (!(await verifyTokenOwnership(wallet, tokenId))) throw new Error("Live NFT ownership changed; check-in is blocked.");
+    console.log("[match-check-in] reconciling Base escrow state", { matchId: id, wallet });
+    const wager = await reconcileWagerBeforeCheckIn(id, wallet, syncMatchWager);
+    console.log("[match-check-in] escrow state reconciled", { matchId: id, wallet, requested: wager.requested, state: wager.state });
     const { data, error } = await supabase.rpc("check_in_scheduled_match", { p_match_id: id, p_actor_wallet: wallet });
     if (error) throw new Error(error.message);
+    console.log("[match-check-in] confirmed", { matchId: id, wallet });
     return NextResponse.json({ ...data, ...(await playerCheckInState(id, wallet)) });
   } catch (error) {
+    console.error("[match-check-in] failed", { error: error instanceof Error ? error.message : String(error) });
     return failure(error);
   }
 }

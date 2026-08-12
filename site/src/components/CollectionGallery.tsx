@@ -11,6 +11,7 @@ import { collectionAbi, collectionAddress, publicClient, ZERO_ADDRESS } from "@/
 import { useWallet } from "@/components/WalletProvider";
 import { signatureEdgeForRarity } from "@/lib/gameplay";
 import { ACTIVE_RULESET_HASH } from "@/lib/match-terms";
+import { challengeScheduleWindow } from "@/lib/challenge-scheduling";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import { athleteRankLabel } from "@/lib/rank-display";
 import { trackMarketingEvent } from "@/lib/analytics";
@@ -100,6 +101,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
   const [listingsById, setListingsById] = useState<Map<number, Listing>>(new Map());
   const [seaportEnabled, setSeaportEnabled] = useState(false);
   const challengeLinkHandled = useRef(false);
+  const matchHouseFeeBps = Math.min(250, Math.max(0, Number(process.env.NEXT_PUBLIC_MATCH_ESCROW_FEE_BPS ?? "0")));
 
   const refreshAvailability = useCallback(async () => {
     if (collectionAddress === ZERO_ADDRESS) {
@@ -206,6 +208,16 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
     if (!normalizedAccount) return [];
     return tokens.filter((token) => directOwnedIds.has(token.token_id) || liveById.get(token.token_id)?.owner === normalizedAccount);
   }, [directOwnedIds, tokens, liveById, normalizedAccount]);
+  const challengeEligibleByDiscipline = useMemo(() => {
+    const eligible = new Map<string, Token[]>();
+    for (const token of myGoons) {
+      const live = liveById.get(token.token_id);
+      if (live?.matchId || live?.challengeId) continue;
+      eligible.set(token.discipline, [...(eligible.get(token.discipline) ?? []), token]);
+    }
+    return eligible;
+  }, [liveById, myGoons]);
+  const eligibleChallengeGoons = challengeTarget ? challengeEligibleByDiscipline.get(challengeTarget.discipline) ?? [] : [];
 
   useEffect(() => {
     if (challengeLinkHandled.current || !normalizedAccount || availableIds === null || !myGoons.length) return;
@@ -215,21 +227,30 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
     const target = tokensById.get(targetId);
     const live = liveById.get(targetId);
     if (!target || availableIds.has(targetId) || live?.owner === normalizedAccount || !live?.owner || live.matchId || live.challengeId) return;
-    const eligibleMine = myGoons.filter((candidate) => candidate.discipline === target.discipline && !liveById.get(candidate.token_id)?.matchId);
+    const eligibleMine = challengeEligibleByDiscipline.get(target.discipline) ?? [];
     if (!eligibleMine.length) return;
     challengeLinkHandled.current = true;
     const timer = window.setTimeout(() => {
-      setChallengerTokenId(eligibleMine[0].token_id);
-      const now = Date.now();
-      setChallengeBounds({ min: new Date(now + 30 * 60_000).toISOString().slice(0, 16), max: new Date(now + 7 * 24 * 60 * 60_000).toISOString().slice(0, 16) });
-      setChallengeStart("");
+      setChallengerTokenId(null);
+      const schedule = challengeScheduleWindow();
+      setChallengeBounds({ min: schedule.min, max: schedule.max });
+      setChallengeStart(schedule.suggested);
       setCompetitionProduct("ranked");
       setChallengeTarget(target);
       params.delete("challengeToken");
       window.history.replaceState({}, "", `${window.location.pathname}${params.size ? `?${params}` : ""}#collection`);
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [availableIds, liveById, myGoons, normalizedAccount, tokensById]);
+  }, [availableIds, challengeEligibleByDiscipline, liveById, myGoons, normalizedAccount, tokensById]);
+
+  function openChallenge(target: Token) {
+    setChallengerTokenId(null);
+    const schedule = challengeScheduleWindow();
+    setChallengeBounds({ min: schedule.min, max: schedule.max });
+    setChallengeStart(schedule.suggested);
+    setCompetitionProduct("ranked");
+    setChallengeTarget(target);
+  }
 
   function toggle(tokenId: number) {
     if (availableIds?.has(tokenId) === false) return;
@@ -304,6 +325,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
   async function submitChallenge() {
     if (!challengeTarget || !challengerTokenId) return;
     try {
+      if (!eligibleChallengeGoons.some((token) => token.token_id === challengerTokenId)) throw new Error("Choose an eligible Goon you own for this challenge.");
       if (competitionProduct === "pink_slip") throw new Error("Pink Slip custody is a separate contract and is not active.");
       const wagerRequested = competitionProduct === "usdc";
       if (wagerRequested && process.env.NEXT_PUBLIC_WAGERING_ENABLED !== "true") throw new Error("USDC challenge creation is not active on this deployment yet.");
@@ -324,7 +346,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
         `Ruleset: ${ACTIVE_RULESET_HASH}`,
         `USDC wager requested: ${wagerRequested ? "yes" : "no"}`,
         wagerRequested ? `Stake minor units: ${stakeMinor}` : "",
-        "House fee bps: 0",
+        `House fee bps: ${matchHouseFeeBps}`,
         `Issued: ${issuedAt}`,
         wagerRequested ? "Equal player stakes are held by the non-custodial Gravity Goons escrow on Base." : "Ranked play only. No wager or token transfer.",
       ].filter(Boolean).join("\n");
@@ -459,7 +481,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
           const listing = listingsById.get(token.token_id);
           const mine = normalizedAccount !== null && (directOwnedIds.has(token.token_id) || live?.owner === normalizedAccount);
           const eligible = !available && !mine && Boolean(live?.owner) && !live?.matchId && !live?.challengeId
-            && myGoons.some((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
+            && (challengeEligibleByDiscipline.get(token.discipline)?.length ?? 0) > 0;
           const cardStatus = mine
             ? "Owned by you"
             : available
@@ -487,15 +509,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
                 {mine && !listing && <button className="challenge-button list-for-sale-button" onClick={() => { setListingTarget(token); setListingPrice(""); setListingCurrency("ETH"); setListingDays(7); setListingStatus(""); }}>LIST FOR SALE</button>}
                 {mine && listing && <button className="challenge-button" onClick={() => cancelListing(listing)}>CANCEL LISTING</button>}
                 {!mine && listing && <button className="challenge-button" onClick={() => buyListing(listing)}>BUY NOW · {listing.currency}</button>}
-                {eligible && <button className="challenge-button" onClick={() => {
-                  const eligibleMine = myGoons.filter((candidate) => candidate.discipline === token.discipline && !liveById.get(candidate.token_id)?.matchId);
-                  setChallengerTokenId(eligibleMine[0]?.token_id ?? null);
-                  const now = Date.now();
-                  setChallengeBounds({ min: new Date(now + 30 * 60_000).toISOString().slice(0, 16), max: new Date(now + 7 * 24 * 60 * 60_000).toISOString().slice(0, 16) });
-                  setChallengeStart("");
-                  setCompetitionProduct("ranked");
-                  setChallengeTarget(token);
-                }}>CHALLENGE</button>}
+                {eligible && <button className="challenge-button" onClick={() => openChallenge(token)}>CHALLENGE</button>}
               </div>
             </article>
           );
@@ -504,32 +518,49 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
 
       {visible.length < ordered.length && <button className="button load" onClick={() => setPage((value) => value + 1)}>Load more athletes</button>}
       {challengeTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="challenge-title">
-        <div>
-          <button className="challenge-close" onClick={() => setChallengeTarget(null)} aria-label="Close challenge">×</button>
+        <div className="challenge-builder">
+          <button className="challenge-close" onClick={() => { setChallengeTarget(null); setChallengerTokenId(null); }} aria-label="Close challenge">×</button>
           <p className="eyebrow">SIGNED LIVE 1V1</p>
           <h2 id="challenge-title">Challenge #{String(challengeTarget.token_id).padStart(4, "0")}</h2>
-          <p>Both Goons are rechecked on Base when the challenge is accepted. They must remain owned, unlocked, and in the same discipline.</p>
-          <label>YOUR {challengeTarget.discipline.toUpperCase()} GOON
-            <select value={challengerTokenId ?? ""} onChange={(event) => setChallengerTokenId(Number(event.target.value))}>
-              {myGoons.filter((token) => token.discipline === challengeTarget.discipline).map((token) => <option value={token.token_id} key={token.token_id}>#{String(token.token_id).padStart(4, "0")} · {token.species} · {token.rarity}</option>)}
-            </select>
-          </label>
+          <p>Choose which of your eligible {challengeTarget.discipline} Goons will issue this challenge. Nothing is sent until you confirm the exact matchup.</p>
+          <div className="challenge-target-card">
+            <Image src={`${imageBaseUrl}/${String(challengeTarget.token_id).padStart(4, "0")}.png`} alt={challengeTarget.name} width={1024} height={1024} />
+            <div><span>YOU ARE CHALLENGING</span><b>#{String(challengeTarget.token_id).padStart(4, "0")} · {challengeTarget.species}</b><small>{challengeTarget.rarity} · {athleteRankLabel(liveById.get(challengeTarget.token_id)?.discipline_rank, liveById.get(challengeTarget.token_id)?.matches_played ?? 0)} · {liveById.get(challengeTarget.token_id)?.wins ?? 0}W–{liveById.get(challengeTarget.token_id)?.losses ?? 0}L</small></div>
+          </div>
+          <fieldset className="challenge-goon-picker">
+            <legend>SELECT YOUR {challengeTarget.discipline.toUpperCase()} GOON</legend>
+            <div>
+              {eligibleChallengeGoons.map((token) => {
+                const live = liveById.get(token.token_id);
+                const chosen = challengerTokenId === token.token_id;
+                return <button type="button" className={chosen ? "selected" : ""} aria-pressed={chosen} onClick={() => setChallengerTokenId(token.token_id)} key={token.token_id}>
+                  <Image src={`${imageBaseUrl}/${String(token.token_id).padStart(4, "0")}.png`} alt={token.name} width={1024} height={1024} />
+                  <span>#{String(token.token_id).padStart(4, "0")}</span>
+                  <b>{token.species} · {token.rarity}</b>
+                  <small>{athleteRankLabel(live?.discipline_rank, live?.matches_played ?? 0)} · {live?.wins ?? 0}W–{live?.losses ?? 0}L · ELO {Math.round(live?.rating ?? 1500)}</small>
+                  <i>{chosen ? "SELECTED" : "CHOOSE THIS GOON"}</i>
+                </button>;
+              })}
+            </div>
+          </fieldset>
+          {!challengerTokenId && <p className="challenge-pick-required">SELECT ONE OF YOUR GOONS TO CONTINUE</p>}
           <p className="challenge-live-lock">LIVE RANKED · BOTH PLAYERS CHECK IN · PUBLIC SCOREBOARD</p>
           <div className="competition-products" aria-label="Competition type">
             <button className={competitionProduct === "ranked" ? "active" : ""} onClick={() => setCompetitionProduct("ranked")}><span>RANKED</span><b>NO WAGER</b><small>AVAILABLE NOW</small></button>
-            <button className={competitionProduct === "usdc" ? "active" : ""} onClick={() => setCompetitionProduct("usdc")}><span>USDC STAKE</span><b>1 · 5 · 10 · 25 USDC</b><small>{process.env.NEXT_PUBLIC_WAGERING_ENABLED === "true" ? "EQUAL STAKES · BASE USDC" : "ESCROW SETUP IN PROGRESS"}</small></button>
+            <button className={competitionProduct === "usdc" ? "active" : ""} onClick={() => setCompetitionProduct("usdc")}><span>USDC STAKE RANKED</span><b>1 · 5 · 10 · 25 USDC</b><small>{process.env.NEXT_PUBLIC_WAGERING_ENABLED === "true" ? "EQUAL STAKES · BASE USDC" : "ESCROW SETUP IN PROGRESS"}</small></button>
             <button className={competitionProduct === "pink_slip" ? "active pink-slip locked" : "pink-slip locked"} onClick={() => setCompetitionProduct("pink_slip")}><span>PINK SLIP</span><b>WINNER TAKES BOTH GOONS</b><small>LOCKED · SEPARATE NFT ESCROW REQUIRED</small></button>
           </div>
           {competitionProduct === "usdc" && <label>PLAYER STAKE · EACH PLAYER<select value={stakeMinor} onChange={(event) => setStakeMinor(Number(event.target.value))}><option value={1_000_000}>1 USDC</option><option value={5_000_000}>5 USDC</option><option value={10_000_000}>10 USDC</option><option value={25_000_000}>25 USDC</option></select></label>}
           {competitionProduct === "pink_slip" && <p className="pink-slip-warning"><b>PINK SLIP — WINNER TAKES BOTH GOONS</b><span>This will require two explicit custody confirmations from each player, Safe-controlled disputes, and a separately audited NFT escrow. It cannot be enabled by opening the mint.</span></p>}
-          <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onChange={(event) => setChallengeStart(event.target.value)} /></label>
+          <label>START TIME · YOUR LOCAL TIME<input type="datetime-local" value={challengeStart} min={challengeBounds.min} max={challengeBounds.max} onInput={(event) => setChallengeStart(event.currentTarget.value)} onChange={(event) => setChallengeStart(event.currentTarget.value)} /></label>
+          {competitionProduct === "usdc" && <p className="challenge-money-lock">HOUSE FEE: {(matchHouseFeeBps / 100).toFixed(2).replace(/\.00$/, "")}% OF COMPLETED POOL · NO FEE ON VOID OR REFUND</p>}
           <p className="challenge-money-lock">PLAYER USDC: {process.env.NEXT_PUBLIC_WAGERING_ENABLED === "true" ? "LIVE" : "SETUP"} · PINK SLIP: LOCKED · FREE SPECTATOR PICKS: LIVE</p>
           <div className="challenge-comparison">
             <span>{athleteRankLabel(liveById.get(challengerTokenId ?? 0)?.discipline_rank, liveById.get(challengerTokenId ?? 0)?.matches_played ?? 0)}</span>
             <b>{challengeTarget.discipline.toUpperCase()}</b>
             <span>{athleteRankLabel(liveById.get(challengeTarget.token_id)?.discipline_rank, liveById.get(challengeTarget.token_id)?.matches_played ?? 0)}</span>
           </div>
-          <button className="button primary" disabled={competitionProduct === "pink_slip" || (competitionProduct === "usdc" && process.env.NEXT_PUBLIC_WAGERING_ENABLED !== "true")} onClick={submitChallenge}>{competitionProduct === "ranked" ? "SIGN + SEND RANKED CHALLENGE" : competitionProduct === "usdc" ? "SIGN + SEND USDC CHALLENGE" : "PINK SLIP LOCKED"}</button>
+          <button className="button primary challenge-send" disabled={!challengerTokenId || competitionProduct === "pink_slip" || (competitionProduct === "usdc" && process.env.NEXT_PUBLIC_WAGERING_ENABLED !== "true")} onClick={submitChallenge}>{!challengerTokenId ? "SELECT YOUR GOON ABOVE" : competitionProduct === "ranked" ? `SIGN + SEND #${String(challengerTokenId).padStart(4, "0")} VS #${String(challengeTarget.token_id).padStart(4, "0")}` : competitionProduct === "usdc" ? `SIGN + SEND USDC · #${String(challengerTokenId).padStart(4, "0")} VS #${String(challengeTarget.token_id).padStart(4, "0")}` : "PINK SLIP LOCKED"}</button>
         </div>
       </div>}
       {listingTarget && <div className="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="listing-title">

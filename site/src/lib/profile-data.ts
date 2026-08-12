@@ -275,10 +275,11 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const supabase = getSupabaseAdmin();
   const quote = formatUsdc(Number(process.env.MOVE_PAIR_PRICE_USDC_MINOR ?? 12000000));
+  const includedRerolls = Math.max(0, Number(process.env.MOVE_INCLUDED_REROLLS_PER_OUTCOME ?? 1));
   if (!supabase || collectionAddress === ZERO_ADDRESS) {
     const { pairs, assets } = demoPairs();
     const goon = buildGoon(tokenId, pairs, assets, true);
-    const outcomesByPair = (pairId: string | null): StudioOutcome[] => pairId ? assets.filter((asset) => asset.pair_id === pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })) : [];
+    const outcomesByPair = (pairId: string | null): StudioOutcome[] => pairId ? assets.filter((asset) => asset.pair_id === pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, rerollsRemaining: Math.max(0, includedRerolls - (asset.version - 1)), createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })) : [];
     return { goon, moves: goon.moves.map((move) => ({ ...move, outcomes: outcomesByPair(move.pairId), quotedPriceUsdc: quote, workflowStartedAt: null, workflowUpdatedAt: null })), demo: true };
   }
 
@@ -299,7 +300,7 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
       const assetDates = pairAssets.flatMap((asset) => [asset.created_at, asset.updated_at]).filter((value): value is string => Boolean(value));
       return {
         ...move,
-        outcomes: pairAssets.map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })),
+        outcomes: pairAssets.map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, rerollsRemaining: Math.max(0, includedRerolls - (asset.version - 1)), createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })),
         quotedPriceUsdc: quote,
         workflowStartedAt: pairAssets.map((asset) => asset.created_at).filter((value): value is string => Boolean(value)).sort()[0] ?? pair?.updated_at ?? pair?.created_at ?? null,
         workflowUpdatedAt: [...assetDates, pair?.updated_at].filter((value): value is string => Boolean(value)).sort().at(-1) ?? null,

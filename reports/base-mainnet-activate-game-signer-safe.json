@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786396085000,
+  "meta": {
+    "name": "Gravity Goons - Activate Replacement Game Signer",
+    "description": "Activates the already-proposed game signer 0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad after the mandatory delay ends at 2026-08-10T22:35:39Z.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x1DDbe6163cEd907135B827cf2E2Be697b5DEeA04",
+      "value": "0",
+      "data": "0x4f288ef7",
+      "contractMethod": {
+        "inputs": [],
+        "name": "activateGameSigner",
+        "payable": false
+      },
+      "contractInputsValues": {}
+    }
+  ]
+}

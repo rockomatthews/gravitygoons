@@ -59,6 +59,7 @@ export type StudioOutcome = {
   videoUrl: string | null;
   posterUrl: string | null;
   ownerDecision: "pending" | "approved" | "rejected";
+  rerollsRemaining: number;
   createdAt: string | null;
   updatedAt: string | null;
 };

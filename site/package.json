@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts src/lib/match-presentation.test.ts src/lib/rank-display.test.ts",
+    "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts src/lib/gooniverse.test.ts src/lib/match-presentation.test.ts src/lib/rank-display.test.ts src/lib/challenge-scheduling.test.ts src/lib/match-check-in.test.ts",
     "test:limitless": "node --test --experimental-strip-types src/lib/limitless/core.test.ts",
     "test:profile": "node --test --experimental-strip-types src/lib/profile-session.test.ts",
     "test:wallet-links": "node --test --experimental-strip-types src/lib/wallet-links.test.ts",

@@ -49,20 +49,6 @@ function assertProductionMovePurchaseReady(): void {
   if (!treasury || !publicTreasury || treasury !== publicTreasury) throw new Error("Movie purchases are temporarily closed because the Base USDC treasury configuration is incomplete. No payment was requested.");
 }
 
-async function assertNoUnresolvedProviderCreditFailure(): Promise<void> {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) return;
-  const { data, error } = await supabase.from("move_generation_jobs")
-    .select("id")
-    .ilike("error_message", "%insufficient credits%")
-    .in("status", ["queued", "failed"])
-    .limit(1);
-  if (error) throw new Error("Movie purchases are temporarily paused because Seevio readiness could not be verified. No USDC payment was requested.");
-  if (data?.length) {
-    throw new Error("New move purchases are paused because an already-paid movie is waiting for Seevio credits. Restore Seevio credits and retry the paid movie first. No USDC payment was requested.");
-  }
-}
-
 export async function createMoveQuote(walletAddress: string, tokenId: number, trickId: number) {
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const { trick } = tokenMove(tokenId, trickId);
@@ -72,7 +58,6 @@ export async function createMoveQuote(walletAddress: string, tokenId: number, tr
   const supabase = getSupabaseAdmin();
   if (!supabase || collectionAddress === ZERO_ADDRESS) return { demo: true, orderId: "demo-order", pairId: "demo-pair", amountMinorUnits: amount, displayPrice: formatUsdc(amount), expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() };
   assertProductionMovePurchaseReady();
-  await assertNoUnresolvedProviderCreditFailure();
 
   const wallet = walletAddress.toLowerCase();
   const profile = await getProfileForWallet(wallet);
@@ -286,7 +271,6 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   const canReview = asset.status === "owner_review" || (decision === "reroll" && asset.status === "rejected");
   if (!canReview) throw new Error("This outcome is not currently awaiting owner review or an included rejected-draft reroll.");
   const reviewedAt = new Date().toISOString();
-  await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
 
   if (decision === "reroll") {
     if (asset.version > includedRerollsPerOutcome()) throw new Error("This movie pair has used its included reroll for this outcome. Reject this draft or purchase an additional reroll when paid rerolls launch.");
@@ -294,22 +278,53 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
     const correctedBasePrompt = promptFor(pair.token_id, pair.trick_id, asset.outcome);
     const rerollPrompt = note.trim() ? `${correctedBasePrompt} Owner revision note: ${note.trim()}` : correctedBasePrompt;
     const { data: nextData, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome: asset.outcome, version: nextVersion, status: "queued", source_image_url: asset.source_image_url, prompt: rerollPrompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();
-    if (error) throw new Error(error.message);
-    const nextAsset = nextData as AssetRow;
+    if (error && error.code !== "23505") throw new Error(error.message);
+    let nextAsset = nextData as AssetRow | null;
+    if (!nextAsset) {
+      const { data: existingAsset, error: existingAssetError } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").eq("pair_id", pair.id).eq("outcome", asset.outcome).eq("version", nextVersion).single();
+      if (existingAssetError) throw new Error(existingAssetError.message);
+      nextAsset = existingAsset as AssetRow;
+    }
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${nextVersion}`;
     const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: rerollPrompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
-    if (jobError) throw new Error(jobError.message);
-    const job = jobData as JobRow;
-    const providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
+    if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
+    let job = jobData as JobRow | null;
+    if (!job) {
+      const { data: existingJob, error: existingJobError } = await supabase.from("move_generation_jobs").select("id,asset_id,idempotency_key,provider_job_id,status").eq("idempotency_key", idempotencyKey).single();
+      if (existingJobError) throw new Error(existingJobError.message);
+      job = existingJob as JobRow;
+    }
+    if (job.provider_job_id || ["submitted", "processing", "succeeded"].includes(job.status)) {
+      await supabase.from("move_media_pairs").update({ status: job.status === "succeeded" ? "owner_review" : "rerolling" }).eq("id", pair.id);
+      return { demo: false, assetId: nextAsset.id, decision, providerJobId: job.provider_job_id, existing: true };
+    }
+    const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing", error_message: null }).eq("id", job.id).in("status", ["queued", "failed"]).select("id").maybeSingle();
+    if (!claimedJob) return { demo: false, assetId: nextAsset.id, decision, providerJobId: null, existing: true };
+    let providerJobId: string | null;
+    try {
+      providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
+    } catch (error) {
+      const providerMessage = error instanceof Error ? error.message : "Seevio submission failed.";
+      await Promise.all([
+        supabase.from("move_generation_jobs").update({ status: "failed", error_message: providerMessage }).eq("id", job.id),
+        supabase.from("move_media_assets").update({ status: "failed" }).eq("id", nextAsset.id),
+        supabase.from("move_media_pairs").update({ status: "failed" }).eq("id", pair.id),
+      ]);
+      console.error("move_reroll_submit_failed", { pairId: pair.id, assetId: nextAsset.id, outcome: asset.outcome, reason: providerMessage });
+      throw error;
+    }
     if (providerJobId) {
       await Promise.all([
         supabase.from("move_generation_jobs").update({ provider_job_id: providerJobId, status: "submitted", submitted_at: reviewedAt }).eq("id", job.id),
         supabase.from("move_media_assets").update({ provider_job_id: providerJobId, status: "generating" }).eq("id", nextAsset.id),
       ]);
     }
+    await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
     await supabase.from("move_media_pairs").update({ status: "rerolling" }).eq("id", pair.id);
     return { demo: false, assetId: nextAsset.id, decision, providerJobId };
   }
+
+  await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
 
   // An approved LAND draft remains private until its matching FALL draft is
   // also approved. This prevents public profiles from advertising an

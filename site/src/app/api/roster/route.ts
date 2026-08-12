@@ -4,6 +4,7 @@ import collection from "@/data/collection.json";
 import { collectionAddress } from "@/lib/contracts";
 import { readSessionAddress, SESSION_COOKIE } from "@/lib/profile-session";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { goonImageUrl } from "@/lib/goon-images";
 
 export async function GET() {
   const supabase = getSupabaseAdmin();
@@ -27,6 +28,10 @@ export async function GET() {
   const ownerNameByWallet = new Map((profileWallets ?? []).map((row) => [row.wallet_address, profileNameById.get(row.profile_id) ?? "Goon Holder"]));
   const byId = new Map<number, Record<string, unknown>>(
     collection.tokens.map((token) => [token.token_id, {
+      name: token.name,
+      discipline: token.discipline,
+      rarity: token.rarity,
+      imageUrl: goonImageUrl(token.token_id),
       matches_played: 0,
       wins: 0,
       losses: 0,

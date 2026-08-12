@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "Pick Your Goon. Call Your Trick.",
     description: "Choose an exact-ID Gravity Goon, enter the live 1v1 Arena, and climb your discipline.",
     url: "https://gravitygoons.com/collection",
-    images: ["/og.png"],
+    images: ["/og-arcade-v2.png"],
   },
 };
 
@@ -44,4 +44,3 @@ export default async function CollectionPage({ searchParams }: { searchParams: P
     </section>
   </main>;
 }
-

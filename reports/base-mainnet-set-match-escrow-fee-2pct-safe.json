@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786403371383,
+  "meta": {
+    "name": "Gravity Goons - Set P2P USDC House Fee to 2%",
+    "description": "Sets GoonMatchEscrow at 0x01fdFfd42229eDFD2148773C57426368CD48b1DA to a 2% fee on successfully completed match pools. Fees go to the Gravity Goons Safe. Voids and refunds remain fee-free.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x01fdFfd42229eDFD2148773C57426368CD48b1DA",
+      "value": "0",
+      "data": "0x2900909d00000000000000000000000028ed8ce998c416b456394a35f080662ade3311ce00000000000000000000000000000000000000000000000000000000000000c8",
+      "contractMethod": {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "feeBps",
+            "type": "uint16"
+          }
+        ],
+        "name": "setFeeConfiguration",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "recipient": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+        "feeBps": "200"
+      }
+    }
+  ]
+}

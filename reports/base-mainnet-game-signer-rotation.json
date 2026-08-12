@@ -9,7 +9,11 @@
   "activation_after_unix": 1786401339,
   "activation_after_utc": "2026-08-10T22:35:39.000Z",
   "activation_after_mountain": "2026-08-10T16:35:39-06:00",
-  "status": "PENDING_DELAY",
+  "activation_transaction": "0x90703cf23ac047473e0450498553b8a67459eb17ec30d0513286b9c5d0eb0f20",
+  "activation_block": 49806295,
+  "activated_signer": "0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad",
+  "verified_signer_balance_eth": "0.001",
+  "status": "ACTIVE_VERIFIED",
   "private_key_storage": "User attested that the replacement private key is stored in macOS Keychain.",
-  "next_action": "After the activation timestamp, the Safe must execute GravityGoonsProgressRegistry.activateGameSigner()."
+  "next_action": "Use the activated protected signer for production progression claims. Keep escrow deployment and wagering activation separately gated."
 }

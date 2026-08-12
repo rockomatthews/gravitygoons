@@ -10,9 +10,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json() as { assetId?: string; decision?: "approved" | "rejected" | "reroll"; note?: string };
     if (!body.assetId || !body.decision || !["approved", "rejected", "reroll"].includes(body.decision)) return NextResponse.json({ error: "Draft and review decision are required." }, { status: 400 });
-    return NextResponse.json(await reviewMoveAsset(address, body.assetId, body.decision, body.note));
+    console.info("move_review_requested", { assetId: body.assetId, decision: body.decision });
+    const result = await reviewMoveAsset(address, body.assetId, body.decision, body.note);
+    console.info("move_review_completed", { assetId: body.assetId, decision: body.decision });
+    return NextResponse.json(result);
   } catch (error) {
+    console.error("move_review_failed", { reason: error instanceof Error ? error.message : "Unknown move review failure." });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to review movie draft." }, { status: 400 });
   }
 }
-

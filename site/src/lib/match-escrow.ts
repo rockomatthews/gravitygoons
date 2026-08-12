@@ -92,6 +92,7 @@ export async function syncMatchWager(matchId: string, wallet: string, txHash?: s
   const normalized = wallet.toLowerCase();
   if (!match || ![match.first_wallet_address, match.second_wallet_address].includes(normalized)) throw new Error("Only match players can sync funding.");
   const detail = await getMatchWager(matchId);
+  if (!detail.requested) return detail;
   if (!detail.chain) throw new Error("The escrow state is not available on Base.");
   const updates: Record<string, unknown> = { state: detail.chain.state, terms_hash: detail.chain.termsHash, last_chain_sync_at: new Date().toISOString(), updated_at: new Date().toISOString() };
   if (detail.chain.disputeDeadline) updates.dispute_deadline = new Date(detail.chain.disputeDeadline * 1000).toISOString();
