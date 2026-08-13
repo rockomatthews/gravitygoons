@@ -2,6 +2,7 @@ import "server-only";
 
 import { getAddress, isAddress } from "viem";
 import { publicClient, ZERO_ADDRESS } from "@/lib/contracts";
+import { correctionWindowLabel, escrowRoute } from "@/lib/escrow-routing";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export const matchEscrowAbi = [
@@ -35,7 +36,10 @@ export async function getMatchWager(matchId: string) {
   if (matchError || !match) throw new Error(matchError?.message ?? "Match not found.");
   if (referenceError) throw new Error(referenceError.message);
   const requested = Boolean(reference && reference.state !== "disabled");
-  const escrowAddress = configuredAddress(process.env.MATCH_ESCROW_ADDRESS ?? process.env.NEXT_PUBLIC_MATCH_ESCROW_ADDRESS);
+  const route = escrowRoute(reference);
+  const escrowAddress = route.address;
+  const escrowVersion = route.version;
+  const correctionWindowSeconds = route.correctionWindowSeconds;
   const settlementSigner = configuredAddress(process.env.MATCH_SETTLEMENT_SIGNER_ADDRESS);
   const feeRecipient = configuredAddress(process.env.MATCH_ESCROW_FEE_RECIPIENT_ADDRESS);
   const enabled = requested && process.env.WAGERING_ENABLED === "true" && Boolean(escrowAddress && settlementSigner && feeRecipient);
@@ -73,7 +77,8 @@ export async function getMatchWager(matchId: string) {
   } : null;
   return {
     requested, enabled: enabled && configValid && chain?.paused === false, configured: enabled && configValid,
-    escrowAddress, usdcAddress: configuredAddress(process.env.BASE_USDC_ADDRESS ?? process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS),
+    escrowAddress, escrowVersion, correctionWindowSeconds,
+    usdcAddress: configuredAddress(process.env.BASE_USDC_ADDRESS ?? process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS),
     state: chain?.state === "none" || !chain ? reference?.state ?? "disabled" : chain.state,
     stakeMinor: reference?.stake_minor ?? null, houseFeeBps: reference?.house_fee_bps ?? 0,
     fundingDeadline: reference?.funding_deadline ?? null, chain, terms,
@@ -81,7 +86,7 @@ export async function getMatchWager(matchId: string) {
       : !enabled ? "USDC escrow configuration is not active. No funding transaction is available."
         : !configValid ? "The deployed escrow configuration does not match this match. Funding is blocked."
           : chain?.paused ? "The escrow is deployed but paused by the Gravity Goons Safe."
-            : "Both players lock the same native Base USDC stake before check-in. Completed payouts have a 24-hour dispute window.",
+            : `Both players lock the same native Base USDC stake before check-in. Completed payouts have a ${correctionWindowLabel(correctionWindowSeconds)} window.`,
   };
 }
 

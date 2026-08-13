@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786651560763,
+  "meta": {
+    "name": "Gravity Goons - Set Escrow V2 House Fee to 2%",
+    "description": "Sets GoonMatchEscrowV2 at 0xDA1ff1521f67ca1f40cC32140D992299E81f9efe to a 2% fee paid to the Gravity Goons Safe. Refunds and voids remain fee-free.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0xDA1ff1521f67ca1f40cC32140D992299E81f9efe",
+      "value": "0",
+      "data": "0x2900909d00000000000000000000000028ed8ce998c416b456394a35f080662ade3311ce00000000000000000000000000000000000000000000000000000000000000c8",
+      "contractMethod": {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "feeBps",
+            "type": "uint16"
+          }
+        ],
+        "name": "setFeeConfiguration",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "recipient": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+        "feeBps": "200"
+      }
+    }
+  ]
+}

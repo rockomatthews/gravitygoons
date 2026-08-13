@@ -1,0 +1,19 @@
+{
+  "schema": "gravity-goons-match-escrow-deployment-v2",
+  "created_at": "2026-08-13T20:03:18.292Z",
+  "stage": "mainnet",
+  "chain_id": 8453,
+  "rpc_host": "light-intensive-county.base-mainnet.quiknode.pro",
+  "deployer": "0xc6953CE04ba077f86021a7fE812011CED0D5f40F",
+  "address": "0xDA1ff1521f67ca1f40cC32140D992299E81f9efe",
+  "deployment_transaction": "0xebce9b3d5cf04e0fba888949f09b08d724746c643b1f158226b8ca4cfa64307c",
+  "deployment_block": 49931024,
+  "owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "collection": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+  "settlementSigner": "0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad",
+  "feeRecipient": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "houseFeeBps": 0,
+  "disputeWindowSeconds": 600,
+  "paused": true
+}
