@@ -2,25 +2,21 @@ import { createHash, randomBytes } from "node:crypto";
 import collection from "@/data/collection.json";
 import { goonImageUrl } from "@/lib/goon-images";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { verifyTokenOwnership } from "@/lib/profile-data";
+import { syncWalletOwnership, verifyTokenOwnership } from "@/lib/profile-data";
 import { TRICK_CATALOG, type Athlete, type Discipline } from "@/lib/pvp";
 import {
   GOONIVERSE_RULESET,
+  deterministicRoll,
+  masteryAttemptUnlocks,
+  masteryEntryCost,
+  masteryGuaranteeRun,
+  masteryUnlockChance,
   TRICK_LINE_OBSTACLES,
   resolveTrickLineAttempt,
   trickLineBankRewards,
   type TrickLineMode,
   type TrickLineStance,
 } from "@/lib/gooniverse";
-
-const GUEST_GOONS: Record<Discipline, number> = {
-  Skateboarding: 34,
-  Snowboarding: 45,
-  Surfing: 207,
-  BMX: 854,
-  Motocross: 499,
-  Skiing: 877,
-};
 
 type SessionRow = {
   id: string;
@@ -38,6 +34,11 @@ type SessionRow = {
   status: "active" | "banked" | "fallen" | "expired";
   action_deadline: string;
   reward_claimed: boolean;
+  target_trick_id: number | null;
+  entry_cost: number;
+  mastery_chance: number | null;
+  mastery_qualified: boolean;
+  mastery_unlocked: boolean;
 };
 
 function sha256(value: string): string {
@@ -88,6 +89,11 @@ function sanitizeSession(session: SessionRow) {
     status: session.status,
     actionDeadline: session.action_deadline,
     ruleset: GOONIVERSE_RULESET,
+    targetTrickId: session.target_trick_id,
+    entryCost: session.entry_cost,
+    masteryChance: session.mastery_chance,
+    masteryQualified: session.mastery_qualified,
+    masteryUnlocked: session.mastery_unlocked,
   };
 }
 
@@ -102,9 +108,14 @@ async function requireSession(id: string, accessKey: string): Promise<SessionRow
 }
 
 async function verifySessionOwner(session: SessionRow, wallet: string | null): Promise<void> {
-  if (session.guest) return;
   if (!wallet || !session.token_id || wallet.toLowerCase() !== session.wallet_at_start?.toLowerCase()) throw new Error("AUTH_REQUIRED");
   if (!await verifyTokenOwnership(wallet, session.token_id)) throw new Error("LIVE_OWNERSHIP_CHANGED");
+}
+
+function bitmapUnlocked(bitmap: string | null | undefined, trickId: number): boolean {
+  if (trickId < 4) return true;
+  const bits = (bitmap ?? "").replace(/^B'/, "").replace(/'$/, "").padStart(64, "0");
+  return bits[63 - trickId] === "1";
 }
 
 export async function getGooniverseOverview() {
@@ -123,14 +134,18 @@ export async function getGoonCareer(tokenId: number) {
   const supabase = getSupabaseAdmin();
   const empty = { tokenId, economy: { grit_balance: 0, grit_reserved: 0, lifetime_grit_earned: 0, xp: 0, level: 1 }, materials: [], inventory: [], loadout: null, trophies: [], activeExpedition: null };
   if (!supabase) return { ...empty, goon: publicGoon(tokenId) };
-  const [economy, materials, inventory, loadout, trophies, expedition] = await Promise.all([
+  const [economy, materials, inventory, loadout, trophies, expedition, sponsorProgress, mastery] = await Promise.all([
     supabase.from("goon_economies").select("grit_balance,grit_reserved,lifetime_grit_earned,xp,level").eq("token_id", tokenId).maybeSingle(),
     supabase.from("goon_material_balances").select("material_key,quantity").eq("token_id", tokenId),
     supabase.from("goon_inventory").select("id,durability,crafted_at,reserved_activity_type,reserved_activity_id,item_definition:item_definition_id(id,name,slot,tier,competitive_modifier,max_durability)").eq("token_id", tokenId),
     supabase.from("goon_loadouts").select("*").eq("token_id", tokenId).maybeSingle(),
     supabase.from("goon_trophies").select("trophy_key,title,season_id,metadata,earned_at").eq("token_id", tokenId).order("earned_at", { ascending: false }),
     supabase.from("goon_expeditions").select("id,location,risk,status,departed_at,resolves_at").eq("token_id", tokenId).in("status", ["active", "ready"]).maybeSingle(),
+    supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle(),
+    supabase.from("goon_trick_mastery").select("trick_id,failed_qualified_runs,qualified_runs,unlocked_at").eq("token_id",tokenId),
   ]);
+  const discipline = collection.tokens[tokenId - 1].discipline as Discipline;
+  const bitmap = sponsorProgress.data?.unlocked_trick_bitmap;
   return {
     goon: publicGoon(tokenId),
     tokenId,
@@ -140,41 +155,50 @@ export async function getGoonCareer(tokenId: number) {
     loadout: loadout.data,
     trophies: trophies.data ?? [],
     activeExpedition: expedition.data,
+    unlockedTricks: TRICK_CATALOG[discipline].filter((trick)=>bitmapUnlocked(bitmap,trick.id)),
+    lockedTricks: TRICK_CATALOG[discipline].filter((trick)=>trick.id>=4&&!bitmapUnlocked(bitmap,trick.id)),
+    mastery: mastery.data ?? [],
   };
 }
 
-export async function startTrickLine(input: { wallet: string | null; tokenId?: number; discipline?: Discipline }) {
+export async function getWalletCareerSummary(wallet:string){const supabase=getSupabaseAdmin();if(!supabase)throw new Error("Career storage unavailable.");const tokenIds=await syncWalletOwnership(wallet);if(!tokenIds.length)return[];const[economies,sessions,reservations]=await Promise.all([supabase.from("goon_economies").select("token_id,grit_balance,grit_reserved").in("token_id",tokenIds),supabase.from("trick_line_sessions").select("token_id,target_trick_id,status").in("token_id",tokenIds).eq("status","active"),supabase.from("competitive_loadout_reservations").select("token_id,grit_committed,status").in("token_id",tokenIds).in("status",["reserved","locked"])]);const economyById=new Map((economies.data??[]).map(row=>[row.token_id,row]));const sessionById=new Map((sessions.data??[]).map(row=>[row.token_id,row]));const reservationById=new Map((reservations.data??[]).map(row=>[row.token_id,row]));return tokenIds.map(tokenId=>{const token=collection.tokens[tokenId-1],economy=economyById.get(tokenId)??{grit_balance:0,grit_reserved:0},session=sessionById.get(tokenId),reservation=reservationById.get(tokenId);return{tokenId,goon:{name:token.name,imageUrl:goonImageUrl(tokenId)},economy:{grit_balance:Number(economy.grit_balance??0),grit_reserved:Number(economy.grit_reserved??0)},activeTrickLineTarget:session?.target_trick_id??null,activeMatchCommitment:reservation?.grit_committed??null};});}
+
+export async function getSponsorOffers(wallet:string){const supabase=getSupabaseAdmin();if(!supabase)throw new Error("Sponsor storage unavailable.");const owned=await syncWalletOwnership(wallet);if(!owned.length)return[];const {data,error}=await supabase.from("athlete_sponsor_offers").select("id,token_id,milestone_wins,first_sponsor_id,second_sponsor_id,status,offered_at").in("token_id",owned).eq("status","pending").order("offered_at");if(error)throw new Error(error.message);return data??[];}
+
+export async function acceptSponsorOffer(wallet:string,input:{offerId:string;tokenId:number;sponsorId:string}){if(!await verifyTokenOwnership(wallet,input.tokenId))throw new Error("LIVE_OWNERSHIP_CHANGED");const supabase=getSupabaseAdmin();if(!supabase)throw new Error("Sponsor storage unavailable.");const {data,error}=await supabase.rpc("accept_sponsor_offer",{p_offer_id:input.offerId,p_token_id:input.tokenId,p_sponsor_id:input.sponsorId,p_wallet:wallet.toLowerCase()});if(error)throw new Error(error.message);return data;}
+
+export async function startTrickLine(input: { wallet: string | null; tokenId?: number; targetTrickId?: number }) {
   const supabase = getSupabaseAdmin();
   if (!supabase) throw new Error("GOONIVERSE_DATABASE_UNAVAILABLE");
-  const guest = !input.tokenId;
-  const discipline = input.discipline && TRICK_LINE_OBSTACLES[input.discipline] ? input.discipline : "Skateboarding";
-  const tokenId = guest ? GUEST_GOONS[discipline] : validTokenId(input.tokenId!);
+  if (!input.wallet || !input.tokenId) throw new Error("OWNED_GOON_REQUIRED");
+  const tokenId = validTokenId(input.tokenId);
   const athlete = athleteFor(tokenId);
-  if (!guest) {
-    if (!input.wallet) throw new Error("AUTH_REQUIRED");
-    if (!await verifyTokenOwnership(input.wallet, tokenId)) throw new Error("LIVE_OWNERSHIP_REQUIRED");
-  }
+  if (!await verifyTokenOwnership(input.wallet, tokenId)) throw new Error("LIVE_OWNERSHIP_REQUIRED");
+  const target = TRICK_CATALOG[athlete.discipline].find((trick) => trick.id === Number(input.targetTrickId) && trick.id >= 4);
+  if (!target) throw new Error("LOCKED_ADVANCED_TRICK_REQUIRED");
+  const [{ data: progress }, { data: mastery }, { data: economy }] = await Promise.all([
+    supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id", tokenId).maybeSingle(),
+    supabase.from("goon_trick_mastery").select("failed_qualified_runs,qualified_runs,unlocked_at").eq("token_id", tokenId).eq("trick_id", target.id).maybeSingle(),
+    supabase.from("goon_economies").select("grit_balance,grit_reserved").eq("token_id", tokenId).maybeSingle(),
+  ]);
+  if (bitmapUnlocked(progress?.unlocked_trick_bitmap, target.id) || mastery?.unlocked_at) throw new Error("TRICK_ALREADY_UNLOCKED");
+  const entryCost = masteryEntryCost(target.difficulty);
+  const spendable = Number(economy?.grit_balance ?? 0) - Number(economy?.grit_reserved ?? 0);
+  if (spendable < entryCost) throw new Error("INSUFFICIENT_GRIT");
+  const failed = Number(mastery?.failed_qualified_runs ?? 0);
+  const chance = masteryUnlockChance(target.difficulty, failed);
   const seed = randomBytes(32).toString("hex");
   const accessKey = randomBytes(24).toString("base64url");
   const actionDeadline = new Date(Date.now() + 5 * 60_000).toISOString();
-  const { data, error } = await supabase.from("trick_line_sessions").insert({
-    token_id: guest ? null : tokenId,
-    wallet_at_start: guest ? null : input.wallet!.toLowerCase(),
-    guest,
-    discipline: athlete.discipline,
-    seed_commitment: sha256(seed),
-    server_seed: seed,
-    access_key_hash: sha256(accessKey),
-    action_deadline: actionDeadline,
-    status: "active",
-  }).select("*").single();
+  const { data, error } = await supabase.rpc("start_trick_line_mastery", { p_token_id: tokenId, p_wallet: input.wallet, p_target_trick_id: target.id, p_entry_cost: entryCost, p_discipline: athlete.discipline, p_seed_commitment: sha256(seed), p_server_seed: seed, p_access_key_hash: sha256(accessKey), p_action_deadline: actionDeadline, p_mastery_chance: chance });
   if (error) throw error;
   return {
     session: sanitizeSession(data as SessionRow),
     accessKey,
     goon: publicGoon(tokenId),
-    tricks: TRICK_CATALOG[athlete.discipline],
+    tricks: TRICK_CATALOG[athlete.discipline].slice(0, 4), target,
     obstacles: TRICK_LINE_OBSTACLES[athlete.discipline],
+    mastery: { entryCost, currentGrit: Number(economy?.grit_balance ?? 0), remainingGrit: spendable - entryCost, chance, failedQualifiedRuns: failed, guaranteeRun: masteryGuaranteeRun(target.difficulty) },
   };
 }
 
@@ -190,7 +214,7 @@ export async function playTrickLineAction(wallet: string | null, sessionId: stri
   }
   const expectedSequence = Number(input.expectedSequence);
   if (!Number.isInteger(expectedSequence) || expectedSequence !== session.action_sequence) throw new Error("STALE_ACTION_SEQUENCE");
-  const tokenId = session.token_id ?? GUEST_GOONS[session.discipline];
+  const tokenId = session.token_id!;
   const athlete = athleteFor(tokenId);
   const trick = TRICK_CATALOG[session.discipline].find((candidate) => candidate.id === Number(input.trickId));
   if (!trick) throw new Error("INVALID_TRICK");
@@ -198,19 +222,11 @@ export async function playTrickLineAction(wallet: string | null, sessionId: stri
   if (!TRICK_LINE_OBSTACLES[session.discipline].includes(obstacle)) throw new Error("INVALID_OBSTACLE");
   const stance = input.stance === "switch" ? "switch" : "regular";
   const mode = input.mode === "send" ? "send" : "standard";
-  const gritUsed = session.guest ? 0 : Math.max(0, Math.min(3, Number(input.gritUsed ?? 0)));
-  if (gritUsed && session.token_id) {
-    const { error } = await supabase.rpc("apply_goon_economy_event", {
-      p_token_id: session.token_id,
-      p_idempotency_key: `trick-line:${session.id}:${expectedSequence}:grit`,
-      p_event_type: "spend",
-      p_grit_balance_delta: -gritUsed,
-      p_source_type: "trick_line",
-      p_source_id: session.id,
-      p_actor_wallet: wallet,
-    });
-    if (error) throw new Error(error.message.includes("INSUFFICIENT_GRIT") ? "INSUFFICIENT_GRIT" : error.message);
-  }
+  const gritUsed = 0;
+  const targetStep = expectedSequence === 2;
+  if (expectedSequence > 2) throw new Error("BANK_THE_QUALIFIED_LINE");
+  if (targetStep && Number(input.trickId) !== session.target_trick_id) throw new Error("TARGET_TRICK_REQUIRED");
+  if (!targetStep && Number(input.trickId) === session.target_trick_id) throw new Error("LAND_TWO_SETUP_TRICKS_FIRST");
   const sequence = expectedSequence + 1;
   const result = resolveTrickLineAttempt({ athlete, trick, stance, obstacle, mode, gritUsed, seed: session.server_seed, sequence, currentMultiplier: Number(session.multiplier) });
   const nextStatus = result.landed ? "active" : "fallen";
@@ -249,15 +265,23 @@ export async function bankTrickLine(wallet: string | null, sessionId: string, in
       banked_score: score, unbanked_score: 0, status: "banked", completed_at: new Date().toISOString(), reward_claimed: false,
     }).eq("id", session.id).eq("status", "active").eq("action_sequence", session.action_sequence).select("*").single();
   if (error) throw new Error("TRICK_LINE_ALREADY_RESOLVED");
-  if (!session.guest && session.token_id) {
+  let unlock = false;
+  const qualified = session.action_sequence === 3 && session.landed_count === 3;
+  if (session.token_id) {
     const base = { p_token_id: session.token_id, p_source_type: "trick_line", p_source_id: session.id, p_actor_wallet: wallet };
     const events = [];
-    if (rewards.grit || rewards.xp) events.push(supabase.rpc("apply_goon_economy_event", { ...base, p_idempotency_key: `trick-line:${session.id}:bank`, p_event_type: "reward", p_grit_balance_delta: rewards.grit, p_xp_delta: rewards.xp }));
+    if (rewards.xp) events.push(supabase.rpc("apply_goon_economy_event", { ...base, p_idempotency_key: `trick-line:${session.id}:bank`, p_event_type: "reward", p_grit_balance_delta: 0, p_xp_delta: rewards.xp }));
     if (rewards.materialQuantity) events.push(supabase.rpc("apply_goon_economy_event", { ...base, p_idempotency_key: `trick-line:${session.id}:material`, p_event_type: "reward", p_material_key: rewards.material, p_material_delta: rewards.materialQuantity }));
     const results = await Promise.all(events);
     const failed = results.find((result) => result.error);
     if (failed?.error) throw failed.error;
+    if (qualified) {
+      const { data: mastery } = await supabase.from("goon_trick_mastery").select("failed_qualified_runs").eq("token_id",session.token_id).eq("trick_id",session.target_trick_id!).maybeSingle();
+      const target = TRICK_CATALOG[session.discipline].find((trick) => trick.id === session.target_trick_id)!;
+      unlock = masteryAttemptUnlocks(target.difficulty, Number(mastery?.failed_qualified_runs ?? 0), deterministicRoll(session.server_seed, 999));
+    }
+    await supabase.rpc("settle_trick_line_mastery", { p_session_id: session.id, p_qualified: qualified, p_unlocked: unlock });
     await supabase.from("trick_line_sessions").update({ reward_claimed: true }).eq("id", session.id).eq("reward_claimed", false);
   }
-  return { session: sanitizeSession(data as SessionRow), rewards: session.guest ? { grit: 0, xp: 0, material: null, materialQuantity: 0 } : rewards };
+  return { session: { ...sanitizeSession(data as SessionRow), masteryQualified: qualified, masteryUnlocked: unlock }, rewards, mastery: { qualified, unlocked: unlock } };
 }

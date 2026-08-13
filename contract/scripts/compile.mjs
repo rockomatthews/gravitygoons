@@ -4,7 +4,7 @@ import solc from "solc";
 
 const root = path.resolve(import.meta.dirname, "..");
 const sources = {};
-for (const file of ["GravityGoons.sol", "GravityGoonsProgressRegistry.sol", "GoonMatchEscrow.sol", "GoonPinkSlipEscrow.sol", "MockArenaAssets.sol"]) {
+for (const file of ["GravityGoons.sol", "GravityGoonsProgressRegistry.sol", "GoonMatchEscrow.sol", "GoonMatchEscrowV2.sol", "GoonPinkSlipEscrow.sol", "MockArenaAssets.sol"]) {
   sources[`src/${file}`] = { content: fs.readFileSync(path.join(root, "src", file), "utf8") };
 }
 

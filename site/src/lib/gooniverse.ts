@@ -1,11 +1,33 @@
 import type { Athlete, Discipline, Trick } from "./pvp.ts";
 import { landingChance } from "./pvp.ts";
 
-export const GOONIVERSE_RULESET = "gooniverse-trick-line-v1";
+export const GOONIVERSE_RULESET = "gooniverse-trick-mastery-v2";
 export const MATERIAL_KEYS = ["scrap", "threads", "grip", "pigment", "components"] as const;
 export type MaterialKey = typeof MATERIAL_KEYS[number];
 export type TrickLineStance = "regular" | "switch";
 export type TrickLineMode = "standard" | "send";
+
+export function masteryEntryCost(difficulty: number): 3 | 5 | 8 {
+  if (difficulty <= 6) return 3;
+  if (difficulty <= 8) return 5;
+  return 8;
+}
+
+export function masteryGuaranteeRun(difficulty: number): 6 | 8 | 10 {
+  if (difficulty <= 6) return 6;
+  if (difficulty <= 8) return 8;
+  return 10;
+}
+
+export function masteryUnlockChance(difficulty: number, failedQualifiedRuns: number): number {
+  const initial = difficulty <= 6 ? 30 : difficulty <= 8 ? 20 : 10;
+  return Math.min(100, initial + Math.max(0, failedQualifiedRuns) * 10);
+}
+
+export function masteryAttemptUnlocks(difficulty: number, failedQualifiedRuns: number, roll: number): boolean {
+  const run = failedQualifiedRuns + 1;
+  return run >= masteryGuaranteeRun(difficulty) || roll <= masteryUnlockChance(difficulty, failedQualifiedRuns);
+}
 
 export const TRICK_LINE_OBSTACLES: Record<Discipline, readonly string[]> = {
   Skateboarding: ["Street Gap", "Handrail", "Quarter Pipe", "Manual Pad"],
@@ -83,10 +105,10 @@ export function resolveTrickLineAttempt(input: TrickLineAttemptInput): TrickLine
   };
 }
 
-export function trickLineBankRewards(score: number): { grit: number; xp: number; material: MaterialKey; materialQuantity: number } {
+export function trickLineBankRewards(score: number): { grit: 0; xp: number; material: MaterialKey; materialQuantity: number } {
   const normalized = Math.max(0, Math.floor(score));
   return {
-    grit: Math.min(3, Math.floor(normalized / 1200)),
+    grit: 0,
     xp: Math.min(120, Math.floor(normalized / 20)),
     material: MATERIAL_KEYS[Math.floor(normalized / 100) % MATERIAL_KEYS.length],
     materialQuantity: normalized >= 400 ? Math.min(5, 1 + Math.floor(normalized / 1800)) : 0,

@@ -53,9 +53,13 @@ export async function createMoveQuote(walletAddress: string, tokenId: number, tr
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const { trick } = tokenMove(tokenId, trickId);
   if (!trick) throw new Error("Move not found in this Goon's discipline.");
-  if (trick.sponsorId !== null) throw new Error("This move must be permanently unlocked before its movie can be commissioned.");
+  const unlockDb=getSupabaseAdmin();
+  if(!unlockDb)throw new Error("Move progression is temporarily unavailable.");
+  const {data:progress}=await unlockDb.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle();
+  const bits=String(progress?.unlocked_trick_bitmap??"").replace(/[^01]/g,"").padStart(64,"0").slice(-64);
+  if(trick.id>=4&&bits[63-trick.id]!=="1")throw new Error("This move must be permanently unlocked before its movie can be commissioned.");
   const amount = quoteAmount();
-  const supabase = getSupabaseAdmin();
+  const supabase = unlockDb;
   if (!supabase || collectionAddress === ZERO_ADDRESS) return { demo: true, orderId: "demo-order", pairId: "demo-pair", amountMinorUnits: amount, displayPrice: formatUsdc(amount), expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() };
   assertProductionMovePurchaseReady();
 

@@ -209,8 +209,8 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
       <header><span>{match.status.toUpperCase()} · {match.discipline}</span><b>{match.mode.replace("_", " ").toUpperCase()}</b><em>{match.actionDeadline ? `TURN CLOCK: ${new Date(match.actionDeadline).toLocaleTimeString()}` : "WAITING FOR START"}</em></header>
       <div className="broadcast-fighters">
         {match.athletes.map((athlete, index) => <article key={athlete.tokenId}>
-          <Image src={athlete.image} alt={athlete.name} width={1024} height={1024} priority={index === 0} />
-          <div><span>#{String(athlete.tokenId).padStart(4, "0")} · {athlete.rarity}</span><h1>{athlete.name}</h1><p>{athlete.ownerName} · {athleteRankLabel(athlete.rank, athlete.matchesPlayed)} · {athlete.wins}-{athlete.losses}</p><div className="broadcast-letters">{letters(match.matchWord, index ? match.score.secondLosses : match.score.firstLosses)}</div><small>{match.score.setterTokenId === athlete.tokenId ? "SETTER" : "RESPONDER"} · GRIT {match.score.grit[String(athlete.tokenId)] ?? 0}</small></div>
+          <div className="broadcast-athlete-image"><Image src={athlete.image} alt={athlete.name} width={1024} height={1024} priority={index === 0} />{match.status==="completed"&&match.winnerTokenId===athlete.tokenId&&<em className="winner-stamp">WINNER</em>}</div>
+          <div><span>#{String(athlete.tokenId).padStart(4, "0")} · {athlete.rarity}</span><h1>{athlete.name}</h1><p>{athlete.ownerName} · {athleteRankLabel(athlete.rank, athlete.matchesPlayed)} · {athlete.wins}-{athlete.losses}</p><div className="broadcast-letters">{letters(match.matchWord, index ? match.score.secondLosses : match.score.firstLosses)}</div><small>{match.score.setterTokenId === athlete.tokenId ? "SETTER" : "RESPONDER"} · STARTED {match.score.gritStarted[String(athlete.tokenId)]??0} · SPENT {match.score.gritSpent[String(athlete.tokenId)]??0} · REMAINING {match.score.grit[String(athlete.tokenId)] ?? 0}</small></div>
         </article>)}
         <strong>VS</strong>
       </div>

@@ -7,6 +7,7 @@ import { baseRpcUrl, publicClient } from "@/lib/contracts";
 import { getMatchWager, syncMatchWager } from "@/lib/match-escrow";
 import { matchEscrowWriteAbi, matchResultTypes, matchVoidTypes } from "@/lib/match-escrow-client";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { settleMatchProgression } from "@/lib/grit-settlement";
 
 export async function processWagerSettlements() {
   if (process.env.WAGERING_ENABLED !== "true") return { processed: 0, skipped: "wagering_disabled" };
@@ -49,6 +50,7 @@ export async function processWagerSettlements() {
         await publicClient.waitForTransactionReceipt({ hash: transactionHash });
         await supabase.from("match_wager_references").update({ state: "settled", finalization_tx_hash: transactionHash, updated_at: new Date().toISOString() }).eq("match_id", match.id);
         action = "settled";
+        await settleMatchProgression(match.id,{requirePaid:true,transactionHash});
       } else if (reference.state === "refund_pending") {
         if (detail.chain?.state === "none") {
           await supabase.from("match_wager_references").update({ state: "voided", updated_at: new Date().toISOString() }).eq("match_id", match.id);

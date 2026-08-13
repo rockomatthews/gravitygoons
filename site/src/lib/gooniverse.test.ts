@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { competitivePositiveModifier, deterministicRoll, resolveTrickLineAttempt, trickLineBankRewards } from "./gooniverse.ts";
+import { competitivePositiveModifier, deterministicRoll, masteryAttemptUnlocks, masteryEntryCost, masteryGuaranteeRun, masteryUnlockChance, resolveTrickLineAttempt, trickLineBankRewards } from "./gooniverse.ts";
 import { TRICK_CATALOG, type Athlete } from "./pvp.ts";
 
 const athlete: Athlete = {
@@ -34,7 +34,15 @@ test("Trick Line resolution preserves deterministic outcome and multiplier", () 
 test("bank rewards are bounded and zero scores cannot create value", () => {
   assert.deepEqual(trickLineBankRewards(0), { grit: 0, xp: 0, material: "scrap", materialQuantity: 0 });
   const rewards = trickLineBankRewards(100_000);
-  assert.equal(rewards.grit, 3);
+  assert.equal(rewards.grit, 0);
   assert.equal(rewards.xp, 120);
   assert.equal(rewards.materialQuantity, 5);
+});
+
+test("mastery prices, pity odds, and guarantees match the published rules", () => {
+  assert.deepEqual([5, 7, 9].map(masteryEntryCost), [3, 5, 8]);
+  assert.deepEqual([5, 7, 9].map(masteryGuaranteeRun), [6, 8, 10]);
+  assert.equal(masteryUnlockChance(7, 3), 50);
+  assert.equal(masteryAttemptUnlocks(9, 8, 100), false);
+  assert.equal(masteryAttemptUnlocks(9, 9, 100), true);
 });

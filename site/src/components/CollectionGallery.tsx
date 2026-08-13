@@ -90,6 +90,8 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
   const [challengeBounds, setChallengeBounds] = useState({ min: "", max: "" });
   const [competitionProduct, setCompetitionProduct] = useState<CompetitionProduct>("ranked");
   const [stakeMinor, setStakeMinor] = useState(1_000_000);
+  const [challengerGrit, setChallengerGrit] = useState(0);
+  const [challengerSpendableGrit, setChallengerSpendableGrit] = useState(0);
   const [transferTarget, setTransferTarget] = useState<Token | null>(null);
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferStatus, setTransferStatus] = useState("");
@@ -249,8 +251,12 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
     setChallengeBounds({ min: schedule.min, max: schedule.max });
     setChallengeStart(schedule.suggested);
     setCompetitionProduct("ranked");
+    setChallengerGrit(0);
+    setChallengerSpendableGrit(0);
     setChallengeTarget(target);
   }
+
+  useEffect(()=>{let live=true;if(!challengerTokenId){queueMicrotask(()=>{if(live){setChallengerSpendableGrit(0);setChallengerGrit(0)}});return()=>{live=false};}fetch(`/api/goons/${challengerTokenId}/career`,{cache:"no-store"}).then(r=>r.json()).then(data=>{if(!live)return;const balance=Number(data.economy?.grit_balance??0),reserved=Number(data.economy?.grit_reserved??0);setChallengerSpendableGrit(Math.max(0,balance-reserved));setChallengerGrit(value=>Math.min(value,10,Math.max(0,balance-reserved)));}).catch(()=>{if(live)setChallengerSpendableGrit(0)});return()=>{live=false};},[challengerTokenId]);
 
   function toggle(tokenId: number) {
     if (availableIds?.has(tokenId) === false) return;
@@ -347,18 +353,20 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
         `USDC wager requested: ${wagerRequested ? "yes" : "no"}`,
         wagerRequested ? `Stake minor units: ${stakeMinor}` : "",
         `House fee bps: ${matchHouseFeeBps}`,
+        `Challenger GRIT: ${challengerGrit}`,
         `Issued: ${issuedAt}`,
         wagerRequested ? "Equal player stakes are held by the non-custodial Gravity Goons escrow on Base." : "Ranked play only. No wager or token transfer.",
       ].filter(Boolean).join("\n");
       const signature = await signMessage(lines, wallet);
       const response = await fetch("/api/challenges", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ challengerTokenId, challengedTokenId: challengeTarget.token_id, matchMode: "live_ranked", proposedStartAt, wagerRequested, stakeMinor: wagerRequested ? stakeMinor : null, issuedAt, signature }),
+        body: JSON.stringify({ challengerTokenId, challengedTokenId: challengeTarget.token_id, challengerGritCommitment: challengerGrit, matchMode: "live_ranked", proposedStartAt, wagerRequested, stakeMinor: wagerRequested ? stakeMinor : null, issuedAt, signature }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       trackMarketingEvent("challenge_created", { challenger_token_id: challengerTokenId, challenged_token_id: challengeTarget.token_id, discipline: challengeTarget.discipline, product: competitionProduct, stake_minor: wagerRequested ? stakeMinor : null });
       setStatus(`Challenge sent for #${String(challengeTarget.token_id).padStart(4, "0")}. It expires in 72 hours.`);
+      window.dispatchEvent(new Event("gravity-goons:economy"));
       setChallengeTarget(null);
       await refreshRoster();
     } catch (error) { setStatus(error instanceof Error ? error.message : "Unable to send challenge."); }
@@ -544,6 +552,10 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
             </div>
           </fieldset>
           {!challengerTokenId && <p className="challenge-pick-required">SELECT ONE OF YOUR GOONS TO CONTINUE</p>}
+          {challengerTokenId && <label className="challenge-grit-commitment">MATCH GRIT · 0–10
+            <input type="range" min="0" max={Math.min(10,challengerSpendableGrit)} value={challengerGrit} onChange={(event)=>setChallengerGrit(Number(event.target.value))}/>
+            <b>{challengerGrit} GRIT COMMITTED</b><span>{challengerSpendableGrit} spendable · unspent commitment returns after the match</span>
+          </label>}
           <p className="challenge-live-lock">LIVE RANKED · BOTH PLAYERS CHECK IN · PUBLIC SCOREBOARD</p>
           <div className="competition-products" aria-label="Competition type">
             <button className={competitionProduct === "ranked" ? "active" : ""} onClick={() => setCompetitionProduct("ranked")}><span>RANKED</span><b>NO WAGER</b><small>AVAILABLE NOW</small></button>

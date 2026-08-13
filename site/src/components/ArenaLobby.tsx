@@ -21,7 +21,7 @@ function MatchCard({ match }: { match: ArenaMatch }) {
     <header><span>{match.status.toUpperCase()} · {match.mode === "live_ranked" ? "SCHEDULED LIVE" : "ASYNC"}</span><b>{match.discipline}</b></header>
     <div className="arena-matchup">
       {match.athletes.map((athlete, index) => <div key={athlete.tokenId}>
-        <Image src={athlete.image} alt={athlete.name} width={1024} height={1024} />
+        <div className="arena-athlete-image"><Image src={athlete.image} alt={athlete.name} width={1024} height={1024} />{match.status==="completed"&&match.winnerTokenId===athlete.tokenId&&<em className="winner-stamp">WINNER</em>}</div>
         <small>#{String(athlete.tokenId).padStart(4, "0")} · {athlete.rarity}</small>
         <h2>{athlete.name}</h2>
         <p>{athlete.ownerName} · {athleteRankLabel(athlete.rank, athlete.matchesPlayed)} · {athlete.rating}</p>

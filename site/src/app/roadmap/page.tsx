@@ -54,7 +54,7 @@ export default function RoadmapPage() {
 
       <section className="roadmap-next shell">
         <div><p className="eyebrow">RIGHT NOW</p><h2>Build the<br />Gooniverse.</h2></div>
-        <p>Every Goon is becoming a persistent athlete with its own career, GRIT, materials, equipment, trophies, assignments, and season history. Guest Trick Line is the first public activity.</p>
+        <p>Every Goon is becoming a persistent athlete with its own career, GRIT, materials, equipment, trophies, assignments, and season history. Owned-Goon Trick Line is the first mastery activity.</p>
         <Link className="button primary" href="/gooniverse">ENTER THE GOONIVERSE</Link>
       </section>
 

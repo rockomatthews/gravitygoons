@@ -3,10 +3,11 @@ import collection from "@/data/collection.json";
 import { verifyTokenOwnership } from "@/lib/profile-data";
 import {
   DISCIPLINE_WORDS, TRICK_CATALOG, addTrickUse, canSetTrick, matchIsOver,
-  resolveSkateTurn, setterTrickCooldown, spendCallGrit, unlockedTricks, updateSetterTrickCooldown, type Athlete, type CallMode, type Discipline,
-  type SponsorProgression, type Trick, type TrickHistory,
+  resolveSkateTurn, setterTrickCooldown, spendCallGrit, updateSetterTrickCooldown, type Athlete, type CallMode, type Discipline,
+  type Trick, type TrickHistory,
 } from "@/lib/pvp";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { settleMatchProgression } from "@/lib/grit-settlement";
 import { seedCommitment } from "@/lib/match-integrity";
 import { addMovePresentations } from "@/lib/match-move-media";
 import { goonImageUrl } from "@/lib/goon-images";
@@ -47,19 +48,13 @@ type AdminClient = NonNullable<ReturnType<typeof getSupabaseAdmin>>;
 
 async function unlockedCatalogue(supabase: AdminClient, tokenId: number, discipline: Discipline): Promise<Trick[]> {
   const { data, error } = await supabase
-    .from("athlete_sponsors")
-    .select("sponsor_id,milestone_wins,accepted_at_wins")
-    .eq("token_id", tokenId);
+    .from("athlete_sponsor_progress")
+    .select("unlocked_trick_bitmap")
+    .eq("token_id", tokenId)
+    .maybeSingle();
   if (error) throw new Error("Unable to load this Goon's unlocked tricks.");
-  const progression: SponsorProgression = {
-    verifiedRankedWins: 0,
-    sponsors: (data ?? []).map((row) => ({
-      sponsorId: row.sponsor_id,
-      milestone: row.milestone_wins,
-      acceptedAtWins: row.accepted_at_wins,
-    })),
-  };
-  return unlockedTricks(discipline, progression);
+  const bitmap=String(data?.unlocked_trick_bitmap??"").replace(/[^01]/g,"").padStart(64,"0").slice(-64);
+  return TRICK_CATALOG[discipline].filter((trick)=>bitmap[63-trick.id]==="1");
 }
 
 export async function getMatch(wallet: string, matchId: string) {
@@ -179,5 +174,6 @@ export async function processMatchAction(wallet: string, matchId: string, input:
     p_loser_token_id: loserTokenId,
   });
   if (commitError) throw new Error(commitError.message);
+  if (winnerTokenId) await settleMatchProgression(matchId).catch(()=>undefined);
   return committed as Record<string, unknown>;
 }

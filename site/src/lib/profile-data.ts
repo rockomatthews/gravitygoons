@@ -46,7 +46,8 @@ function normalizeOutcomeStatus(value: string | undefined): OutcomeStatus {
   return allowed.includes(value as OutcomeStatus) ? value as OutcomeStatus : "missing";
 }
 
-function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], assets: AssetRow[], includePrivate = false): ProfileMove[] {
+function bitmapUnlocked(bitmap:string|undefined,trickId:number){if(trickId<4)return true;const bits=(bitmap??"").replace(/[^01]/g,"").padStart(64,"0").slice(-64);return bits[63-trickId]==="1";}
+function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], assets: AssetRow[], includePrivate = false,bitmap?:string): ProfileMove[] {
   return TRICK_CATALOG[discipline].map((trick) => {
     const pair = pairs.find((candidate) => candidate.token_id === tokenId && candidate.trick_id === trick.id);
     const pairAssets = pair ? assets.filter((asset) => asset.pair_id === pair.id) : [];
@@ -57,7 +58,7 @@ function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], a
       trickId: trick.id,
       name: trick.name,
       difficulty: trick.difficulty,
-      unlocked: trick.sponsorId === null,
+      unlocked: bitmapUnlocked(bitmap,trick.id),
       pairId: pair?.id ?? null,
       pairStatus: normalizeStatus(pair?.status),
       landStatus: normalizeOutcomeStatus(land?.status),
@@ -68,7 +69,7 @@ function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], a
   });
 }
 
-function buildGoon(tokenId: number, pairs: PairRow[] = [], assets: AssetRow[] = [], includePrivate = false): ProfileGoon {
+function buildGoon(tokenId: number, pairs: PairRow[] = [], assets: AssetRow[] = [], includePrivate = false,bitmap?:string): ProfileGoon {
   const token = collection.tokens[tokenId - 1];
   const discipline = token.discipline as Discipline;
   return {
@@ -80,7 +81,7 @@ function buildGoon(tokenId: number, pairs: PairRow[] = [], assets: AssetRow[] = 
     playStyle: token.play_style,
     trickSpecialty: token.trick_specialty,
     imageUrl: goonImageUrl(tokenId),
-    moves: buildMoves(discipline, tokenId, pairs, assets, includePrivate),
+    moves: buildMoves(discipline, tokenId, pairs, assets, includePrivate,bitmap),
   };
 }
 
@@ -129,7 +130,10 @@ export async function getPublicProfile(username: string): Promise<PublicProfile 
   const tokenIds = ((ownershipData ?? []) as OwnershipRow[]).map((row) => row.token_id).sort((a, b) => a - b);
   let pairs: PairRow[] = [];
   let assets: AssetRow[] = [];
+  const bitmaps=new Map<number,string>();
   if (tokenIds.length) {
+    const {data:progress}=await supabase.from("athlete_sponsor_progress").select("token_id,unlocked_trick_bitmap").in("token_id",tokenIds);
+    for(const row of progress??[])bitmaps.set(row.token_id,row.unlocked_trick_bitmap);
     const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).in("token_id", tokenIds);
     pairs = (pairData ?? []) as PairRow[];
     const pairIds = pairs.map((pair) => pair.id);
@@ -152,7 +156,7 @@ export async function getPublicProfile(username: string): Promise<PublicProfile 
     bio: profile.bio,
     avatarUrl: profile.avatar_url,
     wallets,
-    goons: tokenIds.map((tokenId) => buildGoon(tokenId, pairs, assets)),
+    goons: tokenIds.map((tokenId) => buildGoon(tokenId, pairs, assets,false,bitmaps.get(tokenId))),
     isDemo: false,
   };
 }
@@ -284,6 +288,7 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
   }
 
   const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,created_at,updated_at").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId);
+  const {data:progress}=await supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle();
   const pairs = (pairData ?? []) as PairRow[];
   const pairIds = pairs.map((pair) => pair.id);
   let assets: AssetRow[] = [];
@@ -291,7 +296,7 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
     const { data } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,video_url,poster_url,owner_decision,created_at,updated_at").in("pair_id", pairIds);
     assets = (data ?? []) as AssetRow[];
   }
-  const goon = buildGoon(tokenId, pairs, assets, true);
+  const goon = buildGoon(tokenId, pairs, assets, true,progress?.unlocked_trick_bitmap);
   return {
     goon,
     moves: goon.moves.map((move) => {

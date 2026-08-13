@@ -17,6 +17,7 @@ type MatchRow = {
   second_checked_in_at?: string | null; first_action_at?: string | null; public_sequence?: number;
   ruleset_hash?: string; result_hash?: string | null; started_at: string | null; completed_at: string | null;
   created_at: string; first_wallet_address: string; second_wallet_address: string;
+  first_grit_start?:number;second_grit_start?:number;first_grit_spent?:number;second_grit_spent?:number;
 };
 
 export type ArenaMatch = {
@@ -39,7 +40,7 @@ export type ArenaMatch = {
   firstCheckedIn: boolean;
   secondCheckedIn: boolean;
   athletes: [ArenaAthlete, ArenaAthlete];
-  score: { firstLosses: number; secondLosses: number; setterTokenId: number | null; grit: Record<string, number>; pendingTrickId: number | null };
+  score: { firstLosses: number; secondLosses: number; setterTokenId: number | null; grit: Record<string, number>; gritStarted:Record<string,number>;gritSpent:Record<string,number>;pendingTrickId: number | null };
 };
 
 export type ArenaAthlete = {
@@ -104,11 +105,13 @@ function sanitize(row: MatchRow, names: Map<string, string>, battle: Map<number,
       firstLosses: Number(state.firstLosses ?? 0), secondLosses: Number(state.secondLosses ?? 0),
       setterTokenId: state.setterTokenId ? Number(state.setterTokenId) : null,
       grit: (state.grit ?? {}) as Record<string, number>, pendingTrickId: pending?.trickId ?? null,
+      gritStarted:{[row.first_token_id]:Number(row.first_grit_start??0),[row.second_token_id]:Number(row.second_grit_start??0)},
+      gritSpent:{[row.first_token_id]:Number(row.first_grit_spent??0),[row.second_token_id]:Number(row.second_grit_spent??0)},
     },
   };
 }
 
-const MATCH_SELECT = "id,status,discipline,match_word,match_mode,first_token_id,second_token_id,first_wallet_address,second_wallet_address,winner_token_id,state,action_deadline,scheduled_start_at,check_in_opens_at,betting_closes_at,first_checked_in_at,second_checked_in_at,first_action_at,public_sequence,ruleset_hash,result_hash,started_at,completed_at,created_at";
+const MATCH_SELECT = "id,status,discipline,match_word,match_mode,first_token_id,second_token_id,first_wallet_address,second_wallet_address,winner_token_id,state,first_grit_start,second_grit_start,first_grit_spent,second_grit_spent,action_deadline,scheduled_start_at,check_in_opens_at,betting_closes_at,first_checked_in_at,second_checked_in_at,first_action_at,public_sequence,ruleset_hash,result_hash,started_at,completed_at,created_at";
 
 export async function listArenaMatches(input: { status?: string; discipline?: string; cursor?: string; limit?: number } = {}) {
   const supabase = getSupabaseAdmin();

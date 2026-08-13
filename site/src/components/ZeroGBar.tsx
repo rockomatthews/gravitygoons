@@ -55,6 +55,7 @@ export function ZeroGBar() {
       <WalletProfileLink className="zero-g-door" ariaLabel="Open your Gravity Goons profile">
         <span>PROFILE ↗</span>
       </WalletProfileLink>
+      <Link href="/gooniverse" className="zero-g-gooniverse" aria-label="Enter the Gooniverse"><span>ENTER THE GOONIVERSE ↗</span></Link>
 
       <div className="zero-g-sign" aria-label="ZERO-G ENERGY">
         <Image src="/collection/zero-g-bar/zero-g-energy.svg" alt="ZERO-G ENERGY" width={320} height={112} />
