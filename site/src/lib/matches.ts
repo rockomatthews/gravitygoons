@@ -60,7 +60,7 @@ async function unlockedCatalogue(supabase: AdminClient, tokenId: number, discipl
 export async function getMatch(wallet: string, matchId: string) {
   const supabase = getSupabaseAdmin();
   if (!supabase) throw new Error("Match storage is not configured.");
-  const { data, error } = await supabase.from("pvp_matches").select("id,status,discipline,match_word,first_token_id,second_token_id,first_wallet_address,second_wallet_address,winner_token_id,loser_token_id,next_turn_number,state,action_deadline,started_at,completed_at").eq("id", matchId).single();
+  const { data, error } = await supabase.from("pvp_matches").select("id,status,discipline,match_word,first_token_id,second_token_id,first_wallet_address,second_wallet_address,winner_token_id,loser_token_id,next_turn_number,state,first_grit_start,second_grit_start,first_grit_spent,second_grit_spent,action_deadline,started_at,completed_at").eq("id", matchId).single();
   if (error || !data) throw new Error("Match not found.");
   if (![data.first_wallet_address, data.second_wallet_address].includes(wallet.toLowerCase())) throw new Error("This match belongs to different wallets.");
   const state = data.state as MatchState;

@@ -23,6 +23,10 @@ type MatchPayload = {
   first_wallet_address: string;
   second_wallet_address: string;
   winner_token_id: number | null;
+  first_grit_start: number;
+  second_grit_start: number;
+  first_grit_spent: number;
+  second_grit_spent: number;
   viewer_token_id: number;
   viewer_is_setter: boolean;
   first_goon: RankedGoon;
@@ -243,6 +247,10 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   const opponentTokenId = firstIsViewer ? match.second_token_id : match.first_token_id;
   const turnExpired = isLive && secondsLeft <= 0;
   const setterGrit = match.state.grit[String(match.state.setterTokenId)] ?? 0;
+  const firstGritRemaining = match.state.grit[String(match.first_token_id)] ?? 0;
+  const secondGritRemaining = match.state.grit[String(match.second_token_id)] ?? 0;
+  const firstGritSpent = Math.max(Number(match.first_grit_spent ?? 0), Number(match.first_grit_start ?? 0) - firstGritRemaining);
+  const secondGritSpent = Math.max(Number(match.second_grit_spent ?? 0), Number(match.second_grit_start ?? 0) - secondGritRemaining);
   const lastLetterTokenId = lastTurn?.turn.letterRecipientTokenId ?? null;
   const lastTurnNumber = lastTurn?.turnNumber ?? 0;
   const latestAction = match.actions.at(-1);
@@ -261,7 +269,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
 
     <div className="ranked-strategy" aria-label="Turn strategy">
       <div><span>CALL MODE</span><div className="ranked-mode-buttons"><button className={callMode === "standard" ? "active" : ""} disabled={!isLive || !match.viewer_is_setter || submitting || turnExpired} onClick={() => setCallMode("standard")}><b>STANDARD</b><small>FREE</small></button><button className={`send-grit ${callMode === "send" ? "active" : ""}`} disabled={!isLive || !match.viewer_is_setter || submitting || turnExpired || setterGrit <= 0} onClick={() => setCallMode("send")}><b>SEND IT</b><small>SPEND 1 GRIT</small></button></div><p className={`grit-arm-state ${callMode === "send" ? "armed" : ""}`}>{callMode === "send" ? `GRIT ARMED · ${setterGrit} LEFT` : `TAP SEND IT TO SPEND GRIT · ${setterGrit} AVAILABLE`}</p></div>
-      <div><span>GRIT</span><b>#{padToken(match.first_token_id)} {match.state.grit[String(match.first_token_id)] ?? 0}/3 · #{padToken(match.second_token_id)} {match.state.grit[String(match.second_token_id)] ?? 0}/3</b><small>Only the setter can spend Grit by choosing SEND IT.</small></div>
+      <div><span>MATCH GRIT</span><b>#{padToken(match.first_token_id)} · STARTED {match.first_grit_start ?? 0} · SPENT {firstGritSpent} · REMAINING {firstGritRemaining}</b><b>#{padToken(match.second_token_id)} · STARTED {match.second_grit_start ?? 0} · SPENT {secondGritSpent} · REMAINING {secondGritRemaining}</b><small>Only the setter can spend one committed GRIT by choosing SEND IT.</small></div>
       <div><span>CROWD PRESSURE</span><b>{(match.state.letterlessTurns ?? 0) > 4 ? "HEATING UP" : "COOL"}</b><small>{match.state.letterlessTurns ?? 0} letterless turns · resets when a letter lands</small></div>
     </div>
 

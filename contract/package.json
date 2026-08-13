@@ -11,6 +11,7 @@
     "deploy": "npm run compile && node scripts/deploy.mjs",
     "deploy:runtime": "node scripts/deploy.mjs",
     "deploy:match-escrow": "npm run compile && node scripts/deploy-match-escrow.mjs",
+    "deploy:match-escrow-v2": "npm run compile && node scripts/deploy-match-escrow-v2.mjs",
     "verify:runtime-isolation": "node scripts/verify-runtime-isolation.mjs",
     "deploy:safe:sepolia": "node scripts/deploy-safe-sepolia.mjs",
     "safe:accept-registry:sepolia": "node scripts/accept-registry-ownership-sepolia.mjs",
