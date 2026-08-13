@@ -129,6 +129,10 @@ export async function getGooniverseOverview() {
   return { season, generators: generators ?? [], recipes: recipes ?? 0, databaseReady: true };
 }
 
+export async function getTrophyHall(){const supabase=getSupabaseAdmin();if(!supabase)return{recent:[],counts:[],total:0};const{data,error}=await supabase.from("goon_trophies").select("id,token_id,trophy_key,title,season_id,earned_at,season:season_id(title)").order("earned_at",{ascending:false}).limit(60);if(error)throw error;const rows=data??[],countMap=new Map<string,number>();for(const row of rows)countMap.set(row.title,(countMap.get(row.title)??0)+1);return{total:rows.length,counts:[...countMap.entries()].map(([title,count])=>({title,count})).slice(0,6),recent:rows.map(row=>({id:row.id,tokenId:row.token_id,title:row.title,earnedAt:row.earned_at,seasonTitle:(row.season as unknown as {title?:string}|null)?.title??null,goonName:collection.tokens[row.token_id-1]?.name??`Goon #${row.token_id}`,imageUrl:goonImageUrl(row.token_id)}))};}
+
+export async function contributeBattery(wallet:string,input:{tokenId?:number;inventoryId?:string}){const tokenId=validTokenId(Number(input.tokenId));if(!input.inventoryId)throw new Error("BATTERY_REQUIRED");if(!await verifyTokenOwnership(wallet,tokenId))throw new Error("LIVE_OWNERSHIP_REQUIRED");const discipline=collection.tokens[tokenId-1].discipline as Discipline;const supabase=getSupabaseAdmin();if(!supabase)throw new Error("GOONIVERSE_DATABASE_UNAVAILABLE");const{data,error}=await supabase.rpc("contribute_zero_g_battery",{p_token_id:tokenId,p_wallet:wallet.toLowerCase(),p_inventory_id:input.inventoryId,p_discipline:discipline});if(error)throw new Error(error.message);return data;}
+
 export async function getGoonCareer(tokenId: number) {
   validTokenId(tokenId);
   const supabase = getSupabaseAdmin();
