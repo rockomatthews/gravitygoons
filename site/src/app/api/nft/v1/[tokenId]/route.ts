@@ -59,7 +59,7 @@ export async function GET(_request: Request, context: { params: Promise<{ tokenI
     name: token.name,
     description: collection.collection.description,
     image: `${imageBase}${String(tokenId).padStart(4, "0")}.png`,
-    external_url: `https://gravitygoons.com/character/${String(tokenId).padStart(4, "0")}`,
+    external_url: `https://gravitygoons.com/${tokenId}`,
     attributes,
     properties: {
       discipline: token.discipline,

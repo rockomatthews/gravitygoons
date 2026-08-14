@@ -174,6 +174,7 @@ export async function getProfileForWallet(walletAddress: string): Promise<Profil
 
 export function validateUsername(username: string): string {
   const normalized = username.trim().toLowerCase();
+  if (/^\d+$/.test(normalized)) throw new Error("Numeric URLs are reserved for Gravity Goons NFT profiles.");
   if (!/^[a-z0-9][a-z0-9_-]{2,23}$/.test(normalized)) throw new Error("Username must be 3–24 lowercase letters, numbers, underscores, or hyphens.");
   if (RESERVED_USERNAMES.has(normalized)) throw new Error("That username is reserved.");
   return normalized;

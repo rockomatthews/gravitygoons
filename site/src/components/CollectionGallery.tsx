@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { createWalletClient, custom, formatEther, formatUnits, getAddress, isAddress, parseEther, parseUnits } from "viem";
 import { base } from "viem/chains";
 import { Seaport } from "@opensea/seaport-js";
@@ -67,6 +68,7 @@ function displayEth(wei: bigint): string {
 }
 
 export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "All" }: { tokens: Token[]; imageBaseUrl: string; initialDiscipline?: string }) {
+  const router = useRouter();
   const { account, connect, provider, signMessage, signProfileChallenge, message: walletMessage } = useWallet();
   const normalizedAccount = account?.toLowerCase() ?? null;
   const [discipline, setDiscipline] = useState(disciplines.includes(initialDiscipline) ? initialDiscipline : "All");
@@ -496,12 +498,16 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
               ? "Available to mint"
               : `Owned by ${live?.ownerName ?? "Goon Holder"}`;
           return (
-            <article className={`token-card ${active ? "selected" : ""} ${mine ? "mine" : ""}`} key={token.token_id}>
-              <button className="card-image" onClick={() => { trackMarketingEvent("goon_viewed", { token_id: token.token_id, discipline: token.discipline, rarity: token.rarity, availability: available ? "available" : "owned" }); toggle(token.token_id); }} aria-label={available ? `Select ${token.name}` : `${token.name} is owned`} disabled={!available}>
+            <article className={`token-card ${active ? "selected" : ""} ${mine ? "mine" : ""}`} key={token.token_id} role="link" tabIndex={0}
+              onClick={(event) => { if ((event.target as HTMLElement).closest("button,a,input,select")) return; trackMarketingEvent("goon_viewed", { token_id: token.token_id, discipline: token.discipline, rarity: token.rarity, availability: available ? "available" : "owned" }); router.push(`/${token.token_id}`); }}
+              onKeyDown={(event) => { if ((event.target as HTMLElement).closest("button,a,input,select")) return; if (event.key === "Enter" || event.key === " ") { event.preventDefault(); router.push(`/${token.token_id}`); } }}>
+              <div className="card-image">
                 <Image src={imageBaseUrl + "/" + String(token.token_id).padStart(4, "0") + ".png"} alt={token.name} width={1024} height={1024} />
                 <span className={`rarity rarity-${token.rarity.toLowerCase()}`}>{token.rarity}</span>
-                <span className="select-mark">{available ? active ? "SELECTED" : "+ SELECT" : mine ? "YOURS" : "OWNED"}</span>
-              </button>
+                <span className="select-mark">{available ? active ? "SELECTED" : "AVAILABLE" : mine ? "YOURS" : "OWNED"}</span>
+                {available && <button className="card-plus-action" aria-label={`${active ? "Remove" : "Select"} ${token.name} for minting`} onClick={() => toggle(token.token_id)}>+</button>}
+                <button className="card-money-action" aria-label={listing ? `Buy ${token.name}` : available ? `Show mint price for ${token.name}` : `${token.name} is not for sale`} onClick={() => listing && !mine ? void buyListing(listing) : available ? toggle(token.token_id) : setStatus(`#${String(token.token_id).padStart(4,"0")} is not for sale.`)}>$</button>
+              </div>
               <div className="card-copy">
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>
                 <h3>{token.species} · {token.body_build}</h3>

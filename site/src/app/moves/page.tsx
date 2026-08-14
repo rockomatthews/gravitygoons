@@ -52,7 +52,7 @@ export default function MovesPage() {
         <div className="move-studio-boundary">
           <div><span>ATHLETE PROGRESSION</span><b>Wins, sponsor contracts, and trick unlocks are still earned through verified play.</b></div>
           <div><span>CINEMA PROGRESSION</span><b>Approved clips can build a separate cosmetic reel, creator level, and spectator-favorite history.</b></div>
-          <Link className="button primary" href="/character/34">Preview a Goon profile</Link>
+          <Link className="button primary" href="/34">Preview a Goon profile</Link>
         </div>
       </section>
     </main>

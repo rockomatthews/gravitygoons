@@ -165,7 +165,30 @@ export async function getGoonCareer(tokenId: number) {
   };
 }
 
-export async function getWalletCareerSummary(wallet:string){const supabase=getSupabaseAdmin();if(!supabase)throw new Error("Career storage unavailable.");const tokenIds=await syncWalletOwnership(wallet);if(!tokenIds.length)return[];const[economies,sessions,reservations]=await Promise.all([supabase.from("goon_economies").select("token_id,grit_balance,grit_reserved").in("token_id",tokenIds),supabase.from("trick_line_sessions").select("token_id,target_trick_id,status").in("token_id",tokenIds).eq("status","active"),supabase.from("competitive_loadout_reservations").select("token_id,grit_committed,status").in("token_id",tokenIds).in("status",["reserved","locked"])]);const economyById=new Map((economies.data??[]).map(row=>[row.token_id,row]));const sessionById=new Map((sessions.data??[]).map(row=>[row.token_id,row]));const reservationById=new Map((reservations.data??[]).map(row=>[row.token_id,row]));return tokenIds.map(tokenId=>{const token=collection.tokens[tokenId-1],economy=economyById.get(tokenId)??{grit_balance:0,grit_reserved:0},session=sessionById.get(tokenId),reservation=reservationById.get(tokenId);return{tokenId,goon:{name:token.name,imageUrl:goonImageUrl(tokenId)},economy:{grit_balance:Number(economy.grit_balance??0),grit_reserved:Number(economy.grit_reserved??0)},activeTrickLineTarget:session?.target_trick_id??null,activeMatchCommitment:reservation?.grit_committed??null};});}
+export async function getWalletCareerSummary(wallet:string){
+  const supabase=getSupabaseAdmin();
+  if(!supabase)throw new Error("Career storage unavailable.");
+  const tokenIds=await syncWalletOwnership(wallet);
+  if(!tokenIds.length)return[];
+  const[economies,sessions,reservations,records,sponsors,trophies]=await Promise.all([
+    supabase.from("goon_economies").select("token_id,grit_balance,grit_reserved").in("token_id",tokenIds),
+    supabase.from("trick_line_sessions").select("token_id,target_trick_id,status").in("token_id",tokenIds).eq("status","active"),
+    supabase.from("competitive_loadout_reservations").select("token_id,grit_committed,status").in("token_id",tokenIds).in("status",["reserved","locked"]),
+    supabase.from("discipline_ranks").select("token_id,wins,losses,rating,discipline_rank,matches_played").in("token_id",tokenIds),
+    supabase.from("athlete_sponsors").select("token_id").in("token_id",tokenIds),
+    supabase.from("goon_trophies").select("token_id").in("token_id",tokenIds),
+  ]);
+  const economyById=new Map((economies.data??[]).map(row=>[row.token_id,row]));
+  const sessionById=new Map((sessions.data??[]).map(row=>[row.token_id,row]));
+  const reservationById=new Map((reservations.data??[]).map(row=>[row.token_id,row]));
+  const recordById=new Map((records.data??[]).map(row=>[row.token_id,row]));
+  const counts=(rows:{token_id:number}[]|null)=>rows?.reduce((map,row)=>map.set(row.token_id,(map.get(row.token_id)??0)+1),new Map<number,number>())??new Map<number,number>();
+  const sponsorCounts=counts(sponsors.data),trophyCounts=counts(trophies.data);
+  return tokenIds.map(tokenId=>{
+    const token=collection.tokens[tokenId-1],economy=economyById.get(tokenId)??{grit_balance:0,grit_reserved:0},session=sessionById.get(tokenId),reservation=reservationById.get(tokenId);
+    return{tokenId,goon:{name:token.name,imageUrl:goonImageUrl(tokenId),discipline:token.discipline,rarity:token.rarity},economy:{grit_balance:Number(economy.grit_balance??0),grit_reserved:Number(economy.grit_reserved??0)},record:recordById.get(tokenId)??{wins:0,losses:0,rating:1500,discipline_rank:null,matches_played:0},sponsorCount:sponsorCounts.get(tokenId)??0,trophyCount:trophyCounts.get(tokenId)??0,activeTrickLineTarget:session?.target_trick_id??null,activeMatchCommitment:reservation?.grit_committed??null};
+  });
+}
 
 export async function getSponsorOffers(wallet:string){const supabase=getSupabaseAdmin();if(!supabase)throw new Error("Sponsor storage unavailable.");const owned=await syncWalletOwnership(wallet);if(!owned.length)return[];const {data,error}=await supabase.from("athlete_sponsor_offers").select("id,token_id,milestone_wins,first_sponsor_id,second_sponsor_id,status,offered_at").in("token_id",owned).eq("status","pending").order("offered_at");if(error)throw new Error(error.message);return data??[];}
 

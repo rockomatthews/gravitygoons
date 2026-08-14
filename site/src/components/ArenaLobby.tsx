@@ -82,7 +82,7 @@ export function ArenaLobby() {
     </div>}
     {tab === "rankings" && <div className="arena-rank-table">
       <header><span>RANK</span><span>GOON</span><span>DISCIPLINE</span><span>RECORD</span><span>RATING</span></header>
-      {rankings.map((row) => <Link href={`/character/${row.tokenId}`} key={row.tokenId}><b>{athleteRankLabel(row.rank, row.matchesPlayed, true)}</b><span>#{String(row.tokenId).padStart(4, "0")} · {row.name}</span><span>{row.discipline}</span><span>{row.wins}-{row.losses}</span><strong>{row.rating}</strong></Link>)}
+      {rankings.map((row) => <Link href={`/${row.tokenId}`} key={row.tokenId}><b>{athleteRankLabel(row.rank, row.matchesPlayed, true)}</b><span>#{String(row.tokenId).padStart(4, "0")} · {row.name}</span><span>{row.discipline}</span><span>{row.wins}-{row.losses}</span><strong>{row.rating}</strong></Link>)}
       {!rankings.length && <div className="arena-empty"><b>NO PLACEMENT RESULTS YET</b><p>Every authoritative result updates the athlete table exactly once. Official discipline ranks begin after five matches.</p></div>}
     </div>}
   </>;

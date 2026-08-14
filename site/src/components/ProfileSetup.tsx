@@ -58,6 +58,7 @@ export function ProfileSetup() {
     try {
       const verified = await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setStatus, preparedChallenge });
       setAuthenticated(true);
+      window.dispatchEvent(new Event("gravity-goons:profile-authenticated"));
       setPreparedChallenge(null);
       setStatus("Wallet verified. Refreshing your Goons…");
       let ownershipCount: number | null = null;
@@ -137,7 +138,7 @@ export function ProfileSetup() {
 
       <aside className="profile-system-status">
         <b>SYSTEM STATUS</b><p>{status}</p>
-        {profile ? <Link href={`/${profile.username}`}>VIEW SHOWCASE →</Link> : <Link href="/founder">VIEW FOUNDER PROFILE DEMO →</Link>}
+        {profile ? <Link href={`/${profile.username}`}>VIEW SHOWCASE →</Link> : <span>CREATE YOUR PROFILE TO OPEN YOUR SHOWCASE</span>}
       </aside>
     </div>
   );
