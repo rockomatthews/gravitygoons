@@ -16,6 +16,7 @@ import { challengeScheduleWindow } from "@/lib/challenge-scheduling";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import { athleteRankLabel } from "@/lib/rank-display";
 import { trackMarketingEvent } from "@/lib/analytics";
+import { collectionVisibleCount } from "@/lib/collection-pagination";
 
 type Token = {
   token_id: number;
@@ -52,7 +53,6 @@ type AthleteLive = {
 type CompetitionProduct = "ranked" | "usdc" | "pink_slip";
 type Listing = { id: string; order_hash: string; token_id: number; offerer_wallet: string; currency: "ETH" | "USDC"; price_minor: string; status: string; expires_at: string; order_payload?: { parameters: Record<string, unknown>; signature: string } };
 
-const PAGE_SIZE = 24;
 const SEAPORT_16_ADDRESS = "0x0000000000000068F116a894984e2DB1123eB395";
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
 const RARITY_PRICE_WEI: Record<string, bigint> = {
@@ -207,7 +207,8 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
     const bMine = normalizedAccount && (directOwnedIds.has(b.token_id) || liveById.get(b.token_id)?.owner === normalizedAccount) ? 1 : 0;
     return bMine - aMine || a.token_id - b.token_id;
   }), [directOwnedIds, filtered, liveById, normalizedAccount]);
-  const visible = ordered.slice(0, normalizedAccount ? Math.max(page * PAGE_SIZE, PAGE_SIZE * 3) : page * PAGE_SIZE);
+  const visibleCount = collectionVisibleCount(page, Boolean(normalizedAccount));
+  const visible = ordered.slice(0, visibleCount);
   const myGoons = useMemo(() => {
     if (!normalizedAccount) return [];
     return tokens.filter((token) => directOwnedIds.has(token.token_id) || liveById.get(token.token_id)?.owner === normalizedAccount);
@@ -505,8 +506,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
                 <Image src={imageBaseUrl + "/" + String(token.token_id).padStart(4, "0") + ".png"} alt={token.name} width={1024} height={1024} />
                 <span className={`rarity rarity-${token.rarity.toLowerCase()}`}>{token.rarity}</span>
                 <span className="select-mark">{available ? active ? "SELECTED" : "AVAILABLE" : mine ? "YOURS" : "OWNED"}</span>
-                {available && <button className="card-plus-action" aria-label={`${active ? "Remove" : "Select"} ${token.name} for minting`} onClick={() => toggle(token.token_id)}>+</button>}
-                <button className="card-money-action" aria-label={listing ? `Buy ${token.name}` : available ? `Show mint price for ${token.name}` : `${token.name} is not for sale`} onClick={() => listing && !mine ? void buyListing(listing) : available ? toggle(token.token_id) : setStatus(`#${String(token.token_id).padStart(4,"0")} is not for sale.`)}>$</button>
+                {available && <button className={`card-add-action ${active ? "active" : ""}`} aria-label={`${active ? "Remove" : "Add"} ${token.name} ${active ? "from" : "to"} your mint lineup`} onClick={(event) => { event.preventDefault(); event.stopPropagation(); toggle(token.token_id); }}>{active ? "REMOVE GOON" : "ADD GOON"}</button>}
               </div>
               <div className="card-copy">
                 <div><b>#{String(token.token_id).padStart(4, "0")}</b><span>{token.discipline}</span></div>

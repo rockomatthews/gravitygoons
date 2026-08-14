@@ -223,7 +223,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .rarity, .select-mark { position: absolute; top: 10px; z-index: 2; padding: 7px 9px; background: #070b10dc; color: white; font: 850 8px var(--mono); letter-spacing: .08em; backdrop-filter: blur(8px); }
 .rarity { left: 10px; }
 .select-mark { right: 10px; background: var(--teal); color: var(--void); }
-.card-plus-action,.card-money-action{width:44px;height:44px;position:absolute;z-index:4;bottom:10px;border:0;color:#050609;font:1000 24px/1 var(--mono);cursor:pointer;box-shadow:5px 5px 0 #05060999}.card-plus-action{right:10px;background:var(--teal)}.card-money-action{left:10px;background:var(--acid)}.card-plus-action:hover,.card-money-action:hover{transform:translateY(-2px);filter:brightness(1.12)}.token-card[role="link"]{cursor:pointer}.token-card[role="link"]:focus-visible{outline:3px solid var(--acid);outline-offset:4px}
+.card-add-action { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; width: 100%; min-height: 48px; border: 0; color: #050609; background: var(--acid); font: 1000 12px/1 var(--mono); letter-spacing: .12em; cursor: pointer; box-shadow: 0 -8px 28px #000b; }
+.card-add-action:hover, .card-add-action:focus-visible { filter: brightness(1.12); box-shadow: 0 -8px 32px #caff3840; }
+.card-add-action.active { background: var(--teal); }
+.token-card[role="link"]{cursor:pointer}.token-card[role="link"]:focus-visible{outline:3px solid var(--acid);outline-offset:4px}
 .rarity-legendary { background: #ffca38; color: #111; }
 .rarity-epic { background: #954fff; }
 .rarity-rare { background: #087dff; }
