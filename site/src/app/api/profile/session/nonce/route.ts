@@ -6,11 +6,26 @@ export async function POST(request: Request) {
     const body = await request.json() as { address?: string };
     if (!body.address) return NextResponse.json({ error: "Wallet address is required." }, { status: 400 });
     const challenge = createSignInChallenge(body.address);
-    const response = NextResponse.json({ message: challenge.message, expiresAt: challenge.expiresAt });
+    const response = NextResponse.json({
+      message: challenge.message,
+      nonce: challenge.nonce,
+      typedData: {
+        ...challenge.typedData,
+        domain: {
+          ...challenge.typedData.domain,
+          chainId: Number(challenge.typedData.domain.chainId),
+        },
+        message: {
+          ...challenge.typedData.message,
+          issuedAt: challenge.typedData.message.issuedAt.toString(),
+          expirationTime: challenge.typedData.message.expirationTime.toString(),
+        },
+      },
+      expiresAt: challenge.expiresAt,
+    });
     response.cookies.set(NONCE_COOKIE, challenge.token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 600, path: "/" });
     return response;
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to create sign-in challenge." }, { status: 400 });
   }
 }
-

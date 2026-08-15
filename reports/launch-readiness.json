@@ -7,15 +7,22 @@
   },
   "reserve_valid": true,
   "ipfs_verified": true,
-  "premint_site_verified": false,
-  "contract_security_verified": false,
+  "premint_site_verified": true,
+  "authoritative_live_match_verified": true,
+  "contract_security_verified": true,
   "production_safe_verified": true,
-  "base_mainnet_deployment_recorded": false,
-  "ready_for_base_sale": false,
-  "mint_gate_should_be_open": false,
-  "blockers": [
-    "full ownership-backed authoritative 1v1 production E2E is pending",
-    "independent human contract review is incomplete",
-    "Base mainnet contracts not recorded with mint closed"
+  "base_mainnet_deployment_recorded": true,
+  "creator_reserve_minted": true,
+  "creator_reserve_verified": true,
+  "creator_reserve_mint_report": "reports/base-mainnet-creator-reserve-mint.json",
+  "ready_for_base_sale": true,
+  "mint_gate_should_be_open": true,
+  "public_mint_authorization": "OPEN PUBLIC MINT",
+  "public_mint_transaction_status": "executed_and_verified",
+  "public_mint_transaction_hash": "0xa17bacbfc4372315deef6828356d50bd2248480ed4a6b4348d1d2e8ffc8c7727",
+  "blockers": [],
+  "notes": [
+    "The Safe-authorized public mint opened successfully on Base mainnet at block 49705385; 950 exact-ID public allocation slots were available at verification.",
+    "USDC player staking, Pink Slip NFT custody, and spectator money markets remain separate disabled products and are not launch blockers for the NFT sale."
   ]
 }

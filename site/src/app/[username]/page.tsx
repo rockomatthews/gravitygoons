@@ -1,18 +1,35 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { AthleteProfilePage } from "@/components/AthleteProfilePage";
 import { ProfileMoveShowcase } from "@/components/ProfileMoveShowcase";
+import { getAthleteProfile } from "@/lib/athlete-profile";
 import { getPublicProfile } from "@/lib/profile-data";
+import { canonicalAthletePath, numericAthleteSlug } from "@/lib/profile-routing";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
   const { username } = await params;
+  const tokenId = numericAthleteSlug(username);
+  if (tokenId) {
+    const athlete = await getAthleteProfile(tokenId);
+    return athlete ? { title: `${athlete.token.name} — Gravity Goons`, description: `${athlete.token.discipline} NFT athlete career, ranks, tricks, sponsors, trophies, equipment, and match history.`, alternates: { canonical: canonicalAthletePath(tokenId) }, openGraph: { images: [athlete.imageUrl] } } : {};
+  }
   const profile = await getPublicProfile(username);
   return profile ? { title: `${profile.displayName} — Gravity Goons`, description: profile.bio || `${profile.displayName}'s Gravity Goons collection and move cinema.` } : {};
 }
 
 export default async function UsernameProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
+  const tokenId = numericAthleteSlug(username);
+  if (tokenId) {
+    if (username !== String(tokenId)) permanentRedirect(canonicalAthletePath(tokenId));
+    const athlete = await getAthleteProfile(tokenId);
+    if (!athlete) notFound();
+    return <AthleteProfilePage profile={athlete} />;
+  }
   const profile = await getPublicProfile(username);
   if (!profile) notFound();
   const approved = profile.goons.flatMap((goon) => goon.moves).filter((move) => move.landVideoUrl).length;
@@ -39,13 +56,13 @@ export default async function UsernameProfilePage({ params }: { params: Promise<
             const complete = goon.moves.filter((move) => move.pairStatus === "approved").length;
             return (
               <article className="profile-goon" key={goon.tokenId}>
-                <div className="profile-goon-image"><Image src={goon.imageUrl} alt={goon.name} width={1024} height={1024} /><span>{goon.rarity}</span></div>
+                <Link className="profile-goon-image" href={`/${goon.tokenId}`}><Image src={goon.imageUrl} alt={goon.name} width={1024} height={1024} /><span>{goon.rarity}</span></Link>
                 <div className="profile-goon-copy">
                   <p className="eyebrow">{goon.discipline}{" // #"}{String(goon.tokenId).padStart(4, "0")}</p>
                   <h2>{goon.species}</h2>
                   <p>{goon.playStyle} build · Signature move: {goon.trickSpecialty}</p>
                   <div className="profile-reel-progress"><span>MOVIE REEL</span><b>{complete}/{goon.moves.filter((move) => move.unlocked).length} COMPLETE</b><i><em style={{ width: `${goon.moves.filter((move) => move.unlocked).length ? complete / goon.moves.filter((move) => move.unlocked).length * 100 : 0}%` }} /></i></div>
-                  <Link className="button primary" href={`/${profile.username}/goons/${goon.tokenId}/moves`}>OPEN MOVE STUDIO</Link>
+                  <div className="profile-goon-actions"><Link className="button primary" href={`/${goon.tokenId}`}>OPEN NFT PROFILE</Link><Link className="button" href={`/${profile.username}/goons/${goon.tokenId}/moves`}>MOVE STUDIO</Link></div>
                 </div>
                 <div className="profile-move-list">
                   {goon.moves.filter((move) => move.unlocked).map((move) => (

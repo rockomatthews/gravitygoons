@@ -80,6 +80,26 @@ Do not insert a metadata directory CID into its own files; that would be self-re
 
 ## 5. Base mainnet deployment
 
+- Build and test before any deployer secret is present. Genesis `tokenURI` values
+  intentionally remain immutable; progression is read from the registry and the
+  Gravity Goons API/site, not from changing marketplace metadata.
+- Use a fresh, minimally funded, burn-after-use deployer account. Keep its key out
+  of the ordinary development install. After compiling and recording artifact
+  hashes, remove the vulnerable test toolchain and verify the runtime-only install:
+
+```bash
+cd contract
+npm ci
+npm test
+npm run compile
+npm prune --omit=dev
+npm run verify:runtime-isolation
+```
+
+- Only after isolation passes, load `DEPLOYER_PRIVATE_KEY` locally, set
+  `ISOLATED_RUNTIME_DEPLOY=true`, and run `npm run deploy:runtime`. Never place the
+  deployer key, recovery phrase, or RPC credential in chat, source control, shell
+  history, or Vercel.
 - Recheck the chain ID is `8453`, deploy with the Safe as collection owner, and leave `mintOpen=false`.
 - Set `DEPLOYMENT_STAGE=mainnet`, `ALLOW_MAINNET_DEPLOY=true`, `SAFE_ADDRESS` to
   the same value as `OWNER_ADDRESS`, and write `../reports/base-mainnet-deployment.json`.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.30;
 
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -46,6 +46,7 @@ contract GravityGoonsProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
     address public gameSigner;
     address public pendingGameSigner;
     uint64 public signerActivationTime;
+    bool public progressPaused;
     mapping(uint256 => Progress) private _progress;
 
     error CollectionAlreadySet();
@@ -57,10 +58,12 @@ contract GravityGoonsProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
     error WrongDiscipline();
     error NonMonotonicProgress();
     error SignerDelayActive();
+    error ProgressUpdatesPaused();
 
     event CollectionSet(address indexed collection);
     event GameSignerProposed(address indexed signer, uint64 activateAfter);
     event GameSignerActivated(address indexed signer);
+    event ProgressPauseChanged(bool paused);
     event ProgressApplied(
         uint256 indexed tokenId,
         uint64 xp,
@@ -91,13 +94,13 @@ contract GravityGoonsProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
     }
 
     function applyProgress(ProgressClaim calldata claim, bytes calldata signature) external nonReentrant {
+        if (progressPaused) revert ProgressUpdatesPaused();
         if (address(collection) == address(0)) revert CollectionNotSet();
         if (block.timestamp > claim.deadline) revert ClaimExpired();
         Progress storage current = _progress[claim.tokenId];
         if (claim.nonce != current.nonce) revert InvalidNonce();
         if (claim.discipline != collection.disciplineOf(claim.tokenId)) revert WrongDiscipline();
-        address tokenOwner = collection.ownerOf(claim.tokenId); // Reverts for a nonexistent token.
-        if (tokenOwner == address(0)) revert InvalidAddress();
+        collection.ownerOf(claim.tokenId); // Reverts for a nonexistent token.
 
         bytes32 structHash = keccak256(abi.encode(
             PROGRESS_TYPEHASH,
@@ -144,6 +147,12 @@ contract GravityGoonsProgressRegistry is EIP712, Ownable2Step, ReentrancyGuard {
         pendingGameSigner = signer;
         signerActivationTime = uint64(block.timestamp + SIGNER_DELAY);
         emit GameSignerProposed(signer, signerActivationTime);
+    }
+
+    /// @notice Immediately freezes progression claims without affecting minting or NFT ownership.
+    function setProgressPaused(bool paused) external onlyOwner {
+        progressPaused = paused;
+        emit ProgressPauseChanged(paused);
     }
 
     function activateGameSigner() external onlyOwner {

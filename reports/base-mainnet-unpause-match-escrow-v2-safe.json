@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786651560763,
+  "meta": {
+    "name": "Gravity Goons - Enable Escrow V2 for Production Test",
+    "description": "Unpauses GoonMatchEscrowV2 at 0xDA1ff1521f67ca1f40cC32140D992299E81f9efe. Execute only after the 2% fee transaction and constructor verification.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0xDA1ff1521f67ca1f40cC32140D992299E81f9efe",
+      "value": "0",
+      "data": "0x3f4ba83a",
+      "contractMethod": {
+        "inputs": [],
+        "name": "unpause",
+        "payable": false
+      },
+      "contractInputsValues": {}
+    }
+  ]
+}

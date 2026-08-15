@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
+import { authenticateProfileSession, fetchWithTimeout, prepareProfileSignIn, type ProfileSignInChallenge } from "@/lib/profile-auth-client";
+import { trackMarketingEvent } from "@/lib/analytics";
 
 type ProfileRecord = { username: string; display_name: string; bio: string };
 
 export function ProfileSetup() {
-  const { account, connect } = useWallet();
+  const { account, connect, signMessage, signProfileChallenge } = useWallet();
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -15,6 +17,7 @@ export function ProfileSetup() {
   const [bio, setBio] = useState("");
   const [status, setStatus] = useState("Connect and sign once. The signature is free and cannot spend funds.");
   const [busy, setBusy] = useState(false);
+  const [preparedChallenge, setPreparedChallenge] = useState<ProfileSignInChallenge | null>(null);
 
   useEffect(() => {
     fetch("/api/profile/me").then((response) => response.json()).then((data) => {
@@ -28,28 +31,54 @@ export function ProfileSetup() {
     }).catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    if (!account || authenticated) return;
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (active) setStatus("Preparing mobile wallet sign-in…");
+      return prepareProfileSignIn(account);
+    }).then((challenge) => {
+      if (!active) return;
+      setPreparedChallenge(challenge);
+      setStatus("Sign-in ready. Press CONNECT + SIGN to approve it in your wallet.");
+    }).catch((error) => {
+      if (active) setStatus(error instanceof Error ? error.message : "Unable to prepare wallet sign-in.");
+    });
+    return () => { active = false; };
+  }, [account, authenticated]);
+
+  const preparedChallengeReady = Boolean(
+    account
+    && preparedChallenge
+    && preparedChallenge.address.toLowerCase() === account.toLowerCase(),
+  );
+
   async function signIn() {
     setBusy(true);
     try {
-      const address = account ?? await connect();
-      if (!address || !window.ethereum) throw new Error("Connect a wallet first.");
-      setStatus("Preparing a secure profile sign-in message…");
-      const challengeResponse = await fetch("/api/profile/session/nonce", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address }) });
-      const challenge = await challengeResponse.json();
-      if (!challengeResponse.ok) throw new Error(challenge.error);
-      const signature = await window.ethereum.request({ method: "personal_sign", params: [challenge.message, address] }) as `0x${string}`;
-      const verifyResponse = await fetch("/api/profile/session/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address, signature }) });
-      const verified = await verifyResponse.json();
-      if (!verifyResponse.ok) throw new Error(verified.error);
+      const verified = await authenticateProfileSession({ account, connect, signMessage, signProfileChallenge, onStatus: setStatus, preparedChallenge });
       setAuthenticated(true);
+      window.dispatchEvent(new Event("gravity-goons:profile-authenticated"));
+      setPreparedChallenge(null);
+      setStatus("Wallet verified. Refreshing your Goons…");
+      let ownershipCount: number | null = null;
+      try {
+        const syncResponse = await fetchWithTimeout("/api/profile/sync", { method: "POST" }, 30_000);
+        const synced = await syncResponse.json();
+        if (syncResponse.ok) ownershipCount = synced.tokenIds.length;
+      } catch { /* The manual refresh remains available if the index is temporarily unavailable. */ }
       if (verified.profile) {
         setProfile(verified.profile);
         setUsername(verified.profile.username);
         setDisplayName(verified.profile.display_name);
         setBio(verified.profile.bio);
-        setStatus("Profile unlocked. You can edit it or refresh the NFTs owned by this wallet.");
+        setStatus(ownershipCount === null
+          ? "Profile unlocked. Use REFRESH MY GOONS if ownership is not visible yet."
+          : `Profile unlocked. Ownership refreshed: ${ownershipCount} Gravity Goon${ownershipCount === 1 ? "" : "s"} found.`);
       } else {
-        setStatus("Wallet verified. Choose the username that will appear after gravitygoons.com/.");
+        setStatus(ownershipCount === null
+          ? "Wallet verified. Choose your username, then use REFRESH MY GOONS if needed."
+          : `Wallet verified. ${ownershipCount} Gravity Goon${ownershipCount === 1 ? "" : "s"} found. Choose your profile username.`);
       }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet sign-in was cancelled.");
@@ -61,10 +90,12 @@ export function ProfileSetup() {
   async function saveProfile() {
     setBusy(true);
     try {
-      const response = await fetch("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ username, displayName, bio }) });
+      const creatingProfile = !profile;
+      const response = await fetchWithTimeout("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ username, displayName, bio }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setProfile(data.profile);
+      if (creatingProfile) trackMarketingEvent("profile_created", { username: data.profile.username });
       setStatus(`Profile saved. gravitygoons.com/${data.profile.username} is ready.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Unable to save profile.");
@@ -76,7 +107,7 @@ export function ProfileSetup() {
   async function syncCollection() {
     setBusy(true);
     try {
-      const response = await fetch("/api/profile/sync", { method: "POST" });
+      const response = await fetchWithTimeout("/api/profile/sync", { method: "POST" }, 30_000);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setStatus(`Ownership refreshed: ${data.tokenIds.length} Gravity Goon${data.tokenIds.length === 1 ? "" : "s"} found.`);
@@ -93,7 +124,7 @@ export function ProfileSetup() {
         <span>01 // VERIFY OWNER</span>
         <h2>{authenticated ? "Wallet verified." : "Sign in with your wallet."}</h2>
         <p>Gravity Goons uses a short wallet signature for profile access. It creates no transaction, costs no gas, and is checked again before any owner-only movie action.</p>
-        {!authenticated && <button className="button primary" onClick={signIn} disabled={busy}>{busy ? "WAITING…" : "CONNECT + SIGN"}</button>}
+        {!authenticated && <button className="button primary" onClick={signIn} disabled={busy || Boolean(account && !preparedChallengeReady)}>{busy ? "WAITING…" : account && !preparedChallengeReady ? "PREPARING SIGN-IN…" : "CONNECT + SIGN"}</button>}
         {authenticated && <button className="button" onClick={syncCollection} disabled={busy}>{busy ? "SYNCING…" : "REFRESH MY GOONS"}</button>}
       </section>
 
@@ -107,9 +138,8 @@ export function ProfileSetup() {
 
       <aside className="profile-system-status">
         <b>SYSTEM STATUS</b><p>{status}</p>
-        {profile ? <Link href={`/${profile.username}`}>OPEN PUBLIC PROFILE →</Link> : <Link href="/founder">VIEW FOUNDER PROFILE DEMO →</Link>}
+        {profile ? <Link href={`/${profile.username}`}>VIEW SHOWCASE →</Link> : <span>CREATE YOUR PROFILE TO OPEN YOUR SHOWCASE</span>}
       </aside>
     </div>
   );
 }
-

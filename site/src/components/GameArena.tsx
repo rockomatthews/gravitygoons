@@ -19,13 +19,13 @@ import {
   recordVerifiedRankedWin,
   repeatCount,
   resolveSkateTurn,
-  resolveSetterAttempt,
+  setterTrickCooldown,
   sponsorById,
   trickIsInCatalogue,
   trickSimilarity,
+  updateSetterTrickCooldown,
   unlockedTricks,
   type Athlete,
-  type AttemptResult,
   type CallMode,
   type Discipline,
   type SkateTurnChoice,
@@ -48,7 +48,7 @@ type MatchState = {
   letterlessTurns: number;
   turns: number;
   setterTokenId: number;
-  previousSetTrickName: string | null;
+  lastLandedSetByToken: Record<string, string>;
 };
 
 const emptyMatch = (first: ArenaGoon, second: ArenaGoon): MatchState => ({
@@ -58,14 +58,8 @@ const emptyMatch = (first: ArenaGoon, second: ArenaGoon): MatchState => ({
   letterlessTurns: 0,
   turns: 0,
   setterTokenId: first.tokenId,
-  previousSetTrickName: null,
+  lastLandedSetByToken: {},
 });
-
-type PendingAnswer = {
-  choice: SkateTurnChoice;
-  seed: string;
-  setterAttempt: AttemptResult;
-};
 
 function randomSeed(turn: number): string {
   const values = new Uint32Array(4);
@@ -100,7 +94,6 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
   const [selectedTrickId, setSelectedTrickId] = useState(0);
   const [match, setMatch] = useState<MatchState>(() => emptyMatch(first, second));
   const [result, setResult] = useState<SkateTurnResult | null>(null);
-  const [pendingAnswer, setPendingAnswer] = useState<PendingAnswer | null>(null);
   const [callMode, setCallMode] = useState<CallMode>("standard");
   const [prediction, setPrediction] = useState<number | null>(null);
   const [playPoints, setPlayPoints] = useState(1000);
@@ -116,30 +109,15 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
   const responder = setter.tokenId === first.tokenId ? second : first;
   const setterCatalogue = setter.tokenId === first.tokenId ? firstAvailableTricks : secondAvailableTricks;
   const responderCatalogue = responder.tokenId === first.tokenId ? firstAvailableTricks : secondAvailableTricks;
-  const legalSetterTricks = setterCatalogue.filter((trick) => canSetTrick(trick, match.previousSetTrickName));
+  const setterCooldown = setterTrickCooldown(match.lastLandedSetByToken, setter.tokenId);
+  const legalSetterTricks = setterCatalogue.filter((trick) => canSetTrick(trick, setterCooldown));
   const selectedTrick = legalSetterTricks.find((trick) => trick.id === selectedTrickId)
-    ?? firstLegalTrick(setterCatalogue, match.previousSetTrickName);
+    ?? firstLegalTrick(setterCatalogue, setterCooldown);
   const ended = matchIsOver(discipline, match.losses[first.tokenId] ?? 0)
     || matchIsOver(discipline, match.losses[second.tokenId] ?? 0);
-  const marketLocked = match.turns > 0 || pendingAnswer !== null;
+  const marketLocked = match.turns > 0;
   const pressurePenalty = crowdPressurePenalty(match.letterlessTurns);
-  const activeCallMode = pendingAnswer?.choice.callMode ?? callMode;
-  const responderGrit = match.grit[responder.tokenId] ?? 0;
-  const pendingResponderChance = pendingAnswer ? landingChance(responder, pendingAnswer.choice.trick, {
-    callMode: activeCallMode,
-    catalogue: responderCatalogue,
-    forcedResponse: true,
-    letterlessTurns: match.letterlessTurns,
-    practice: match.forcedPractice[responder.tokenId] ?? {},
-  }) : null;
-  const pendingFocusedChance = pendingAnswer ? landingChance(responder, pendingAnswer.choice.trick, {
-    callMode: activeCallMode,
-    catalogue: responderCatalogue,
-    forcedResponse: true,
-    letterlessTurns: match.letterlessTurns,
-    practice: match.forcedPractice[responder.tokenId] ?? {},
-    usesGrit: true,
-  }) : null;
+  const activeCallMode = callMode;
   const resultSetter = result
     ? (result.setterTokenId === first.tokenId ? first : second)
     : null;
@@ -157,7 +135,6 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
     setSelectedTrickId(0);
     setMatch(emptyMatch(nextFirst, nextSecond));
     setResult(null);
-    setPendingAnswer(null);
     setCallMode("standard");
     setPrediction(null);
   }
@@ -173,7 +150,6 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
     setSelectedTrickId(0);
     setMatch(emptyMatch(nextFirst, nextSecond));
     setResult(null);
-    setPendingAnswer(null);
     setCallMode("standard");
     setPrediction(null);
   }
@@ -208,10 +184,16 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       setPrediction(null);
     }
 
+    const nextCooldowns = updateSetterTrickCooldown(
+      match.lastLandedSetByToken,
+      next.setterTokenId,
+      next.trick.name,
+      next.attempts[0].landed,
+    );
     const nextSetterCatalogue = next.nextSetterTokenId === first.tokenId
       ? firstAvailableTricks
       : secondAvailableTricks;
-    const nextLegalTrick = firstLegalTrick(nextSetterCatalogue, next.trick.name);
+    const nextLegalTrick = firstLegalTrick(nextSetterCatalogue, setterTrickCooldown(nextCooldowns, next.nextSetterTokenId));
     setSelectedTrickId(nextLegalTrick.id);
     setMatch({
       losses,
@@ -220,15 +202,14 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       letterlessTurns: next.letterRecipientTokenId === null ? match.letterlessTurns + 1 : 0,
       turns: match.turns + 1,
       setterTokenId: next.nextSetterTokenId,
-      previousSetTrickName: next.trick.name,
+      lastLandedSetByToken: nextCooldowns,
     });
     setCallMode("standard");
-    setPendingAnswer(null);
     setResult(next);
   }
 
   function callAndAttempt() {
-    if (ended || pendingAnswer) return;
+    if (ended) return;
     if (callMode === "send" && (match.grit[setter.tokenId] ?? 0) === 0) return;
     const seed = randomSeed(match.turns + 1);
     const choice: SkateTurnChoice = {
@@ -238,31 +219,13 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       setterCatalogue,
       responderCatalogue,
       responderPractice: match.forcedPractice[responder.tokenId] ?? {},
-      previousSetTrickName: match.previousSetTrickName,
+      previousSetTrickName: setterCooldown,
       callMode,
       letterlessTurns: match.letterlessTurns,
     };
-    const setterAttempt = resolveSetterAttempt(choice, seed);
     const grit = { ...match.grit };
     if (callMode === "send") grit[setter.tokenId] = Math.max(0, grit[setter.tokenId] - 1);
-    if (setterAttempt.landed) {
-      setMatch({ ...match, grit });
-      setPendingAnswer({ choice, seed, setterAttempt });
-      setResult(null);
-      return;
-    }
     completeTurn(resolveSkateTurn(choice, seed), grit);
-  }
-
-  function answerCall(usesGrit: boolean) {
-    if (!pendingAnswer || ended) return;
-    if (usesGrit && (match.grit[responder.tokenId] ?? 0) === 0) return;
-    const grit = { ...match.grit };
-    if (usesGrit) grit[responder.tokenId] = Math.max(0, grit[responder.tokenId] - 1);
-    completeTurn(resolveSkateTurn({
-      ...pendingAnswer.choice,
-      responderUsesGrit: usesGrit,
-    }, pendingAnswer.seed), grit);
   }
 
   function chooseSponsor(tokenId: number, sponsorId: string) {
@@ -289,13 +252,13 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
 
       <div className="arena-turn-banner">
         <span>TURN {match.turns + 1}</span>
-        <b>{pendingAnswer ? `${responder.name.toUpperCase()} MUST ANSWER` : `${setter.name.toUpperCase()} CALLS`}</b>
-        <small>{pendingAnswer ? `${setter.name.toUpperCase()} LANDED ${pendingAnswer.choice.trick.name.toUpperCase()} — RESPONDER CHOOSES WHETHER TO SPEND GRIT` : `${responder.name.toUpperCase()} ONLY ATTEMPTS IT IF THE SETTER LANDS`}</small>
+        <b>{setter.name.toUpperCase()} CALLS</b>
+        <small>60 SECONDS TO PICK · {responder.name.toUpperCase()} AUTOMATICALLY ATTEMPTS THE EXACT TRICK IF IT LANDS</small>
       </div>
 
       <div className="arena-strategy" aria-label="Turn strategy">
-        <div><span>CALL MODE</span><div><button className={callMode === "standard" ? "active" : ""} disabled={pendingAnswer !== null || ended} onClick={() => setCallMode("standard")}>STANDARD</button><button className={callMode === "send" ? "active" : ""} disabled={pendingAnswer !== null || ended || (match.grit[setter.tokenId] ?? 0) === 0} onClick={() => setCallMode("send")}>SEND IT · 1 GRIT</button></div><small>SEND IT: SETTER −10% · RESPONDER −15%</small></div>
-        <div><span>GRIT</span><b>{first.name} {match.grit[first.tokenId] ?? 0}/{GRIT_PER_MATCH} · {second.name} {match.grit[second.tokenId] ?? 0}/{GRIT_PER_MATCH}</b><small>SPEND OFFENSIVELY TO SEND IT OR DEFENSIVELY TO FOCUS +8%</small></div>
+        <div><span>CALL MODE</span><div><button className={callMode === "standard" ? "active" : ""} disabled={ended} onClick={() => setCallMode("standard")}><b>STANDARD</b><small>FREE</small></button><button className={`send-grit ${callMode === "send" ? "active" : ""}`} disabled={ended || (match.grit[setter.tokenId] ?? 0) === 0} onClick={() => setCallMode("send")}><b>SEND IT</b><small>SPEND 1 GRIT</small></button></div><small className={`grit-arm-state ${callMode === "send" ? "armed" : ""}`}>{callMode === "send" ? `GRIT ARMED · ${match.grit[setter.tokenId] ?? 0} LEFT` : `TAP SEND IT TO SPEND GRIT · ${match.grit[setter.tokenId] ?? 0} AVAILABLE`}</small></div>
+        <div><span>GRIT</span><b>{first.name} {match.grit[first.tokenId] ?? 0}/{GRIT_PER_MATCH} · {second.name} {match.grit[second.tokenId] ?? 0}/{GRIT_PER_MATCH}</b><small>SPEND IT OFFENSIVELY WHEN YOU CALL; REQUIRED REPLICATIONS RUN AUTOMATICALLY</small></div>
         <div><span>CROWD PRESSURE</span><b>{pressurePenalty > 0 ? `RESPONDER −${pressurePenalty}%` : "COOL"}</b><small>{match.letterlessTurns} LETTERLESS TURNS · PRESSURE RESETS WHEN A LETTER LANDS</small></div>
       </div>
 
@@ -320,7 +283,7 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
             <div className="fighter-copy"><p>{goon.species} · {goon.parodyBrand}</p><h2>{goon.name}</h2>
               <label>SELECT ATHLETE<select disabled={marketLocked} value={goon.tokenId} onChange={(event) => chooseAthlete(index as 0 | 1, Number(event.target.value))}>{roster.filter((option) => option.tokenId !== (index === 0 ? second.tokenId : first.tokenId)).map((option) => <option value={option.tokenId} key={option.tokenId}>{option.name} · {option.species}</option>)}</select></label>
               <div className="fighter-stats">{Object.entries(goon.stats).map(([stat, value]) => <span key={stat}>{stat.slice(0, 3).toUpperCase()} <b>{value}</b></span>)}</div>
-              <label>{isSetter ? "CALL A TRICK" : "CALLED TRICK"}<select disabled={!isSetter || pendingAnswer !== null} value={selectedTrick.id} onChange={(event) => setSelectedTrickId(Number(event.target.value))}>{(isSetter ? legalSetterTricks : [selectedTrick]).map((item) => <option value={item.id} key={item.id}>{item.name} · D{item.difficulty}{item.sponsorId ? ` · ${sponsorById(item.sponsorId).shortMark}` : ""}</option>)}</select></label>
+              <label>{isSetter ? "CALL A TRICK" : "CALLED TRICK"}<select disabled={!isSetter} value={selectedTrick.id} onChange={(event) => setSelectedTrickId(Number(event.target.value))}>{(isSetter ? legalSetterTricks : [selectedTrick]).map((item) => <option value={item.id} key={item.id}>{item.name} · D{item.difficulty}{item.sponsorId ? ` · ${sponsorById(item.sponsorId).shortMark}` : ""}</option>)}</select></label>
               <div className="odds-strip"><span>LAND <b>{chance}%</b></span><span>GRIT <b>{match.grit[goon.tokenId] ?? 0}/{GRIT_PER_MATCH}</b></span><span>{ownsCalledTrick ? "STATUS" : "TEMP TRY"} <b>{ownsCalledTrick ? "CATALOGUE" : `${Math.round(trickSimilarity(selectedTrick, availableTricks) * 100)}% SIMILAR`}</b></span><span>FORCED PRACTICE <b>{repeatCount(practice, selectedTrick.name)}×</b></span></div>
               {!isSetter && !ownsCalledTrick && <p className="temporary-attempt">TEMPORARY ATTEMPT ONLY — landing this call does not permanently unlock the trick.</p>}
               <div className="sponsor-career">
@@ -334,8 +297,8 @@ export function GameArena({ goons }: { goons: ArenaGoon[] }) {
       </div>
 
       <div className="arena-resolve">
-        <div>{pendingAnswer ? <><span>TURN {match.turns + 1} {"//"} SETTER LANDED</span><b>{responder.name.toUpperCase()}, ANSWER {pendingAnswer.choice.trick.name.toUpperCase()}</b><small>BASE {pendingResponderChance}% {"//"} FOCUS {pendingFocusedChance}% {"//"} {responderGrit} GRIT LEFT {"//"} SEED COMMITTED</small></> : result && resultSetter && resultResponder ? <><span>TURN {match.turns} {"//"} {result.reason.replaceAll("-", " ")}</span><b>{result.reason === "setter-missed" ? `${resultResponder.name.toUpperCase()} GETS THE NEXT CALL` : result.reason === "responder-landed" ? `${resultResponder.name.toUpperCase()} MATCHED IT — THEIR CALL` : `${resultResponder.name.toUpperCase()} TAKES A LETTER`}</b><small>{resultSetter.name.toUpperCase()} {result.attempts[0].chance}% {result.attempts[0].landed ? "LANDED" : "MISSED"}{result.attempts[1] ? ` // ${resultResponder.name.toUpperCase()} ${result.attempts[1].chance}% ${result.attempts[1].landed ? "LANDED" : "MISSED"}` : ""} {"//"} SEED {result.seed}</small></> : <><span>{setter.name.toUpperCase()} HAS THE CALL</span><b>PICK {"//"} SET {"//"} ANSWER</b><small>THREE GRIT PER PLAYER: SPEND IT TO SEND A HARDER CALL OR FOCUS AN ANSWER</small></>}</div>
-        {pendingAnswer ? <div className="answer-actions"><button disabled={ended} onClick={() => answerCall(false)}>ANSWER · {pendingResponderChance}%</button><button disabled={ended || responderGrit === 0} onClick={() => answerCall(true)}>FOCUS · {pendingFocusedChance}% · 1 GRIT</button></div> : <button disabled={ended} onClick={callAndAttempt}>{ended ? "MATCH COMPLETE" : `${callMode === "send" ? "SEND" : "SET"} ${selectedTrick.name.toUpperCase()}`}</button>}
+        <div>{result && resultSetter && resultResponder ? <><span>TURN {match.turns} {"//"} {result.reason.replaceAll("-", " ")}</span><b>{result.reason === "setter-missed" ? `${resultResponder.name.toUpperCase()} GETS THE NEXT CALL` : result.reason === "responder-landed" ? `${resultResponder.name.toUpperCase()} MATCHED IT — THEIR CALL` : `${resultResponder.name.toUpperCase()} TAKES A LETTER`}</b><small>{resultSetter.name.toUpperCase()} {result.attempts[0].chance}% {result.attempts[0].landed ? "LANDED" : "MISSED"}{result.attempts[1] ? ` // AUTO REPLICATION: ${resultResponder.name.toUpperCase()} ${result.attempts[1].chance}% ${result.attempts[1].landed ? "LANDED" : "MISSED"}` : ""} {"//"} SEED {result.seed}</small></> : <><span>{setter.name.toUpperCase()} HAS THE CALL</span><b>PICK {"//"} SET {"//"} AUTO-ANSWER</b><small>THE SETTER CHOOSES; A REQUIRED REPLICATION RESOLVES AUTOMATICALLY</small></>}</div>
+        <button disabled={ended} onClick={callAndAttempt}>{ended ? "MATCH COMPLETE" : `${callMode === "send" ? "SEND" : "SET"} ${selectedTrick.name.toUpperCase()}`}</button>
         {ended && <button className="reset-match" onClick={() => reset()}>NEW MATCH</button>}
       </div>
     </div>

@@ -45,7 +45,7 @@ export function GameExplainer() {
           <p className="eyebrow">ONE ARENA // TWO WAYS IN</p>
           <h2>Own the athlete.<br /><i>Or call the winner.</i></h2>
         </div>
-        <p>Gravity Goons plays like SKATE and HORSE. One player calls and attempts a trick. Land it and the second player chooses how to answer; miss the answer and take a letter. Three Grit per player creates a visible offense-versus-defense resource battle that spectators can follow without owning an NFT.</p>
+        <p>Gravity Goons plays like SKATE and HORSE. One player has 60 seconds to call a trick. Land it and the opponent&apos;s required replication runs automatically; miss the replication and take a letter. Grit creates visible offensive strategy that spectators can follow without owning an NFT.</p>
       </div>
 
       <div className="primer-personas">

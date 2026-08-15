@@ -8,8 +8,8 @@ hashes below and requires the reviewer to assess the diff.
 
 | Contract | SHA-256 |
 | --- | --- |
-| `src/GravityGoons.sol` | `7b48d1a22b686ba717f72313fcd9e9a913f04246a35b470b8d776c2bff1fd37f` |
-| `src/GravityGoonsProgressRegistry.sol` | `c6594718da2785e39276ed17ac65350b9834a0e47add3d95b94996d6751e2a08` |
+| `src/GravityGoons.sol` | `fe07678bb1ab2ed2ece3dc3e57c977443e4757b43dfbf21181b648f5083d1a43` |
+| `src/GravityGoonsProgressRegistry.sol` | `c51e8f3c615eae0d274a20dedab6c39d4b409d5433c4f94593c90baf32129736` |
 
 Compiler: Solidity `0.8.30`, EVM target `shanghai`, optimizer enabled with 200
 runs. OpenZeppelin Contracts is pinned to `5.4.0` in `package-lock.json`.
@@ -43,10 +43,12 @@ runs. OpenZeppelin Contracts is pinned to `5.4.0` in `package-lock.json`.
 7. Progress claims are EIP-712 signed, bound to the deployed registry and chain,
    discipline-correct, deadline-limited, nonce-ordered, and monotonic.
 8. A game-signer replacement requires a two-day delay.
-9. ERC-721 receiver callbacks and ETH withdrawal cannot create reentrancy that
+9. The Safe can immediately pause progression claims while a compromised game
+   signer completes the delayed replacement process.
+10. ERC-721 receiver callbacks and ETH withdrawal cannot create reentrancy that
    bypasses mint accounting or permissions.
-10. Safe ownership transfer and registry two-step ownership cannot leave an
-    unauthorized controller or an unusable pending-owner state.
+11. Safe ownership transfer and registry two-step ownership cannot leave an
+   unauthorized controller or an unusable pending-owner state.
 
 ## Reviewer deliverables
 
@@ -57,7 +59,9 @@ runs. OpenZeppelin Contracts is pinned to `5.4.0` in `package-lock.json`.
   trait inputs, and Safe ownership handoff—not source files alone.
 - Written acknowledgement of the two documented Slither findings in
   `../reports/contract-security-review.json`, whether accepted or disputed.
-- The exact reviewed commit hash and both source hashes above.
+- A fix review of the remediation diff from reviewed commit
+  `37c42dbeb807ebd130af2935d28094742c49d215`.
+- The exact reviewed commit hash and all source hashes above.
 
 ## Verification commands
 
@@ -71,13 +75,15 @@ npm run compile
 
 Static-analysis evidence is stored in:
 
-- `../reports/slither-gravity-goons-filtered.json`
-- `../reports/slither-progress-registry-filtered.json`
+- `../reports/slither-gravity-goons-fix-review.json`
+- `../reports/slither-progress-registry-fix-review.json`
 - `../reports/contract-security-review.json`
 
 ## Explicitly out of scope
 
-The website, Supabase match settlement, USDC wagering, spectator markets,
-third-party marketplace contracts, Safe implementation, and hosted IPFS
-providers are not part of these two contracts. USDC wagering and real-money
-spectator markets remain disabled.
+`src/GoonMatchEscrow.sol`, `src/GoonPinkSlipEscrow.sol`, the website, Supabase
+match settlement, spectator markets, third-party market contracts, Safe
+implementation, and hosted IPFS providers remain outside this launch-contract
+review. Legal classification is also separate. USDC wagering, Pink Slip NFT
+custody, and real-money spectator markets remain disabled until each escrow
+receives its own independent security and legal reviews.

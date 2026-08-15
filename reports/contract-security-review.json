@@ -1,21 +1,17 @@
 {
   "schema": "gravity-goons-contract-security-review-v1",
-  "checked_at": "2026-07-31T20:37:07Z",
+  "checked_at": "2026-08-01T22:30:00Z",
   "contract_tests_passed": true,
-  "contract_test_count": 10,
+  "contract_test_count": 18,
   "website_production_dependency_vulnerabilities": 0,
-  "contract_toolchain_dependency_vulnerabilities": {
-    "total": 37,
-    "high": 24,
-    "critical": 5,
-    "scope": "Ganache development and local test toolchain; not deployed contract bytecode"
-  },
+  "production_contract_runtime_dependency_vulnerabilities": 0,
+  "development_toolchain_isolated_from_mainnet_deployer": true,
   "static_analysis": {
     "tool": "Slither",
     "version": "0.11.6",
     "compiler": "solc 0.8.30",
-    "collection_report": "reports/slither-gravity-goons-filtered.json",
-    "registry_report": "reports/slither-progress-registry-filtered.json",
+    "collection_report": "reports/slither-gravity-goons-fix-review.json",
+    "registry_report": "reports/slither-progress-registry-fix-review.json",
     "untriaged_findings": 0,
     "accepted_findings": [
       {
@@ -27,21 +23,43 @@
         "detector": "timestamp",
         "location": "GravityGoonsProgressRegistry",
         "reason": "Timestamps enforce signed-claim expiry and the two-day signer activation delay; neither controls randomness, pricing, or winner selection."
+      },
+      {
+        "detector": "unused-return",
+        "location": "GravityGoonsProgressRegistry.applyProgress",
+        "reason": "ownerOf is intentionally called only for its ERC-721 nonexistent-token revert; its returned owner is not part of progression authorization."
       }
     ]
   },
   "static_analysis_passed": true,
-  "independent_review_complete": false,
+  "independent_initial_review_complete": true,
+  "independent_reviewed_commit": "37c42dbeb807ebd130af2935d28094742c49d215",
+  "independent_review_verdict": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 3,
+    "informational": 4
+  },
+  "independent_fix_review_complete": true,
+  "independent_fix_review_commit": "c2704df7ac613f6c99021d6fb8de788a49007b6b",
+  "independent_fix_review_report": "reports/independent-fix-review-2026-08-01.md",
+  "independent_review_complete": true,
   "unresolved_high_findings": 0,
   "unresolved_critical_findings": 0,
-  "mainnet_deployment_authorized": false,
+  "mainnet_deployment_authorized": true,
+  "mainnet_deployment_completed": true,
+  "mainnet_deployment_record": "reports/base-mainnet-deployment.json",
   "independent_review_packet_ready": true,
   "independent_review_scope": "contract/AUDIT_SCOPE.md",
+  "remediation_record": "reports/independent-review-remediation.json",
   "notes": [
-    "Compilation and all ten local launch-contract tests pass after the static-analysis hardening changes, including all 1,000 packed rarity and discipline assignments.",
+    "Compilation and all 18 local contract tests pass after the independent-review hardening changes, including all 1,000 packed rarity and discipline assignments.",
     "The website production dependency audit reports zero vulnerabilities.",
-    "Slither reports zero untriaged first-party findings after filtering OpenZeppelin dependencies and documenting two intentional patterns.",
-    "The Ganache findings remain isolated to the local development dependency tree and are not included in deployed bytecode.",
-    "An independent human contract review is still required before mainnet deployment."
+    "Slither reports no first-party high or critical issue; three intentional first-party patterns are documented above.",
+    "The mainnet deployment script refuses to run unless development tooling is absent and isolated-runtime mode is explicitly enabled.",
+    "The independent fix review confirms every prior finding is resolved or accepted by design and reports zero Critical, High, or Medium findings at c2704df.",
+    "Contract security is cleared. Rob explicitly authorized the closed Base mainnet deployment; it completed with public minting closed and zero minted supply.",
+    "Registry ownership acceptance, the exact creator reserve mint, production verification, and public-mint authorization remain separate gates."
   ]
 }

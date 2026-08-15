@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.30;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
@@ -83,7 +83,7 @@ contract GravityGoons is ERC721, ERC2981, Ownable2Step, ReentrancyGuard {
         for (uint256 i; i < quantity; ++i) _safeMint(msg.sender, tokenIds[i]);
     }
 
-    function creatorMintSelected(address recipient, uint16[] calldata tokenIds) external onlyOwner {
+    function creatorMintSelected(address recipient, uint16[] calldata tokenIds) external onlyOwner nonReentrant {
         uint256 quantity = tokenIds.length;
         if (quantity == 0) revert InvalidQuantity();
         if (creatorMinted + quantity > CREATOR_ALLOCATION) revert CreatorAllocationExceeded();

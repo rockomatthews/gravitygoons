@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { WalletProfileLink } from "@/components/WalletProfileLink";
 
 const tvs = [
   { className: "zero-g-tv tv-one", label: "Watch SKATE in Game Mode" },
@@ -51,9 +52,10 @@ export function ZeroGBar() {
           <span>GAME MODE ↗</span>
         </Link>
       ))}
-      <Link href="/profile" className="zero-g-door" aria-label="Open your Gravity Goons profile">
+      <WalletProfileLink className="zero-g-door" ariaLabel="Open your Gravity Goons profile">
         <span>PROFILE ↗</span>
-      </Link>
+      </WalletProfileLink>
+      <Link href="/gooniverse" className="zero-g-gooniverse" aria-label="Enter the Gooniverse"><span>ENTER THE GOONIVERSE ↗</span></Link>
 
       <div className="zero-g-sign" aria-label="ZERO-G ENERGY">
         <Image src="/collection/zero-g-bar/zero-g-energy.svg" alt="ZERO-G ENERGY" width={320} height={112} />
@@ -63,9 +65,9 @@ export function ZeroGBar() {
 
       <div className="zero-g-copy">
         <p className="eyebrow">WELCOME TO THE ZERO-G BAR</p>
-        <h1>Pick a Goon.<br /><i>Call the trick.</i></h1>
-        <p>Every screen leads to the game. The bathroom door leads to your profile. The roster below is where rivals meet.</p>
-        <a className="button primary" href="#collection">ENTER THE ROSTER</a>
+        <h1>Pick a Goon.<br /><i>Call the trick.</i><br />Take the letters.</h1>
+        <p>Most NFTs sit in wallets. Gravity Goons compete live across six action-sports disciplines on Base.</p>
+        <Link className="button primary" href="/collection">ENTER THE ROSTER</Link>
       </div>
       <button className="zero-g-sound" onClick={() => setMuted((value) => !value)} aria-pressed={!muted}>
         {muted ? "SOUND OFF" : "SOUND ON"}

@@ -5,20 +5,25 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts",
+    "test:game": "node --test --experimental-strip-types src/lib/pvp.test.ts src/lib/gooniverse.test.ts src/lib/match-presentation.test.ts src/lib/rank-display.test.ts src/lib/challenge-scheduling.test.ts src/lib/match-check-in.test.ts src/lib/escrow-routing.test.ts",
     "test:limitless": "node --test --experimental-strip-types src/lib/limitless/core.test.ts",
-    "test:profile": "node --test --experimental-strip-types src/lib/profile-session.test.ts",
-    "test": "npm run test:game && npm run test:limitless && npm run test:profile",
+    "test:profile": "node --test --experimental-strip-types src/lib/profile-session.test.ts src/lib/profile-routing.test.ts src/lib/collection-pagination.test.ts",
+    "test:wallet-links": "node --test --experimental-strip-types src/lib/wallet-links.test.ts",
+    "test:move-provider": "node --test --experimental-strip-types src/lib/seevio-server.test.ts src/lib/move-studio-ui.test.ts src/lib/move-prompts.test.ts",
+    "test": "npm run test:game && npm run test:limitless && npm run test:profile && npm run test:wallet-links && npm run test:move-provider",
     "analyze:game-balance": "node --experimental-strip-types scripts/simulate-pvp-balance.mjs ../reports/pvp-balance-v04.json",
+    "marketing:link": "node scripts/marketing-link.mjs",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
-    "@fal-ai/client": "1.10.1",
     "@limitless-exchange/sdk": "^1.0.11",
+    "@opensea/seaport-js": "^4.1.7",
     "@supabase/supabase-js": "2.110.7",
     "@types/three": "^0.185.1",
+    "@walletconnect/ethereum-provider": "2.23.10",
     "next": "16.2.12",
+    "posthog-js": "^1.414.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "three": "^0.185.1",
@@ -33,6 +38,8 @@
     "typescript": "5.9.3"
   },
   "overrides": {
+    "axios": "1.19.0",
+    "nanoid": "3.3.17",
     "postcss": "8.5.25",
     "sharp": "0.35.3"
   }

@@ -3,7 +3,8 @@ import { collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { goonImageUrl } from "@/lib/goon-images";
 import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { seedanceConfigured, submitSeedanceJob } from "@/lib/seedance-server";
+import { publicSeevioFailureMessage, SEEVIO_VIDEO_MODEL, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
+import { movePromptFor } from "@/lib/move-prompts";
 
 const CHAIN_ID = 8453;
 const BASE_USDC = (process.env.BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913").toLowerCase();
@@ -25,10 +26,7 @@ function promptFor(tokenId: number, trickId: number, outcome: "land" | "fall"): 
   const result = tokenMove(tokenId, trickId);
   if (!result.trick) throw new Error("Move not found in this discipline catalog.");
   const token = result.token;
-  const action = outcome === "land"
-    ? `performs a ${result.trick.name} and lands it cleanly, riding away under full control`
-    : `performs a ${result.trick.name}, loses control during the landing, falls safely, and does not land the trick`;
-  return `Five-second square action-sports broadcast clip. Preserve the exact identity, species, face, body, clothing, fictional sponsor marks, stance, and ${token.sport_equipment} from the source image. The ${token.species} ${result.discipline} rider ${action}. Show one coherent rider and one complete set of discipline-correct equipment. Keep anatomy, pedals, bindings, boards, skis, wheels, handlebars, fins, and tail attachment physically correct. No extra limbs, duplicate equipment, real trademarks, text mutation, camera cuts, or outcome ambiguity.`;
+  return movePromptFor({ token, discipline: result.discipline, trickName: result.trick.name, outcome });
 }
 
 function quoteAmount(): number {
@@ -43,14 +41,27 @@ function includedRerollsPerOutcome(): number {
   return value;
 }
 
+function assertProductionMovePurchaseReady(): void {
+  if (process.env.MOVE_PAYMENT_MODE !== "live") throw new Error("Movie purchases are temporarily closed while the Seevio production connection is being verified. No payment was requested.");
+  if (!seevioConfigured()) throw new Error("Movie purchases are temporarily closed until the Seevio API key and secure callback are configured. No payment was requested.");
+  const treasury = process.env.MOVE_TREASURY_ADDRESS?.toLowerCase();
+  const publicTreasury = process.env.NEXT_PUBLIC_MOVE_TREASURY_ADDRESS?.toLowerCase();
+  if (!treasury || !publicTreasury || treasury !== publicTreasury) throw new Error("Movie purchases are temporarily closed because the Base USDC treasury configuration is incomplete. No payment was requested.");
+}
+
 export async function createMoveQuote(walletAddress: string, tokenId: number, trickId: number) {
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const { trick } = tokenMove(tokenId, trickId);
   if (!trick) throw new Error("Move not found in this Goon's discipline.");
-  if (trick.sponsorId !== null) throw new Error("This move must be permanently unlocked before its movie can be commissioned.");
+  const unlockDb=getSupabaseAdmin();
+  if(!unlockDb)throw new Error("Move progression is temporarily unavailable.");
+  const {data:progress}=await unlockDb.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle();
+  const bits=String(progress?.unlocked_trick_bitmap??"").replace(/[^01]/g,"").padStart(64,"0").slice(-64);
+  if(trick.id>=4&&bits[63-trick.id]!=="1")throw new Error("This move must be permanently unlocked before its movie can be commissioned.");
   const amount = quoteAmount();
-  const supabase = getSupabaseAdmin();
+  const supabase = unlockDb;
   if (!supabase || collectionAddress === ZERO_ADDRESS) return { demo: true, orderId: "demo-order", pairId: "demo-pair", amountMinorUnits: amount, displayPrice: formatUsdc(amount), expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() };
+  assertProductionMovePurchaseReady();
 
   const wallet = walletAddress.toLowerCase();
   const profile = await getProfileForWallet(wallet);
@@ -61,8 +72,9 @@ export async function createMoveQuote(walletAddress: string, tokenId: number, tr
   if (existing) {
     const { data: orderData } = await supabase.from("move_media_orders").select("id,pair_id,payer_wallet_address,amount_minor_units,status,quote_expires_at,payment_tx_hash").eq("pair_id", existing.id).maybeSingle();
     const order = orderData as OrderRow | null;
-    if (order && order.status !== "expired") return { demo: false, orderId: order.id, pairId: existing.id, amountMinorUnits: Number(order.amount_minor_units), displayPrice: formatUsdc(Number(order.amount_minor_units)), expiresAt: order.quote_expires_at, status: order.status };
-    if (order?.status === "expired") {
+    const quoteExpired = order?.status === "expired" || (order?.status === "quoted" && new Date(order.quote_expires_at).getTime() < Date.now());
+    if (order && !quoteExpired) return { demo: false, orderId: order.id, pairId: existing.id, amountMinorUnits: Number(order.amount_minor_units), displayPrice: formatUsdc(Number(order.amount_minor_units)), expiresAt: order.quote_expires_at, status: order.status };
+    if (order && quoteExpired) {
       const providerCost = Math.min(amount, Number(process.env.MOVE_PAIR_ESTIMATED_COST_USDC_MINOR ?? 2_500_000));
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
       await Promise.all([
@@ -135,6 +147,9 @@ async function verifyUsdcTransfer(order: OrderRow, txHash: `0x${string}`): Promi
 async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configured: boolean }> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return { submitted: 0, configured: false };
+  if (["generating", "owner_review", "approved", "rerolling", "rejected", "unpublished"].includes(pair.status)) {
+    return { submitted: 0, configured: seevioConfigured() };
+  }
   const sourceImageUrl = absoluteImageUrl(pair.token_id);
   const assets: AssetRow[] = [];
   for (const outcome of ["land", "fall"] as const) {
@@ -150,10 +165,11 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
     }
   }
   let submitted = 0;
+  let active = 0;
   for (const asset of assets) {
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${asset.version}`;
-    const requestPayload = { model: "bytedance/seedance-2.0/fast/image-to-video", prompt: asset.prompt, image_url: asset.source_image_url, resolution: "720p", duration: 5 };
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
+    const requestPayload = { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: asset.prompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 };
+    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
     let job = jobData as JobRow | null;
     if (!job) {
@@ -161,14 +177,25 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
       if (existingJobError) throw new Error(existingJobError.message);
       job = existingJob as JobRow;
     }
-    if (job.provider_job_id || job.status !== "queued" || !seedanceConfigured()) continue;
-    const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing" }).eq("id", job.id).eq("status", "queued").select("id").maybeSingle();
+    if (job.provider_job_id || ["submitted", "processing", "succeeded"].includes(job.status)) {
+      active += 1;
+      continue;
+    }
+    if (!["queued", "failed"].includes(job.status) || !seevioConfigured()) continue;
+    const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing", error_message: null }).eq("id", job.id).in("status", ["queued", "failed"]).select("id").maybeSingle();
     if (!claimedJob) continue;
+    await supabase.from("move_media_assets").update({ status: "queued" }).eq("id", asset.id);
     let providerJobId: string | null;
     try {
-      providerJobId = await submitSeedanceJob({ prompt: asset.prompt, imageUrl: asset.source_image_url, idempotencyKey });
+      providerJobId = await submitSeevioJob({ prompt: asset.prompt, imageUrl: asset.source_image_url, idempotencyKey });
     } catch (error) {
-      await supabase.from("move_generation_jobs").update({ status: "queued", error_message: error instanceof Error ? error.message : "Seedance submission failed." }).eq("id", job.id);
+      const providerMessage = error instanceof Error ? error.message : "Seevio submission failed.";
+      await Promise.all([
+        supabase.from("move_generation_jobs").update({ status: "failed", error_message: providerMessage }).eq("id", job.id),
+        supabase.from("move_media_assets").update({ status: "failed" }).eq("id", asset.id),
+        supabase.from("move_media_pairs").update({ status: "failed" }).eq("id", pair.id),
+      ]);
+      console.error("move_generation_submit_failed", { pairId: pair.id, assetId: asset.id, outcome: asset.outcome, provider: "seevio", reason: providerMessage });
       throw error;
     }
     if (!providerJobId) {
@@ -180,9 +207,10 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
       supabase.from("move_media_assets").update({ provider_job_id: providerJobId, status: "generating" }).eq("id", asset.id),
     ]);
     submitted += 1;
+    active += 1;
   }
-  await supabase.from("move_media_pairs").update({ status: submitted ? "generating" : "queued" }).eq("id", pair.id);
-  return { submitted, configured: seedanceConfigured() };
+  await supabase.from("move_media_pairs").update({ status: active ? "generating" : "queued" }).eq("id", pair.id);
+  return { submitted, configured: seevioConfigured() };
 }
 
 export async function confirmMovePayment(walletAddress: string, orderId: string, txHash: `0x${string}`) {
@@ -193,12 +221,12 @@ export async function confirmMovePayment(walletAddress: string, orderId: string,
   if (!order || order.payer_wallet_address !== walletAddress.toLowerCase()) throw new Error("Move order not found for this wallet.");
   if (order.status === "confirmed") {
     const { data: confirmedPairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("id", order.pair_id).single();
-    const generation = await enqueuePair(confirmedPairData as PairRow);
-    return { demo: false, orderId, status: "confirmed", generation };
-  }
-  if (new Date(order.quote_expires_at).getTime() < Date.now()) {
-    await supabase.from("move_media_orders").update({ status: "expired" }).eq("id", order.id);
-    throw new Error("This quote expired. Request a new quote before paying.");
+    try {
+      const generation = await enqueuePair(confirmedPairData as PairRow);
+      return { demo: false, orderId, pairId: order.pair_id, status: "confirmed", generation };
+    } catch (error) {
+      return { demo: false, orderId, pairId: order.pair_id, status: "confirmed", generation: { retryRequired: true, message: publicSeevioFailureMessage(error) } };
+    }
   }
   await verifyUsdcTransfer(order, txHash);
   const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("id", order.pair_id).single();
@@ -208,8 +236,31 @@ export async function confirmMovePayment(walletAddress: string, orderId: string,
     supabase.from("move_media_orders").update({ status: "confirmed", payment_tx_hash: txHash, paid_at: new Date().toISOString() }).eq("id", order.id),
     supabase.from("move_media_pairs").update({ status: "paid" }).eq("id", pair.id),
   ]);
-  const submitted = await enqueuePair(pair);
-  return { demo: false, orderId, status: "confirmed", generation: submitted };
+  console.info("move_payment_confirmed", { orderId: order.id, pairId: pair.id, tokenId: pair.token_id, txHash });
+  try {
+    const submitted = await enqueuePair(pair);
+    return { demo: false, orderId, pairId: pair.id, status: "confirmed", generation: submitted };
+  } catch (error) {
+    return { demo: false, orderId, pairId: pair.id, status: "confirmed", generation: { retryRequired: true, message: publicSeevioFailureMessage(error) } };
+  }
+}
+
+export async function retryMoveGeneration(walletAddress: string, pairId: string) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase || collectionAddress === ZERO_ADDRESS) return { demo: true, pairId, status: "confirmed", generation: "demo" };
+  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("id", pairId).maybeSingle();
+  const pair = pairData as PairRow | null;
+  if (!pair || !(await verifyTokenOwnership(walletAddress, pair.token_id))) throw new Error("Paid movie workflow not found for the current NFT owner.");
+  const { data: orderData } = await supabase.from("move_media_orders").select("id,pair_id,payer_wallet_address,amount_minor_units,status,quote_expires_at,payment_tx_hash").eq("pair_id", pair.id).maybeSingle();
+  const order = orderData as OrderRow | null;
+  if (!order || order.status !== "confirmed" || !order.payment_tx_hash) throw new Error("No confirmed payment exists for this movie workflow. No generation retry was started.");
+  try {
+    const generation = await enqueuePair(pair);
+    console.info("move_generation_retried", { orderId: order.id, pairId: pair.id, tokenId: pair.token_id, submitted: generation.submitted });
+    return { demo: false, orderId: order.id, pairId: pair.id, status: "confirmed", generation };
+  } catch (error) {
+    return { demo: false, orderId: order.id, pairId: pair.id, status: "confirmed", generation: { retryRequired: true, message: publicSeevioFailureMessage(error) } };
+  }
 }
 
 export async function reviewMoveAsset(walletAddress: string, assetId: string, decision: "approved" | "rejected" | "reroll", note = "") {
@@ -221,36 +272,74 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("id", asset.pair_id).single();
   const pair = pairData as PairRow;
   if (!(await verifyTokenOwnership(walletAddress, pair.token_id))) throw new Error("Only the current NFT owner can review this movie.");
-  if (asset.status !== "owner_review") throw new Error("This outcome is not currently awaiting owner review.");
+  const canReview = asset.status === "owner_review" || (decision === "reroll" && asset.status === "rejected");
+  if (!canReview) throw new Error("This outcome is not currently awaiting owner review or an included rejected-draft reroll.");
   const reviewedAt = new Date().toISOString();
-  await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
 
   if (decision === "reroll") {
     if (asset.version > includedRerollsPerOutcome()) throw new Error("This movie pair has used its included reroll for this outcome. Reject this draft or purchase an additional reroll when paid rerolls launch.");
     const nextVersion = asset.version + 1;
-    const rerollPrompt = note.trim() ? `${asset.prompt} Owner revision note: ${note.trim()}` : asset.prompt;
+    const correctedBasePrompt = promptFor(pair.token_id, pair.trick_id, asset.outcome);
+    const rerollPrompt = note.trim() ? `${correctedBasePrompt} Owner revision note: ${note.trim()}` : correctedBasePrompt;
     const { data: nextData, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome: asset.outcome, version: nextVersion, status: "queued", source_image_url: asset.source_image_url, prompt: rerollPrompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();
-    if (error) throw new Error(error.message);
-    const nextAsset = nextData as AssetRow;
+    if (error && error.code !== "23505") throw new Error(error.message);
+    let nextAsset = nextData as AssetRow | null;
+    if (!nextAsset) {
+      const { data: existingAsset, error: existingAssetError } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").eq("pair_id", pair.id).eq("outcome", asset.outcome).eq("version", nextVersion).single();
+      if (existingAssetError) throw new Error(existingAssetError.message);
+      nextAsset = existingAsset as AssetRow;
+    }
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${nextVersion}`;
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, status: "queued", attempt: nextVersion, request_payload: { prompt: rerollPrompt, image_url: asset.source_image_url, resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
-    if (jobError) throw new Error(jobError.message);
-    const job = jobData as JobRow;
-    const providerJobId = await submitSeedanceJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
+    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: rerollPrompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
+    if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
+    let job = jobData as JobRow | null;
+    if (!job) {
+      const { data: existingJob, error: existingJobError } = await supabase.from("move_generation_jobs").select("id,asset_id,idempotency_key,provider_job_id,status").eq("idempotency_key", idempotencyKey).single();
+      if (existingJobError) throw new Error(existingJobError.message);
+      job = existingJob as JobRow;
+    }
+    if (job.provider_job_id || ["submitted", "processing", "succeeded"].includes(job.status)) {
+      await supabase.from("move_media_pairs").update({ status: job.status === "succeeded" ? "owner_review" : "rerolling" }).eq("id", pair.id);
+      return { demo: false, assetId: nextAsset.id, decision, providerJobId: job.provider_job_id, existing: true };
+    }
+    const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing", error_message: null }).eq("id", job.id).in("status", ["queued", "failed"]).select("id").maybeSingle();
+    if (!claimedJob) return { demo: false, assetId: nextAsset.id, decision, providerJobId: null, existing: true };
+    let providerJobId: string | null;
+    try {
+      providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
+    } catch (error) {
+      const providerMessage = error instanceof Error ? error.message : "Seevio submission failed.";
+      await Promise.all([
+        supabase.from("move_generation_jobs").update({ status: "failed", error_message: providerMessage }).eq("id", job.id),
+        supabase.from("move_media_assets").update({ status: "failed" }).eq("id", nextAsset.id),
+        supabase.from("move_media_pairs").update({ status: "failed" }).eq("id", pair.id),
+      ]);
+      console.error("move_reroll_submit_failed", { pairId: pair.id, assetId: nextAsset.id, outcome: asset.outcome, reason: providerMessage });
+      throw error;
+    }
     if (providerJobId) {
       await Promise.all([
         supabase.from("move_generation_jobs").update({ provider_job_id: providerJobId, status: "submitted", submitted_at: reviewedAt }).eq("id", job.id),
         supabase.from("move_media_assets").update({ provider_job_id: providerJobId, status: "generating" }).eq("id", nextAsset.id),
       ]);
     }
+    await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
     await supabase.from("move_media_pairs").update({ status: "rerolling" }).eq("id", pair.id);
     return { demo: false, assetId: nextAsset.id, decision, providerJobId };
   }
 
+  await supabase.from("move_media_reviews").insert({ asset_id: asset.id, reviewer_wallet_address: walletAddress.toLowerCase(), decision, note, ownership_verified_at: reviewedAt });
+
   // An approved LAND draft remains private until its matching FALL draft is
   // also approved. This prevents public profiles from advertising an
   // incomplete gameplay pair.
-  await supabase.from("move_media_assets").update({ owner_decision: decision, status: decision, reviewed_at: reviewedAt, published_at: null }).eq("id", asset.id);
+  await supabase.from("move_media_assets").update({
+    owner_decision: decision,
+    status: decision,
+    moderation_status: decision === "approved" ? "passed" : "failed",
+    reviewed_at: reviewedAt,
+    published_at: null,
+  }).eq("id", asset.id);
   const { data: latestData } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").eq("pair_id", pair.id).order("version", { ascending: false });
   const latestByOutcome = new Map<string, AssetRow>();
   for (const row of (latestData ?? []) as AssetRow[]) if (!latestByOutcome.has(row.outcome)) latestByOutcome.set(row.outcome, row);

@@ -1,0 +1,34 @@
+{
+  "schema": "gravity-goons-slither-triage-v1",
+  "generated_at": "2026-08-01",
+  "tool": "Slither 0.11.6",
+  "compiler": "solc 0.8.30",
+  "target": "contract/src/GravityGoonsProgressRegistry.sol",
+  "raw_result_count": 53,
+  "dependency_results_omitted": true,
+  "first_party_results": [
+    {
+      "detector": "unused-return",
+      "impact": "Medium",
+      "status": "accepted_false_positive",
+      "location": "GravityGoonsProgressRegistry.applyProgress",
+      "reason": "ownerOf is intentionally called for its standards-defined nonexistent-token revert. The returned owner is irrelevant because progression authorization comes from the EIP-712 game signer."
+    },
+    {
+      "detector": "timestamp",
+      "impact": "Low",
+      "status": "accepted",
+      "location": "GravityGoonsProgressRegistry.applyProgress and activateGameSigner",
+      "reason": "Timestamps enforce claim expiry and the two-day signer activation delay; neither controls randomness, pricing, or match outcomes."
+    },
+    {
+      "detector": "pragma",
+      "impact": "Informational",
+      "status": "accepted",
+      "location": "GravityGoonsProgressRegistry pragma",
+      "reason": "The first-party pragma is pinned to 0.8.30. Slither reports mixed directives inherited from pinned OpenZeppelin dependencies."
+    }
+  ],
+  "untriaged_first_party_results": 0,
+  "high_or_critical_first_party_results": 0
+}

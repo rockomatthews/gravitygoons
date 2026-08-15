@@ -1,0 +1,36 @@
+{
+  "schema": "gravity-goons-slither-triage-v1",
+  "generated_at": "2026-08-07",
+  "tool": "Slither 0.11.6",
+  "compiler": "solc 0.8.30",
+  "target": "contract/src/GoonPinkSlipEscrow.sol",
+  "raw_result_count": 60,
+  "dependency_results_omitted": true,
+  "first_party_results": [
+    {
+      "detector": "timestamp",
+      "impact": "Low",
+      "status": "accepted",
+      "location": "deposit, proposeResult, dispute, finalize, and refundExpired",
+      "reason": "Timestamps enforce deposit, scheduled-start, result-submission, dispute, finalization, and refund deadlines. They do not control randomness or select the winner."
+    },
+    {
+      "detector": "cyclomatic-complexity",
+      "impact": "Informational",
+      "status": "accepted",
+      "location": "deposit",
+      "reason": "The deposit entry point intentionally performs explicit terms, signature, ownership, discipline, replay, and state validation before NFT custody."
+    },
+    {
+      "detector": "pragma",
+      "impact": "Informational",
+      "status": "accepted",
+      "location": "GoonPinkSlipEscrow pragma",
+      "reason": "The first-party pragma is pinned to 0.8.30. Slither reports mixed directives inherited from pinned OpenZeppelin dependencies."
+    }
+  ],
+  "untriaged_first_party_results": 0,
+  "critical_first_party_results": 0,
+  "high_first_party_results": 0,
+  "medium_first_party_results": 0
+}

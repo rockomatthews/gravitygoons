@@ -1,0 +1,14 @@
+name,destination,utm_source,utm_medium,utm_campaign,utm_content
+X profile roster,https://gravitygoons.com/collection,x,profile,goon_league_launch,x_bio
+X organic roster,https://gravitygoons.com/collection,x,organic_post,goon_league_launch,roster
+X reply roster,https://gravitygoons.com/collection,x,organic_reply,goon_league_launch,conversation
+X live arena,https://gravitygoons.com/arena,x,organic_post,goon_league_launch,arena
+Base app roster,https://gravitygoons.com/collection,base,app_directory,goon_league_launch,app_profile
+OpenSea roster,https://gravitygoons.com/collection,opensea,collection_profile,goon_league_launch,overview
+Creator skate,https://gravitygoons.com/collection?discipline=Skateboarding,creator,paid_pilot,goon_league_launch,skate
+Creator snow,https://gravitygoons.com/collection?discipline=Snowboarding,creator,paid_pilot,goon_league_launch,snow
+Creator surf,https://gravitygoons.com/collection?discipline=Surfing,creator,paid_pilot,goon_league_launch,surf
+Creator BMX,https://gravitygoons.com/collection?discipline=BMX,creator,paid_pilot,goon_league_launch,bmx
+Creator moto,https://gravitygoons.com/collection?discipline=Motocross,creator,paid_pilot,goon_league_launch,moto
+Creator ski,https://gravitygoons.com/collection?discipline=Skiing,creator,paid_pilot,goon_league_launch,ski
+

@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1786402555000,
+  "meta": {
+    "name": "Gravity Goons - Enable P2P USDC Match Escrow",
+    "description": "Unpauses GoonMatchEscrow at 0x01fdFfd42229eDFD2148773C57426368CD48b1DA. This enables equal-stake native Base USDC funding. House fee remains 0%.",
+    "txBuilderVersion": "1.18.0",
+    "createdFromSafeAddress": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x01fdFfd42229eDFD2148773C57426368CD48b1DA",
+      "value": "0",
+      "data": "0x3f4ba83a",
+      "contractMethod": {
+        "inputs": [],
+        "name": "unpause",
+        "payable": false
+      },
+      "contractInputsValues": {}
+    }
+  ]
+}

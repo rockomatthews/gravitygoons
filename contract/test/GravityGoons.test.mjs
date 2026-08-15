@@ -96,6 +96,7 @@ describe("Gravity Goons launch contracts", function () {
     await (await collection.setMintOpen(true)).wait();
     await assert.rejects(collection.connect(collector).mintSelected([4, 4], { value: await collection.mintPriceFor([4, 4]) }));
     await assert.rejects(collection.connect(collector).mintSelected([4], { value: parseEther("0.015") }));
+    await assert.rejects(collection.connect(collector).mintSelected([4], { value: (await collection.priceFor(4)) + 1n }));
     const firstFivePrice = await collection.mintPriceFor([1, 2, 3, 4, 5]);
     await (await collection.connect(collector).mintSelected([1, 2, 3, 4, 5], { value: firstFivePrice })).wait();
     await assert.rejects(collection.connect(collector).mintSelected([6], { value: await collection.priceFor(6) }));
@@ -158,6 +159,69 @@ describe("Gravity Goons launch contracts", function () {
     const [recipient, royaltyAmount] = await collection.royaltyInfo(13, salePrice);
     assert.equal(recipient.toLowerCase(), owner.address.toLowerCase());
     assert.equal(royaltyAmount, parseEther("0.1"));
+  });
+
+  it("withdraws mint proceeds only to the owner", async function () {
+    await (await collection.setMintOpen(true)).wait();
+    const price = await collection.priceFor(17);
+    await (await collection.connect(collector).mintSelected([17], { value: price })).wait();
+    assert.equal(BigInt(await ganacheProvider.request({ method: "eth_getBalance", params: [await collection.getAddress(), "latest"] })), price);
+    await assert.rejects(collection.connect(collector).withdraw());
+    await (await collection.withdraw()).wait();
+    assert.equal(BigInt(await ganacheProvider.request({ method: "eth_getBalance", params: [await collection.getAddress(), "latest"] })), 0n);
+  });
+
+  it("binds the registry collection once and completes two-step ownership transfer", async function () {
+    await assert.rejects(async () => (await registry.setCollectionOnce(await collection.getAddress(), { gasLimit: 1_000_000 })).wait());
+    await (await registry.transferOwnership(secondCollector.address)).wait();
+    assert.equal(await registry.owner(), owner.address);
+    assert.equal(await registry.pendingOwner(), secondCollector.address);
+    await assert.rejects(async () => (await registry.connect(collector).acceptOwnership({ gasLimit: 1_000_000 })).wait());
+    await (await registry.connect(secondCollector).acceptOwnership()).wait();
+    assert.equal(await registry.owner(), secondCollector.address);
+  });
+
+  it("delays signer rotation and allows the owner to pause claims immediately", async function () {
+    const replacement = await provider.getSigner(4);
+    await (await registry.proposeGameSigner(replacement.address)).wait();
+    await assert.rejects(registry.activateGameSigner());
+    await (await registry.setProgressPaused(true)).wait();
+    assert.equal(await registry.progressPaused(), true);
+    await ganacheProvider.request({ method: "evm_increaseTime", params: [2 * 24 * 60 * 60 + 1] });
+    await ganacheProvider.request({ method: "evm_mine", params: [] });
+    await (await registry.activateGameSigner({ gasLimit: 1_000_000 })).wait();
+    assert.equal(await registry.gameSigner(), replacement.address);
+    await (await registry.setProgressPaused(false)).wait();
+    assert.equal(await registry.progressPaused(), false);
+  });
+
+  it("rejects expired progress claims and paused progression updates", async function () {
+    await (await collection.setMintOpen(true)).wait();
+    await (await collection.connect(collector).mintSelected([1], { value: await collection.priceFor(1) })).wait();
+    const network = await provider.getNetwork();
+    const block = await provider.getBlock("latest");
+    const domain = { name: "Gravity Goons Progress", version: "1", chainId: network.chainId, verifyingContract: await registry.getAddress() };
+    const types = { ProgressClaim: [
+      { name: "tokenId", type: "uint256" }, { name: "xp", type: "uint64" },
+      { name: "level", type: "uint32" }, { name: "trickBitmap", type: "uint64" },
+      { name: "achievementBitmap", type: "uint64" }, { name: "catalogVersion", type: "uint16" },
+      { name: "discipline", type: "uint8" }, { name: "nonce", type: "uint32" },
+      { name: "deadline", type: "uint64" },
+    ] };
+    const baseClaim = {
+      tokenId: 1n, xp: 10n, level: 1, trickBitmap: 1n, achievementBitmap: 0n,
+      catalogVersion: 1, discipline: Number(await collection.disciplineOf(1)), nonce: 0,
+    };
+    const expired = { ...baseClaim, deadline: BigInt(block.timestamp - 1) };
+    await assert.rejects(registry.applyProgress(expired, await gameSigner.signTypedData(domain, types, expired)));
+
+    const valid = { ...baseClaim, deadline: BigInt(block.timestamp + 3600) };
+    const signature = await gameSigner.signTypedData(domain, types, valid);
+    await (await registry.setProgressPaused(true)).wait();
+    await assert.rejects(registry.applyProgress(valid, signature));
+    await (await registry.setProgressPaused(false)).wait();
+    await (await registry.applyProgress(valid, signature, { gasLimit: 2_000_000 })).wait();
+    assert.equal((await registry.progressOf(1)).xp, 10n);
   });
 
   it("settles signed monotonic progress and keeps it attached after transfer", async function () {

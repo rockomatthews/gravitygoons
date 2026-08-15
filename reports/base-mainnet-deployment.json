@@ -1,0 +1,34 @@
+{
+  "schema": "gravity-goons-contract-deployment-v1",
+  "created_at": "2026-08-01T22:19:41.624Z",
+  "stage": "mainnet",
+  "chain_id": 8453,
+  "rpc_host": "light-intensive-county.base-mainnet.quiknode.pro",
+  "deployer": "0xc6953CE04ba077f86021a7fE812011CED0D5f40F",
+  "owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "safe_address": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "game_signer": "0x75097B28ca0B0E1110Ff40381992dB6624353407",
+  "metadata_base_url": "ipfs://bafybeiaz3ncdswnf7nfauqzyd7n2frzmk36ovtmvzldp2sz4vwwi2mtzqe/",
+  "registry": {
+    "address": "0x1DDbe6163cEd907135B827cf2E2Be697b5DEeA04",
+    "deployment_transaction": "0xa22240484c70207f516401abf12791998e3bf87c37ecd72caa9885ea63e411bb",
+    "deployment_block": 49416711,
+    "owner": "0xc6953CE04ba077f86021a7fE812011CED0D5f40F",
+    "pending_owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "ownership_transfer_transaction": "0xb91db75be5f49628a8416935a3d4e70e859304b13c41a1bb18b156c175bf4c12",
+    "ownership_transfer_block": 49416716,
+    "collection": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4"
+  },
+  "collection": {
+    "address": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+    "deployment_transaction": "0x204e173cd566e4c7711a83ec8eb331e5b927d317c7877fc8a63a9c9afc252334",
+    "deployment_block": 49416711,
+    "owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+    "link_transaction": "0xe9254da6a9df7448d83a39dc996564f60a8493160ce22f007d138955ded3be9c",
+    "link_block": 49416714,
+    "mint_open": false,
+    "creator_minted": 0,
+    "public_minted": 0
+  },
+  "public_mint_open": false
+}

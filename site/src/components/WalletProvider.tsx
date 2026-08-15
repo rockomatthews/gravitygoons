@@ -1,81 +1,361 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import {
+  createBaseAppDappUrl,
+  createMetaMaskDappUrl,
+  createRainbowDappUrl,
+  isWalletKind,
+  type MobileWalletKind,
+} from "@/lib/wallet-links";
+import { personalSignParams } from "@/lib/wallet-signing";
+import { identifyMarketingWallet, trackMarketingEvent } from "@/lib/analytics";
 
-type EthereumProvider = {
-  request(args: { method: string; params?: unknown[] }): Promise<unknown>;
+export type EthereumProvider = {
+  request<T = unknown>(args: { method: string; params?: unknown[] }): Promise<T>;
   on?(event: string, listener: (...args: unknown[]) => void): void;
   removeListener?(event: string, listener: (...args: unknown[]) => void): void;
+  disconnect?(): Promise<void>;
+  isCoinbaseWallet?: boolean;
+  isMetaMask?: boolean;
+  isRainbow?: boolean;
+};
+
+type InjectedWallet = {
+  id: string;
+  name: string;
+  icon: string;
+  rdns?: string;
+  provider: EthereumProvider;
+};
+
+type Eip6963Detail = {
+  info: { uuid: string; name: string; icon: string; rdns: string };
+  provider: EthereumProvider;
 };
 
 declare global {
   interface Window { ethereum?: EthereumProvider }
+  interface WindowEventMap { "eip6963:announceProvider": CustomEvent<Eip6963Detail> }
 }
 
 type WalletState = {
   account: `0x${string}` | null;
+  provider: EthereumProvider | null;
   connecting: boolean;
   message: string;
+  modalOpen: boolean;
+  wallets: InjectedWallet[];
   connect: () => Promise<`0x${string}` | null>;
+  connectBase: () => Promise<`0x${string}` | null>;
+  connectMetaMask: () => Promise<`0x${string}` | null>;
+  connectRainbow: () => Promise<`0x${string}` | null>;
+  connectWalletConnect: () => Promise<`0x${string}` | null>;
+  connectInjected: (walletId?: string) => Promise<`0x${string}` | null>;
+  disconnect: () => Promise<void>;
+  openModal: () => void;
+  closeModal: () => void;
+  request: <T = unknown>(args: { method: string; params?: unknown[] }) => Promise<T>;
+  signMessage: (message: string, address?: string) => Promise<`0x${string}`>;
+  signProfileChallenge: (typedData: object, address?: string) => Promise<`0x${string}` | null>;
 };
 
 const WalletContext = createContext<WalletState | null>(null);
 const BASE_CHAIN_HEX = "0x2105";
+const BASE_CHAIN_ID = 8453;
+const STORAGE_KEY = "gravity-goons-wallet-connector";
+
+function conciseError(error: unknown): string {
+  if (typeof error === "object" && error && "code" in error && Number(error.code) === 4001) return "The request was rejected in the wallet.";
+  if (error instanceof Error) return error.message.split("\n")[0];
+  return "The wallet connection did not complete.";
+}
+
+function normalizeAccount(value: unknown): `0x${string}` | null {
+  if (typeof value !== "string" || !/^0x[0-9a-fA-F]{40}$/.test(value)) return null;
+  return value.toLowerCase() as `0x${string}`;
+}
+
+async function withConnectionTimeout<T>(operation: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error("Wallet approval timed out. Reopen the wallet app and retry.")), 90_000); }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [account, setAccount] = useState<`0x${string}` | null>(null);
+  const [provider, setProvider] = useState<EthereumProvider | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [message, setMessage] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [wallets, setWallets] = useState<InjectedWallet[]>([]);
+  const providerRef = useRef<EthereumProvider | null>(null);
+  const connectorIdRef = useRef<string | null>(null);
 
-  const ensureBase = useCallback(async () => {
-    if (!window.ethereum) throw new Error("Open this site inside a Base-compatible wallet.");
+  const bindProvider = useCallback((nextProvider: EthereumProvider, connectorId: string, nextAccount: `0x${string}`) => {
+    providerRef.current = nextProvider;
+    connectorIdRef.current = connectorId;
+    setProvider(nextProvider);
+    setAccount(nextAccount);
+    window.localStorage.setItem(STORAGE_KEY, connectorId);
+    setMessage("Connected to Base.");
+    identifyMarketingWallet(nextAccount);
+    trackMarketingEvent("wallet_connect_succeeded", { connector: connectorId });
+    setModalOpen(false);
+  }, []);
+
+  const ensureBase = useCallback(async (nextProvider: EthereumProvider) => {
+    const current = await nextProvider.request<string>({ method: "eth_chainId" }).catch(() => null);
+    if (current?.toLowerCase() === BASE_CHAIN_HEX) return;
     try {
-      await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE_CHAIN_HEX }] });
+      await nextProvider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE_CHAIN_HEX }] });
     } catch (error) {
       const code = typeof error === "object" && error && "code" in error ? Number(error.code) : 0;
-      if (code !== 4902) throw error;
-      await window.ethereum.request({
+      if (code !== 4902) throw new Error("Switch the connected wallet to Base Mainnet and try again.");
+      await nextProvider.request({
         method: "wallet_addEthereumChain",
         params: [{ chainId: BASE_CHAIN_HEX, chainName: "Base", nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 }, rpcUrls: ["https://mainnet.base.org"], blockExplorerUrls: ["https://basescan.org"] }],
       });
     }
   }, []);
 
-  const connect = useCallback(async () => {
-    if (!window.ethereum) {
-      setMessage("No wallet detected. Install Coinbase Wallet, MetaMask, or another Base wallet.");
+  const finishConnection = useCallback(async (nextProvider: EthereumProvider, connectorId: string, suppliedAccounts?: unknown[]) => {
+    await ensureBase(nextProvider);
+    const accounts = suppliedAccounts ?? await nextProvider.request<unknown[]>({ method: "eth_requestAccounts" });
+    const nextAccount = normalizeAccount(accounts[0]);
+    if (!nextAccount) throw new Error("The wallet did not return a Base account.");
+    bindProvider(nextProvider, connectorId, nextAccount);
+    return nextAccount;
+  }, [bindProvider, ensureBase]);
+
+  const findWallet = useCallback((kind: MobileWalletKind) => wallets.find((wallet) => isWalletKind(wallet.name, wallet.rdns, kind)), [wallets]);
+
+  const connectMobileWallet = useCallback(async (
+    kind: MobileWalletKind,
+    label: string,
+    createDappUrl: (url: string) => string,
+  ) => {
+    trackMarketingEvent("wallet_connect_started", { connector: kind, surface: "mobile_or_injected" });
+    const injected = findWallet(kind);
+    if (injected) {
+      setConnecting(true);
+      setMessage(`Waiting for ${label} approval…`);
+      try { return await withConnectionTimeout(finishConnection(injected.provider, `${kind}-app`)); }
+      catch (error) { setMessage(conciseError(error)); return null; }
+      finally { setConnecting(false); }
+    }
+
+    setMessage(`Opening Gravity Goons in ${label}…`);
+    window.location.assign(createDappUrl(window.location.href));
+    return null;
+  }, [findWallet, finishConnection]);
+
+  const connectBase = useCallback(async () => {
+    return connectMobileWallet("base", "Base App", createBaseAppDappUrl);
+  }, [connectMobileWallet]);
+
+  const connectMetaMask = useCallback(async () => connectMobileWallet("metamask", "MetaMask", createMetaMaskDappUrl), [connectMobileWallet]);
+  const connectRainbow = useCallback(async () => connectMobileWallet("rainbow", "Rainbow", createRainbowDappUrl), [connectMobileWallet]);
+
+  const connectWalletConnect = useCallback(async () => {
+    trackMarketingEvent("wallet_connect_started", { connector: "walletconnect", surface: "wallet_selector" });
+    const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID?.trim();
+    if (!projectId) {
+      setMessage("WalletConnect is awaiting a Reown project ID. Use Sign in with Base or a detected browser wallet for now.");
       return null;
     }
     setConnecting(true);
-    setMessage("Connecting to Base…");
+    setMessage("Opening the wallet chooser…");
     try {
-      await ensureBase();
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" }) as `0x${string}`[];
-      const next = accounts[0] ?? null;
-      setAccount(next);
-      setMessage(next ? "Connected to Base" : "Wallet connection cancelled.");
-      return next;
+      const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
+      const walletConnect = await EthereumProvider.init({
+        projectId,
+        chains: [BASE_CHAIN_ID],
+        showQrModal: true,
+        metadata: {
+          name: "Gravity Goons",
+          description: "Connect to the Gravity Goons collection and live arena.",
+          url: window.location.origin,
+          icons: [`${window.location.origin}/collection/gravity-goons-logo.png`],
+        },
+        rpcMap: { [BASE_CHAIN_ID]: process.env.NEXT_PUBLIC_BASE_RPC_URL ?? "https://mainnet.base.org" },
+      });
+      await withConnectionTimeout(walletConnect.connect());
+      return await withConnectionTimeout(finishConnection(walletConnect as EthereumProvider, "walletconnect", walletConnect.accounts));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message.split("\n")[0] : "Wallet connection cancelled.");
+      setMessage(conciseError(error));
       return null;
-    } finally {
-      setConnecting(false);
-    }
-  }, [ensureBase]);
+    } finally { setConnecting(false); }
+  }, [finishConnection]);
 
-  useEffect(() => {
-    if (!window.ethereum) return;
-    window.ethereum.request({ method: "eth_accounts" }).then((accounts) => {
-      const first = (accounts as `0x${string}`[])[0];
-      if (first) setAccount(first);
-    }).catch(() => undefined);
-    const handleAccounts = (...args: unknown[]) => setAccount(((args[0] as `0x${string}`[]) ?? [])[0] ?? null);
-    window.ethereum.on?.("accountsChanged", handleAccounts);
-    return () => window.ethereum?.removeListener?.("accountsChanged", handleAccounts);
+  const connectInjected = useCallback(async (walletId?: string) => {
+    trackMarketingEvent("wallet_connect_started", { connector: walletId ? "eip6963" : "injected", surface: "browser" });
+    const selected = walletId ? wallets.find((wallet) => wallet.id === walletId)?.provider : wallets[0]?.provider ?? window.ethereum;
+    if (!selected) {
+      setMessage("No browser wallet was detected. Use Sign in with Base or WalletConnect.");
+      return null;
+    }
+    setConnecting(true);
+    setMessage("Waiting for wallet approval…");
+    try { return await withConnectionTimeout(finishConnection(selected, walletId ? `injected:${walletId}` : "injected")); }
+    catch (error) { setMessage(conciseError(error)); return null; }
+    finally { setConnecting(false); }
+  }, [finishConnection, wallets]);
+
+  const connect = useCallback(async () => {
+    if (account) return account;
+    setModalOpen(true);
+    setMessage("Choose how to connect.");
+    return null;
+  }, [account]);
+
+  const disconnect = useCallback(async () => {
+    try { await providerRef.current?.disconnect?.(); } catch { /* local disconnect still clears the session */ }
+    providerRef.current = null;
+    connectorIdRef.current = null;
+    setProvider(null);
+    setAccount(null);
+    setMessage("Wallet disconnected.");
+    window.localStorage.removeItem(STORAGE_KEY);
+    await fetch("/api/profile/session/logout", { method: "POST" }).catch(() => undefined);
   }, []);
 
-  const value = useMemo(() => ({ account, connecting, message, connect }), [account, connecting, message, connect]);
-  return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
+  const request = useCallback(async <T,>(args: { method: string; params?: unknown[] }) => {
+    if (!providerRef.current) throw new Error("Connect a wallet first.");
+    return providerRef.current.request<T>(args);
+  }, []);
+
+  const signMessage = useCallback(async (text: string, address?: string) => {
+    const signer = normalizeAccount(address ?? account);
+    if (!signer) throw new Error("Connect a wallet first.");
+    try {
+      return await withConnectionTimeout(request<`0x${string}`>({ method: "personal_sign", params: personalSignParams(text, signer) }));
+    } catch (error) {
+      throw new Error(conciseError(error));
+    }
+  }, [account, request]);
+
+  const signProfileChallenge = useCallback(async (typedData: object, address?: string): Promise<`0x${string}` | null> => {
+    const nextProvider = providerRef.current;
+    const isBaseConnector = connectorIdRef.current?.startsWith("base") || nextProvider?.isCoinbaseWallet;
+    if (!nextProvider || !isBaseConnector) return null;
+    const signer = normalizeAccount(address ?? account);
+    if (!signer) throw new Error("Connect a wallet first.");
+    try {
+      return await withConnectionTimeout(nextProvider.request<`0x${string}`>({
+        method: "eth_signTypedData_v4",
+        params: [signer, JSON.stringify(typedData)],
+      }));
+    } catch (error) {
+      const code = typeof error === "object" && error && "code" in error ? Number(error.code) : 0;
+      if (code === 4100 || code === 4200 || code === -32601) return null;
+      throw new Error(conciseError(error));
+    }
+  }, [account]);
+
+  useEffect(() => {
+    const announced = new Map<string, InjectedWallet>();
+    const announce = (event: WindowEventMap["eip6963:announceProvider"]) => {
+      const { info, provider: announcedProvider } = event.detail;
+      announced.set(info.uuid, { id: info.uuid, name: info.name, icon: info.icon, rdns: info.rdns, provider: announcedProvider });
+      setWallets(Array.from(announced.values()));
+    };
+    window.addEventListener("eip6963:announceProvider", announce);
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+    const legacyTimer = window.setTimeout(() => {
+      if (window.ethereum) setWallets((current) => {
+        if (current.length) return current;
+        const legacy = window.ethereum!;
+        const name = legacy.isRainbow ? "Rainbow" : legacy.isCoinbaseWallet ? "Base App" : legacy.isMetaMask ? "MetaMask" : "Browser wallet";
+        return [{ id: "legacy", name, icon: "", provider: legacy }];
+      });
+    }, 0);
+    return () => { window.clearTimeout(legacyTimer); window.removeEventListener("eip6963:announceProvider", announce); };
+  }, []);
+
+  useEffect(() => {
+    const prior = window.localStorage.getItem(STORAGE_KEY);
+    if (!prior || account || connecting) return;
+    const reconnect = async () => {
+      if (/^(base|metamask|rainbow)-app$/.test(prior)) {
+        const kind = prior.replace("-app", "") as MobileWalletKind;
+        const selectedProvider = findWallet(kind)?.provider;
+        if (!selectedProvider) return;
+        const accounts = await selectedProvider.request<unknown[]>({ method: "eth_accounts" }).catch(() => []);
+        const next = normalizeAccount(accounts[0]);
+        if (next) bindProvider(selectedProvider, prior, next);
+      } else if (prior === "base") {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } else if (prior.startsWith("injected")) {
+        const id = prior.split(":")[1];
+        const selected = wallets.find((wallet) => wallet.id === id)?.provider ?? window.ethereum;
+        if (!selected) return;
+        const accounts = await selected.request<unknown[]>({ method: "eth_accounts" }).catch(() => []);
+        const next = normalizeAccount(accounts[0]);
+        if (next) bindProvider(selected, prior, next);
+      }
+    };
+    void reconnect();
+  }, [account, bindProvider, connecting, findWallet, wallets]);
+
+  useEffect(() => {
+    if (!provider) return;
+    const accountsChanged = (...args: unknown[]) => setAccount(normalizeAccount(((args[0] as unknown[]) ?? [])[0]));
+    const chainChanged = (...args: unknown[]) => setMessage(String(args[0]).toLowerCase() === BASE_CHAIN_HEX ? "Connected to Base." : "Switch this wallet to Base Mainnet.");
+    provider.on?.("accountsChanged", accountsChanged);
+    provider.on?.("chainChanged", chainChanged);
+    return () => {
+      provider.removeListener?.("accountsChanged", accountsChanged);
+      provider.removeListener?.("chainChanged", chainChanged);
+    };
+  }, [provider]);
+
+  const value = useMemo<WalletState>(() => ({
+    account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect,
+    connectInjected, disconnect, openModal: () => setModalOpen(true), closeModal: () => setModalOpen(false), request, signMessage, signProfileChallenge,
+  }), [account, provider, connecting, message, modalOpen, wallets, connect, connectBase, connectMetaMask, connectRainbow, connectWalletConnect, connectInjected, disconnect, request, signMessage, signProfileChallenge]);
+
+  return <WalletContext.Provider value={value}>
+    {children}
+    {modalOpen && <div className="wallet-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalOpen(false); }}>
+      <section className="wallet-modal" role="dialog" aria-modal="true" aria-labelledby="wallet-modal-title">
+        <button className="wallet-modal-close" onClick={() => setModalOpen(false)} aria-label="Close wallet chooser">×</button>
+        <span>BASE MAINNET // 8453</span>
+        <h2 id="wallet-modal-title">Connect a wallet</h2>
+        <p>Choose your wallet. On a phone, Gravity Goons reopens securely inside that wallet&apos;s app.</p>
+        <div className="wallet-options">
+          <button onClick={connectBase} disabled={connecting} aria-label="Open Gravity Goons in the Base App">
+            <Image src="/wallets/base.svg" alt="" width={48} height={48}/><strong>Base</strong><small>OPEN APP</small>
+          </button>
+          <button onClick={connectMetaMask} disabled={connecting} aria-label="Open Gravity Goons in MetaMask">
+            <Image src="/wallets/metamask.svg" alt="" width={48} height={48}/><strong>MetaMask</strong><small>OPEN APP</small>
+          </button>
+          <button onClick={connectRainbow} disabled={connecting} aria-label="Open Gravity Goons in Rainbow">
+            <Image src="/wallets/rainbow.svg" alt="" width={48} height={48}/><strong>Rainbow</strong><small>OPEN APP</small>
+          </button>
+        </div>
+        {Boolean(process.env.NEXT_PUBLIC_REOWN_PROJECT_ID?.trim()) && <button className="wallet-more" onClick={connectWalletConnect} disabled={connecting}>More wallets via WalletConnect</button>}
+        {wallets.filter((wallet) => !(["base", "metamask", "rainbow"] as MobileWalletKind[]).some((kind) => isWalletKind(wallet.name, wallet.rdns, kind))).map((wallet) => <button className="wallet-more" key={wallet.id} onClick={() => connectInjected(wallet.id)} disabled={connecting}>
+          {wallet.icon && <Image src={wallet.icon} alt="" width={24} height={24} unoptimized/>}<span>Connect {wallet.name}</span>
+        </button>)}
+        <div className="wallet-modal-status" aria-live="polite"><b>{connecting ? "CONNECTING" : "STATUS"}</b><span>{message || "Choose a connection method."}</span></div>
+        <button className="wallet-diagnostic-copy" type="button" onClick={() => navigator.clipboard.writeText([
+          `Gravity Goons wallet status: ${message || "idle"}`,
+          `URL: ${window.location.href}`,
+          `Base chain: ${BASE_CHAIN_ID}`,
+          `Browser: ${navigator.userAgent}`,
+        ].join("\n"))}>COPY DIAGNOSTICS</button>
+        <small>A connection or signature cannot spend funds. Transactions always require a separate wallet confirmation.</small>
+      </section>
+    </div>}
+  </WalletContext.Provider>;
 }
 
 export function useWallet() {

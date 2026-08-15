@@ -40,6 +40,17 @@ if (stage === "sepolia" && process.env.ALLOW_NON_BASE !== "true") {
   throw new Error("Set ALLOW_NON_BASE=true for the deliberate Base Sepolia test deployment");
 }
 if (stage === "mainnet") {
+  if (process.env.ISOLATED_RUNTIME_DEPLOY !== "true") {
+    throw new Error("Set ISOLATED_RUNTIME_DEPLOY=true only after npm prune --omit=dev and npm run verify:runtime-isolation pass");
+  }
+  for (const packageName of ["ganache", "mocha", "solc"]) {
+    try {
+      import.meta.resolve(packageName);
+      throw new Error(`Refusing mainnet deployment while development package ${packageName} is installed`);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("Refusing mainnet")) throw error;
+    }
+  }
   if (process.env.ALLOW_MAINNET_DEPLOY !== "true") {
     throw new Error("Set ALLOW_MAINNET_DEPLOY=true only for the reviewed Base mainnet deployment");
   }

@@ -1,0 +1,39 @@
+{
+  "schema": "gravity-goons-match-escrow-predeploy-v1",
+  "created_at": "2026-08-10T22:48:27Z",
+  "status": "DEPLOYED_PAUSED_VERIFIED",
+  "chain_id": 8453,
+  "contract": "GoonMatchEscrow",
+  "contract_source_sha256": "c6872468915ca68b1c2edb8c0d0e6501cec150622fd39d7a6bfd94cff1c4a377",
+  "artifact_sha256": "ffed03b108e0caf974ad2bde0702ab691834b1ce75669236fcceb0cedc38006d",
+  "deployer": "0xc6953CE04ba077f86021a7fE812011CED0D5f40F",
+  "deployer_balance_eth": "0.000974666436399709",
+  "safe_owner": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "fee_recipient": "0x28ed8CE998C416B456394A35f080662aDE3311Ce",
+  "collection": "0x0354F25c86aDb97BF12E2d8462acB6c22D9676e4",
+  "native_base_usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "settlement_signer": "0x272d06F095C0DEAF99a5Fa790B38D20ca98631Ad",
+  "settlement_signer_balance_eth": "0.001",
+  "estimated_deployment_gas": "2762872",
+  "estimated_fee_gwei": "0.011",
+  "estimated_max_cost_eth": "0.000030391592",
+  "constructor_expectations": {
+    "paused": true,
+    "house_fee_bps": 0,
+    "safe_controls_pause": true,
+    "safe_controls_disputes": true,
+    "safe_controls_fee": true,
+    "maximum_house_fee_bps": 250
+  },
+  "preflight": {
+    "safe_has_code": true,
+    "collection_has_code": true,
+    "usdc_has_code": true,
+    "settlement_signer_is_active_registry_signer": true,
+    "deployer_balance_covers_estimate": true,
+    "deployment_record_absent": true,
+    "escrow_tests_passing": 9
+  },
+  "deployment_gate": "A new explicit user authorization is required before setting ALLOW_MAINNET_MATCH_ESCROW_DEPLOY=true and broadcasting the deployment transaction.",
+  "activation_gate": "Deployment does not enable wagering. The new escrow must remain paused and WAGERING_ENABLED must remain false until a separate Safe unpause and production configuration authorization."
+}

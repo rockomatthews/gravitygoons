@@ -6,19 +6,29 @@
   "scripts": {
     "compile": "node scripts/compile.mjs",
     "test": "npm run compile && mocha --timeout 30000 test/*.test.mjs",
+    "test:escrow": "npm run compile && mocha --timeout 30000 test/GoonMatchEscrow.test.mjs",
+    "test:pink-slip": "npm run compile && mocha --timeout 30000 test/GoonPinkSlipEscrow.test.mjs",
     "deploy": "npm run compile && node scripts/deploy.mjs",
+    "deploy:runtime": "node scripts/deploy.mjs",
+    "deploy:match-escrow": "npm run compile && node scripts/deploy-match-escrow.mjs",
+    "deploy:match-escrow-v2": "npm run compile && node scripts/deploy-match-escrow-v2.mjs",
+    "build:match-escrow-v2-safe": "node scripts/build-match-escrow-v2-safe-transactions.mjs",
+    "verify:runtime-isolation": "node scripts/verify-runtime-isolation.mjs",
     "deploy:safe:sepolia": "node scripts/deploy-safe-sepolia.mjs",
     "safe:accept-registry:sepolia": "node scripts/accept-registry-ownership-sepolia.mjs",
     "safe:mint-reserve:sepolia": "node scripts/mint-creator-reserve-sepolia.mjs",
     "build:reserve-transactions": "node scripts/build-reserve-transactions.mjs",
+    "build:open-public-mint": "node scripts/build-open-public-mint-transaction.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs",
     "verify:safe:mainnet": "node scripts/verify-mainnet-safe.mjs"
+  },
+  "dependencies": {
+    "dotenv": "17.2.3",
+    "ethers": "6.17.0"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "5.4.0",
     "@safe-global/protocol-kit": "^8.0.4",
-    "dotenv": "17.2.3",
-    "ethers": "6.17.0",
     "ganache": "7.9.2",
     "mocha": "11.7.4",
     "solc": "0.8.30"

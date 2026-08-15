@@ -14,6 +14,7 @@ export const publicClient = createPublicClient({ chain: base, transport: http(ba
 
 export const collectionAbi = [
   { type: "function", name: "ownerOf", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "address" }] },
+  { type: "function", name: "safeTransferFrom", stateMutability: "nonpayable", inputs: [{ name: "from", type: "address" }, { name: "to", type: "address" }, { name: "tokenId", type: "uint256" }], outputs: [] },
   { type: "function", name: "mintOpen", stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
   { type: "function", name: "mintSelected", stateMutability: "payable", inputs: [{ name: "tokenIds", type: "uint16[]" }], outputs: [] },
   { type: "function", name: "rarityOf", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }], outputs: [{ type: "uint8" }] },
@@ -22,6 +23,7 @@ export const collectionAbi = [
   { type: "function", name: "setMintOpen", stateMutability: "nonpayable", inputs: [{ name: "open", type: "bool" }], outputs: [] },
   { type: "function", name: "creatorMintSelected", stateMutability: "nonpayable", inputs: [{ name: "recipient", type: "address" }, { name: "tokenIds", type: "uint16[]" }], outputs: [] },
   { type: "function", name: "availabilityWord", stateMutability: "view", inputs: [{ name: "startTokenId", type: "uint256" }], outputs: [{ type: "uint256" }] },
+  { type: "function", name: "royaltyInfo", stateMutability: "view", inputs: [{ name: "tokenId", type: "uint256" }, { name: "salePrice", type: "uint256" }], outputs: [{ name: "receiver", type: "address" }, { name: "royaltyAmount", type: "uint256" }] },
 ] as const;
 
 export const registryAbi = [

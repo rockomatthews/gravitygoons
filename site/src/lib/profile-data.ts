@@ -22,7 +22,7 @@ const DISCIPLINE_INDEX: Record<Discipline, number> = {
 type ProfileRow = { id: string; username: string; display_name: string; bio: string; avatar_url: string | null };
 type WalletRow = { wallet_address: string };
 type OwnershipRow = { token_id: number };
-type PairRow = { id: string; token_id: number; trick_id: number; status: string };
+type PairRow = { id: string; token_id: number; trick_id: number; status: string; created_at?: string | null; updated_at?: string | null };
 type AssetRow = {
   id: string;
   pair_id: string;
@@ -32,6 +32,8 @@ type AssetRow = {
   video_url: string | null;
   poster_url: string | null;
   owner_decision: "pending" | "approved" | "rejected";
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 function normalizeStatus(value: string | undefined): MovePairStatus {
@@ -44,7 +46,8 @@ function normalizeOutcomeStatus(value: string | undefined): OutcomeStatus {
   return allowed.includes(value as OutcomeStatus) ? value as OutcomeStatus : "missing";
 }
 
-function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], assets: AssetRow[], includePrivate = false): ProfileMove[] {
+function bitmapUnlocked(bitmap:string|undefined,trickId:number){if(trickId<4)return true;const bits=(bitmap??"").replace(/[^01]/g,"").padStart(64,"0").slice(-64);return bits[63-trickId]==="1";}
+function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], assets: AssetRow[], includePrivate = false,bitmap?:string): ProfileMove[] {
   return TRICK_CATALOG[discipline].map((trick) => {
     const pair = pairs.find((candidate) => candidate.token_id === tokenId && candidate.trick_id === trick.id);
     const pairAssets = pair ? assets.filter((asset) => asset.pair_id === pair.id) : [];
@@ -55,7 +58,7 @@ function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], a
       trickId: trick.id,
       name: trick.name,
       difficulty: trick.difficulty,
-      unlocked: trick.sponsorId === null,
+      unlocked: bitmapUnlocked(bitmap,trick.id),
       pairId: pair?.id ?? null,
       pairStatus: normalizeStatus(pair?.status),
       landStatus: normalizeOutcomeStatus(land?.status),
@@ -66,7 +69,7 @@ function buildMoves(discipline: Discipline, tokenId: number, pairs: PairRow[], a
   });
 }
 
-function buildGoon(tokenId: number, pairs: PairRow[] = [], assets: AssetRow[] = [], includePrivate = false): ProfileGoon {
+function buildGoon(tokenId: number, pairs: PairRow[] = [], assets: AssetRow[] = [], includePrivate = false,bitmap?:string): ProfileGoon {
   const token = collection.tokens[tokenId - 1];
   const discipline = token.discipline as Discipline;
   return {
@@ -78,7 +81,7 @@ function buildGoon(tokenId: number, pairs: PairRow[] = [], assets: AssetRow[] = 
     playStyle: token.play_style,
     trickSpecialty: token.trick_specialty,
     imageUrl: goonImageUrl(tokenId),
-    moves: buildMoves(discipline, tokenId, pairs, assets, includePrivate),
+    moves: buildMoves(discipline, tokenId, pairs, assets, includePrivate,bitmap),
   };
 }
 
@@ -127,7 +130,10 @@ export async function getPublicProfile(username: string): Promise<PublicProfile 
   const tokenIds = ((ownershipData ?? []) as OwnershipRow[]).map((row) => row.token_id).sort((a, b) => a - b);
   let pairs: PairRow[] = [];
   let assets: AssetRow[] = [];
+  const bitmaps=new Map<number,string>();
   if (tokenIds.length) {
+    const {data:progress}=await supabase.from("athlete_sponsor_progress").select("token_id,unlocked_trick_bitmap").in("token_id",tokenIds);
+    for(const row of progress??[])bitmaps.set(row.token_id,row.unlocked_trick_bitmap);
     const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).in("token_id", tokenIds);
     pairs = (pairData ?? []) as PairRow[];
     const pairIds = pairs.map((pair) => pair.id);
@@ -150,7 +156,7 @@ export async function getPublicProfile(username: string): Promise<PublicProfile 
     bio: profile.bio,
     avatarUrl: profile.avatar_url,
     wallets,
-    goons: tokenIds.map((tokenId) => buildGoon(tokenId, pairs, assets)),
+    goons: tokenIds.map((tokenId) => buildGoon(tokenId, pairs, assets,false,bitmaps.get(tokenId))),
     isDemo: false,
   };
 }
@@ -168,6 +174,7 @@ export async function getProfileForWallet(walletAddress: string): Promise<Profil
 
 export function validateUsername(username: string): string {
   const normalized = username.trim().toLowerCase();
+  if (/^\d+$/.test(normalized)) throw new Error("Numeric URLs are reserved for Gravity Goons NFT profiles.");
   if (!/^[a-z0-9][a-z0-9_-]{2,23}$/.test(normalized)) throw new Error("Username must be 3–24 lowercase letters, numbers, underscores, or hyphens.");
   if (RESERVED_USERNAMES.has(normalized)) throw new Error("That username is reserved.");
   return normalized;
@@ -201,22 +208,49 @@ export async function saveProfileForWallet(walletAddress: string, input: { usern
   return profile;
 }
 
-export async function syncWalletOwnership(walletAddress: string): Promise<number[]> {
+export async function readWalletOwnership(walletAddress: string): Promise<number[]> {
   const wallet = walletAddress.toLowerCase();
-  const supabase = getSupabaseAdmin();
-  if (!supabase || collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
+  if (collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
+
+  // Only minted tokens can have an owner. Reading the four availability words first
+  // avoids 1,000 reverting ownerOf calls and is much friendlier to public RPCs.
+  const availabilityWords = await Promise.all(
+    [1n, 257n, 513n, 769n].map((startTokenId) => publicClient.readContract({
+      address: collectionAddress,
+      abi: collectionAbi,
+      functionName: "availabilityWord",
+      args: [startTokenId],
+    })),
+  );
+  const mintedTokenIds: number[] = [];
+  availabilityWords.forEach((word, wordIndex) => {
+    const startTokenId = wordIndex * 256 + 1;
+    for (let bit = 0; bit < 256 && startTokenId + bit <= 1000; bit += 1) {
+      if ((word & (1n << BigInt(bit))) === 0n) mintedTokenIds.push(startTokenId + bit);
+    }
+  });
 
   const owned: number[] = [];
-  for (let start = 1; start <= 1000; start += 100) {
-    const tokenIds = Array.from({ length: Math.min(100, 1001 - start) }, (_, index) => start + index);
+  for (let start = 0; start < mintedTokenIds.length; start += 100) {
+    const tokenIds = mintedTokenIds.slice(start, start + 100);
     const results = await publicClient.multicall({
       allowFailure: true,
       contracts: tokenIds.map((tokenId) => ({ address: collectionAddress, abi: collectionAbi, functionName: "ownerOf" as const, args: [BigInt(tokenId)] })),
     });
+    const failed = results.filter((result) => result.status === "failure").length;
+    if (failed) throw new Error(`Base RPC could not verify ${failed} minted token owner${failed === 1 ? "" : "s"}.`);
     results.forEach((result, index) => {
       if (result.status === "success" && String(result.result).toLowerCase() === wallet) owned.push(tokenIds[index]);
     });
   }
+  return owned;
+}
+
+export async function syncWalletOwnership(walletAddress: string): Promise<number[]> {
+  const wallet = walletAddress.toLowerCase();
+  const supabase = getSupabaseAdmin();
+  if (!supabase || collectionAddress === ZERO_ADDRESS) return process.env.NODE_ENV === "production" ? [] : DEMO_TOKEN_IDS;
+  const owned = await readWalletOwnership(wallet);
 
   const { data: staleData } = await supabase.from("nft_ownership").select("token_id").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("owner_wallet_address", wallet);
   const staleIds = ((staleData ?? []) as OwnershipRow[]).map((row) => row.token_id).filter((tokenId) => !owned.includes(tokenId));
@@ -246,29 +280,38 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
   if (!(await verifyTokenOwnership(walletAddress, tokenId))) throw new Error("The connected wallet does not currently own this Goon.");
   const supabase = getSupabaseAdmin();
   const quote = formatUsdc(Number(process.env.MOVE_PAIR_PRICE_USDC_MINOR ?? 12000000));
+  const includedRerolls = Math.max(0, Number(process.env.MOVE_INCLUDED_REROLLS_PER_OUTCOME ?? 1));
   if (!supabase || collectionAddress === ZERO_ADDRESS) {
     const { pairs, assets } = demoPairs();
     const goon = buildGoon(tokenId, pairs, assets, true);
-    const outcomesByPair = (pairId: string | null): StudioOutcome[] => pairId ? assets.filter((asset) => asset.pair_id === pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision })) : [];
-    return { goon, moves: goon.moves.map((move) => ({ ...move, outcomes: outcomesByPair(move.pairId), quotedPriceUsdc: quote })), demo: true };
+    const outcomesByPair = (pairId: string | null): StudioOutcome[] => pairId ? assets.filter((asset) => asset.pair_id === pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, rerollsRemaining: Math.max(0, includedRerolls - (asset.version - 1)), createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })) : [];
+    return { goon, moves: goon.moves.map((move) => ({ ...move, outcomes: outcomesByPair(move.pairId), quotedPriceUsdc: quote, workflowStartedAt: null, workflowUpdatedAt: null })), demo: true };
   }
 
-  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId);
+  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,created_at,updated_at").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId);
+  const {data:progress}=await supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle();
   const pairs = (pairData ?? []) as PairRow[];
   const pairIds = pairs.map((pair) => pair.id);
   let assets: AssetRow[] = [];
   if (pairIds.length) {
-    const { data } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,video_url,poster_url,owner_decision").in("pair_id", pairIds);
+    const { data } = await supabase.from("move_media_assets").select("id,pair_id,outcome,version,status,video_url,poster_url,owner_decision,created_at,updated_at").in("pair_id", pairIds);
     assets = (data ?? []) as AssetRow[];
   }
-  const goon = buildGoon(tokenId, pairs, assets, true);
+  const goon = buildGoon(tokenId, pairs, assets, true,progress?.unlocked_trick_bitmap);
   return {
     goon,
-    moves: goon.moves.map((move) => ({
-      ...move,
-      outcomes: move.pairId ? assets.filter((asset) => asset.pair_id === move.pairId).map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision })) : [],
-      quotedPriceUsdc: quote,
-    })),
+    moves: goon.moves.map((move) => {
+      const pair = pairs.find((candidate) => candidate.id === move.pairId);
+      const pairAssets = move.pairId ? assets.filter((asset) => asset.pair_id === move.pairId) : [];
+      const assetDates = pairAssets.flatMap((asset) => [asset.created_at, asset.updated_at]).filter((value): value is string => Boolean(value));
+      return {
+        ...move,
+        outcomes: pairAssets.map((asset) => ({ id: asset.id, outcome: asset.outcome, version: asset.version, status: normalizeOutcomeStatus(asset.status), videoUrl: asset.video_url, posterUrl: asset.poster_url, ownerDecision: asset.owner_decision, rerollsRemaining: Math.max(0, includedRerolls - (asset.version - 1)), createdAt: asset.created_at ?? null, updatedAt: asset.updated_at ?? null })),
+        quotedPriceUsdc: quote,
+        workflowStartedAt: pairAssets.map((asset) => asset.created_at).filter((value): value is string => Boolean(value)).sort()[0] ?? pair?.updated_at ?? pair?.created_at ?? null,
+        workflowUpdatedAt: [...assetDates, pair?.updated_at].filter((value): value is string => Boolean(value)).sort().at(-1) ?? null,
+      };
+    }),
     demo: false,
   };
 }
