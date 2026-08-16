@@ -1415,3 +1415,77 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .academia-callout{display:grid;grid-template-columns:1fr .75fr;gap:50px;margin-bottom:100px;padding:40px;border:1px solid #18f1dc44;background:radial-gradient(circle at 80% 20%,#18f1dc20,transparent 28%),linear-gradient(140deg,#101b21,#070a0d);box-shadow:15px 15px 0 #4d7dff22}.academia-callout h2{margin:12px 0;font-size:clamp(45px,7vw,92px);line-height:.82}.academia-callout>div:last-child{display:grid;align-content:end;justify-items:start}.academia-callout p:not(.eyebrow){color:#a0acb2;line-height:1.65}.academia-callout a{padding:15px 19px;color:#050609;background:var(--teal);font:950 9px var(--mono)}
 @media(max-width:900px){.academia-hero{grid-template-columns:1fr;padding-top:35px}.academia-campus{min-height:auto}.academia-dashboard{grid-template-columns:1fr 1fr;margin-top:0}.academia-courses>header,.academia-callout{grid-template-columns:1fr}.academia-lessons{grid-template-columns:1fr}.academia-safety{grid-template-columns:1fr}.academia-safety a,.academia-safety p{grid-column:1;grid-row:auto}.academia-callout{margin-inline:12px}}
 @media(max-width:600px){.academia-hero{min-height:auto;padding:60px 14px 80px}.academia-title h1{font-size:26vw}.academia-campus{grid-template-columns:1fr;gap:28px;padding:30px 12px}.academia-campus button,.academia-campus button:nth-child(even){min-height:145px;transform:rotateY(-7deg) rotateX(3deg)}.academia-dashboard{grid-template-columns:1fr;margin-inline:12px}.academia-courses{padding:80px 12px}.academia-classroom{padding:8px}.academia-classroom>article{max-height:96vh}.academia-page,.academia-quiz{padding:22px 16px}.academia-page footer{display:grid;gap:14px}.academia-page footer button{width:100%}.academia-safety{margin-inline:12px;padding:24px}.academia-status{bottom:8px}.academia-callout{padding:25px}}
+
+/* Mobile application shell and Training Facility Academia entrance. */
+.mobile-app-nav{display:none}
+.gooniverse-academia-hotspot{z-index:5}
+.gooniverse-academia-hotspot span{bottom:auto;top:0;opacity:1;padding:9px 13px;background:var(--teal);box-shadow:6px 6px 0 var(--coral),0 0 26px #18f1dc66;font-size:clamp(7px,1vw,13px);letter-spacing:.08em}
+.gooniverse-academia-hotspot span::after{content:" · TRAINING";font-size:.68em}
+
+@media(max-width:760px){
+  html{scroll-padding-bottom:78px}
+  body{padding-bottom:calc(66px + env(safe-area-inset-bottom));overflow-x:clip}
+  main{max-width:100vw;overflow-x:clip}
+  .mobile-app-nav{position:fixed;z-index:230;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);min-height:62px;padding:5px 6px max(5px,env(safe-area-inset-bottom));border-top:1px solid #18f1dc55;background:#05090df5;box-shadow:0 -18px 55px #000c;backdrop-filter:blur(18px)}
+  .mobile-app-nav a{min-width:0;min-height:52px;display:grid;place-content:center;justify-items:center;gap:3px;color:#a8b4ba;text-align:center}
+  .mobile-app-nav b{color:var(--teal);font:950 12px var(--mono)}
+  .mobile-app-nav span{font:850 7px var(--mono);letter-spacing:.04em}
+  .chat-dock{right:8px;bottom:calc(72px + env(safe-area-inset-bottom))}
+  .chat-launcher{width:46px;min-width:46px;height:46px;padding:0;gap:0;border-radius:50%}
+  .chat-launcher>b,.chat-launcher>i{display:none}
+  .mint-dock,.move-quote-dock{bottom:calc(72px + env(safe-area-inset-bottom))}
+  .shell{width:calc(100% - 24px)}
+  h1,h2,h3,p,b,span{overflow-wrap:anywhere}
+  button,a,input,select,textarea{max-width:100%}
+  input,select,textarea{font-size:16px}
+  .button{min-height:48px;text-align:center;white-space:normal}
+  .profile-connect-card,.profile-form-card{min-height:auto;padding:22px 16px}
+  .profile-connect-card h2{margin-top:36px;font-size:32px}
+  .profile-connect-card .button,.profile-form-card>.button{width:100%;margin-top:20px;padding-inline:10px}
+  .profile-editor-hero{padding-block:52px 46px}
+  .profile-editor-hero h1,.profile-hero h1,.studio-goon-summary h1{font-size:clamp(48px,15.5vw,68px);letter-spacing:-.06em}
+  .owned-goons-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .owned-goons-grid small{line-height:1.35}
+  .owned-goon-modal,.challenge-modal,.result-receipt-backdrop{padding:8px 8px calc(72px + env(safe-area-inset-bottom))}
+  .result-receipt{max-height:calc(100svh - 90px);overflow:auto;padding:22px 16px;box-shadow:7px 7px 0 var(--coral)}
+  .result-receipt dl{grid-template-columns:1fr}
+  .academia-status{position:relative;left:auto;bottom:auto;width:calc(100% - 24px);translate:none;margin:24px auto 0;padding:16px}
+  .academia-page{padding-bottom:40px}
+  .academia-campus{grid-template-columns:1fr 1fr;gap:20px 12px;padding:24px 5px}
+  .academia-campus button,.academia-campus button:nth-child(even){min-height:132px;grid-template-columns:38px 1fr;padding:14px;box-shadow:8px 8px 0 color-mix(in srgb,var(--academy-color) 20%,#020304);transform:rotateY(-5deg) rotateX(2deg)}
+  .academia-campus button>span{font-size:25px}
+  .academia-campus button b{font-size:16px}
+  .academia-campus button small{font-size:6px}
+  .academia-dashboard>div,.academia-dashboard>label{min-height:112px}
+  .academia-courses{padding-block:64px}
+  .academia-lessons>button{min-height:250px;padding:20px}
+  .academia-classroom{padding:6px 6px calc(68px + env(safe-area-inset-bottom))}
+  .academia-classroom>article{max-height:calc(100svh - 78px);box-shadow:6px 6px 0 #ff4b3530;transform:none}
+  .academia-classroom>article>header{padding:22px 58px 18px 16px}
+  .academia-classroom h2{font-size:36px}
+  .academia-page{min-height:0}
+  .academia-quiz fieldset{padding:12px}
+  .academia-quiz label{min-height:48px}
+  .gooniverse-academia-hotspot span{opacity:1!important;padding:7px 9px!important;font-size:7px!important;box-shadow:3px 3px 0 var(--coral),0 0 15px #18f1dc88}
+  .gooniverse-academia-hotspot span::after{content:""}
+  .gooniverse-map-controls button{min-height:52px}
+  .blackout-progress>div{grid-template-columns:1fr}
+  .generator-console,.trick-line-console{padding:18px 14px}
+  .line-score{grid-template-columns:1fr}
+  .token-grid,.approval-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .filter-bar select,.filter-bar input{min-height:48px}
+  .trophy-summary{grid-template-columns:1fr 1fr}
+  .trophy-vault{padding-block:64px}
+  .trophy-vault article{grid-template-columns:34% 1fr}
+  .roadmap-card,.roadmap-stop:nth-of-type(even) .roadmap-card{padding:20px 16px;margin-left:64px;width:calc(100% - 64px);transform:none}
+  .roadmap-stop:nth-of-type(odd) .roadmap-node,.roadmap-stop:nth-of-type(even) .roadmap-node{width:48px;height:48px}
+}
+
+@media(max-width:390px){
+  .grit-control>button{min-width:66px}
+  .wallet-button{min-width:74px;padding-inline:8px}
+  .nav{gap:6px}
+  .academia-campus{grid-template-columns:1fr}
+  .academia-campus button,.academia-campus button:nth-child(even){min-height:120px}
+  .athlete-record-grid,.athlete-career-dl,.athlete-metadata dl,.trophy-summary{grid-template-columns:1fr}
+}

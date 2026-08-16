@@ -4,6 +4,7 @@ import { ChatDock } from "@/components/ChatDock";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import "./globals.css";
 import { ResultReceiptModal } from "@/components/ResultReceiptModal";
+import { MobileNav } from "@/components/MobileNav";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gravitygoons.com"),
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body><WalletProvider><AnalyticsProvider />{children}<ResultReceiptModal/><ChatDock /></WalletProvider></body>
+      <body><WalletProvider><AnalyticsProvider />{children}<MobileNav/><ResultReceiptModal/><ChatDock /></WalletProvider></body>
     </html>
   );
 }
