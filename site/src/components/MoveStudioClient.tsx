@@ -45,7 +45,7 @@ function MoveProgress({ move, now, lastCheckedAt }: { move: StudioMove; now: num
   );
 }
 
-export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username: string; tokenId: number; fallbackGoon: ProfileGoon }) {
+export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, backLabel }: { username: string; tokenId: number; fallbackGoon: ProfileGoon; backHref?: string; backLabel?: string }) {
   const { account, connect, provider, signMessage, signProfileChallenge } = useWallet();
   const [studio, setStudio] = useState<StudioPayload | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -211,7 +211,7 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon }: { username
     <div className="owner-move-studio">
       <section className="studio-goon-summary">
         <Image src={goon.imageUrl} alt={goon.name} width={1024} height={1024} priority />
-        <div><p className="eyebrow">#{String(tokenId).padStart(4, "0")}{" // "}{goon.discipline}</p><h1>{goon.species}<br /><i>Move Studio</i></h1><p>{goon.rarity} · {goon.playStyle} · Signature move: {goon.trickSpecialty}</p><Link href={`/${username}`}>← BACK TO {username.toUpperCase()}&apos;S COLLECTION</Link></div>
+        <div><p className="eyebrow">#{String(tokenId).padStart(4, "0")}{" // "}{goon.discipline}</p><h1>{goon.species}<br /><i>Move Studio</i></h1><p>{goon.rarity} · {goon.playStyle} · Signature move: {goon.trickSpecialty}</p><Link href={backHref ?? `/${username}`}>← {backLabel ?? `BACK TO ${username.toUpperCase()}'S COLLECTION`}</Link></div>
       </section>
 
       <aside className="studio-live-status" aria-live="polite"><b>OWNER WORKFLOW</b><p>{status}</p>{studio ? <Link href="/profile">MANAGE PROFILE</Link> : <button onClick={unlockOwnerStudio} disabled={busy}>{busy ? "VERIFYING…" : "CONNECT + VERIFY OWNER"}</button>}</aside>

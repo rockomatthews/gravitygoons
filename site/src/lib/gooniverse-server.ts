@@ -135,8 +135,11 @@ export async function contributeBattery(wallet:string,input:{tokenId?:number;inv
 
 export async function getGoonCareer(tokenId: number) {
   validTokenId(tokenId);
+  const discipline = collection.tokens[tokenId - 1].discipline as Discipline;
+  const baseUnlockedTricks = TRICK_CATALOG[discipline].filter((trick) => trick.id < 4);
+  const baseLockedTricks = TRICK_CATALOG[discipline].filter((trick) => trick.id >= 4);
   const supabase = getSupabaseAdmin();
-  const empty = { tokenId, economy: { grit_balance: 0, grit_reserved: 0, lifetime_grit_earned: 0, xp: 0, level: 1 }, materials: [], inventory: [], loadout: null, trophies: [], activeExpedition: null };
+  const empty = { tokenId, economy: { grit_balance: 0, grit_reserved: 0, lifetime_grit_earned: 0, xp: 0, level: 1 }, materials: [], inventory: [], loadout: null, trophies: [], activeExpedition: null, unlockedTricks: baseUnlockedTricks, lockedTricks: baseLockedTricks, mastery: [] };
   if (!supabase) return { ...empty, goon: publicGoon(tokenId) };
   const [economy, materials, inventory, loadout, trophies, expedition, sponsorProgress, mastery] = await Promise.all([
     supabase.from("goon_economies").select("grit_balance,grit_reserved,lifetime_grit_earned,xp,level").eq("token_id", tokenId).maybeSingle(),
@@ -148,7 +151,6 @@ export async function getGoonCareer(tokenId: number) {
     supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle(),
     supabase.from("goon_trick_mastery").select("trick_id,failed_qualified_runs,qualified_runs,unlocked_at").eq("token_id",tokenId),
   ]);
-  const discipline = collection.tokens[tokenId - 1].discipline as Discipline;
   const bitmap = sponsorProgress.data?.unlocked_trick_bitmap;
   return {
     goon: publicGoon(tokenId),

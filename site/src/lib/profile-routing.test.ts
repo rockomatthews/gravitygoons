@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { canonicalAthletePath, numericAthleteSlug } from "./profile-routing.ts";
+import { canonicalAthletePath, canonicalMoveStudioPath, numericAthleteSlug } from "./profile-routing.ts";
 
 test("numeric athlete routes resolve only collection IDs", () => {
   assert.equal(numericAthleteSlug("32"), 32);
@@ -12,4 +12,5 @@ test("numeric athlete routes resolve only collection IDs", () => {
 
 test("canonical athlete paths are unpadded", () => {
   assert.equal(canonicalAthletePath(32), "/32");
+  assert.equal(canonicalMoveStudioPath(32), "/32/moves");
 });

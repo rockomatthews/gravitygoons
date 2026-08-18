@@ -4,6 +4,7 @@ import collection from "@/data/collection.json";
 import { AthleteChallengeAction } from "@/components/AthleteChallengeAction";
 import { athleteRankLabel } from "@/lib/rank-display";
 import type { getAthleteProfile } from "@/lib/athlete-profile";
+import { canonicalMoveStudioPath } from "@/lib/profile-routing";
 
 type Profile = NonNullable<Awaited<ReturnType<typeof getAthleteProfile>>>;
 
@@ -16,6 +17,7 @@ export function AthleteProfilePage({ profile }: { profile: Profile }) {
   const price = listing?.price_minor ? `${Number(listing.price_minor) / (listing.currency === "USDC" ? 1e6 : 1e18)} ${listing.currency}` : null;
   const unlocked = career.unlockedTricks ?? [];
   const locked = career.lockedTricks ?? [];
+  const moveStudioHref = canonicalMoveStudioPath(token.token_id);
 
   return <main className="athlete-profile-page">
     <header className="nav shell">
@@ -40,6 +42,10 @@ export function AthleteProfilePage({ profile }: { profile: Profile }) {
           {profile.ownerProfile ? <Link href={`/${profile.ownerProfile.username}`}>{profile.ownerProfile.display_name} →</Link> : ownership.owner ? <code>{ownership.owner.slice(0, 6)}…{ownership.owner.slice(-4)}</code> : null}
           <b>{price ? `LISTED · ${price}` : ownership.minted ? "NOT FOR SALE" : "PUBLIC MINT"}</b>
         </div>
+        <Link className="athlete-move-studio-action" href={moveStudioHref}>
+          <span>{ownership.minted ? "MOVE STUDIO" : "MINT TO UNLOCK MOVE STUDIO"}</span>
+          <b>{ownership.minted ? "ADD + MANAGE MOVIE CLIPS →" : "OWN THIS GOON TO CREATE MOVIES →"}</b>
+        </Link>
         <AthleteChallengeAction tokenId={token.token_id} discipline={token.discipline} eligibleTokenIds={eligibleTokenIds} minted={ownership.minted} owner={ownership.owner} locked={Boolean(profile.activeLock || profile.activeChallenge)} />
       </div>
     </section>
@@ -52,7 +58,7 @@ export function AthleteProfilePage({ profile }: { profile: Profile }) {
     <section className="athlete-tricks shell">
       <header><div><p className="eyebrow">CANONICAL ARSENAL</p><h2>Unlocked and locked tricks.</h2></div><p>{unlocked.length} unlocked · {locked.length} still to master. Approved move movies appear beside their trick.</p></header>
       <div className="athlete-trick-grid">
-        {unlocked.map((trick) => { const movie = profile.moveMovies[String(trick.id)] ?? profile.moveMovies[trick.id]; return <article className="unlocked" key={trick.id}><span>UNLOCKED · D{trick.difficulty}</span><b>{trick.name}</b>{movie?.videoUrl ? <video controls playsInline preload="metadata" poster={movie.posterUrl ?? undefined} src={movie.videoUrl} /> : <small>MOVIE NOT CREATED YET</small>}</article>; })}
+        {unlocked.map((trick) => { const movie = profile.moveMovies[String(trick.id)] ?? profile.moveMovies[trick.id]; return <article className={`unlocked${movie?.videoUrl ? " has-movie" : ""}`} key={trick.id}><span>UNLOCKED · D{trick.difficulty}</span><b>{trick.name}</b>{movie?.videoUrl ? <div className="athlete-move-movie"><video controls playsInline preload="metadata" poster={movie.posterUrl ?? undefined} src={movie.videoUrl} /><small>APPROVED MOVE MOVIE</small></div> : <Link className="athlete-add-movie" href={moveStudioHref}>{ownership.minted ? "ADD MOVIE CLIP →" : "OPEN STUDIO · OWN TO CREATE →"}</Link>}</article>; })}
         {locked.map((trick) => <article className="locked" key={trick.id}><span>LOCKED · D{trick.difficulty}</span><b>{trick.name}</b><small>SPONSOR OR TRICK LINE MASTERY REQUIRED</small></article>)}
       </div>
     </section>

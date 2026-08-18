@@ -7,3 +7,7 @@ export function numericAthleteSlug(slug: string): number | null {
 export function canonicalAthletePath(tokenId: number): string {
   return `/${tokenId}`;
 }
+
+export function canonicalMoveStudioPath(tokenId: number): string {
+  return `${canonicalAthletePath(tokenId)}/moves`;
+}
