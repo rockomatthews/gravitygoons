@@ -1264,6 +1264,19 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
 .move-quote-dock em { color: #a61f24; font: 850 8px/1.35 var(--mono); font-style: normal; }
 .move-quote-dock button { border: 0; padding: 15px 18px; color: white; background: var(--coral); font: 950 8px var(--mono); cursor: pointer; }
 .move-quote-dock .quote-cancel { color: #45504f; background: transparent; }
+.reroll-dialog-backdrop { position: fixed; inset: 0; z-index: 260; display: grid; place-items: center; padding: 18px; background: #000e; backdrop-filter: blur(14px); }
+.reroll-dialog { width: min(650px, 100%); display: grid; gap: 14px; padding: clamp(24px, 5vw, 42px); border: 1px solid var(--teal); color: white; background: radial-gradient(circle at 85% 10%, #18f1dc1c, transparent 34%), #081016; box-shadow: 14px 14px 0 var(--coral), 0 35px 100px #000; }
+.reroll-dialog > span, .reroll-dialog > label { color: var(--teal); font: 900 8px var(--mono); letter-spacing: .1em; }
+.reroll-dialog h2 { margin: 2px 0 0; font-size: clamp(40px, 7vw, 72px); line-height: .84; text-transform: uppercase; }
+.reroll-dialog p { margin: 0 0 4px; color: #aab6bc; line-height: 1.6; }
+.reroll-dialog textarea { width: 100%; min-height: 150px; resize: vertical; border: 1px solid #ffffff30; padding: 15px; color: white; background: #03070a; font: 750 14px/1.55 var(--mono); outline: none; }
+.reroll-dialog textarea:focus { border-color: var(--acid); box-shadow: 0 0 0 2px #caff3825; }
+.reroll-note-meta { min-height: 20px; display: flex; justify-content: space-between; gap: 15px; color: #718089; font: 800 7px var(--mono); }
+.reroll-note-meta b { color: #ff8f7f; }
+.reroll-dialog-actions { display: grid; grid-template-columns: auto 1fr; gap: 9px; margin-top: 5px; }
+.reroll-dialog-actions button { min-height: 54px; border: 1px solid #ffffff28; padding: 14px 18px; color: white; background: #111820; font: 950 8px var(--mono); cursor: pointer; }
+.reroll-dialog-actions button:last-child { border: 0; color: #050609; background: var(--acid); box-shadow: 7px 7px 0 var(--coral); }
+.reroll-dialog-actions button:disabled { opacity: .55; cursor: wait; }
 
 /* Private profile chat. It stays visually subordinate to the Arena and never exposes wallets. */
 .chat-dock { position: fixed; right: 18px; bottom: 18px; z-index: 240; font-family: var(--mono); }
@@ -1434,6 +1447,12 @@ footer { min-height: 90px; display: flex; justify-content: space-between; align-
   .chat-launcher{width:46px;min-width:46px;height:46px;padding:0;gap:0;border-radius:50%}
   .chat-launcher>b,.chat-launcher>i{display:none}
   .mint-dock,.move-quote-dock{bottom:calc(72px + env(safe-area-inset-bottom))}
+  .reroll-dialog-backdrop{align-items:end;padding:8px 8px calc(72px + env(safe-area-inset-bottom))}
+  .reroll-dialog{max-height:calc(100svh - 84px);overflow:auto;padding:24px 16px;box-shadow:6px 6px 0 var(--coral)}
+  .reroll-dialog h2{font-size:42px}
+  .reroll-dialog textarea{min-height:130px}
+  .reroll-dialog-actions{grid-template-columns:1fr}
+  .reroll-dialog-actions button:last-child{grid-row:1}
   .shell{width:calc(100% - 24px)}
   h1,h2,h3,p,b,span{overflow-wrap:anywhere}
   button,a,input,select,textarea{max-width:100%}

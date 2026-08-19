@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveWorkflowLabel, moveWorkflowProgress } from "./move-studio-ui.ts";
+import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveWorkflowLabel, moveWorkflowProgress, rerollNoteError, REROLL_NOTE_MAX_LENGTH } from "./move-studio-ui.ts";
 
 test("a quote remains purchasable and is never presented as a started workflow", () => {
   assert.equal(isMovePurchasable("quoted"), true);
@@ -37,4 +37,10 @@ test("failed workflow is paused and never pretends to keep progressing", () => {
   assert.equal(progress.paused, true);
   assert.equal(progress.active, false);
   assert.match(progress.detail, /without paying again/i);
+});
+
+test("rerolls require a useful bounded correction note", () => {
+  assert.match(rerollNoteError("bad") ?? "", /at least 5/i);
+  assert.equal(rerollNoteError("  The board rotated like a shove-it instead of flipping toe-side.  "), null);
+  assert.match(rerollNoteError("x".repeat(REROLL_NOTE_MAX_LENGTH + 1)) ?? "", /under 500/i);
 });

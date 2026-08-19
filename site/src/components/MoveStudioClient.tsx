@@ -8,7 +8,7 @@ import { base } from "viem/chains";
 import type { ProfileGoon, StudioMove } from "@/lib/profile-types";
 import { useWallet } from "@/components/WalletProvider";
 import { authenticateProfileSession } from "@/lib/profile-auth-client";
-import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveWorkflowLabel, moveWorkflowProgress } from "@/lib/move-studio-ui";
+import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveWorkflowLabel, moveWorkflowProgress, rerollNoteError, REROLL_NOTE_MAX_LENGTH } from "@/lib/move-studio-ui";
 
 const USDC_ADDRESS = (process.env.NEXT_PUBLIC_BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913") as `0x${string}`;
 const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_MOVE_TREASURY_ADDRESS as `0x${string}` | undefined;
@@ -16,6 +16,7 @@ const erc20Abi = [{ type: "function", name: "transfer", stateMutability: "nonpay
 
 type StudioPayload = { goon: ProfileGoon; moves: StudioMove[]; demo: boolean };
 type Quote = { orderId: string; pairId: string; amountMinorUnits: number; displayPrice: string; expiresAt: string; demo: boolean };
+type RerollTarget = { assetId: string; moveName: string; outcome: "land" | "fall" };
 
 function elapsedLabel(startedAt: string | null, now: number): string {
   if (!startedAt) return "Starting now";
@@ -56,6 +57,9 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
   const [busy, setBusy] = useState(false);
   const [lastCheckedAt, setLastCheckedAt] = useState<number | null>(null);
   const [clockNow, setClockNow] = useState(() => Date.now());
+  const [rerollTarget, setRerollTarget] = useState<RerollTarget | null>(null);
+  const [rerollNote, setRerollNote] = useState("");
+  const [rerollError, setRerollError] = useState("");
 
   const refresh = useCallback(async (preserveStatus = false) => {
     const response = await fetch(`/api/moves/studio/${tokenId}`, { cache: "no-store" });
@@ -89,6 +93,19 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
     document.addEventListener("visibilitychange", onVisibility);
     return () => { window.clearInterval(poll); window.clearInterval(clock); document.removeEventListener("visibilitychange", onVisibility); };
   }, [refresh, studio]);
+
+  useEffect(() => {
+    if (!rerollTarget) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !busy) {
+        setRerollTarget(null);
+        setRerollNote("");
+        setRerollError("");
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [busy, rerollTarget]);
 
   async function requestQuote(move: StudioMove) {
     setBusy(true);
@@ -184,22 +201,44 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
     }
   }
 
-  async function review(assetId: string, decision: "approved" | "rejected" | "reroll") {
+  async function review(assetId: string, decision: "approved" | "rejected" | "reroll", note?: string) {
     setBusy(true);
     setActionError("");
     try {
-      const response = await fetch("/api/moves/review", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ assetId, decision }) });
+      const response = await fetch("/api/moves/review", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ assetId, decision, ...(note ? { note: note.trim() } : {}) }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setStatus(decision === "approved" ? "Outcome approved. LAND publishes only when the pair is complete; FALL remains private for matches." : decision === "reroll" ? "A new version of this outcome has been queued without discarding the other approved outcome." : "Draft rejected and kept private.");
+      if (decision === "reroll") {
+        setRerollTarget(null);
+        setRerollNote("");
+        setRerollError("");
+      }
       await refresh(true);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to review this draft.";
       setStatus(message);
       setActionError(message);
+      if (decision === "reroll") setRerollError(message);
     } finally {
       setBusy(false);
     }
+  }
+
+  function openReroll(target: RerollTarget) {
+    setRerollTarget(target);
+    setRerollNote("");
+    setRerollError("");
+  }
+
+  async function submitReroll() {
+    if (!rerollTarget) return;
+    const validationError = rerollNoteError(rerollNote);
+    if (validationError) {
+      setRerollError(validationError);
+      return;
+    }
+    await review(rerollTarget.assetId, "reroll", rerollNote);
   }
 
   const goon = studio?.goon ?? fallbackGoon;
@@ -241,8 +280,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
                   <div className={`outcome-slot outcome-${outcome}`} key={outcome}>
                     <span>{outcome.toUpperCase()}{" // "}{asset?.status.replaceAll("_", " ") ?? "NOT MADE"}</span>
                     {asset?.videoUrl ? <video src={asset.videoUrl} poster={asset.posterUrl ?? undefined} controls playsInline preload="metadata" /> : <div className="outcome-placeholder"><b>{outcome === "land" ? "STICK IT" : "BAIL IT"}</b><small>5 SEC · 720P · SEEVIO</small></div>}
-                    {asset?.status === "owner_review" && <div className="outcome-review-buttons"><button onClick={() => review(asset.id, "approved")} disabled={busy}>APPROVE</button>{asset.rerollsRemaining > 0 ? <button onClick={() => review(asset.id, "reroll")} disabled={busy}>{busy ? "WORKING…" : `REROLL · ${asset.rerollsRemaining} LEFT`}</button> : <span className="outcome-reroll-used">INCLUDED REROLL USED</span>}<button onClick={() => review(asset.id, "rejected")} disabled={busy}>REJECT</button></div>}
-                    {asset?.status === "rejected" && asset.rerollsRemaining > 0 && <button className="outcome-rejected-reroll" onClick={() => review(asset.id, "reroll")} disabled={busy}>REGENERATE · {asset.rerollsRemaining} INCLUDED REROLL LEFT</button>}
+                    {asset?.status === "owner_review" && <div className="outcome-review-buttons"><button onClick={() => review(asset.id, "approved")} disabled={busy}>APPROVE</button>{asset.rerollsRemaining > 0 ? <button onClick={() => openReroll({ assetId: asset.id, moveName: move.name, outcome })} disabled={busy}>{`REROLL · ${asset.rerollsRemaining} LEFT`}</button> : <span className="outcome-reroll-used">INCLUDED REROLL USED</span>}<button onClick={() => review(asset.id, "rejected")} disabled={busy}>REJECT</button></div>}
+                    {asset?.status === "rejected" && asset.rerollsRemaining > 0 && <button className="outcome-rejected-reroll" onClick={() => openReroll({ assetId: asset.id, moveName: move.name, outcome })} disabled={busy}>REGENERATE · {asset.rerollsRemaining} INCLUDED REROLL LEFT</button>}
                     {outcome === "fall" && <small>PRIVATE · GAME OUTCOMES ONLY</small>}
                   </div>
                 );
@@ -254,6 +293,17 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
       </section>
 
       {quote && selectedMove && <div className="move-quote-dock"><div><span>02 // CONFIRM THIS EXACT TRICK</span><b>{selectedMove.name} · LAND + FALL</b><small>{quote.displayPrice} · INCLUDES ONE REROLL EACH</small>{actionError && <em role="alert">{actionError}</em>}</div><button onClick={payAndGenerate} disabled={busy}>{busy ? "PROCESSING…" : quote.demo ? "SIMULATE PAYMENT" : `PAY ${quote.displayPrice} + GENERATE`}</button><button className="quote-cancel" onClick={() => { setQuote(null); setActionError(""); }}>CHANGE TRICK</button></div>}
+      {rerollTarget && <div className="reroll-dialog-backdrop">
+        <section className="reroll-dialog" role="dialog" aria-modal="true" aria-labelledby="reroll-dialog-title" aria-describedby="reroll-dialog-description">
+          <span>OWNER CORRECTION · {rerollTarget.outcome.toUpperCase()}</span>
+          <h2 id="reroll-dialog-title">Reroll {rerollTarget.moveName}</h2>
+          <p id="reroll-dialog-description">Describe exactly what looked wrong. Your Goon image and the verified trick-motion reference remain attached to the new generation.</p>
+          <label htmlFor="reroll-note">WHAT MUST CHANGE?</label>
+          <textarea id="reroll-note" autoFocus maxLength={REROLL_NOTE_MAX_LENGTH} value={rerollNote} onChange={(event) => { setRerollNote(event.target.value); if (rerollError) setRerollError(""); }} placeholder="Example: The board rotated like a shove-it. Keep it aligned with the skater and flip it toe-side along its long axis." disabled={busy} />
+          <div className="reroll-note-meta"><span>{rerollNote.length}/{REROLL_NOTE_MAX_LENGTH}</span>{rerollError && <b role="alert">{rerollError}</b>}</div>
+          <div className="reroll-dialog-actions"><button type="button" onClick={() => { setRerollTarget(null); setRerollNote(""); setRerollError(""); }} disabled={busy}>CANCEL</button><button type="button" onClick={submitReroll} disabled={busy}>{busy ? "QUEUEING REROLL…" : "SEND NOTE + REROLL"}</button></div>
+        </section>
+      </div>}
     </div>
   );
 }

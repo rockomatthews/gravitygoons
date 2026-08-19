@@ -1,5 +1,13 @@
 import type { MovePairStatus, OutcomeStatus, StudioMove } from "@/lib/profile-types";
 
+export const REROLL_NOTE_MAX_LENGTH = 500;
+
+export function rerollNoteError(note: unknown): string | null {
+  if (typeof note !== "string" || note.trim().length < 5) return "Describe what needs to change in at least 5 characters.";
+  if (note.trim().length > REROLL_NOTE_MAX_LENGTH) return `Keep the reroll note under ${REROLL_NOTE_MAX_LENGTH} characters.`;
+  return null;
+}
+
 export type MoveWorkflowProgress = {
   percent: number;
   label: string;
