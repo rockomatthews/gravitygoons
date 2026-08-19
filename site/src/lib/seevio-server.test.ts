@@ -51,3 +51,38 @@ test("submits the documented Seevio image-to-video request with a protected call
     if (originalEnv.siteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL; else process.env.NEXT_PUBLIC_SITE_URL = originalEnv.siteUrl;
   }
 });
+
+test("uses reference-to-video when an exact private motion clip is available", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalEnv = {
+    apiKey: process.env.SEEVIO_API_KEY,
+    webhookSecret: process.env.SEEVIO_WEBHOOK_SECRET,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+  };
+  process.env.SEEVIO_API_KEY = "sk_test_gravity_goons";
+  process.env.SEEVIO_WEBHOOK_SECRET = "a-secure-webhook-secret-for-testing";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
+  let capturedBody: { input: { prompt: string; generation_type: string; image_urls: string[]; video_urls?: string[] } } | null = null;
+  globalThis.fetch = async (_input, init) => {
+    capturedBody = JSON.parse(String(init?.body));
+    return new Response(JSON.stringify({ taskId: "seevio-reference-task" }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+  try {
+    const taskId = await submitSeevioJob({
+      prompt: "The Goon performs a kickflip.",
+      imageUrl: "https://gravitygoons.com/goon.png",
+      referenceVideoUrl: "https://signed.example/kickflip.mp4",
+      idempotencyKey: "pair:kickflip:land:v1",
+    });
+    assert.equal(taskId, "seevio-reference-task");
+    assert.equal(capturedBody?.input.generation_type, "reference-to-video");
+    assert.deepEqual(capturedBody?.input.video_urls, ["https://signed.example/kickflip.mp4"]);
+    assert.match(capturedBody?.input.prompt ?? "", /authoritative trick mechanics/);
+    assert.match(capturedBody?.input.prompt ?? "", /Do not copy the human skater/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalEnv.apiKey === undefined) delete process.env.SEEVIO_API_KEY; else process.env.SEEVIO_API_KEY = originalEnv.apiKey;
+    if (originalEnv.webhookSecret === undefined) delete process.env.SEEVIO_WEBHOOK_SECRET; else process.env.SEEVIO_WEBHOOK_SECRET = originalEnv.webhookSecret;
+    if (originalEnv.siteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL; else process.env.NEXT_PUBLIC_SITE_URL = originalEnv.siteUrl;
+  }
+});

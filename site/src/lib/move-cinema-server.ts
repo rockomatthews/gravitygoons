@@ -5,6 +5,7 @@ import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verif
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { publicSeevioFailureMessage, SEEVIO_VIDEO_MODEL, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
 import { movePromptFor } from "@/lib/move-prompts";
+import { signedMoveMotionReference } from "@/lib/move-reference-server";
 
 const CHAIN_ID = 8453;
 const BASE_USDC = (process.env.BASE_USDC_ADDRESS ?? "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913").toLowerCase();
@@ -27,6 +28,25 @@ function promptFor(tokenId: number, trickId: number, outcome: "land" | "fall"): 
   if (!result.trick) throw new Error("Move not found in this discipline catalog.");
   const token = result.token;
   return movePromptFor({ token, discipline: result.discipline, trickName: result.trick.name, outcome });
+}
+
+async function generationReferenceFor(tokenId: number, trickId: number) {
+  const result = tokenMove(tokenId, trickId);
+  if (!result.trick) return null;
+  return signedMoveMotionReference(result.discipline, result.trick.name);
+}
+
+function providerRequestPayload(prompt: string, imageUrl: string, referenceObjectPath?: string) {
+  return {
+    model: SEEVIO_VIDEO_MODEL,
+    generation_type: referenceObjectPath ? "reference-to-video" : "image-to-video",
+    prompt,
+    image_urls: [imageUrl],
+    ...(referenceObjectPath ? { reference_video_path: referenceObjectPath } : {}),
+    aspect_ratio: "1:1",
+    resolution: "720p",
+    duration: 5,
+  };
 }
 
 function quoteAmount(): number {
@@ -151,6 +171,7 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
     return { submitted: 0, configured: seevioConfigured() };
   }
   const sourceImageUrl = absoluteImageUrl(pair.token_id);
+  const motionReference = await generationReferenceFor(pair.token_id, pair.trick_id);
   const assets: AssetRow[] = [];
   for (const outcome of ["land", "fall"] as const) {
     const prompt = promptFor(pair.token_id, pair.trick_id, outcome);
@@ -168,7 +189,7 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
   let active = 0;
   for (const asset of assets) {
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${asset.version}`;
-    const requestPayload = { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: asset.prompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 };
+    const requestPayload = providerRequestPayload(asset.prompt, asset.source_image_url, motionReference?.objectPath);
     const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
     let job = jobData as JobRow | null;
@@ -187,7 +208,7 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
     await supabase.from("move_media_assets").update({ status: "queued" }).eq("id", asset.id);
     let providerJobId: string | null;
     try {
-      providerJobId = await submitSeevioJob({ prompt: asset.prompt, imageUrl: asset.source_image_url, idempotencyKey });
+      providerJobId = await submitSeevioJob({ prompt: asset.prompt, imageUrl: asset.source_image_url, idempotencyKey, referenceVideoUrl: motionReference?.signedUrl });
     } catch (error) {
       const providerMessage = error instanceof Error ? error.message : "Seevio submission failed.";
       await Promise.all([
@@ -290,7 +311,9 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
       nextAsset = existingAsset as AssetRow;
     }
     const idempotencyKey = `${pair.id}:${asset.outcome}:v${nextVersion}`;
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: { model: SEEVIO_VIDEO_MODEL, generation_type: "image-to-video", prompt: rerollPrompt, image_urls: [asset.source_image_url], aspect_ratio: "1:1", resolution: "720p", duration: 5 } }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
+    const motionReference = await generationReferenceFor(pair.token_id, pair.trick_id);
+    const requestPayload = providerRequestPayload(rerollPrompt, asset.source_image_url, motionReference?.objectPath);
+    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: nextAsset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt: nextVersion, request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
     if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
     let job = jobData as JobRow | null;
     if (!job) {
@@ -306,7 +329,7 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
     if (!claimedJob) return { demo: false, assetId: nextAsset.id, decision, providerJobId: null, existing: true };
     let providerJobId: string | null;
     try {
-      providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey });
+      providerJobId = await submitSeevioJob({ prompt: rerollPrompt, imageUrl: asset.source_image_url, idempotencyKey, referenceVideoUrl: motionReference?.signedUrl });
     } catch (error) {
       const providerMessage = error instanceof Error ? error.message : "Seevio submission failed.";
       await Promise.all([

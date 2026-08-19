@@ -1,0 +1,19 @@
+{
+  "source": {
+    "title": "100 FLATGROUND SKATEBOARDING TRICKS",
+    "creator": "Michael Dorgan",
+    "url": "https://www.youtube.com/watch?v=hr9sz0n8teo",
+    "sha256": "d69c5c94cab2e2ccdfbea05b99d2761494cbc2441cbd976fc3c76e53a1399a1a",
+    "usage": "Private motion reference for generation only; never serve these clips to site visitors."
+  },
+  "references": [
+    { "discipline": "Skateboarding", "trickName": "Ollie", "sourceLabel": "001 Ollie", "startSeconds": 37, "durationSeconds": 4, "objectPath": "skateboarding/ollie-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "Heelflip", "sourceLabel": "006 Heelflip", "startSeconds": 52, "durationSeconds": 4, "objectPath": "skateboarding/heelflip-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "Kickflip", "sourceLabel": "007 Kickflip", "startSeconds": 55, "durationSeconds": 4, "objectPath": "skateboarding/kickflip-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "Hardflip", "sourceLabel": "010 Hardflip", "startSeconds": 64, "durationSeconds": 4, "objectPath": "skateboarding/hardflip-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "360 Flip", "sourceLabel": "018 Tre Flip", "startSeconds": 114, "durationSeconds": 4, "objectPath": "skateboarding/360-flip-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "Laser Flip", "sourceLabel": "019 Laser Flip", "startSeconds": 118, "durationSeconds": 5, "objectPath": "skateboarding/laser-flip-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "Bigspin Heelflip", "sourceLabel": "023 Bigspin Heelflip", "startSeconds": 136, "durationSeconds": 4, "objectPath": "skateboarding/bigspin-heelflip-v1.mp4" },
+    { "discipline": "Skateboarding", "trickName": "Impossible", "sourceLabel": "046 Impossible", "startSeconds": 211, "durationSeconds": 4, "objectPath": "skateboarding/impossible-v1.mp4" }
+  ]
+}

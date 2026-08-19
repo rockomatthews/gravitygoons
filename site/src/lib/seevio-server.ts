@@ -33,7 +33,7 @@ export function publicSeevioFailureMessage(error: unknown): string {
   return "Your $12 USDC payment is confirmed and recorded, but Seevio could not start the movies. Press RETRY GENERATION — NO CHARGE after the provider is available.";
 }
 
-export async function submitSeevioJob(input: { prompt: string; imageUrl: string; idempotencyKey: string }): Promise<string | null> {
+export async function submitSeevioJob(input: { prompt: string; imageUrl: string; idempotencyKey: string; referenceVideoUrl?: string | null }): Promise<string | null> {
   const apiKey = process.env.SEEVIO_API_KEY;
   const webhookUrl = callbackUrl();
   if (!apiKey || !webhookUrl) return null;
@@ -48,9 +48,12 @@ export async function submitSeevioJob(input: { prompt: string; imageUrl: string;
       model: SEEVIO_VIDEO_MODEL,
       callback_url: webhookUrl,
       input: {
-        prompt: input.prompt,
-        generation_type: "image-to-video",
+        prompt: input.referenceVideoUrl
+          ? `Use Image 1 as the exact Goon identity and opening appearance. Use Video 1 only as the authoritative trick mechanics, body timing, board path, catch, and landing reference. Do not copy the human skater, clothing, location, camera crop, captions, or text from Video 1. ${input.prompt}`
+          : input.prompt,
+        generation_type: input.referenceVideoUrl ? "reference-to-video" : "image-to-video",
         image_urls: [input.imageUrl],
+        ...(input.referenceVideoUrl ? { video_urls: [input.referenceVideoUrl] } : {}),
         duration: 5,
         aspect_ratio: "1:1",
         resolution: "720p",
