@@ -25,6 +25,45 @@ type SeevioCreateResponse = {
   error?: { code?: string; message?: string };
 };
 
+function generationPayload(input: { prompt: string; imageUrl: string; idempotencyKey: string; referenceVideoUrl?: string | null }) {
+  const useVideoReference = Boolean(input.referenceVideoUrl);
+  return {
+    model: SEEVIO_VIDEO_MODEL,
+    callback_url: callbackUrl(),
+    input: {
+      prompt: useVideoReference
+        ? `Use Image 1 as the exact Goon identity and opening appearance. Use Video 1 only as the authoritative trick mechanics, body timing, board path, catch, and landing reference. Do not copy the human skater, clothing, location, camera crop, captions, or text from Video 1. ${input.prompt}`
+        : input.prompt,
+      generation_type: useVideoReference ? "reference-to-video" : "image-to-video",
+      image_urls: [input.imageUrl],
+      ...(useVideoReference ? { video_urls: [input.referenceVideoUrl] } : {}),
+      duration: 5,
+      aspect_ratio: "1:1",
+      resolution: "720p",
+      generate_audio: false,
+      watermark: false,
+      web_search: false,
+      return_last_frame: true,
+      seed: deterministicSeed(input.idempotencyKey),
+    },
+  };
+}
+
+async function createSeevioTask(apiKey: string, payload: ReturnType<typeof generationPayload>): Promise<SeevioCreateResponse> {
+  const response = await fetch(`${API_BASE_URL}/v1/videos/generations`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${apiKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(20_000),
+  });
+  const result = await response.json() as SeevioCreateResponse;
+  if (!response.ok && !result.error?.message) result.error = { message: `Seevio submission failed with HTTP ${response.status}.` };
+  return result;
+}
+
 export function publicSeevioFailureMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   if (message.toLowerCase().includes("insufficient credits")) {
@@ -38,39 +77,16 @@ export async function submitSeevioJob(input: { prompt: string; imageUrl: string;
   const webhookUrl = callbackUrl();
   if (!apiKey || !webhookUrl) return null;
 
-  const response = await fetch(`${API_BASE_URL}/v1/videos/generations`, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${apiKey}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: SEEVIO_VIDEO_MODEL,
-      callback_url: webhookUrl,
-      input: {
-        prompt: input.referenceVideoUrl
-          ? `Use Image 1 as the exact Goon identity and opening appearance. Use Video 1 only as the authoritative trick mechanics, body timing, board path, catch, and landing reference. Do not copy the human skater, clothing, location, camera crop, captions, or text from Video 1. ${input.prompt}`
-          : input.prompt,
-        generation_type: input.referenceVideoUrl ? "reference-to-video" : "image-to-video",
-        image_urls: [input.imageUrl],
-        ...(input.referenceVideoUrl ? { video_urls: [input.referenceVideoUrl] } : {}),
-        duration: 5,
-        aspect_ratio: "1:1",
-        resolution: "720p",
-        generate_audio: false,
-        watermark: false,
-        web_search: false,
-        return_last_frame: true,
-        seed: deterministicSeed(input.idempotencyKey),
-      },
-    }),
-    signal: AbortSignal.timeout(20_000),
-  });
-  const payload = await response.json() as SeevioCreateResponse;
-  if (!response.ok || !payload.taskId) {
-    throw new Error(payload.error?.message ?? `Seevio submission failed with HTTP ${response.status}.`);
+  const primary = await createSeevioTask(apiKey, generationPayload(input));
+  if (primary.taskId) return primary.taskId;
+  const primaryMessage = primary.error?.message ?? "Seevio submission failed.";
+  if (input.referenceVideoUrl && /could not read reference media duration/i.test(primaryMessage)) {
+    console.warn("seevio_reference_duration_fallback", { idempotencyKey: input.idempotencyKey, fallback: "image-to-video" });
+    const fallback = await createSeevioTask(apiKey, generationPayload({ ...input, referenceVideoUrl: null }));
+    if (fallback.taskId) return fallback.taskId;
+    throw new Error(fallback.error?.message ?? primaryMessage);
   }
-  return payload.taskId;
+  throw new Error(primaryMessage);
 }
 
 export function verifySeevioWebhookToken(token: string | null): boolean {

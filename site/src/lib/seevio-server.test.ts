@@ -86,3 +86,40 @@ test("uses reference-to-video when an exact private motion clip is available", a
     if (originalEnv.siteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL; else process.env.NEXT_PUBLIC_SITE_URL = originalEnv.siteUrl;
   }
 });
+
+test("falls back to image-to-video when Seevio cannot parse a valid reference duration", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalEnv = {
+    apiKey: process.env.SEEVIO_API_KEY,
+    webhookSecret: process.env.SEEVIO_WEBHOOK_SECRET,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+  };
+  process.env.SEEVIO_API_KEY = "sk_test_gravity_goons";
+  process.env.SEEVIO_WEBHOOK_SECRET = "a-secure-webhook-secret-for-testing";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
+  const generationTypes: string[] = [];
+  globalThis.fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body)) as { input: { generation_type: string; video_urls?: string[] } };
+    generationTypes.push(body.input.generation_type);
+    if (generationTypes.length === 1) {
+      return new Response(JSON.stringify({ error: { message: "Could not read reference media duration. Ensure the URLs point to publicly accessible media files." } }), { status: 400, headers: { "content-type": "application/json" } });
+    }
+    assert.equal(body.input.video_urls, undefined);
+    return new Response(JSON.stringify({ taskId: "seevio-fallback-task" }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+  try {
+    const taskId = await submitSeevioJob({
+      prompt: "The Goon performs a kickflip with an accurate toe-side flick.",
+      imageUrl: "https://gravitygoons.com/goon.png",
+      referenceVideoUrl: "https://gravitygoons.com/kickflip.mp4",
+      idempotencyKey: "pair:kickflip:fallback:v1",
+    });
+    assert.equal(taskId, "seevio-fallback-task");
+    assert.deepEqual(generationTypes, ["reference-to-video", "image-to-video"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalEnv.apiKey === undefined) delete process.env.SEEVIO_API_KEY; else process.env.SEEVIO_API_KEY = originalEnv.apiKey;
+    if (originalEnv.webhookSecret === undefined) delete process.env.SEEVIO_WEBHOOK_SECRET; else process.env.SEEVIO_WEBHOOK_SECRET = originalEnv.webhookSecret;
+    if (originalEnv.siteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL; else process.env.NEXT_PUBLIC_SITE_URL = originalEnv.siteUrl;
+  }
+});
