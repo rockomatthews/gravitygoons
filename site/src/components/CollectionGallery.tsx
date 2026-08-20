@@ -16,6 +16,7 @@ import { challengeScheduleWindow } from "@/lib/challenge-scheduling";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import { athleteRankLabel } from "@/lib/rank-display";
 import { trackMarketingEvent } from "@/lib/analytics";
+import { startVisiblePolling } from "@/lib/visible-polling";
 import { collectionVisibleCount } from "@/lib/collection-pagination";
 
 type Token = {
@@ -132,9 +133,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
   }, [tokens]);
 
   useEffect(() => {
-    const initial = window.setTimeout(refreshAvailability, 0);
-    const timer = window.setInterval(refreshAvailability, 15_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+    return startVisiblePolling(refreshAvailability, 30_000);
   }, [refreshAvailability]);
 
   const refreshConnectedOwnership = useCallback(async () => {
@@ -167,9 +166,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
     } catch { /* chain availability remains usable while lobby data retries */ }
   }, []);
   useEffect(() => {
-    const initial = window.setTimeout(refreshRoster, 0);
-    const timer = window.setInterval(refreshRoster, 15_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+    return startVisiblePolling(refreshRoster, 30_000);
   }, [refreshRoster]);
 
   const refreshListings = useCallback(async () => {
@@ -183,9 +180,7 @@ export function CollectionGallery({ tokens, imageBaseUrl, initialDiscipline = "A
     } catch { /* primary mint and roster remain usable */ }
   }, []);
   useEffect(() => {
-    const initial = window.setTimeout(refreshListings, 0);
-    const timer = window.setInterval(refreshListings, 20_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+    return startVisiblePolling(refreshListings, 60_000);
   }, [refreshListings]);
 
   const filtered = useMemo(() => tokens.filter((token) => {

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
 import { useWallet } from "@/components/WalletProvider";
 import { trackMarketingEvent } from "@/lib/analytics";
+import { startVisiblePolling } from "@/lib/visible-polling";
 
 type Goon = { tokenId: number; discipline: string; species: string; rarity: string };
 type Person = { id: string; username: string; displayName: string; isNftHolder: boolean; goons: Goon[] };
@@ -22,7 +23,7 @@ export function ChatDock() {
 
   const loadRoom = useCallback(async () => { const response = await fetch("/api/chat/room", { cache: "no-store" }); const data = await response.json(); if (!response.ok) throw new Error(data.error ?? "Chat room unavailable."); setRoom(data); setAuthState(data.self ? "ready" : "visitor"); return data as Room; }, []);
   useEffect(() => { if (!open) return; const timer = window.setTimeout(() => void loadRoom().catch((error) => setStatus(error.message)), 0); return () => window.clearTimeout(timer); }, [loadRoom, open]);
-  useEffect(() => { if (!open) return; const timer = window.setInterval(() => void loadRoom(), 7_500); return () => window.clearInterval(timer); }, [loadRoom, open]);
+  useEffect(() => { if (!open) return; return startVisiblePolling(loadRoom, 15_000); }, [loadRoom, open]);
   useEffect(() => { if (!open) return; const url = process.env.NEXT_PUBLIC_SUPABASE_URL; const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; if (!url || !key) return; const client = createClient(url, key, { auth: { persistSession: false } }); client.channel("chat:room").on("broadcast", { event: "chat_room_message" }, () => void loadRoom()).subscribe(); return () => { void client.removeAllChannels(); }; }, [loadRoom, open]);
   useEffect(() => { if (!room || !open) return; const timer = window.setTimeout(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: seenRef.current ? "smooth" : "auto" }); seenRef.current = room.messages.length; }, 0); return () => window.clearTimeout(timer); }, [open, room]);
 

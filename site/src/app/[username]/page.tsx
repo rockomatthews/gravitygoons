@@ -4,7 +4,9 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AthleteProfilePage } from "@/components/AthleteProfilePage";
 import { ProfileMoveShowcase } from "@/components/ProfileMoveShowcase";
+import collection from "@/data/collection.json";
 import { getAthleteProfile } from "@/lib/athlete-profile";
+import { goonImageUrl } from "@/lib/goon-images";
 import { getPublicProfile } from "@/lib/profile-data";
 import { canonicalAthletePath, numericAthleteSlug } from "@/lib/profile-routing";
 
@@ -14,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   const { username } = await params;
   const tokenId = numericAthleteSlug(username);
   if (tokenId) {
-    const athlete = await getAthleteProfile(tokenId);
-    return athlete ? { title: `${athlete.token.name} — Gravity Goons`, description: `${athlete.token.discipline} NFT athlete career, ranks, tricks, sponsors, trophies, equipment, and match history.`, alternates: { canonical: canonicalAthletePath(tokenId) }, openGraph: { images: [athlete.imageUrl] } } : {};
+    const token = collection.tokens[tokenId - 1];
+    return { title: `${token.name} — Gravity Goons`, description: `${token.discipline} NFT athlete career, ranks, tricks, sponsors, trophies, equipment, and match history.`, alternates: { canonical: canonicalAthletePath(tokenId) }, openGraph: { images: [goonImageUrl(tokenId)] } };
   }
   const profile = await getPublicProfile(username);
   return profile ? { title: `${profile.displayName} — Gravity Goons`, description: profile.bio || `${profile.displayName}'s Gravity Goons collection and move cinema.` } : {};

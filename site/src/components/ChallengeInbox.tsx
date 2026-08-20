@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useWallet } from "@/components/WalletProvider";
 import { ensureProfileSession } from "@/lib/profile-auth-client";
+import { startVisiblePolling } from "@/lib/visible-polling";
 
 type Challenge = {
   id: string;
@@ -40,7 +41,7 @@ function message(wallet: string, action: string, challengeId: string, issuedAt: 
 export function ChallengeInbox() {
   const { account, connect, signMessage, signProfileChallenge } = useWallet();
   const [inbox, setInbox] = useState<Inbox>({ incoming: [], sent: [], active: [], history: [] });
-  const [status, setStatus] = useState("Challenge updates poll every 15 seconds; private realtime can take over when production auth is configured.");
+  const [status, setStatus] = useState("Challenge updates refresh while this tab is visible; private realtime can take over when production auth is configured.");
   const [rescheduleTimes, setRescheduleTimes] = useState<Record<string, string>>({});
   const [accepting,setAccepting]=useState<Challenge|null>(null);
   const [recipientGrit,setRecipientGrit]=useState(0);
@@ -53,9 +54,7 @@ export function ChallengeInbox() {
   }, []);
 
   useEffect(() => {
-    const initial = window.setTimeout(refresh, 0);
-    const timer = window.setInterval(refresh, 15_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+    return startVisiblePolling(refresh, 30_000);
   }, [refresh]);
 
   useEffect(() => {

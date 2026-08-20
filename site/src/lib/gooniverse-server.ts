@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import collection from "@/data/collection.json";
+import { getAthleteCareer } from "@/lib/athlete-profile";
 import { goonImageUrl } from "@/lib/goon-images";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { syncWalletOwnership, verifyTokenOwnership } from "@/lib/profile-data";
@@ -135,36 +136,7 @@ export async function contributeBattery(wallet:string,input:{tokenId?:number;inv
 
 export async function getGoonCareer(tokenId: number) {
   validTokenId(tokenId);
-  const discipline = collection.tokens[tokenId - 1].discipline as Discipline;
-  const baseUnlockedTricks = TRICK_CATALOG[discipline].filter((trick) => trick.id < 4);
-  const baseLockedTricks = TRICK_CATALOG[discipline].filter((trick) => trick.id >= 4);
-  const supabase = getSupabaseAdmin();
-  const empty = { tokenId, economy: { grit_balance: 0, grit_reserved: 0, lifetime_grit_earned: 0, xp: 0, level: 1 }, materials: [], inventory: [], loadout: null, trophies: [], activeExpedition: null, unlockedTricks: baseUnlockedTricks, lockedTricks: baseLockedTricks, mastery: [] };
-  if (!supabase) return { ...empty, goon: publicGoon(tokenId) };
-  const [economy, materials, inventory, loadout, trophies, expedition, sponsorProgress, mastery] = await Promise.all([
-    supabase.from("goon_economies").select("grit_balance,grit_reserved,lifetime_grit_earned,xp,level").eq("token_id", tokenId).maybeSingle(),
-    supabase.from("goon_material_balances").select("material_key,quantity").eq("token_id", tokenId),
-    supabase.from("goon_inventory").select("id,durability,crafted_at,reserved_activity_type,reserved_activity_id,item_definition:item_definition_id(id,name,slot,tier,competitive_modifier,max_durability)").eq("token_id", tokenId),
-    supabase.from("goon_loadouts").select("*").eq("token_id", tokenId).maybeSingle(),
-    supabase.from("goon_trophies").select("trophy_key,title,season_id,metadata,earned_at").eq("token_id", tokenId).order("earned_at", { ascending: false }),
-    supabase.from("goon_expeditions").select("id,location,risk,status,departed_at,resolves_at").eq("token_id", tokenId).in("status", ["active", "ready"]).maybeSingle(),
-    supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle(),
-    supabase.from("goon_trick_mastery").select("trick_id,failed_qualified_runs,qualified_runs,unlocked_at").eq("token_id",tokenId),
-  ]);
-  const bitmap = sponsorProgress.data?.unlocked_trick_bitmap;
-  return {
-    goon: publicGoon(tokenId),
-    tokenId,
-    economy: economy.data ?? empty.economy,
-    materials: materials.data ?? [],
-    inventory: inventory.data ?? [],
-    loadout: loadout.data,
-    trophies: trophies.data ?? [],
-    activeExpedition: expedition.data,
-    unlockedTricks: TRICK_CATALOG[discipline].filter((trick)=>bitmapUnlocked(bitmap,trick.id)),
-    lockedTricks: TRICK_CATALOG[discipline].filter((trick)=>trick.id>=4&&!bitmapUnlocked(bitmap,trick.id)),
-    mastery: mastery.data ?? [],
-  };
+  return getAthleteCareer(tokenId);
 }
 
 export async function getWalletCareerSummary(wallet:string){

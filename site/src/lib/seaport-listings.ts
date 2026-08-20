@@ -101,8 +101,8 @@ export async function createSeaportListing(wallet: string, input: { tokenId: num
 export async function listSeaportListings(tokenId?: number, includeOrder = false) {
   const supabase = getSupabaseAdmin();
   if (!supabase) return [];
-  await supabase.from("seaport_listings").update({ status: "expired", updated_at: new Date().toISOString() }).eq("status", "active").lt("expires_at", new Date().toISOString());
-  let query = supabase.from("seaport_listings").select(includeOrder ? "*" : "id,order_hash,token_id,offerer_wallet,currency,price_minor,status,expires_at").eq("status", "active").order("created_at", { ascending: false });
+  const now = new Date().toISOString();
+  let query = supabase.from("seaport_listings").select(includeOrder ? "*" : "id,order_hash,token_id,offerer_wallet,currency,price_minor,status,expires_at").eq("status", "active").lte("starts_at", now).gt("expires_at", now).order("created_at", { ascending: false });
   if (tokenId) query = query.eq("token_id", tokenId);
   const { data, error } = await query;
   if (error) throw new Error(error.message);

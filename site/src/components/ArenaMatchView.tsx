@@ -12,6 +12,7 @@ import { base } from "viem/chains";
 import { createWalletClient, custom, getAddress } from "viem";
 import { publicClient } from "@/lib/contracts";
 import { baseUsdcWriteAbi, matchEscrowWriteAbi, wagerTermsTypes } from "@/lib/match-escrow-client";
+import { startVisiblePolling } from "@/lib/visible-polling";
 
 type TranscriptTurn = { turn: number; action: string; createdAt: string; result: Record<string, unknown>; presentation: MatchActionPresentation };
 type WagerTerms = { matchId: `0x${string}`; playerA: `0x${string}`; playerB: `0x${string}`; tokenA: string; tokenB: string; stake: string; scheduledStart: string; fundingDeadline: string; rulesetHash: `0x${string}`; settlementSigner: `0x${string}`; feeBps: number; feeRecipient: `0x${string}` };
@@ -70,7 +71,7 @@ export function ArenaMatchView({ matchId }: { matchId: string }) {
     setClock(Date.now());
     setStatus("Public transcript current.");
   }, [matchId]);
-  useEffect(() => { const initial = window.setTimeout(refresh, 0); const timer = window.setInterval(refresh, 5_000); return () => { window.clearTimeout(initial); window.clearInterval(timer); }; }, [refresh]);
+  useEffect(() => startVisiblePolling(refresh, 10_000), [refresh]);
   useEffect(() => {
     if (!account) return;
     const load = async () => {

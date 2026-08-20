@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { ArenaMatch } from "@/lib/arena";
 import { athleteRankLabel } from "@/lib/rank-display";
+import { startVisiblePolling } from "@/lib/visible-polling";
 
 const tabs = [{ id: "live", label: "LIVE NOW" }, { id: "upcoming", label: "UPCOMING" }, { id: "results", label: "RESULTS" }, { id: "rankings", label: "RANKINGS" }];
 const disciplines = ["All", "Skateboarding", "Snowboarding", "Surfing", "BMX", "Motocross", "Skiing"];
@@ -59,9 +60,7 @@ export function ArenaLobby() {
   }, [discipline, tab]);
 
   useEffect(() => {
-    const initial = window.setTimeout(refresh, 0);
-    const timer = window.setInterval(refresh, tab === "live" ? 5_000 : 15_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+    return startVisiblePolling(refresh, tab === "live" ? 10_000 : 30_000);
   }, [refresh, tab]);
 
   useEffect(() => {

@@ -10,6 +10,7 @@ import {
 } from "@/lib/match-presentation";
 import type { CallMode } from "@/lib/pvp";
 import { trackMarketingEvent } from "@/lib/analytics";
+import { startVisiblePolling } from "@/lib/visible-polling";
 
 type AvailableTrick = { id: number; name: string; difficulty: number };
 type RankedGoon = { tokenId: number; name: string; species: string; parodyBrand: string; image: string };
@@ -144,9 +145,7 @@ export function RankedMatch({ matchId }: { matchId: string }) {
   }, [account, matchId]);
 
   useEffect(() => {
-    const initial = window.setTimeout(refresh, 0);
-    const timer = window.setInterval(refresh, 2_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(timer); };
+    return startVisiblePolling(refresh, 4_000);
   }, [refresh]);
 
   useEffect(() => {
