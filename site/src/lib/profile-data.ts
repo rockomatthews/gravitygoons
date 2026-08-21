@@ -134,7 +134,7 @@ export async function getPublicProfile(username: string): Promise<PublicProfile 
   if (tokenIds.length) {
     const {data:progress}=await supabase.from("athlete_sponsor_progress").select("token_id,unlocked_trick_bitmap").in("token_id",tokenIds);
     for(const row of progress??[])bitmaps.set(row.token_id,row.unlocked_trick_bitmap);
-    const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).in("token_id", tokenIds);
+    const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,created_at").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).in("token_id", tokenIds).order("created_at", { ascending: false });
     pairs = (pairData ?? []) as PairRow[];
     const pairIds = pairs.map((pair) => pair.id);
     if (pairIds.length) {
@@ -288,7 +288,7 @@ export async function getStudioMoves(walletAddress: string, tokenId: number): Pr
     return { goon, moves: goon.moves.map((move) => ({ ...move, outcomes: outcomesByPair(move.pairId), quotedPriceUsdc: quote, workflowStartedAt: null, workflowUpdatedAt: null })), demo: true };
   }
 
-  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,created_at,updated_at").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId);
+  const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,created_at,updated_at").eq("chain_id", CHAIN_ID).eq("contract_address", collectionAddress.toLowerCase()).eq("token_id", tokenId).order("created_at", { ascending: false });
   const {data:progress}=await supabase.from("athlete_sponsor_progress").select("unlocked_trick_bitmap").eq("token_id",tokenId).maybeSingle();
   const pairs = (pairData ?? []) as PairRow[];
   const pairIds = pairs.map((pair) => pair.id);

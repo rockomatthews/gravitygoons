@@ -50,11 +50,19 @@ export function moveWorkflowProgress(move: Pick<StudioMove, "pairStatus" | "outc
 }
 
 export function isMovePurchasable(status: MovePairStatus): boolean {
-  return status === "no_movie" || status === "quoted";
+  return status === "no_movie" || status === "quoted" || status === "rejected";
 }
 
 export function isMoveGenerationRetryable(status: MovePairStatus): boolean {
   return status === "paid" || status === "queued" || status === "failed";
+}
+
+export function moveStudioActionLabel(status: MovePairStatus, selected: boolean): string {
+  if (isMoveGenerationRetryable(status)) return "RETRY GENERATION — NO CHARGE";
+  if (!isMovePurchasable(status)) return "WORKFLOW IN PROGRESS";
+  if (status === "rejected") return "SELECT THIS TRICK";
+  if (status === "quoted") return "REVIEW / PAY";
+  return selected ? "SELECTED" : "SELECT THIS TRICK";
 }
 
 export function moveWorkflowLabel(status: MovePairStatus): string {
@@ -64,6 +72,7 @@ export function moveWorkflowLabel(status: MovePairStatus): string {
     case "paid": return "PAID · READY TO RETRY";
     case "queued": return "QUEUED · NO NEW PAYMENT";
     case "failed": return "RETRY NEEDED · PAID";
+    case "rejected": return "REJECTED · AVAILABLE TO BUY AGAIN";
     default: return status.replaceAll("_", " ").toUpperCase();
   }
 }

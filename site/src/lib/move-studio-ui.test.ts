@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveWorkflowLabel, moveWorkflowProgress, rerollNoteError, REROLL_NOTE_MAX_LENGTH } from "./move-studio-ui.ts";
+import { friendlyWalletPaymentError, isMoveGenerationRetryable, isMovePurchasable, isMoveWorkflowActive, moveStudioActionLabel, moveWorkflowLabel, moveWorkflowProgress, rerollNoteError, REROLL_NOTE_MAX_LENGTH } from "./move-studio-ui.ts";
 
 test("a quote remains purchasable and is never presented as a started workflow", () => {
   assert.equal(isMovePurchasable("quoted"), true);
@@ -12,6 +12,13 @@ test("paid or failed generation can retry without another purchase", () => {
   assert.equal(isMoveGenerationRetryable("paid"), true);
   assert.equal(isMoveGenerationRetryable("failed"), true);
   assert.equal(isMovePurchasable("paid"), false);
+});
+
+test("a rejected movie returns the trick to the normal purchase flow", () => {
+  assert.equal(isMovePurchasable("rejected"), true);
+  assert.equal(isMoveGenerationRetryable("rejected"), false);
+  assert.equal(moveWorkflowLabel("rejected"), "REJECTED · AVAILABLE TO BUY AGAIN");
+  assert.equal(moveStudioActionLabel("rejected", true), "SELECT THIS TRICK");
 });
 
 test("wallet rejection never exposes raw RPC request details", () => {

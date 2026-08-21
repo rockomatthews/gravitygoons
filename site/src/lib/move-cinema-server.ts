@@ -87,9 +87,9 @@ export async function createMoveQuote(walletAddress: string, tokenId: number, tr
   const profile = await getProfileForWallet(wallet);
   if (!profile) throw new Error("Create your Gravity Goons username profile before commissioning a movie.");
   const contract = collectionAddress.toLowerCase();
-  const { data: existingData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("chain_id", CHAIN_ID).eq("contract_address", contract).eq("token_id", tokenId).eq("catalog_version", 1).eq("trick_id", trickId).maybeSingle();
+  const { data: existingData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("chain_id", CHAIN_ID).eq("contract_address", contract).eq("token_id", tokenId).eq("catalog_version", 1).eq("trick_id", trickId).order("created_at", { ascending: false }).limit(1).maybeSingle();
   const existing = existingData as PairRow | null;
-  if (existing) {
+  if (existing && existing.status !== "rejected") {
     const { data: orderData } = await supabase.from("move_media_orders").select("id,pair_id,payer_wallet_address,amount_minor_units,status,quote_expires_at,payment_tx_hash").eq("pair_id", existing.id).maybeSingle();
     const order = orderData as OrderRow | null;
     const quoteExpired = order?.status === "expired" || (order?.status === "quoted" && new Date(order.quote_expires_at).getTime() < Date.now());
@@ -293,8 +293,8 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   const { data: pairData } = await supabase.from("move_media_pairs").select("id,token_id,trick_id,status,commissioned_by_wallet").eq("id", asset.pair_id).single();
   const pair = pairData as PairRow;
   if (!(await verifyTokenOwnership(walletAddress, pair.token_id))) throw new Error("Only the current NFT owner can review this movie.");
-  const canReview = asset.status === "owner_review" || (decision === "reroll" && asset.status === "rejected");
-  if (!canReview) throw new Error("This outcome is not currently awaiting owner review or an included rejected-draft reroll.");
+  const canReview = asset.status === "owner_review";
+  if (!canReview) throw new Error("This outcome is not currently awaiting owner review.");
   const reviewedAt = new Date().toISOString();
 
   if (decision === "reroll") {

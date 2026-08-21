@@ -22,7 +22,8 @@ export async function addMovePresentations<T extends ActionRow>(supabase: AdminC
     .eq("chain_id", CHAIN_ID)
     .eq("contract_address", collectionAddress.toLowerCase())
     .in("token_id", tokenIds)
-    .in("trick_id", trickIds);
+    .in("trick_id", trickIds)
+    .eq("status", "approved");
   if (pairError || !pairData?.length) return actions.map((action) => ({ ...action, presentation: { attempts: [] } }));
   const pairs = pairData as PairRow[];
 
