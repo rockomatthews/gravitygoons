@@ -2,8 +2,8 @@ type PromptToken = { species: string; sport_equipment: string };
 
 const TRICK_MECHANICS: Record<string, string> = {
   "Skateboarding:Ollie": "Crouch, snap the tail against the ground with the back foot, slide the front foot up the grip tape, level the board in the air, and keep both feet over the deck; the board never flips.",
-  "Skateboarding:Kickflip": "Set the rear foot on the tail and angle the front foot behind the front bolts. Snap the tail, slide the front foot toward the nose, then flick the FRONT TOES diagonally forward through the HEEL-SIDE corner of the nose. The deck makes exactly one roll around its nose-to-tail axis TOWARD the rider's toes. The board does not yaw or shove-it. Lift both feet clear, wait until the grip tape faces upward, catch over the bolts, then land.",
-  "Skateboarding:Heelflip": "Set the rear foot on the tail and the front foot behind the front bolts with the FRONT TOES visibly hanging over the TOE-SIDE edge. Snap the tail, slide the front foot straight toward the nose, then kick the FRONT HEEL forward and outward through the TOE-SIDE corner of the nose. The deck makes exactly one roll around its nose-to-tail axis AWAY from the rider's toes—the opposite direction from a kickflip. The board does not yaw or shove-it. Lift both feet clear, let the grip tape return upward, catch over the bolts, then land.",
+  "Skateboarding:Kickflip": "Set the rear foot on the tail and angle the front foot behind the front bolts. Snap the tail straight down without scooping it sideways. Slide the front foot toward the nose, then flick the FRONT TOES diagonally forward through the HEEL-SIDE corner of the nose. The toe flick initiates exactly one roll around the deck's nose-to-tail axis, opposite a heelflip: grip tape, underside, then grip tape again. The nose stays pointed in the original travel direction during the entire airborne motion: ZERO horizontal turn, ZERO shove-it, ZERO yaw. At the halfway frame the underside faces upward while the nose still points forward. Preserve the source rider's stance and the reference clip's roll direction; never reinterpret it as screen-clockwise or screen-counterclockwise. Lift both feet clear, catch over the bolts only after the grip tape faces upward, then land.",
+  "Skateboarding:Heelflip": "Set the rear foot on the tail and the front foot behind the front bolts with the FRONT TOES slightly over the TOE-SIDE edge. Snap the tail, slide the front foot toward the nose, then drive the FRONT HEEL forward and outward through the TOE-SIDE corner of the nose. The heel flick initiates exactly one roll around the deck's nose-to-tail axis, opposite a kickflip: grip tape, underside, then grip tape again. Preserve the source rider's stance and the reference clip's roll direction; never reinterpret it as screen-clockwise or screen-counterclockwise. The board does not yaw or shove-it. Lift both feet clear, catch over the bolts only after the grip tape faces upward, then land.",
   "Skateboarding:Boardslide": "Approach a rail, ollie, turn the board exactly 90 degrees, and place the middle underside of the deck across the rail with both trucks straddling it. Slide perpendicular to the rail, then rotate off; neither truck grinds on the rail.",
   "Skateboarding:50-50 Grind": "Ollie onto a rail with the board parallel to it and lock both trucks onto the rail at the same time. Grind on both axles with all four wheels clear, then pop off straight; the deck itself does not slide on the rail.",
   "Skateboarding:Manual Revert": "Balance only on the rear wheels with the nose visibly raised, then pivot the board and rider 180 degrees on the rear wheels before setting all four wheels down. Do not turn it into an ollie or flip trick.",
@@ -152,4 +152,10 @@ export function movePromptFor(input: { token: PromptToken; discipline: string; t
 
 export function hasExactMoveGuide(discipline: string, trickName: string): boolean {
   return Boolean(TRICK_MECHANICS[`${discipline}:${trickName}`]);
+}
+
+export function moveRerollPromptFor(basePrompt: string, ownerNote: string): string {
+  const correction = ownerNote.trim();
+  if (!correction) return basePrompt;
+  return `OWNER CORRECTION — THIS OVERRIDES ANY CONFLICTING CREATIVE INTERPRETATION: ${correction} Do not repeat the rejected motion. ${basePrompt}`;
 }

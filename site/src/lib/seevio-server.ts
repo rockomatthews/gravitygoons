@@ -32,7 +32,7 @@ function generationPayload(input: { prompt: string; imageUrl: string; idempotenc
     callback_url: callbackUrl(),
     input: {
       prompt: useVideoReference
-        ? `Use Image 1 as the exact Goon identity and opening appearance. Use Video 1 only as the authoritative trick mechanics, body timing, board path, catch, and landing reference. Do not copy the human skater, clothing, location, camera crop, captions, or text from Video 1. ${input.prompt}`
+        ? `MOTION FIDELITY IS THE HIGHEST PRIORITY. Copy the exact trick mechanics, body timing, board path, rotation axes, catch, and landing from Video 1. Do not improvise, combine, or add another rotation. Use Image 1 as the exact Goon identity and opening appearance. Do not copy the human skater, clothing, location, camera crop, captions, or text from Video 1. ${input.prompt}`
         : input.prompt,
       generation_type: useVideoReference ? "reference-to-video" : "image-to-video",
       image_urls: [input.imageUrl],
@@ -69,6 +69,9 @@ export function publicSeevioFailureMessage(error: unknown): string {
   if (message.toLowerCase().includes("insufficient credits")) {
     return "Your $12 USDC payment is confirmed and recorded. Seevio needs more generation credits before LAND and FALL can start. Add Seevio credits, then press RETRY GENERATION — NO CHARGE.";
   }
+  if (message.toLowerCase().includes("reference media duration")) {
+    return "Your $12 USDC payment is confirmed and recorded, but Seevio could not read the required motion-reference video. No image-only substitute was generated. Repair the reference, then press RETRY GENERATION — NO CHARGE.";
+  }
   return "Your $12 USDC payment is confirmed and recorded, but Seevio could not start the movies. Press RETRY GENERATION — NO CHARGE after the provider is available.";
 }
 
@@ -81,10 +84,7 @@ export async function submitSeevioJob(input: { prompt: string; imageUrl: string;
   if (primary.taskId) return primary.taskId;
   const primaryMessage = primary.error?.message ?? "Seevio submission failed.";
   if (input.referenceVideoUrl && /could not read reference media duration/i.test(primaryMessage)) {
-    console.warn("seevio_reference_duration_fallback", { idempotencyKey: input.idempotencyKey, fallback: "image-to-video" });
-    const fallback = await createSeevioTask(apiKey, generationPayload({ ...input, referenceVideoUrl: null }));
-    if (fallback.taskId) return fallback.taskId;
-    throw new Error(fallback.error?.message ?? primaryMessage);
+    console.error("seevio_required_reference_rejected", { idempotencyKey: input.idempotencyKey, fallback: "blocked" });
   }
   throw new Error(primaryMessage);
 }

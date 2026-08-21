@@ -77,7 +77,9 @@ test("uses reference-to-video when an exact private motion clip is available", a
     assert.equal(taskId, "seevio-reference-task");
     assert.equal(capturedBody?.input.generation_type, "reference-to-video");
     assert.deepEqual(capturedBody?.input.video_urls, ["https://signed.example/kickflip.mp4"]);
-    assert.match(capturedBody?.input.prompt ?? "", /authoritative trick mechanics/);
+    assert.match(capturedBody?.input.prompt ?? "", /MOTION FIDELITY IS THE HIGHEST PRIORITY/);
+    assert.match(capturedBody?.input.prompt ?? "", /rotation axes/);
+    assert.match(capturedBody?.input.prompt ?? "", /Do not improvise, combine, or add another rotation/);
     assert.match(capturedBody?.input.prompt ?? "", /Do not copy the human skater/);
   } finally {
     globalThis.fetch = originalFetch;
@@ -87,7 +89,7 @@ test("uses reference-to-video when an exact private motion clip is available", a
   }
 });
 
-test("falls back to image-to-video when Seevio cannot parse a valid reference duration", async () => {
+test("fails closed when Seevio cannot parse a required motion reference", async () => {
   const originalFetch = globalThis.fetch;
   const originalEnv = {
     apiKey: process.env.SEEVIO_API_KEY,
@@ -101,21 +103,17 @@ test("falls back to image-to-video when Seevio cannot parse a valid reference du
   globalThis.fetch = async (_input, init) => {
     const body = JSON.parse(String(init?.body)) as { input: { generation_type: string; video_urls?: string[] } };
     generationTypes.push(body.input.generation_type);
-    if (generationTypes.length === 1) {
-      return new Response(JSON.stringify({ error: { message: "Could not read reference media duration. Ensure the URLs point to publicly accessible media files." } }), { status: 400, headers: { "content-type": "application/json" } });
-    }
-    assert.equal(body.input.video_urls, undefined);
-    return new Response(JSON.stringify({ taskId: "seevio-fallback-task" }), { status: 200, headers: { "content-type": "application/json" } });
+    return new Response(JSON.stringify({ error: { message: "Could not read reference media duration. Ensure the URLs point to publicly accessible media files." } }), { status: 400, headers: { "content-type": "application/json" } });
   };
   try {
-    const taskId = await submitSeevioJob({
-      prompt: "The Goon performs a kickflip with an accurate toe-side flick.",
-      imageUrl: "https://gravitygoons.com/goon.png",
-      referenceVideoUrl: "https://gravitygoons.com/kickflip.mp4",
-      idempotencyKey: "pair:kickflip:fallback:v1",
-    });
-    assert.equal(taskId, "seevio-fallback-task");
-    assert.deepEqual(generationTypes, ["reference-to-video", "image-to-video"]);
+    await assert.rejects(() => submitSeevioJob({
+        prompt: "The Goon performs a kickflip with an accurate toe-side flick.",
+        imageUrl: "https://gravitygoons.com/goon.png",
+        referenceVideoUrl: "https://gravitygoons.com/kickflip.mp4",
+        idempotencyKey: "pair:kickflip:required-reference:v1",
+      }), /Could not read reference media duration/);
+    assert.deepEqual(generationTypes, ["reference-to-video"]);
+    assert.match(publicSeevioFailureMessage(new Error("Could not read reference media duration.")), /No image-only substitute was generated/);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalEnv.apiKey === undefined) delete process.env.SEEVIO_API_KEY; else process.env.SEEVIO_API_KEY = originalEnv.apiKey;

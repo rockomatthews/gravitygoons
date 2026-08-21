@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TRICK_CATALOG } from "./pvp.ts";
-import { hasExactMoveGuide, movePromptFor } from "./move-prompts.ts";
+import { hasExactMoveGuide, movePromptFor, moveRerollPromptFor } from "./move-prompts.ts";
 
 test("every catalog trick has an exact discipline-specific motion guide", () => {
   for (const [discipline, tricks] of Object.entries(TRICK_CATALOG)) {
@@ -11,16 +11,21 @@ test("every catalog trick has an exact discipline-specific motion guide", () => 
 
 test("Heelflip prompts specify the correct front-foot path and forbid a shove-it", () => {
   const prompt = movePromptFor({ token: { species: "Snow Leopard", sport_equipment: "Skateboard" }, discipline: "Skateboarding", trickName: "Heelflip", outcome: "land" });
-  assert.match(prompt, /FRONT TOES visibly hanging over the TOE-SIDE edge/);
+  assert.match(prompt, /FRONT TOES slightly over the TOE-SIDE edge/);
   assert.match(prompt, /FRONT HEEL forward and outward through the TOE-SIDE corner/);
-  assert.match(prompt, /AWAY from the rider's toes/);
+  assert.match(prompt, /heel flick initiates exactly one roll/);
+  assert.match(prompt, /opposite a kickflip/);
   assert.match(prompt, /does not yaw or shove-it/);
 });
 
 test("Kickflip prompts distinguish the opposite front-foot flick", () => {
   const prompt = movePromptFor({ token: { species: "Snow Leopard", sport_equipment: "Skateboard" }, discipline: "Skateboarding", trickName: "Kickflip", outcome: "land" });
   assert.match(prompt, /FRONT TOES diagonally forward through the HEEL-SIDE corner/);
-  assert.match(prompt, /TOWARD the rider's toes/);
+  assert.match(prompt, /toe flick initiates exactly one roll/);
+  assert.match(prompt, /Snap the tail straight down without scooping it sideways/);
+  assert.match(prompt, /ZERO horizontal turn, ZERO shove-it, ZERO yaw/);
+  assert.match(prompt, /halfway frame the underside faces upward while the nose still points forward/);
+  assert.match(prompt, /never reinterpret it as screen-clockwise or screen-counterclockwise/);
   assert.match(prompt, /Reject a heelflip/);
 });
 
@@ -64,4 +69,12 @@ test("fall prompts require the exact trick before the miss", () => {
   assert.match(prompt, /Perform the complete defining trick correctly through 3\.6 seconds/);
   assert.match(prompt, /Only during the catch or touchdown/);
   assert.match(prompt, /do not ride away as though the trick was landed/);
+});
+
+test("reroll corrections override the prior creative interpretation", () => {
+  const basePrompt = "The board performs exactly one kickflip with zero yaw.";
+  const prompt = moveRerollPromptFor(basePrompt, "The rejected board path was a varial flip.");
+  assert.ok(prompt.startsWith("OWNER CORRECTION — THIS OVERRIDES ANY CONFLICTING CREATIVE INTERPRETATION:"));
+  assert.match(prompt, /Do not repeat the rejected motion/);
+  assert.ok(prompt.indexOf("varial flip") < prompt.indexOf(basePrompt));
 });

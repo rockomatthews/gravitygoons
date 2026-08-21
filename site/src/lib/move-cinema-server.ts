@@ -4,7 +4,7 @@ import { goonImageUrl } from "@/lib/goon-images";
 import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { publicSeevioFailureMessage, SEEVIO_VIDEO_MODEL, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
-import { movePromptFor } from "@/lib/move-prompts";
+import { movePromptFor, moveRerollPromptFor } from "@/lib/move-prompts";
 import { signedMoveMotionReference } from "@/lib/move-reference-server";
 
 const CHAIN_ID = 8453;
@@ -301,7 +301,7 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
     if (asset.version > includedRerollsPerOutcome()) throw new Error("This movie pair has used its included reroll for this outcome. Reject this draft or purchase an additional reroll when paid rerolls launch.");
     const nextVersion = asset.version + 1;
     const correctedBasePrompt = promptFor(pair.token_id, pair.trick_id, asset.outcome);
-    const rerollPrompt = note.trim() ? `${correctedBasePrompt} Owner revision note: ${note.trim()}` : correctedBasePrompt;
+    const rerollPrompt = moveRerollPromptFor(correctedBasePrompt, note);
     const { data: nextData, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome: asset.outcome, version: nextVersion, status: "queued", source_image_url: asset.source_image_url, prompt: rerollPrompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();
     if (error && error.code !== "23505") throw new Error(error.message);
     let nextAsset = nextData as AssetRow | null;

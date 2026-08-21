@@ -4,9 +4,12 @@ export type MoveMotionReference = {
   discipline: string;
   trickName: string;
   sourceLabel: string;
+  sourceFile?: string;
+  sourceSha256?: string;
   startSeconds: number;
   durationSeconds: number;
   objectPath: string;
+  motionNotes?: string;
 };
 
 const references = catalog.references as MoveMotionReference[];

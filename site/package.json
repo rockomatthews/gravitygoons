@@ -15,6 +15,7 @@
     "analyze:game-balance": "node --experimental-strip-types scripts/simulate-pvp-balance.mjs ../reports/pvp-balance-v04.json",
     "marketing:link": "node scripts/marketing-link.mjs",
     "prepare:skate-references": "node scripts/prepare-skate-motion-references.mjs",
+    "upload:trick-reference": "node scripts/upload-trick-motion-reference.mjs",
     "start": "next start",
     "lint": "eslint ."
   },
