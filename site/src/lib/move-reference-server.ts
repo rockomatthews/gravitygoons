@@ -1,15 +1,26 @@
 import { moveMotionReferenceFor } from "@/lib/move-reference-catalog";
-import { createMoveReferenceAccessUrl } from "@/lib/move-reference-access";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export const MOVE_REFERENCE_BUCKET = "move-reference-clips";
+const REFERENCE_URL_TTL_SECONDS = 60 * 60;
 
 export async function signedMoveMotionReference(discipline: string, trickName: string): Promise<{ objectPath: string; signedUrl: string } | null> {
   const reference = moveMotionReferenceFor(discipline, trickName);
   if (!reference) return null;
-  const signedUrl = createMoveReferenceAccessUrl(reference.objectPath);
-  if (!signedUrl) {
-    console.warn("move_reference_sign_failed", { discipline, trickName, objectPath: reference.objectPath, reason: "Reference access URL is not configured." });
-    return null;
+  const supabase = getSupabaseAdmin();
+  if (!supabase) throw new Error("The required motion-reference service is not configured.");
+
+  const { data, error } = await supabase.storage
+    .from(MOVE_REFERENCE_BUCKET)
+    .createSignedUrl(reference.objectPath, REFERENCE_URL_TTL_SECONDS);
+  if (error || !data?.signedUrl) {
+    console.error("move_reference_sign_failed", {
+      discipline,
+      trickName,
+      objectPath: reference.objectPath,
+      reason: error?.message ?? "Supabase Storage returned no signed URL.",
+    });
+    throw new Error("The required motion-reference video could not be prepared.");
   }
-  return { objectPath: reference.objectPath, signedUrl };
+  return { objectPath: reference.objectPath, signedUrl: data.signedUrl };
 }

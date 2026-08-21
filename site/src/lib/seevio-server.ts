@@ -25,6 +25,36 @@ type SeevioCreateResponse = {
   error?: { code?: string; message?: string };
 };
 
+const verifiedReferenceUrls = new Map<string, number>();
+const REFERENCE_PREFLIGHT_CACHE_MS = 5 * 60 * 1000;
+
+async function preflightVideoReference(url: string): Promise<void> {
+  const verifiedAt = verifiedReferenceUrls.get(url);
+  if (verifiedAt && Date.now() - verifiedAt < REFERENCE_PREFLIGHT_CACHE_MS) return;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error("The required motion-reference URL is invalid.");
+  }
+  if (parsed.protocol !== "https:") throw new Error("The required motion-reference URL must use HTTPS.");
+
+  const response = await fetch(url, {
+    headers: { range: "bytes=0-65535" },
+    redirect: "follow",
+    signal: AbortSignal.timeout(15_000),
+  });
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!response.ok || !contentType.startsWith("video/")) {
+    await response.body?.cancel();
+    throw new Error(`The required motion-reference video failed its delivery check (HTTP ${response.status}).`);
+  }
+  const firstBytes = await response.arrayBuffer();
+  if (firstBytes.byteLength === 0) throw new Error("The required motion-reference video is empty.");
+  verifiedReferenceUrls.set(url, Date.now());
+}
+
 function generationPayload(input: { prompt: string; imageUrl: string; idempotencyKey: string; referenceVideoUrl?: string | null }) {
   const useVideoReference = Boolean(input.referenceVideoUrl);
   return {
@@ -69,7 +99,7 @@ export function publicSeevioFailureMessage(error: unknown): string {
   if (message.toLowerCase().includes("insufficient credits")) {
     return "Your $12 USDC payment is confirmed and recorded. Seevio needs more generation credits before LAND and FALL can start. Add Seevio credits, then press RETRY GENERATION — NO CHARGE.";
   }
-  if (message.toLowerCase().includes("reference media duration")) {
+  if (/reference media duration|motion-reference/i.test(message)) {
     return "Your $12 USDC payment is confirmed and recorded, but Seevio could not read the required motion-reference video. No image-only substitute was generated. Repair the reference, then press RETRY GENERATION — NO CHARGE.";
   }
   return "Your $12 USDC payment is confirmed and recorded, but Seevio could not start the movies. Press RETRY GENERATION — NO CHARGE after the provider is available.";
@@ -79,6 +109,8 @@ export async function submitSeevioJob(input: { prompt: string; imageUrl: string;
   const apiKey = process.env.SEEVIO_API_KEY;
   const webhookUrl = callbackUrl();
   if (!apiKey || !webhookUrl) return null;
+
+  if (input.referenceVideoUrl) await preflightVideoReference(input.referenceVideoUrl);
 
   const primary = await createSeevioTask(apiKey, generationPayload(input));
   if (primary.taskId) return primary.taskId;

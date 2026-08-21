@@ -63,7 +63,11 @@ test("uses reference-to-video when an exact private motion clip is available", a
   process.env.SEEVIO_WEBHOOK_SECRET = "a-secure-webhook-secret-for-testing";
   process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
   let capturedBody: { input: { prompt: string; generation_type: string; image_urls: string[]; video_urls?: string[] } } | null = null;
-  globalThis.fetch = async (_input, init) => {
+  globalThis.fetch = async (input, init) => {
+    if (String(input) === "https://signed.example/kickflip.mp4") {
+      assert.equal(new Headers(init?.headers).get("range"), "bytes=0-65535");
+      return new Response(new Uint8Array([0, 0, 0, 24]), { status: 206, headers: { "content-type": "video/mp4", "content-range": "bytes 0-3/4" } });
+    }
     capturedBody = JSON.parse(String(init?.body));
     return new Response(JSON.stringify({ taskId: "seevio-reference-task" }), { status: 200, headers: { "content-type": "application/json" } });
   };
@@ -100,7 +104,10 @@ test("fails closed when Seevio cannot parse a required motion reference", async 
   process.env.SEEVIO_WEBHOOK_SECRET = "a-secure-webhook-secret-for-testing";
   process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
   const generationTypes: string[] = [];
-  globalThis.fetch = async (_input, init) => {
+  globalThis.fetch = async (input, init) => {
+    if (String(input) === "https://gravitygoons.com/kickflip.mp4") {
+      return new Response(new Uint8Array([0, 0, 0, 24]), { status: 206, headers: { "content-type": "video/mp4", "content-range": "bytes 0-3/4" } });
+    }
     const body = JSON.parse(String(init?.body)) as { input: { generation_type: string; video_urls?: string[] } };
     generationTypes.push(body.input.generation_type);
     return new Response(JSON.stringify({ error: { message: "Could not read reference media duration. Ensure the URLs point to publicly accessible media files." } }), { status: 400, headers: { "content-type": "application/json" } });
@@ -114,6 +121,38 @@ test("fails closed when Seevio cannot parse a required motion reference", async 
       }), /Could not read reference media duration/);
     assert.deepEqual(generationTypes, ["reference-to-video"]);
     assert.match(publicSeevioFailureMessage(new Error("Could not read reference media duration.")), /No image-only substitute was generated/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalEnv.apiKey === undefined) delete process.env.SEEVIO_API_KEY; else process.env.SEEVIO_API_KEY = originalEnv.apiKey;
+    if (originalEnv.webhookSecret === undefined) delete process.env.SEEVIO_WEBHOOK_SECRET; else process.env.SEEVIO_WEBHOOK_SECRET = originalEnv.webhookSecret;
+    if (originalEnv.siteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL; else process.env.NEXT_PUBLIC_SITE_URL = originalEnv.siteUrl;
+  }
+});
+
+test("does not contact Seevio when the signed reference fails preflight", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalEnv = {
+    apiKey: process.env.SEEVIO_API_KEY,
+    webhookSecret: process.env.SEEVIO_WEBHOOK_SECRET,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+  };
+  process.env.SEEVIO_API_KEY = "sk_test_gravity_goons";
+  process.env.SEEVIO_WEBHOOK_SECRET = "a-secure-webhook-secret-for-testing";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
+  let requests = 0;
+  globalThis.fetch = async () => {
+    requests += 1;
+    return new Response("not found", { status: 404, headers: { "content-type": "text/plain" } });
+  };
+  try {
+    await assert.rejects(() => submitSeevioJob({
+      prompt: "The Goon performs a kickflip.",
+      imageUrl: "https://gravitygoons.com/goon.png",
+      referenceVideoUrl: "https://signed.example/missing-kickflip.mp4",
+      idempotencyKey: "pair:kickflip:preflight:v1",
+    }), /failed its delivery check/i);
+    assert.equal(requests, 1);
+    assert.match(publicSeevioFailureMessage(new Error("The required motion-reference video failed its delivery check.")), /No image-only substitute was generated/);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalEnv.apiKey === undefined) delete process.env.SEEVIO_API_KEY; else process.env.SEEVIO_API_KEY = originalEnv.apiKey;
