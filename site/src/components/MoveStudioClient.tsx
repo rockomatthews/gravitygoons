@@ -60,6 +60,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
   const [rerollTarget, setRerollTarget] = useState<RerollTarget | null>(null);
   const [rerollNote, setRerollNote] = useState("");
   const [rerollError, setRerollError] = useState("");
+  const [retryingPairId, setRetryingPairId] = useState<string | null>(null);
+  const [retryError, setRetryError] = useState<{ pairId: string; message: string } | null>(null);
 
   const refresh = useCallback(async (preserveStatus = false) => {
     const response = await fetch(`/api/moves/studio/${tokenId}`, { cache: "no-store" });
@@ -180,23 +182,31 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
   }
 
   async function retryGeneration(move: StudioMove) {
-    if (!move.pairId) return;
+    const pairId = move.pairId;
+    if (!pairId) return;
     setBusy(true);
+    setRetryingPairId(pairId);
+    setRetryError(null);
     setActionError("");
     setStatus(`Retrying ${move.name} LAND and FALL generation. No wallet payment is required…`);
     try {
-      const response = await fetch("/api/moves/generation/retry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pairId: move.pairId }) });
+      const response = await fetch("/api/moves/generation/retry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pairId }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       const finalMessage = data.generation?.retryRequired ? data.generation.message : `${move.name} LAND and FALL jobs are queued. No additional USDC was charged.`;
-      if (data.generation?.retryRequired) setActionError(finalMessage);
+      if (data.generation?.retryRequired) {
+        setActionError(finalMessage);
+        setRetryError({ pairId, message: finalMessage });
+      }
       await refresh(true);
       setStatus(finalMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Generation could not be retried yet. Your confirmed payment remains recorded.";
       setStatus(message);
       setActionError(message);
+      setRetryError({ pairId, message });
     } finally {
+      setRetryingPairId(null);
       setBusy(false);
     }
   }
@@ -286,7 +296,8 @@ export function MoveStudioClient({ username, tokenId, fallbackGoon, backHref, ba
                 );
               })}
             </div>
-            <footer><b>{move.quotedPriceUsdc}</b><span>{isMoveGenerationRetryable(move.pairStatus) ? "PAYMENT ALREADY CONFIRMED" : "INCLUDES LAND + FALL"}</span><button onClick={() => { if (!studio) return unlockOwnerStudio(); if (isMoveGenerationRetryable(move.pairStatus)) return retryGeneration(move); setSelectedTrickId(move.trickId); setQuote(null); setActionError(""); document.getElementById("studio-trick-picker-title")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} disabled={busy || !move.unlocked || (Boolean(studio) && !isMovePurchasable(move.pairStatus) && !isMoveGenerationRetryable(move.pairStatus))}>{move.unlocked ? studio ? moveStudioActionLabel(move.pairStatus, selectedPurchasableMove?.trickId === move.trickId) : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
+            <footer><b>{move.quotedPriceUsdc}</b><span>{isMoveGenerationRetryable(move.pairStatus) ? "PAYMENT ALREADY CONFIRMED" : "INCLUDES LAND + FALL"}</span><button onClick={() => { if (!studio) return unlockOwnerStudio(); if (isMoveGenerationRetryable(move.pairStatus)) return retryGeneration(move); setSelectedTrickId(move.trickId); setQuote(null); setActionError(""); document.getElementById("studio-trick-picker-title")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} disabled={busy || !move.unlocked || (Boolean(studio) && !isMovePurchasable(move.pairStatus) && !isMoveGenerationRetryable(move.pairStatus))}>{move.unlocked ? studio ? retryingPairId === move.pairId ? "RETRYING LAND + FALL…" : moveStudioActionLabel(move.pairStatus, selectedPurchasableMove?.trickId === move.trickId) : "SIGN IN TO MAKE MOVIES" : "LOCKED MOVE"}</button></footer>
+            {retryError?.pairId === move.pairId && <p className="studio-action-error" role="alert">{retryError.message}</p>}
           </article>
         ))}
       </section>

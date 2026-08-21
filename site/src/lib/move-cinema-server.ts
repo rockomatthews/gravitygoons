@@ -14,7 +14,7 @@ const TRANSFER_EVENT = parseAbiItem("event Transfer(address indexed from, addres
 type PairRow = { id: string; token_id: number; trick_id: number; status: string; commissioned_by_wallet: string };
 type OrderRow = { id: string; pair_id: string; payer_wallet_address: string; amount_minor_units: number | string; status: string; quote_expires_at: string; payment_tx_hash: string | null };
 type AssetRow = { id: string; pair_id: string; outcome: "land" | "fall"; version: number; status: string; source_image_url: string; prompt: string; provider_job_id: string | null; moderation_status: string; owner_decision: string };
-type JobRow = { id: string; asset_id: string; idempotency_key: string; provider_job_id: string | null; status: string };
+type JobRow = { id: string; asset_id: string; idempotency_key: string; provider_job_id: string | null; status: string; attempt: number };
 
 function absoluteImageUrl(tokenId: number): string {
   const url = goonImageUrl(tokenId);
@@ -187,23 +187,53 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
   }
   let submitted = 0;
   let active = 0;
+  const failures: string[] = [];
   for (const asset of assets) {
-    const idempotencyKey = `${pair.id}:${asset.outcome}:v${asset.version}`;
     const requestPayload = providerRequestPayload(asset.prompt, asset.source_image_url, motionReference?.objectPath);
-    const { data: jobData, error: jobError } = await supabase.from("move_generation_jobs").insert({ asset_id: asset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", request_payload: requestPayload }).select("id,asset_id,idempotency_key,provider_job_id,status").single();
-    if (jobError && jobError.code !== "23505") throw new Error(jobError.message);
-    let job = jobData as JobRow | null;
-    if (!job) {
-      const { data: existingJob, error: existingJobError } = await supabase.from("move_generation_jobs").select("id,asset_id,idempotency_key,provider_job_id,status").eq("idempotency_key", idempotencyKey).single();
-      if (existingJobError) throw new Error(existingJobError.message);
-      job = existingJob as JobRow;
-    }
-    if (job.provider_job_id || ["submitted", "processing", "succeeded"].includes(job.status)) {
+    const { data: latestJobData, error: latestJobError } = await supabase
+      .from("move_generation_jobs")
+      .select("id,asset_id,idempotency_key,provider_job_id,status,attempt")
+      .eq("asset_id", asset.id)
+      .order("attempt", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestJobError) throw new Error(latestJobError.message);
+    let job = latestJobData as JobRow | null;
+
+    if (job && ["submitted", "processing", "succeeded"].includes(job.status)) {
       active += 1;
       continue;
     }
-    if (!["queued", "failed"].includes(job.status) || !seevioConfigured()) continue;
-    const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing", error_message: null }).eq("id", job.id).in("status", ["queued", "failed"]).select("id").maybeSingle();
+
+    const attempt = job && ["failed", "cancelled"].includes(job.status) ? job.attempt + 1 : job?.attempt ?? 1;
+    if (attempt > 10) {
+      failures.push(`${asset.outcome.toUpperCase()} exhausted its generation retry limit.`);
+      continue;
+    }
+    if (!job || ["failed", "cancelled"].includes(job.status)) {
+      const idempotencyKey = `${pair.id}:${asset.outcome}:v${asset.version}:attempt${attempt}`;
+      const { data: insertedJob, error: insertJobError } = await supabase
+        .from("move_generation_jobs")
+        .insert({ asset_id: asset.id, idempotency_key: idempotencyKey, provider: "seevio", status: "queued", attempt, request_payload: requestPayload })
+        .select("id,asset_id,idempotency_key,provider_job_id,status,attempt")
+        .single();
+      if (insertJobError && insertJobError.code !== "23505") throw new Error(insertJobError.message);
+      if (insertedJob) {
+        job = insertedJob as JobRow;
+      } else {
+        const { data: concurrentJob, error: concurrentJobError } = await supabase
+          .from("move_generation_jobs")
+          .select("id,asset_id,idempotency_key,provider_job_id,status,attempt")
+          .eq("idempotency_key", idempotencyKey)
+          .single();
+        if (concurrentJobError) throw new Error(concurrentJobError.message);
+        job = concurrentJob as JobRow;
+      }
+    }
+    if (!job || job.status !== "queued" || !seevioConfigured()) continue;
+
+    const idempotencyKey = job.idempotency_key;
+    const { data: claimedJob } = await supabase.from("move_generation_jobs").update({ status: "processing", error_message: null }).eq("id", job.id).eq("status", "queued").select("id").maybeSingle();
     if (!claimedJob) continue;
     await supabase.from("move_media_assets").update({ status: "queued" }).eq("id", asset.id);
     let providerJobId: string | null;
@@ -214,10 +244,10 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
       await Promise.all([
         supabase.from("move_generation_jobs").update({ status: "failed", error_message: providerMessage }).eq("id", job.id),
         supabase.from("move_media_assets").update({ status: "failed" }).eq("id", asset.id),
-        supabase.from("move_media_pairs").update({ status: "failed" }).eq("id", pair.id),
       ]);
-      console.error("move_generation_submit_failed", { pairId: pair.id, assetId: asset.id, outcome: asset.outcome, provider: "seevio", reason: providerMessage });
-      throw error;
+      console.error("move_generation_submit_failed", { pairId: pair.id, assetId: asset.id, outcome: asset.outcome, attempt: job.attempt, provider: "seevio", reason: providerMessage });
+      failures.push(`${asset.outcome.toUpperCase()}: ${providerMessage}`);
+      continue;
     }
     if (!providerJobId) {
       await supabase.from("move_generation_jobs").update({ status: "queued" }).eq("id", job.id);
@@ -229,6 +259,10 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
     ]);
     submitted += 1;
     active += 1;
+  }
+  if (failures.length > 0) {
+    await supabase.from("move_media_pairs").update({ status: "failed" }).eq("id", pair.id);
+    throw new Error(failures.join(" "));
   }
   await supabase.from("move_media_pairs").update({ status: active ? "generating" : "queued" }).eq("id", pair.id);
   return { submitted, configured: seevioConfigured() };

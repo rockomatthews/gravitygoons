@@ -36,7 +36,8 @@ for (const reference of catalog.references) {
   execFileSync("ffmpeg", [
     "-hide_banner", "-loglevel", "error", "-y",
     "-ss", String(reference.startSeconds), "-t", String(reference.durationSeconds), "-i", sourcePath,
-    "-an", "-vf", "scale=-2:720", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+    "-an", "-vf", "scale=720:1280:flags=lanczos,setsar=1", "-r", "30",
+    "-c:v", "libx264", "-profile:v", "high", "-level:v", "4.0", "-preset", "medium", "-crf", "18",
     "-pix_fmt", "yuv420p", "-movflags", "+faststart", outputPath,
   ]);
   const clipBytes = readFileSync(outputPath);

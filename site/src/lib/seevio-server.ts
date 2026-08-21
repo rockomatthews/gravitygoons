@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
 const API_BASE_URL = "https://api.seevio.ai";
-export const SEEVIO_VIDEO_MODEL = "seedance-2-0";
+export const SEEVIO_VIDEO_MODEL = "seedance-2-5";
 
 function callbackUrl(): string | null {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
@@ -74,7 +74,7 @@ function generationPayload(input: { prompt: string; imageUrl: string; idempotenc
       watermark: false,
       web_search: false,
       return_last_frame: true,
-      seed: deterministicSeed(input.idempotencyKey),
+      ...(SEEVIO_VIDEO_MODEL === "seedance-2-5" ? {} : { seed: deterministicSeed(input.idempotencyKey) }),
     },
   };
 }
