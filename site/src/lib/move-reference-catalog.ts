@@ -9,6 +9,7 @@ export type MoveMotionReference = {
   startSeconds: number;
   durationSeconds: number;
   objectPath: string;
+  publicPath?: string;
   motionNotes?: string;
 };
 

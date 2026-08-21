@@ -7,6 +7,11 @@ const REFERENCE_URL_TTL_SECONDS = 60 * 60;
 export async function signedMoveMotionReference(discipline: string, trickName: string): Promise<{ objectPath: string; signedUrl: string } | null> {
   const reference = moveMotionReferenceFor(discipline, trickName);
   if (!reference) return null;
+  if (reference.publicPath) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+    if (!siteUrl?.startsWith("https://")) throw new Error("The required motion-reference service is not configured.");
+    return { objectPath: reference.objectPath, signedUrl: `${siteUrl}${reference.publicPath}` };
+  }
   const supabase = getSupabaseAdmin();
   if (!supabase) throw new Error("The required motion-reference service is not configured.");
 
