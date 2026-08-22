@@ -10,7 +10,7 @@
     "test:profile": "node --test --experimental-strip-types src/lib/profile-session.test.ts src/lib/profile-routing.test.ts src/lib/collection-pagination.test.ts",
     "test:academia": "node --test --experimental-strip-types src/lib/academia/quiz.test.ts",
     "test:wallet-links": "node --test --experimental-strip-types src/lib/wallet-links.test.ts",
-    "test:move-provider": "node --test --experimental-strip-types src/lib/seevio-server.test.ts src/lib/move-studio-ui.test.ts src/lib/move-prompts.test.ts src/lib/move-reference-catalog.test.ts src/lib/move-reference-access.test.ts",
+    "test:move-provider": "node --test --experimental-strip-types src/lib/seevio-server.test.ts src/lib/move-studio-ui.test.ts src/lib/move-prompts.test.ts src/lib/move-reference-catalog.test.ts src/lib/move-reference-access.test.ts src/lib/move-reference-storage.test.ts",
     "test": "npm run test:game && npm run test:limitless && npm run test:profile && npm run test:academia && npm run test:wallet-links && npm run test:move-provider",
     "analyze:game-balance": "node --experimental-strip-types scripts/simulate-pvp-balance.mjs ../reports/pvp-balance-v04.json",
     "marketing:link": "node scripts/marketing-link.mjs",
