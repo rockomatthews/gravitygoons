@@ -2,6 +2,14 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 const API_BASE_URL = "https://api.seevio.ai";
 export const SEEVIO_VIDEO_MODEL = "seedance-2-5";
+export const SEEVIO_REFERENCE_VIDEO_MODEL = "seedance-2-0";
+
+export function seevioModelFor(hasReferenceVideo: boolean): string {
+  // Seevio currently rejects otherwise-valid signed MP4 references on 2.5 with
+  // "Could not read reference media duration". The same endpoint, URL
+  // transport, and reference-to-video payload are proven in production on 2.0.
+  return hasReferenceVideo ? SEEVIO_REFERENCE_VIDEO_MODEL : SEEVIO_VIDEO_MODEL;
+}
 
 function callbackUrl(): string | null {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
@@ -57,8 +65,9 @@ async function preflightVideoReference(url: string): Promise<void> {
 
 function generationPayload(input: { prompt: string; imageUrl: string; idempotencyKey: string; referenceVideoUrl?: string | null }) {
   const useVideoReference = Boolean(input.referenceVideoUrl);
+  const model = seevioModelFor(useVideoReference);
   return {
-    model: SEEVIO_VIDEO_MODEL,
+    model,
     callback_url: callbackUrl(),
     input: {
       prompt: useVideoReference
@@ -74,7 +83,7 @@ function generationPayload(input: { prompt: string; imageUrl: string; idempotenc
       watermark: false,
       web_search: false,
       return_last_frame: true,
-      ...(SEEVIO_VIDEO_MODEL === "seedance-2-5" ? {} : { seed: deterministicSeed(input.idempotencyKey) }),
+      ...(model === "seedance-2-5" ? {} : { seed: deterministicSeed(input.idempotencyKey) }),
     },
   };
 }

@@ -63,7 +63,7 @@ test("uses reference-to-video when an exact private motion clip is available", a
   process.env.SEEVIO_API_KEY = "sk_test_gravity_goons";
   process.env.SEEVIO_WEBHOOK_SECRET = "a-secure-webhook-secret-for-testing";
   process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
-  let capturedBody: { input: { prompt: string; generation_type: string; image_urls: string[]; video_urls?: string[] } } | null = null;
+  let capturedBody: { model: string; input: { prompt: string; generation_type: string; image_urls: string[]; video_urls?: string[]; seed?: number } } | null = null;
   globalThis.fetch = async (input, init) => {
     if (String(input) === "https://signed.example/kickflip.mp4") {
       assert.equal(new Headers(init?.headers).get("range"), "bytes=0-65535");
@@ -80,8 +80,10 @@ test("uses reference-to-video when an exact private motion clip is available", a
       idempotencyKey: "pair:kickflip:land:v1",
     });
     assert.equal(taskId, "seevio-reference-task");
+    assert.equal(capturedBody?.model, "seedance-2-0");
     assert.equal(capturedBody?.input.generation_type, "reference-to-video");
     assert.deepEqual(capturedBody?.input.video_urls, ["https://signed.example/kickflip.mp4"]);
+    assert.equal(typeof capturedBody?.input.seed, "number");
     assert.match(capturedBody?.input.prompt ?? "", /MOTION FIDELITY IS THE HIGHEST PRIORITY/);
     assert.match(capturedBody?.input.prompt ?? "", /rotation axes/);
     assert.match(capturedBody?.input.prompt ?? "", /Do not improvise, combine, or add another rotation/);

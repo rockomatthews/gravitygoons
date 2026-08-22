@@ -3,7 +3,7 @@ import { collectionAddress, publicClient, ZERO_ADDRESS } from "@/lib/contracts";
 import { goonImageUrl } from "@/lib/goon-images";
 import { formatUsdc, getProfileForWallet, tokenDisciplineIndex, tokenMove, verifyTokenOwnership } from "@/lib/profile-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { publicSeevioFailureMessage, SEEVIO_VIDEO_MODEL, seevioConfigured, submitSeevioJob } from "@/lib/seevio-server";
+import { publicSeevioFailureMessage, seevioConfigured, seevioModelFor, submitSeevioJob } from "@/lib/seevio-server";
 import { movePromptFor, moveRerollPromptFor } from "@/lib/move-prompts";
 import { signedMoveMotionReference } from "@/lib/move-reference-server";
 
@@ -38,7 +38,7 @@ async function generationReferenceFor(tokenId: number, trickId: number) {
 
 function providerRequestPayload(prompt: string, imageUrl: string, referenceObjectPath?: string) {
   return {
-    model: SEEVIO_VIDEO_MODEL,
+    model: seevioModelFor(Boolean(referenceObjectPath)),
     generation_type: referenceObjectPath ? "reference-to-video" : "image-to-video",
     prompt,
     image_urls: [imageUrl],
