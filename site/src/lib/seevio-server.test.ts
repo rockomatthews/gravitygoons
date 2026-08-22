@@ -86,6 +86,8 @@ test("uses reference-to-video when an exact private motion clip is available", a
     assert.equal(typeof capturedBody?.input.seed, "number");
     assert.match(capturedBody?.input.prompt ?? "", /VIDEO EDITING TASK/);
     assert.match(capturedBody?.input.prompt ?? "", /Replace only the human skater in Video 1/);
+    assert.match(capturedBody?.input.prompt ?? "", /animate continuously/);
+    assert.match(capturedBody?.input.prompt ?? "", /Never paste, pin, or freeze a static Goon image/);
     assert.match(capturedBody?.input.prompt ?? "", /frame-by-frame body timing/);
     assert.match(capturedBody?.input.prompt ?? "", /absolutely no yaw, no shove-it, no horizontal spin, and no varial flip/);
     assert.match(capturedBody?.input.prompt ?? "", /Do not regenerate or reinterpret the trick/);

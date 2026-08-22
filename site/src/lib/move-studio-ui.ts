@@ -59,6 +59,8 @@ export function isMoveGenerationRetryable(status: MovePairStatus): boolean {
 
 export function moveStudioActionLabel(status: MovePairStatus, selected: boolean): string {
   if (isMoveGenerationRetryable(status)) return "RETRY GENERATION — NO CHARGE";
+  if (status === "approved" || status === "unpublished") return "MOVIES COMPLETE";
+  if (status === "owner_review") return "REVIEW MOVIES ABOVE";
   if (!isMovePurchasable(status)) return "WORKFLOW IN PROGRESS";
   if (status === "rejected") return "SELECT THIS TRICK";
   if (status === "quoted") return "REVIEW / PAY";

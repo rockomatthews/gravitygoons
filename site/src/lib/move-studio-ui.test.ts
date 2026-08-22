@@ -21,6 +21,12 @@ test("a rejected movie returns the trick to the normal purchase flow", () => {
   assert.equal(moveStudioActionLabel("rejected", true), "SELECT THIS TRICK");
 });
 
+test("completed movies are never labeled as still in progress", () => {
+  assert.equal(moveStudioActionLabel("approved", false), "MOVIES COMPLETE");
+  assert.equal(moveStudioActionLabel("unpublished", false), "MOVIES COMPLETE");
+  assert.equal(moveStudioActionLabel("owner_review", false), "REVIEW MOVIES ABOVE");
+});
+
 test("wallet rejection never exposes raw RPC request details", () => {
   const raw = new Error("User rejected the request. Request Arguments: data: 0xa9059cbb000000000000000000");
   const message = friendlyWalletPaymentError(raw);

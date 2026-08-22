@@ -24,15 +24,15 @@ test("kickflip and heelflip use the supplied dedicated slow-motion clips", () =>
   assert.equal(kickflip?.sourceFile, "kickflip.mov");
   assert.equal(kickflip?.sourceSha256, "bd423d17d100249e4207e1702e55d7c28e60e0136e61c38ef9b22070264baee8");
   assert.match(kickflip?.motionNotes ?? "", /heel-side nose corner/);
-  assert.equal(heelflip?.objectPath, "skateboarding/heelflip-v3.mp4");
-  assert.equal(heelflip?.publicPath, "/move-references/heelflip-v3.mp4");
+  assert.equal(heelflip?.objectPath, "skateboarding/heelflip-v4.mp4");
+  assert.equal(heelflip?.publicPath, "/move-references/heelflip-v4.mp4");
   assert.equal(heelflip?.sourceFile, "healfip.mp4");
   assert.equal(heelflip?.sourceSha256, "337a550abb36f470558f0a8ee9d25bc844b4def0e0fa123bb4e1c303c17cbcc9");
   assert.match(heelflip?.motionNotes ?? "", /toe-side nose corner/);
 
   const expectedPublicAssets = new Map([
     [kickflip?.publicPath, "db4003e14baefb6f04a6e6e6654161d8af5ba123b9df0a26a21472c988ffebca"],
-    [heelflip?.publicPath, "b3bebed0c93d5532511aa8f1dfbbe97e771fb5a2a9f2475825f2e9ca6ee59c31"],
+    [heelflip?.publicPath, "8e4b1e9ea55dfc77f90502d34e9ef75db2842c309bbb1da5963c488426827038"],
   ]);
   for (const [publicPath, expectedSha256] of expectedPublicAssets) {
     assert.ok(publicPath);
