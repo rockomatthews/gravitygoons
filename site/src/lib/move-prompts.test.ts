@@ -65,10 +65,25 @@ test("prompts include a fixed camera and explicit five-second phases", () => {
 });
 
 test("fall prompts require the exact trick before the miss", () => {
-  const prompt = movePromptFor({ token: { species: "Snow Leopard", sport_equipment: "Skateboard" }, discipline: "Skateboarding", trickName: "Heelflip", outcome: "fall" });
+  const prompt = movePromptFor({ token: { species: "Snow Leopard", sport_equipment: "Skateboard" }, discipline: "Skateboarding", trickName: "Heelflip", outcome: "fall", fallVariation: 1 });
   assert.match(prompt, /Perform the complete defining trick correctly through 3\.6 seconds/);
   assert.match(prompt, /Only during the catch or touchdown/);
-  assert.match(prompt, /do not ride away as though the trick was landed/);
+  assert.match(prompt, /MUST visibly fall/);
+  assert.match(prompt, /invalid if the Goon lands on their feet, rides away, or merely wobbles/);
+  assert.match(prompt, /Exactly one shoe pops off/);
+  assert.match(prompt, /harmless, non-graphic/);
+});
+
+test("fall versions select different discipline-safe comic mishaps", () => {
+  const base = { token: { species: "Snow Leopard", sport_equipment: "Skateboard" }, discipline: "Skateboarding", trickName: "Kickflip", outcome: "fall" as const };
+  const first = movePromptFor({ ...base, fallVariation: 0 });
+  const second = movePromptFor({ ...base, fallVariation: 1 });
+  assert.notEqual(first, second);
+  assert.match(first, /board shoots forward/);
+  assert.match(second, /one shoe pops off/i);
+
+  const snow = movePromptFor({ token: { species: "Bear", sport_equipment: "Snowboard" }, discipline: "Snowboarding", trickName: "Ollie", outcome: "fall", fallVariation: 0 });
+  assert.match(snow, /Both boots stay locked in the bindings/);
 });
 
 test("reroll corrections override the prior creative interpretation", () => {

@@ -137,8 +137,50 @@ const TRICK_DISAMBIGUATION: Record<string, string> = {
   "Skiing:Bio 1260": "Use a forward low-axis spin without the skis passing over the head; reject a fully inverted misty or backward cork.",
 };
 
-export function movePromptFor(input: { token: PromptToken; discipline: string; trickName: string; outcome: "land" | "fall" }): string {
-  const { token, discipline, trickName, outcome } = input;
+const COMEDIC_FALL_BEATS: Record<string, string[]> = {
+  Skateboarding: [
+    "The board shoots forward on touchdown; the rider windmills both arms, lands seated, and watches the board roll a few feet away.",
+    "Exactly one shoe pops off only after the completed flip; the shoe tumbles harmlessly aside while the rider misses the catch and slides gently on their backside.",
+    "The rider catches the board briefly, overbalances, takes two exaggerated running steps, then makes a harmless shoulder roll as the board rolls away.",
+    "One foot misses the bolts, the rider pinwheels both arms with a surprised expression, and drops into a short seated slide while the board squirts sideways.",
+    "The rider lands momentarily, the attached tail swings comically for balance, and the rider tips safely into the grass while the skateboard stops nearby.",
+  ],
+  Snowboarding: [
+    "Both boots stay locked in the bindings as the rider catches an edge, spins gently onto their backside, and sends up a comic puff of snow.",
+    "The rider touches down off-balance, windmills both arms, and softly sits into the snow while the attached snowboard stays crosswise downhill.",
+    "The board lands base-down but the rider folds into an exaggerated harmless somersault in soft powder with both boots still bound.",
+  ],
+  Surfing: [
+    "The rider reconnects with the board, immediately overbalances with flailing arms, and splashes beside it while the board bobs nearby.",
+    "The landing catches a rail, producing a harmless comic spray as the rider slides into the water and resurfaces beside the same board.",
+    "The rider briefly touches down, loses footing, and performs an exaggerated seated splash while the board shoots gently ahead.",
+  ],
+  BMX: [
+    "Both hands and feet stay with the BMX through the trick; on touchdown the rear wheel skips, the rider steps off awkwardly, and bike and rider tip harmlessly onto the grass.",
+    "The rider lands crooked, windmills one arm after releasing a grip, and makes a harmless running exit while the BMX settles onto its side.",
+    "The wheels touch down, the rider overbalances into a slow comic topple, and the intact BMX slides a short distance beside them.",
+  ],
+  Motocross: [
+    "The motorcycle completes the trick and touches down, then the rider harmlessly tips into a soft foam pit while the intact bike settles separately nearby.",
+    "The landing is slightly sideways; the rider makes an exaggerated safe step-off into soft dirt while the intact motorcycle gently falls onto its side.",
+    "Both wheels touch down before the rider loses balance and slides harmlessly into a padded berm, separated safely from the intact motorcycle.",
+  ],
+  Skiing: [
+    "Both boots remain bound to their skis as the rider catches an edge, crosses the ski tips, and tumbles harmlessly into a comic cloud of powder.",
+    "The rider touches down, windmills both poles and arms, then sits abruptly into soft snow with both skis still attached.",
+    "The skis land parallel for an instant before the rider overbalances into a gentle shoulder roll in powder, keeping both skis and bindings intact.",
+  ],
+};
+
+function comedicFallBeat(discipline: string, variation: number): string {
+  const beats = COMEDIC_FALL_BEATS[discipline];
+  if (!beats?.length) return "The rider visibly misses the landing and makes a harmless, unmistakable, semi-comical tumble away from the equipment.";
+  const index = ((Math.trunc(variation) % beats.length) + beats.length) % beats.length;
+  return beats[index];
+}
+
+export function movePromptFor(input: { token: PromptToken; discipline: string; trickName: string; outcome: "land" | "fall"; fallVariation?: number }): string {
+  const { token, discipline, trickName, outcome, fallVariation = 0 } = input;
   const mechanics = TRICK_MECHANICS[`${discipline}:${trickName}`];
   if (!mechanics) throw new Error(`Missing exact motion guide for ${discipline}: ${trickName}.`);
   const physics = DISCIPLINE_PHYSICS[discipline];
@@ -146,7 +188,7 @@ export function movePromptFor(input: { token: PromptToken; discipline: string; t
   const disambiguation = TRICK_DISAMBIGUATION[`${discipline}:${trickName}`] ?? "Do not substitute a different trick or add an unrequested flip, spin, grab, or body rotation.";
   const result = outcome === "land"
     ? "From 3.6–5.0 seconds, finish the required catch or reconnection, land cleanly with knees absorbing impact, and visibly ride away under control."
-    : "Perform the complete defining trick correctly through 3.6 seconds. Only during the catch or touchdown, visibly miss the catch or lose the landing, separate safely from the equipment, and do not ride away as though the trick was landed.";
+    : `Perform the complete defining trick correctly through 3.6 seconds. Only during the catch or touchdown, visibly miss the catch or lose the landing. The Goon MUST visibly fall; the result is invalid if the Goon lands on their feet, rides away, or merely wobbles. SEMI-COMICAL BAIL: ${comedicFallBeat(discipline, fallVariation)} Keep the fall harmless, non-graphic, and readable in the wide shot.`;
   return `Use Image 1 as the exact character, equipment, clothing, markings, stance, and opening-frame reference. Create one continuous five-second square action-sports shot with no cuts, no slow motion, and no camera orbit. Keep a steady wide three-quarter side view so the full rider and all equipment remain visible at the same time. SUBJECT: the same ${token.species} ${discipline} rider performs exactly one ${trickName} on the same ${token.sport_equipment}. TIMELINE: 0.0–0.8 seconds, show a natural discipline-correct approach and compress for takeoff. 0.8–3.6 seconds, show this exact motion in normal speed: ${mechanics} DISTINGUISH IT: ${disambiguation} EQUIPMENT PHYSICS: ${physics} OUTCOME: ${result} Preserve the character's face, anatomy, body proportions, clothing, fictional sponsor marks, and attached tail. No extra limbs, duplicate or disappearing equipment, floating parts, real trademarks, mutated text, camera cuts, or ambiguous outcome.`;
 }
 

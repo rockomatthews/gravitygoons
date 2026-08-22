@@ -23,11 +23,12 @@ function absoluteImageUrl(tokenId: number): string {
   return siteUrl ? `${siteUrl}${url}` : url;
 }
 
-function promptFor(tokenId: number, trickId: number, outcome: "land" | "fall"): string {
+function promptFor(tokenId: number, trickId: number, outcome: "land" | "fall", version = 1): string {
   const result = tokenMove(tokenId, trickId);
   if (!result.trick) throw new Error("Move not found in this discipline catalog.");
   const token = result.token;
-  return movePromptFor({ token, discipline: result.discipline, trickName: result.trick.name, outcome });
+  const fallVariation = tokenId * 31 + trickId * 7 + version;
+  return movePromptFor({ token, discipline: result.discipline, trickName: result.trick.name, outcome, fallVariation });
 }
 
 async function generationReferenceFor(tokenId: number, trickId: number) {
@@ -174,7 +175,7 @@ async function enqueuePair(pair: PairRow): Promise<{ submitted: number; configur
   const motionReference = await generationReferenceFor(pair.token_id, pair.trick_id);
   const assets: AssetRow[] = [];
   for (const outcome of ["land", "fall"] as const) {
-    const prompt = promptFor(pair.token_id, pair.trick_id, outcome);
+    const prompt = promptFor(pair.token_id, pair.trick_id, outcome, 1);
     const { data, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome, version: 1, status: "queued", source_image_url: sourceImageUrl, prompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();
     if (error && error.code !== "23505") throw new Error(error.message);
     if (data) {
@@ -334,7 +335,7 @@ export async function reviewMoveAsset(walletAddress: string, assetId: string, de
   if (decision === "reroll") {
     if (asset.version > includedRerollsPerOutcome()) throw new Error("This movie pair has used its included reroll for this outcome. Reject this draft or purchase an additional reroll when paid rerolls launch.");
     const nextVersion = asset.version + 1;
-    const correctedBasePrompt = promptFor(pair.token_id, pair.trick_id, asset.outcome);
+    const correctedBasePrompt = promptFor(pair.token_id, pair.trick_id, asset.outcome, nextVersion);
     const rerollPrompt = moveRerollPromptFor(correctedBasePrompt, note);
     const { data: nextData, error } = await supabase.from("move_media_assets").insert({ pair_id: pair.id, outcome: asset.outcome, version: nextVersion, status: "queued", source_image_url: asset.source_image_url, prompt: rerollPrompt }).select("id,pair_id,outcome,version,status,source_image_url,prompt,provider_job_id,moderation_status,owner_decision").single();
     if (error && error.code !== "23505") throw new Error(error.message);
