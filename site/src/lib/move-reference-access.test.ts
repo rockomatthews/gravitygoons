@@ -9,12 +9,12 @@ test("creates an expiring capability URL only for cataloged references", () => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://gravitygoons.com";
   try {
     const now = 1_800_000_000_000;
-    const objectPath = "skateboarding/kickflip-v3.mp4";
+    const objectPath = "skateboarding/kickflip-v4.mp4";
     const url = createMoveReferenceAccessUrl(objectPath, now);
     assert.ok(url);
     const parsed = new URL(url);
     const [, , , , token, slug] = parsed.pathname.split("/");
-    assert.equal(slug, "kickflip-v3.mp4");
+    assert.equal(slug, "kickflip-v4.mp4");
     assert.equal(verifyMoveReferenceAccess(token, slug, now), objectPath);
     assert.equal(verifyMoveReferenceAccess(`${token}x`, slug, now), null);
     assert.equal(verifyMoveReferenceAccess(token, slug, now + 60 * 60 * 1000 + 1_000), null);

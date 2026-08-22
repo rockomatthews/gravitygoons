@@ -12,15 +12,15 @@ test("the supplied labeled video covers the exact overlapping skateboard tricks"
     assert.ok(reference);
     assert.ok(/^\d{3} /.test(reference.sourceLabel) || reference.sourceLabel.startsWith("User slow-motion "));
     assert.ok(reference.durationSeconds > 0 && reference.durationSeconds <= 5);
-    assert.match(reference.objectPath, /^skateboarding\/[a-z0-9-]+-v[1-3]\.mp4$/);
+    assert.match(reference.objectPath, /^skateboarding\/[a-z0-9-]+-v[1-4]\.mp4$/);
   }
 });
 
 test("kickflip and heelflip use the supplied dedicated slow-motion clips", () => {
   const kickflip = moveMotionReferenceFor("Skateboarding", "Kickflip");
   const heelflip = moveMotionReferenceFor("Skateboarding", "Heelflip");
-  assert.equal(kickflip?.objectPath, "skateboarding/kickflip-v3.mp4");
-  assert.equal(kickflip?.publicPath, "/move-references/kickflip-v3.mp4");
+  assert.equal(kickflip?.objectPath, "skateboarding/kickflip-v4.mp4");
+  assert.equal(kickflip?.publicPath, "/move-references/kickflip-v4.mp4");
   assert.equal(kickflip?.sourceFile, "kickflip.mp4");
   assert.equal(kickflip?.sourceSha256, "3bac348d29c5a6689c16cce551eae0c99ddfe6eaf67c726051d4e8dd3c74fb83");
   assert.match(kickflip?.motionNotes ?? "", /heel-side nose corner/);
@@ -31,7 +31,7 @@ test("kickflip and heelflip use the supplied dedicated slow-motion clips", () =>
   assert.match(heelflip?.motionNotes ?? "", /toe-side nose corner/);
 
   const expectedPublicAssets = new Map([
-    [kickflip?.publicPath, "18db257645e6b09f6efde25a52a08004beb5ae4c885e09045ef245eb1479d9e6"],
+    [kickflip?.publicPath, "d91ff25cee2a851049ce4da3c8ab689e8671ae417889b78893da7e2e866d67a9"],
     [heelflip?.publicPath, "b3bebed0c93d5532511aa8f1dfbbe97e771fb5a2a9f2475825f2e9ca6ee59c31"],
   ]);
   for (const [publicPath, expectedSha256] of expectedPublicAssets) {
