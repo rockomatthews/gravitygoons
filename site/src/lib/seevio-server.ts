@@ -71,7 +71,7 @@ function generationPayload(input: { prompt: string; imageUrl: string; idempotenc
     callback_url: callbackUrl(),
     input: {
       prompt: useVideoReference
-        ? `MOTION FIDELITY IS THE HIGHEST PRIORITY. Copy the exact trick mechanics, body timing, board path, rotation axes, catch, and landing from Video 1. Do not improvise, combine, or add another rotation. Use Image 1 as the exact Goon identity and opening appearance. Do not copy the human skater, clothing, location, camera crop, captions, or text from Video 1. ${input.prompt}`
+        ? `VIDEO EDITING TASK — VIDEO 1 IS THE SOURCE FOOTAGE, NOT LOOSE INSPIRATION. Replace only the human skater in Video 1 with the exact Goon from Image 1. Preserve Video 1's frame-by-frame body timing, foot path, skateboard trajectory, skateboard orientation, rotation axis, camera, crop, and background. The skateboard must make the same single nose-to-tail-axis roll shown in Video 1. Its nose must keep pointing in the same travel direction in every corresponding frame: absolutely no yaw, no shove-it, no horizontal spin, and no varial flip. Do not regenerate or reinterpret the trick. For a LAND outcome, preserve Video 1 through the landing. For a FALL outcome, preserve the source motion through the completed one-axis roll and alter only the final catch or touchdown. Any later camera or timeline wording is subordinate to this source-footage edit instruction. Preserve the Goon's face, anatomy, clothing, markings, and equipment design from Image 1 while keeping the source motion unchanged. ${input.prompt}`
         : input.prompt,
       generation_type: useVideoReference ? "reference-to-video" : "image-to-video",
       image_urls: [input.imageUrl],

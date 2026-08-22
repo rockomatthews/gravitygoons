@@ -12,17 +12,17 @@ test("the supplied labeled video covers the exact overlapping skateboard tricks"
     assert.ok(reference);
     assert.ok(/^\d{3} /.test(reference.sourceLabel) || reference.sourceLabel.startsWith("User slow-motion "));
     assert.ok(reference.durationSeconds > 0 && reference.durationSeconds <= 5);
-    assert.match(reference.objectPath, /^skateboarding\/[a-z0-9-]+-v[1-4]\.mp4$/);
+    assert.match(reference.objectPath, /^skateboarding\/[a-z0-9-]+-v[1-5]\.mp4$/);
   }
 });
 
 test("kickflip and heelflip use the supplied dedicated slow-motion clips", () => {
   const kickflip = moveMotionReferenceFor("Skateboarding", "Kickflip");
   const heelflip = moveMotionReferenceFor("Skateboarding", "Heelflip");
-  assert.equal(kickflip?.objectPath, "skateboarding/kickflip-v4.mp4");
-  assert.equal(kickflip?.publicPath, "/move-references/kickflip-v4.mp4");
-  assert.equal(kickflip?.sourceFile, "kickflip.mp4");
-  assert.equal(kickflip?.sourceSha256, "3bac348d29c5a6689c16cce551eae0c99ddfe6eaf67c726051d4e8dd3c74fb83");
+  assert.equal(kickflip?.objectPath, "skateboarding/kickflip-v5.mp4");
+  assert.equal(kickflip?.publicPath, "/move-references/kickflip-v5.mp4");
+  assert.equal(kickflip?.sourceFile, "kickflip.mov");
+  assert.equal(kickflip?.sourceSha256, "bd423d17d100249e4207e1702e55d7c28e60e0136e61c38ef9b22070264baee8");
   assert.match(kickflip?.motionNotes ?? "", /heel-side nose corner/);
   assert.equal(heelflip?.objectPath, "skateboarding/heelflip-v3.mp4");
   assert.equal(heelflip?.publicPath, "/move-references/heelflip-v3.mp4");
@@ -31,7 +31,7 @@ test("kickflip and heelflip use the supplied dedicated slow-motion clips", () =>
   assert.match(heelflip?.motionNotes ?? "", /toe-side nose corner/);
 
   const expectedPublicAssets = new Map([
-    [kickflip?.publicPath, "d91ff25cee2a851049ce4da3c8ab689e8671ae417889b78893da7e2e866d67a9"],
+    [kickflip?.publicPath, "db4003e14baefb6f04a6e6e6654161d8af5ba123b9df0a26a21472c988ffebca"],
     [heelflip?.publicPath, "b3bebed0c93d5532511aa8f1dfbbe97e771fb5a2a9f2475825f2e9ca6ee59c31"],
   ]);
   for (const [publicPath, expectedSha256] of expectedPublicAssets) {

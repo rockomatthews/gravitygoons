@@ -84,10 +84,12 @@ test("uses reference-to-video when an exact private motion clip is available", a
     assert.equal(capturedBody?.input.generation_type, "reference-to-video");
     assert.deepEqual(capturedBody?.input.video_urls, ["https://signed.example/kickflip.mp4"]);
     assert.equal(typeof capturedBody?.input.seed, "number");
-    assert.match(capturedBody?.input.prompt ?? "", /MOTION FIDELITY IS THE HIGHEST PRIORITY/);
-    assert.match(capturedBody?.input.prompt ?? "", /rotation axes/);
-    assert.match(capturedBody?.input.prompt ?? "", /Do not improvise, combine, or add another rotation/);
-    assert.match(capturedBody?.input.prompt ?? "", /Do not copy the human skater/);
+    assert.match(capturedBody?.input.prompt ?? "", /VIDEO EDITING TASK/);
+    assert.match(capturedBody?.input.prompt ?? "", /Replace only the human skater in Video 1/);
+    assert.match(capturedBody?.input.prompt ?? "", /frame-by-frame body timing/);
+    assert.match(capturedBody?.input.prompt ?? "", /absolutely no yaw, no shove-it, no horizontal spin, and no varial flip/);
+    assert.match(capturedBody?.input.prompt ?? "", /Do not regenerate or reinterpret the trick/);
+    assert.match(capturedBody?.input.prompt ?? "", /alter only the final catch or touchdown/);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalEnv.apiKey === undefined) delete process.env.SEEVIO_API_KEY; else process.env.SEEVIO_API_KEY = originalEnv.apiKey;
